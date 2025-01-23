@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(uuid())
-  email    String?   @unique
-  name     String?
-  chats    Chat[]
-  messages Message[]
+  id        String     @id @default(uuid())
+  email     String?    @unique
+  name      String?
+  chats     Chat[]
+  messages  Message[]
+  contracts Contract[] // New relation to track user's contracts
 }
 
 model Chat {
@@ -33,6 +34,16 @@ model Message {
   userId   String
   Chat     Chat    @relation(fields: [chatId], references: [id])
   User     User    @relation(fields: [userId], references: [id])
+}
+
+model Contract {
+  id           String   @id @default(uuid())
+  name         String
+  contractCode Json     // Stores the contract source code or ABI
+  metadata     Json?    // Optional metadata for the contract
+  deployedAt   DateTime // Timestamp for when the contract was deployed
+  userId       String
+  User         User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {

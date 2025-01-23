@@ -7,7 +7,9 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import chalk from "chalk";
 import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client"; // Import Prisma Client
 
+const prisma = new PrismaClient(); // Initialize Prisma Client
 const execAsync = promisify(exec);
 
 interface CompilationResult {
@@ -167,107 +169,118 @@ async function validateEnvironment(): Promise<{
 }
 
 export async function POST(req: NextRequest) {
-    try {
-      // Validate environment configuration
-      const envValidation = await validateEnvironment();
-      if (!envValidation.valid) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Environment configuration error',
-            details: envValidation.error,
-          },
-          { status: 500 }
-        );
-      }
-  
-      console.log('Starting contract compilation...');
-      const compilation = await compileCairo();
-      if (!compilation.success) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Compilation failed',
-            details: compilation.error,
-          },
-          { status: 500 }
-        );
-      }
-  
-      const { contractName = 'lib' } = await req.json();
-  
-      const isValid = await validateCompilation(contractName);
-      if (!isValid) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: `Contract ${contractName} not found in compilation output`,
-            details: `Available contracts: ${compilation.contracts.join(', ')}`,
-          },
-          { status: 400 }
-        );
-      }
-  
-      console.log('Initializing Starknet provider...');
-      const provider = new RpcProvider({
-        nodeUrl: process.env.STARKNET_RPC_URL,
-      });
-  
-      const account = new Account(
-        provider,
-        process.env.ACCOUNT_ADDRESS!,
-        process.env.OZ_ACCOUNT_PRIVATE_KEY!
-      );
-  
-      console.log('Reading compiled contract code...');
-      const { sierraCode, casmCode } = await getCompiledCode(contractName);
-  
-      console.log('Declaring contract...');
-      const declareResponse = await account.declare({
-        contract: sierraCode,
-        casm: casmCode,
-      });
-  
-      console.log('Waiting for declaration transaction...');
-      await provider.waitForTransaction(declareResponse.transaction_hash);
-  
-      console.log('Deploying contract...');
-      const deployResponse = await account.deployContract({
-        classHash: declareResponse.class_hash,
-      });
-  
-      console.log('Waiting for deployment transaction...');
-      await provider.waitForTransaction(deployResponse.transaction_hash);
-  
-      const { abi } = await provider.getClassByHash(declareResponse.class_hash);
-      if (!abi) {
-        throw new Error('No ABI found for deployed contract');
-      }
-  
-      const contract = new Contract(
-        abi,
-        deployResponse.contract_address,
-        provider
-      );
-  
-      console.log('Contract deployment successful!');
-  
-      return NextResponse.json({
-        success: true,
-        contractAddress: contract.address,
-        classHash: declareResponse.class_hash,
-        transactionHash: deployResponse.transaction_hash,
-      });
-    } catch (error) {
-      console.error('Contract deployment error:', error);
+  try {
+    // Validate environment configuration
+    const envValidation = await validateEnvironment();
+    if (!envValidation.valid) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Contract deployment failed',
-          details: error instanceof Error ? error.message : 'Unknown error',
+          error: "Environment configuration error",
+          details: envValidation.error,
         },
         { status: 500 }
       );
     }
+
+    console.log("Starting contract compilation...");
+    const compilation = await compileCairo();
+    if (!compilation.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Compilation failed",
+          details: compilation.error,
+        },
+        { status: 500 }
+      );
+    }
+
+    const { contractName = "lib", userId } = await req.json(); // Get `userId` from the request
+
+    const isValid = await validateCompilation(contractName);
+    if (!isValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Contract ${contractName} not found in compilation output`,
+          details: `Available contracts: ${compilation.contracts.join(", ")}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    console.log("Initializing Starknet provider...");
+    const provider = new RpcProvider({
+      nodeUrl: process.env.STARKNET_RPC_URL,
+    });
+
+    const account = new Account(
+      provider,
+      process.env.ACCOUNT_ADDRESS!,
+      process.env.OZ_ACCOUNT_PRIVATE_KEY!
+    );
+
+    console.log("Reading compiled contract code...");
+    const { sierraCode, casmCode } = await getCompiledCode(contractName);
+
+    console.log("Declaring contract...");
+    const declareResponse = await account.declare({
+      contract: sierraCode,
+      casm: casmCode,
+    });
+
+    console.log("Waiting for declaration transaction...");
+    await provider.waitForTransaction(declareResponse.transaction_hash);
+
+    console.log("Deploying contract...");
+    const deployResponse = await account.deployContract({
+      classHash: declareResponse.class_hash,
+    });
+
+    console.log("Waiting for deployment transaction...");
+    await provider.waitForTransaction(deployResponse.transaction_hash);
+
+    const { abi } = await provider.getClassByHash(declareResponse.class_hash);
+    if (!abi) {
+      throw new Error("No ABI found for deployed contract");
+    }
+
+    const contract = new Contract(
+      abi,
+      deployResponse.contract_address,
+      provider
+    );
+
+    console.log("Saving contract details to database...");
+    // Save contract details in the database
+    await prisma.contract.create({
+      data: {
+        name: contractName,
+        contractCode: { sierraCode, casmCode },
+        metadata: { abi },
+        deployedAt: new Date(),
+        userId,
+      },
+    });
+
+    console.log("Contract deployment successful!");
+
+    return NextResponse.json({
+      success: true,
+      contractAddress: contract.address,
+      classHash: declareResponse.class_hash,
+      transactionHash: deployResponse.transaction_hash,
+    });
+  } catch (error) {
+    console.error("Contract deployment error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Contract deployment failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
-  
+}
