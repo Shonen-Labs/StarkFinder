@@ -64,7 +64,7 @@ export class ChatHistoryManager {
     const chat = await this.getOrCreateChat(telegramChatId);
 
     try {
-      await prisma.user.deleteMany({
+      await prisma.chat.deleteMany({
         where: { chatId: chat.id}
       })
     } catch (error) {

@@ -540,8 +540,8 @@ bot.command("txn", (ctx) => {
         return ctx.reply('❌ Unable to clear chat memory. Please try again.');
     }
     return ctx.reply(`
-        ✅ Wallet data has been cleared.
-        ✅ Chat memory has been cleared.
+      ✅ Wallet data has been cleared.
+      ✅ Chat memory has been cleared.
     `)
 });
   
