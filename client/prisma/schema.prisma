@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String?    @unique
+  id        String              @id @default(uuid())
+  email     String?             @unique
   name      String?
   chats     Chat[]
   messages  Message[]
-  contracts Contract[] // New relation to track user's contracts
+  contracts GeneratedContract[] @relation("GeneratedContracts")
+  deployments DeployedContract[] @relation("DeployedContracts")
 }
 
 model Chat {
@@ -36,14 +37,26 @@ model Message {
   User     User    @relation(fields: [userId], references: [id])
 }
 
-model Contract {
+model GeneratedContract {
   id           String   @id @default(uuid())
   name         String
-  contractCode Json     // Stores the contract source code or ABI
-  metadata     Json?    // Optional metadata for the contract
-  deployedAt   DateTime // Timestamp for when the contract was deployed
+  contractCode Json
+  metadata     Json?
+  createdAt    DateTime @default(now())
   userId       String
-  User         User     @relation(fields: [userId], references: [id])
+  User         User     @relation("GeneratedContracts", fields: [userId], references: [id])
+}
+
+model DeployedContract {
+  id           String   @id @default(uuid())
+  name         String
+  deployedAt   DateTime @default(now())
+  address      String   @unique 
+  metadata     Json?
+  userId       String
+  User         User     @relation("DeployedContracts", fields: [userId], references: [id])
+  generatedId  String?  
+  GeneratedContract GeneratedContract? @relation(fields: [generatedId], references: [id])
 }
 
 enum Role {
