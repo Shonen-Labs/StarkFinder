@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
 import { Code } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod";
+import { DIRTY, z } from "zod";
 import { toast } from 'sonner'
 
 interface FloatingSidebarProps {
@@ -13,7 +14,9 @@ interface FloatingSidebarProps {
 }
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
+
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
@@ -28,40 +31,81 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     },
   })
   return (
-    <div className="flex max-w-36 max-h-[50rem] rounded-lg drop-shadow-2xl">
-      <div className="bg-[#faf3dd] p-4 text-white rounded-xl ">
-        <div className="mt-4">
-          {Object.entries(groupedBlocks).map(([category, blocks]) => (
-            <div key={category} className="mb-2">
-              <h4 className="text-sm text-gray-800 my-4">{category}</h4>
-              <div className="flex gap-4 flex-wrap">
-                {blocks.map((block, index) => (
-                  <button
-                    key={index}
-                    onClick={() => addBlock(block)}
-                    className={`relative w-8 h-8 rounded flex items-center justify-center transition-colors text-gray-400 ${block.color} ${block.borderColor} ${block.hoverBorderColor} group hoverEffect`}
-                  >
-                    {<block.icon size="20" />}
-                    {/* Tooltip */}
-                    <div
-                      className="absolute top-10 left-1/2 transform -translate-x-1/3 whitespace-nowrap bg-black text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none z-10"
-                    >
-                      {block.content}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-          <CustomBlock isOpen={isCustomModalOpen}
-            onOpenChange={setIsCustomModalOpen}
-            onSubmitCustomBlock={onSubmitCustomBlock}
-          />
-        </div>
+    <div className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg">
+      <div className="flex justify-between">
+        <h2>DevXstarck</h2>
+        <span>icon</span>
       </div>
 
-      <div className="flex-1 bg-gray-800">
-        {/* <!-- Canvas content --> */}
+      <div className="mt-10">
+        <h4 className="text-gray-400">Defi</h4>
+      
+        <div className="mt-4 flex flex-col gap-2">
+          <div className="px-3 py-2 flex justify-between items-center">
+            <div className="flex gap-3">
+              <span>icon</span>
+              <div>Trigger Actions</div>
+            </div>
+            <ChevronDown/>
+          </div>
+          <div>
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Token Actions</div>
+              </div>
+              <ChevronDown/>
+            </div>
+            <div className="ml-10 mt-2 flex flex-col gap-2">
+              <div className="px-3 py-2">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Swap Token</div>
+                </div>
+              </div>
+              <div className="px-3 py-2">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Stake Token </div>
+                </div>
+                
+              </div>
+              <div className="px-3 py-2 ">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Allocate Token</div>
+                </div>
+              </div>
+              <div className="px-3 py-2 flex justify-between items-center">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Yield Farming</div>
+                </div>
+                <ChevronDown/>
+              </div>
+              <div className="px-3 py-2 ">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Lend Tokens</div>
+                </div>               
+              </div>
+              <div className="px-3 py-2">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Borrow Token</div>
+                </div>
+              </div>
+              <div className="px-3 py-2 ">
+                <div className="flex gap-3">
+                  <span>icon</span>
+                  <div>Repay Loan</div>
+                </div>  
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
       </div>
     </div>
   );
