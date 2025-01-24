@@ -532,9 +532,9 @@ bot.command("txn", (ctx) => {
   // clear command
   bot.command("clear",  async (ctx) => {
     try{
-        await ctx.api.deleteChat(ctx.chat.id); 
-        ctx.session.connectedWallet = null;
-        ctx.session.privateKey = null;
+        await chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
+        ctx.session.connectedWallet = undefined;
+        ctx.session.privateKey = undefined;
     }catch (error) {
         console.error('clear command error:', error);
         return ctx.reply('❌ Unable to clear chat memory. Please try again.');
