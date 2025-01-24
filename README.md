@@ -1,5 +1,9 @@
 # StarkFinder: Your AI-Powered Starknet Navigator
 
+[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://t.me/shogenlabs)
+[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-light--blue?logo=telegram)](https://t.me/starkfinder_bot)
+[![Website](https://img.shields.io/badge/Website-StarkFinder-green)](https://www.starkfinder.ai](https://stark-finder-mq45.vercel.app/))
+
 ![image](https://github.com/user-attachments/assets/22bf72f4-0edd-4af6-a3c2-1397e85ca0f8)
 
 
@@ -16,6 +20,7 @@
     - [Investment Agent](#investment-agent)
     - [Exploration Agent](#exploration-agent)
     - [Research Agent](#research-agent)
+- [Design](#design)
 - [Future Plans](#future-plans)
 - [Contributing](#contributing)
 - [License](#license)
@@ -92,17 +97,31 @@ The Exploration Agent helps users discover new Starknet-based projects, protocol
 #### Research Agent
 The Research Agent provides in-depth analysis and insights about the Starknet ecosystem. Users can interact with this agent using the `/research` command.
 
+## Design
+Kindly refer to the following for the [landing page](https://www.figma.com/design/pfxBpMpBiiJvXQtF7zUgFy/Starkfinder?node-id=0-1&t=sgOod3BsqDHeHuhC-1) design.
+
 ## Future Plans
 In the future, the StarkFinder team plans to expand the application's capabilities by integrating with more Starknet-based protocols and services. Additionally, the team aims to explore the integration of XMTP (Cross-Message Transport Protocol) to enhance the decentralized and secure communication between the agents and users.
 
 ## Contributing
 Contributions to the StarkFinder project are welcome. If you'd like to contribute, please follow these steps:
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them.
-4. Push your changes to your forked repository.
-5. Submit a pull request to the original repository.
+Refer to [Contributing](./CONTRIBUTING.md) for contributing.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
+
+
+
+
+
+
+
+
+
+
+
+## Contributors
+
+<a href='https://github.com/PoulavBhowmick03' target='_blank'><img src='https://avatars.githubusercontent.com/u/133862694?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='PoulavBhowmick03' /></a><a href='https://github.com/tosoham' target='_blank'><img src='https://avatars.githubusercontent.com/u/144812467?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='tosoham' /></a><a href='https://github.com/TheRanomial' target='_blank'><img src='https://avatars.githubusercontent.com/u/129299316?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='TheRanomial' /></a><a href='https://github.com/guha-rahul' target='_blank'><img src='https://avatars.githubusercontent.com/u/52607971?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='guha-rahul' /></a><a href='https://github.com/actions-user' target='_blank'><img src='https://avatars.githubusercontent.com/u/65916846?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='actions-user' /></a><a href='https://github.com/akintewe' target='_blank'><img src='https://avatars.githubusercontent.com/u/85641756?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='akintewe' /></a><a href='https://github.com/Reallanky' target='_blank'><img src='https://avatars.githubusercontent.com/u/107430741?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Reallanky' /></a><a href='https://github.com/armaanansari121' target='_blank'><img src='https://avatars.githubusercontent.com/u/145029005?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='armaanansari121' /></a><a href='https://github.com/SudiptaPaul-31' target='_blank'><img src='https://avatars.githubusercontent.com/u/117905151?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='SudiptaPaul-31' /></a>
+

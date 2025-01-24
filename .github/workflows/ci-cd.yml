@@ -100,16 +100,3 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
-
-      - name: Deploy to Vercel
-        run: |
-          if [ ${{ github.event_name }} == 'pull_request' ]; then
-            npx vercel --token ${{ secrets.VERCEL_TOKEN }}
-          else
-            npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
-          fi
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

@@ -5,7 +5,7 @@ flake.lock
 default.nix
 env/
 venv/
-.env/
+*.env
 .venv/
 node_modules/
 *.log
