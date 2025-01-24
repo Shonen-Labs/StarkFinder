@@ -7,9 +7,8 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import chalk from "chalk";
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client"; // Import Prisma Client
+import prisma from "@/lib/db";
 
-const prisma = new PrismaClient(); // Initialize Prisma Client
 const execAsync = promisify(exec);
 
 interface CompilationResult {
@@ -33,86 +32,64 @@ function getContractsPath(...paths: string[]) {
 
 async function compileCairo(): Promise<CompilationResult> {
   try {
-    try {
-      await execAsync("scarb --version");
-    } catch (error) {
-      throw new Error("Scarb is not installed. Please install Scarb first.");
-    }
-
-    const scarbPath = getContractsPath("Scarb.toml");
-    try {
-      await fs.access(scarbPath);
-    } catch {
-      throw new Error("Scarb.toml not found in contracts directory");
-    }
-
-    console.log(chalk.blue("📦 Starting Cairo compilation..."));
-    const startTime = Date.now();
-
-    const { stdout, stderr } = await execAsync("scarb build", {
-      cwd: getContractsPath(),
-    });
-
-    if (stderr && !stderr.includes("Finished")) {
-      throw new Error(`Compilation error: ${stderr}`);
-    }
-
-    const targetDir = getContractsPath("target", "dev");
-    const files = await fs.readdir(targetDir);
-
-    const contractFiles = files.filter(
-      (file) =>
-        file.endsWith(".contract_class.json") ||
-        file.endsWith(".compiled_contract_class.json")
-    );
-
-    const contracts = [
-      ...new Set(
-        contractFiles.map((file) =>
-          file
-            .replace(".contract_class.json", "")
-            .replace(".compiled_contract_class.json", "")
-        )
-      ),
-    ];
-
-    const endTime = Date.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-
-    console.log(chalk.green(`✅ Compilation successful in ${duration}s!`));
-    console.log(chalk.blue("📄 Compiled contracts:"));
-    contracts.forEach((contract) => {
-      console.log(chalk.cyan(`   - ${contract}`));
-    });
-
-    return {
-      success: true,
-      contracts,
-    };
-  } catch (error) {
-    console.error(chalk.red("❌ Compilation failed:"));
-    console.error(
-      chalk.red(error instanceof Error ? error.message : "Unknown error")
-    );
-
-    return {
-      success: false,
-      contracts: [],
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
+    await execAsync("scarb --version");
+  } catch {
+    throw new Error("Scarb is not installed. Please install Scarb first.");
   }
+
+  const scarbPath = getContractsPath("Scarb.toml");
+  try {
+    await fs.access(scarbPath);
+  } catch {
+    throw new Error("Scarb.toml not found in contracts directory");
+  }
+
+  console.log(chalk.blue("📦 Starting Cairo compilation..."));
+  const startTime = Date.now();
+
+  const { stdout, stderr } = await execAsync("scarb build", {
+    cwd: getContractsPath(),
+  });
+
+  if (stderr && !stderr.includes("Finished")) {
+    throw new Error(`Compilation error: ${stderr}`);
+  }
+
+  const targetDir = getContractsPath("target", "dev");
+  const files = await fs.readdir(targetDir);
+
+  const contractFiles = files.filter(
+    (file) =>
+      file.endsWith(".contract_class.json") ||
+      file.endsWith(".compiled_contract_class.json")
+  );
+
+  const contracts = [
+    ...new Set(
+      contractFiles.map((file) =>
+        file
+          .replace(".contract_class.json", "")
+          .replace(".compiled_contract_class.json", "")
+      )
+    ),
+  ];
+
+  const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+
+  console.log(chalk.green(`✅ Compilation successful in ${duration}s!`));
+  console.log(chalk.blue("📄 Compiled contracts:"));
+  contracts.forEach((contract) => {
+    console.log(chalk.cyan(`   - ${contract}`));
+  });
+
+  return { success: true, contracts };
 }
 
 async function validateCompilation(contractName: string): Promise<boolean> {
   const targetDir = getContractsPath("target", "dev");
 
   try {
-    await Promise.all([
-      fs.access(path.join(targetDir, `${contractName}.contract_class.json`)),
-      fs.access(
-        path.join(targetDir, `${contractName}.compiled_contract_class.json`)
-      ),
-    ]);
+    await Promise.all([fs.access(path.join(targetDir, `${contractName}.contract_class.json`)), fs.access(path.join(targetDir, `${contractName}.compiled_contract_class.json`))]);
     return true;
   } catch {
     return false;
@@ -120,43 +97,23 @@ async function validateCompilation(contractName: string): Promise<boolean> {
 }
 
 async function getCompiledCode(filename: string) {
-  const sierraFilePath = getContractsPath(
-    "target",
-    "dev",
-    `${filename}.contract_class.json`
+  const sierraFilePath = getContractsPath("target", "dev", `${filename}.contract_class.json`);
+  const casmFilePath = getContractsPath("target", "dev", `${filename}.compiled_contract_class.json`);
+
+  const [sierraCode, casmCode] = await Promise.all(
+    [sierraFilePath, casmFilePath].map(async (filePath) => {
+      const file = await fs.readFile(filePath);
+      return JSON.parse(file.toString("ascii"));
+    })
   );
-  const casmFilePath = getContractsPath(
-    "target",
-    "dev",
-    `${filename}.compiled_contract_class.json`
-  );
 
-  const code = [sierraFilePath, casmFilePath].map(async (filePath) => {
-    const file = await fs.readFile(filePath);
-    return JSON.parse(file.toString("ascii"));
-  });
-
-  const [sierraCode, casmCode] = await Promise.all(code);
-
-  return {
-    sierraCode,
-    casmCode,
-  };
+  return { sierraCode, casmCode };
 }
 
-async function validateEnvironment(): Promise<{
-  valid: boolean;
-  error?: string;
-}> {
-  const requiredEnvVars = [
-    "OZ_ACCOUNT_PRIVATE_KEY",
-    "ACCOUNT_ADDRESS",
-    "STARKNET_PROVIDER_URL",
-  ];
+async function validateEnvironment(): Promise<{ valid: boolean; error?: string }> {
+  const requiredEnvVars = ["OZ_ACCOUNT_PRIVATE_KEY", "ACCOUNT_ADDRESS", "STARKNET_PROVIDER_URL"];
 
-  const missingVars = requiredEnvVars.filter(
-    (varName) => !process.env[varName]
-  );
+  const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 
   if (missingVars.length > 0) {
     return {
@@ -170,7 +127,6 @@ async function validateEnvironment(): Promise<{
 
 export async function POST(req: NextRequest) {
   try {
-    // Validate environment configuration
     const envValidation = await validateEnvironment();
     if (!envValidation.valid) {
       return NextResponse.json(
@@ -196,7 +152,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { contractName = "lib", userId } = await req.json(); // Get `userId` from the request
+    const { contractName = "lib", userId } = await req.json();
 
     const isValid = await validateCompilation(contractName);
     if (!isValid) {
@@ -246,21 +202,18 @@ export async function POST(req: NextRequest) {
       throw new Error("No ABI found for deployed contract");
     }
 
-    const contract = new Contract(
-      abi,
-      deployResponse.contract_address,
-      provider
-    );
+    const contract = new Contract(abi, deployResponse.contract_address, provider);
 
-    console.log("Saving contract details to database...");
-    // Save contract details in the database
-    await prisma.contract.create({
+    
+    await prisma.deployedContract.create({
       data: {
         name: contractName,
         contractCode: { sierraCode, casmCode },
         metadata: { abi },
         deployedAt: new Date(),
         userId,
+        schema: { contractName, abi, classHash: declareResponse.class_hash },
+        generatedId: null, 
       },
     });
 
