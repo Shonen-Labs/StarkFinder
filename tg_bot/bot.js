@@ -403,6 +403,21 @@ bot.command("txn", (ctx) => {
 //  }
 //});
 // Message handler
+bot.command("clear", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    try{
+        yield ctx.api.deleteChat(chatId); 
+        ctx.session.connectedWallet = null;
+        ctx.session.privateKey = null;
+    }catch (error) {
+        console.error('clear command error:', error);
+        return ctx.reply('❌ Unable to clear chat memory. Please try again.');
+    }
+    return ctx.reply(`
+        ✅ Wallet data has been cleared.
+        ✅ Chat memory has been cleared.
+    `)
+}));
+
 bot.on("message:text", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chat = yield ctx.api.getChat(ctx.chat.id);
