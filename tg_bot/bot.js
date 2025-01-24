@@ -337,6 +337,7 @@ Commands:
 /wallet - Create a new wallet
 /balance [token_address] - Check token balance
 /txn <description> - Create a transaction
+/clear - Clear chat memory
 /help - Show detailed help
 
 Just type naturally - no need to use commands for every interaction!`);
