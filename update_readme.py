@@ -2,8 +2,8 @@ import requests
 import os
 
 
-REPO_OWNER = "PoulavBhowmick03"
-REPO_NAME = "Shonen-Labs/StarkFinder"
+REPO_OWNER = "Shonen-Labs"
+REPO_NAME = "StarkFinder"
 GITHUB_TOKEN = os.getenv("TOKEN_GH")
 
 def fetch_contributors():

@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String              @id @default(uuid())
-  email     String?             @unique
-  name      String?
-  chats     Chat[]
-  messages  Message[]
-  contracts GeneratedContract[] @relation("GeneratedContracts")
-  deployments DeployedContract[] @relation("DeployedContracts")
+  id            String              @id @default(uuid())
+  email         String?             @unique
+  name          String?
+  address       String?             @unique
+  chats         Chat[]
+  messages      Message[]
+  contracts     GeneratedContract[] @relation("GeneratedContracts")
+  deployments   DeployedContract[]  @relation("DeployedContracts")
+  transactions  Transaction[]
 }
 
 model Chat {
@@ -22,45 +24,79 @@ model Chat {
   title    String?
   metadata Json?
   userId   String?
+  type     ChatType  @default(GENERAL)
   User     User?     @relation(fields: [userId], references: [id])
   Message  Message[]
 }
 
 model Message {
-  id       String  @id @default(uuid())
-  content  Json[]
-  metadata Json?
-  replyTo  String?
-  chatId   String
-  userId   String
-  Chat     Chat    @relation(fields: [chatId], references: [id])
-  User     User    @relation(fields: [userId], references: [id])
+  id        String    @id @default(uuid())
+  content   Json[]
+  metadata  Json?
+  replyTo   String?
+  chatId    String
+  userId    String
+  createdAt DateTime   @default(now())
+  Chat      Chat       @relation(fields: [chatId], references: [id])
+  User      User       @relation(fields: [userId], references: [id])
 }
 
 model GeneratedContract {
-  id           String   @id @default(uuid())
-  name         String
-  contractCode Json
-  metadata     Json?
-  createdAt    DateTime @default(now())
-  userId       String
-  User         User     @relation("GeneratedContracts", fields: [userId], references: [id])
+  id               String             @id @default(uuid())
+  name             String
+  contractCode     Json
+  metadata         Json?
+  createdAt        DateTime           @default(now())
+  userId           String
+  User             User               @relation("GeneratedContracts", fields: [userId], references: [id])
   DeployedContracts DeployedContract[]
 }
 
 model DeployedContract {
-  id           String   @id @default(uuid())
-  name         String
-  deployedAt   DateTime @default(now())
-  address      String   @unique 
-  metadata     Json?
-  userId       String
-  User         User     @relation("DeployedContracts", fields: [userId], references: [id])
-  generatedId  String?  
+  id               String             @id @default(uuid())
+  name             String
+  deployedAt       DateTime           @default(now())
+  address          String             @unique
+  metadata         Json?
+  userId           String
+  User             User               @relation("DeployedContracts", fields: [userId], references: [id])
+  generatedId      String?
   GeneratedContract GeneratedContract? @relation(fields: [generatedId], references: [id])
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  type        TxType
+  status      TxStatus @default(PENDING)
+  metadata    Json?
+  hash        String?
+  userId      String
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+  User        User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {
   USER
   ASSISTANT
+}
+
+enum ChatType {
+  GENERAL
+  TRANSACTION
+  ASK
+}
+
+enum TxType {
+  SWAP
+  TRANSFER
+  BRIDGE
+  DEPOSIT
+  WITHDRAW
+}
+
+enum TxStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }

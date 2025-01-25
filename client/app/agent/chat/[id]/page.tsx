@@ -62,6 +62,12 @@ export default function ChatPage() {
     }
   }, [chatId]);
 
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, streamedResponse]);
+
   const createNewChat = async () => {
     const id = uuidv4();
     await router.push(`/agent/chat/${id}`);
@@ -86,58 +92,110 @@ export default function ChatPage() {
   };
 
   const handleSendMessage = async () => {
-    if (inputValue.trim()) {
-      const newMessage = {
-        id: uuidv4(),
-        role: "user",
-        content: inputValue,
-        timestamp: new Date().toLocaleTimeString(),
-        user: "User",
+    if (!inputValue.trim()) return;
+  
+    const newMessage = {
+      id: uuidv4(),
+      role: "user",
+      content: inputValue,
+      timestamp: new Date().toLocaleTimeString(),
+      user: "User",
+    };
+  
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setInputValue("");
+    setIsLoading(true);
+    setStreamedResponse("");
+    setError("");
+  
+    try {
+      // Format messages for the API - only include unique user messages
+      const formattedMessages = Array.from(
+        new Set(
+          messages
+            .filter(msg => msg.role === "user")
+            .map(msg => msg.content)
+        )
+      ).map(content => ({
+        sender: "user",
+        content
+      }));
+  
+      // Add the current message if it's not already included
+      if (!formattedMessages.some(msg => msg.content === inputValue)) {
+        formattedMessages.push({
+          sender: "user",
+          content: inputValue
+        });
+      }
+  
+      const requestBody = {
+        prompt: inputValue,
+        address: address || "0x0",
+        messages: formattedMessages,
+        stream: true
       };
   
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-      setInputValue("");
-      setIsLoading(true);
-      setStreamedResponse("");
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
   
-      try {
-        // Format messages for the API - only include unique user messages
-        const formattedMessages = Array.from(
-          new Set(
-            messages
-              .filter(msg => msg.role === "user")
-              .map(msg => msg.content)
-          )
-        ).map(content => ({
-          sender: "user",
-          content
-        }));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details?.message || 'Failed to get response');
+      }
   
-        // Add the current message if it's not already included
-        if (!formattedMessages.some(msg => msg.content === inputValue)) {
-          formattedMessages.push({
-            sender: "user",
-            content: inputValue
-          });
+      // Check if the response is a stream (has body readable)
+      if (response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = '';
+  
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+  
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n').filter(Boolean);
+  
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(5));
+                  if (data.content) {
+                    accumulatedResponse += data.content;
+                    setStreamedResponse(accumulatedResponse);
+                  } else if (data.error) {
+                    throw new Error(data.error);
+                  }
+                } catch (e) {
+                  console.error('Error parsing JSON:', e);
+                }
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock();
         }
   
-        const response = await fetch("/api/ask", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: inputValue,
-            address: address || "0x0",
-            messages: formattedMessages
-          }),
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.details?.message || 'Failed to get response');
+        // Add final message to chat
+        if (accumulatedResponse) {
+          setMessages(prev => [...prev, {
+            id: uuidv4(),
+            role: "agent",
+            content: accumulatedResponse,
+            timestamp: new Date().toLocaleTimeString(),
+            user: "Agent",
+          }]);
+          setAnswer(accumulatedResponse);
         }
-  
+      } else {
+        // Fallback to non-streaming response
         const data = await response.json();
         
         if (data.error) {
@@ -155,14 +213,15 @@ export default function ChatPage() {
           },
         ]);
         setAnswer(data.answer);
-        setError("");
-      } catch (err: any) {
-        console.error('Chat error:', err);
-        setError(err.message || "Unable to get response from Brian's API");
-        setAnswer("");
-      } finally {
-        setIsLoading(false);
       }
+      
+    } catch (err: any) {
+      console.error('Chat error:', err);
+      setError(err.message || "Unable to get response");
+      setAnswer("");
+    } finally {
+      setIsLoading(false);
+      setStreamedResponse("");
     }
   };
 
