@@ -7,9 +7,10 @@ import { NavbarDemo } from "@/components/landing/Navbar";
 export default function Home() {
   return (
     <div>
+       <NavbarDemo />
       <Background />
       <BentoDemo />
-      <NavbarDemo />
+     
       <GridPatternDemo />
     </div>);
 }
