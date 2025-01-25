@@ -174,6 +174,13 @@ export default function TransactionPage() {
     { text: "Bridge", action: "lorem" }
   ];
 
+  const handleSimplifiedAction = async (text: String) => {
+    console.log(text);
+    const userQuery = `I want to ${text.toLowerCase()}`;
+    setInputValue(userQuery);
+    handleSendMessage();
+  }
+
   React.useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
@@ -236,6 +243,8 @@ export default function TransactionPage() {
       setMessages((prev) => [...prev, errorMessage]);
       return;
     }
+
+
 
     const userMessage: Message = {
       id: uuidv4(),
@@ -393,7 +402,7 @@ export default function TransactionPage() {
                 key={item.text}
                 variant="ghost"
                 className="justify-start bg--300 w-44 border border-white/20 hover:bg-white/10 transition-colors"
-                onClick={item.action}
+                onClick={() => handleSimplifiedAction(item.text)}
               >
                 {item.text}
               </Button>
