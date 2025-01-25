@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from 'react';
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Play, Edit2, Shield, CheckCircle, XCircle  } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion"
+
+
+import { Card } from "@/components/ui/card";
+import { Steps } from '@/components/ui/steps';
 
 interface DeploymentResponse {
   success: boolean;
@@ -21,6 +26,21 @@ interface ContractCodeProps {
   setDisplayState: (state: any) => void; // Update with proper type if available
 }
 
+interface DeploymentStep {
+  title: string;
+  status: 'pending' | 'processing' | 'complete' | 'error';
+  details?: string;
+  hash?: string;
+}
+
+const initialSteps: DeploymentStep[] = [
+  { title: 'Building Contract', status: 'pending' },
+  { title: 'Declaring Sierra Hash', status: 'pending' },
+  { title: 'Declaring CASM Hash', status: 'pending' },
+  { title: 'Deploying Contract', status: 'pending' },
+  { title: 'Confirming Transaction', status: 'pending' }
+];
+
 const ContractCode: React.FC<ContractCodeProps> = ({
   nodes,
   edges,
@@ -29,8 +49,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   setSourceCode,
   setDisplayState,
 }) => {
+  const [steps, setSteps] = useState<DeploymentStep[]>(initialSteps);
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [editable, setEditable] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<DeploymentResponse | null>(null);
   
@@ -53,44 +75,64 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     }
   }, [sourceCode, logs]);
 
-  const compileContractHandler = async (): Promise<void> => {
-    setIsLoading(true);
-    setResult(null);
-    setLogs([]);
-    addLog("Starting deployment process...");
+  const updateStep = (index: number, updates: Partial<DeploymentStep>) => {
+    setSteps(current => 
+      current.map((step, i) => 
+        i === index ? { ...step, ...updates } : step
+      )
+    );
+  };
 
+  const compileContractHandler = async () => {
+    setIsDeploying(true);
+    
     try {
-      addLog("Compiling and deploying contract...");
+      // Step 1: Building Contract
+      updateStep(0, { status: 'processing' });
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate build time
+      updateStep(0, { status: 'complete' });
 
+      // Step 2: Declaring Sierra Hash
+      updateStep(1, { status: 'processing' });
       const response = await fetch("/api/deploy-contract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contractName: "contractww_contractww" }),
       });
 
-      const data: DeploymentResponse = await response.json();
-      setResult(data);
-
+      const data = await response.json();
+      
       if (data.success) {
-        addLog("✅ Deployment successful!");
-        addLog(`📄 Contract Address: ${data.contractAddress}`);
-        addLog(`🔗 Transaction Hash: ${data.transactionHash}`);
+        // Update steps with actual data
+        updateStep(1, { 
+          status: 'complete',
+          hash: data.classHash 
+        });
+        updateStep(2, { 
+          status: 'complete',
+          hash: data.casmHash 
+        });
+        updateStep(3, { 
+          status: 'complete',
+          details: data.contractAddress 
+        });
+        updateStep(4, { 
+          status: 'complete',
+          hash: data.transactionHash 
+        });
       } else {
-        addLog(`❌ Error: ${data.error}`);
-        if (data.details) {
-          addLog(`📝 Details: ${data.details}`);
-        }
+        throw new Error(data.error || 'Deployment failed');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      addLog(`❌ Error: ${errorMessage}`);
-      setResult({
-        success: false,
-        error: "Deployment failed",
-        details: errorMessage,
-      });
+      const currentStep = steps.findIndex(step => step.status === 'processing');
+      if (currentStep !== -1) {
+        updateStep(currentStep, { 
+          status: 'error',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
     } finally {
-      setIsLoading(false);
+      setIsDeploying(false);
     }
   };
 
@@ -124,16 +166,28 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2">
-        <div className="text-black text-2xl font-bold">Contract Code</div>
+    <motion.div
+    initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+     className="flex flex-col gap-8 p-8 bg-navy-900 rounded-2xl shadow-2xl border border-navy-700 relative min-h-[500px] max-h-[80vh] overflow-y-auto"
+      style={{
+        background: "linear-gradient(to bottom right, #0a192f, #112240, #1a365f)",
+        boxShadow: "0 0 20px rgba(100, 255, 218, 0.1)",
+      }}
+    >
+      <div className="flex flex-col gap-8 pb-24">
+        <motion.div className="text-4xl font-bold text-cyan-300"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}>Contract Code</motion.div>
         <div
           ref={containerRef}
-          className={`text-black mt-1 overflow-y-auto pl-2 border-4 border-black rounded-xl min-h-[10vh] max-h-[40vh] ${
+          className={`text-black relative overflow-hidden rounded-xl bg-navy-800 border border-navy-600" ${
             editable ? "bg-yellow-200" : "bg-yellow-100"
           }`}
         >
-          <pre>
+          <pre className="p-6 overflow-y-auto max-h-[60vh]">
             <code
               contentEditable={editable}
               spellCheck="false"
@@ -154,35 +208,75 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
         <div className="flex gap-4 mt-2">
           <button 
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none ocus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 font-bold ${
               isLoading || editable 
-                ? 'bg-gray-300 cursor-not-allowed' 
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
+                ? 'bg-gray-500 cursor-not-allowed' 
+                : 'bg-cyan-500 hover:bg-cyan-600 text-black'
             }`}
+            style={{
+              boxShadow: "0 0 15px rgba(100, 255, 218, 0.3)",
+            }}
             onClick={compileContractHandler}
-            disabled={editable || isLoading}
+            disabled={isDeploying || editable}
           >
+            <span className="flex items-center justify-center gap-2">
+            <Play className="w-5 h-5" />
             {isLoading ? "Deploying..." : "Deploy"}
+            </span>
           </button>
           <button 
-            className="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white"
+            className="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50"
             onClick={() => setEditable(!editable)}
-            disabled={isLoading}
+            disabled={isDeploying}
           >
+            <span className="flex items-center justify-center gap-2 ">
+            <Edit2 className="w-5 h-5" />
             {editable ? "Save" : "Edit"}
+            </span>
           </button>
           <button 
             className={`px-4 py-2 rounded-lg ${
               editable || isLoading 
-                ? 'bg-gray-300 cursor-not-allowed' 
-                : 'bg-green-500 hover:bg-green-600 text-white'
+                ? 'bg-gray-500 cursor-not-allowed' 
+                : 'bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50' 
             }`}
+            style={{
+              boxShadow: "0 0 15px rgba(255, 255, 0, 0.3)",
+            }}
             onClick={auditCodeHandler}
-            disabled={editable || isLoading}
+            disabled={editable || isDeploying}
           >
+            <span className="flex items-center justify-center gap-2">
+            <Shield className="w-5 h-5" />
             Audit
+            </span>
           </button>
         </div>
+
+        {/* Deployment Steps */}
+        <Card className="mt-4 p-4">
+          <Steps items={steps.map(step => ({
+            title: step.title,
+            status: step.status,
+            description: step.details && (
+              <div className="text-sm">
+                {step.hash ? (
+                  <a
+                    href={`https://starkscan.co/tx/${step.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+                  >
+                    {step.hash.slice(0, 6)}...{step.hash.slice(-4)}
+                    <ExternalLink size={12} />
+                  </a>
+                ) : (
+                  step.details
+                )}
+              </div>
+            )
+          }))} />
+        </Card>
       </div>
 
       {/* Deployment Logs */}
@@ -203,13 +297,22 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       )}
 
       {/* Deployment Result */}
+
+      <AnimatePresence>
       {result && (
-        <div className={`mt-4 p-4 rounded-lg border ${
-          result.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-        }`}>
+        <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 100 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${
+          result.success ? "bg-green-900/95 border-green-700" : "bg-red-900/95 border-red-700"
+        }`}
+      >
           {result.success ? (
             <div className="flex flex-col gap-2">
-              <div className="font-semibold text-green-700">
+              <div className="font-semibold text-white">
+              <CheckCircle className="w-6 h-6" />
                 Deployment Successful!
               </div>
               <div className="flex items-center gap-2">
@@ -234,17 +337,20 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               </div>
             </div>
           ) : (
-            <div className="text-red-700">
-              <div className="font-semibold">Deployment Failed</div>
-              <div className="text-sm mt-1">{result.error}</div>
+            <div className="">
+              <div className="font-semibold text-xl flex items-center gap-2">
+              <XCircle className="w-6 h-6" />
+                Deployment Failed</div>
+              <div className="text-sm mt-2">{result.error}</div>
               {result.details && (
-                <div className="text-sm mt-1 text-red-600">{result.details}</div>
+                <div className="text-sm mt-2 text-white">{result.details}</div>
               )}
             </div>
           )}
-        </div>
+        </motion.div>
       )}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

@@ -434,6 +434,7 @@ Commands:
 /wallet - Create a new wallet
 /balance [token_address] - Check token balance
 /txn <description> - Create a transaction
+/clear - Clear chat memory
 /help - Show detailed help
 
 Just type naturally - no need to use commands for every interaction!`);
@@ -527,6 +528,23 @@ bot.command("txn", (ctx) => {
   //    console.error('Error fetching chat details:', error);
   //  }
   //});
+
+  // clear command
+  bot.command("clear",  async (ctx) => {
+    try{
+        await chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
+        ctx.session.connectedWallet = undefined;
+        ctx.session.privateKey = undefined;
+        workflowManager.clearMemory(ctx.chat.id.toString());
+    }catch (error) {
+        console.error('clear command error:', error);
+        return ctx.reply('❌ Unable to clear chat memory. Please try again.');
+    }
+    return ctx.reply(`
+      ✅ Wallet data has been cleared.
+      ✅ Chat memory has been cleared.
+    `)
+});
   
 // Message handler
 bot.on("message:text", async (ctx) => {
