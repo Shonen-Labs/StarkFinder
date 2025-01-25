@@ -99,7 +99,6 @@ const agent = new ChatOpenAI({
   modelName: "gpt-4o",
   temperature: 0.5,
   openAIApiKey: OPENAI_API_KEY,
-  streaming: true
 });
 const prompt = askAgentPromptTemplate;
 // const chain = prompt.pipe(agent);
@@ -123,7 +122,7 @@ async function getChatHistory(chatId: string | { configurable?: { additional_arg
       }
     });
 
-    const formattedHistory = messages.flatMap((msg : any) => {
+    const formattedHistory = messages.flatMap(msg => {
       const content = msg.content as any[];
       return content.map(c => ({
         role: c.role,
@@ -188,35 +187,15 @@ const workflow = new StateGraph(MessagesAnnotation)
 const app = workflow.compile({ checkpointer: new MemorySaver() });
 
 async function queryOpenAI({
-  userQuery,
-  brianaiResponse,
-  chatId,
-  streamCallback
+  userQuery, 
+  brianaiResponse, 
+  chatId
 }: {
-  userQuery: string,
+  userQuery: string, 
   brianaiResponse: string,
-  chatId?: string,
-  streamCallback?: (chunk: string) => Promise<void>
+  chatId?: string
 }): Promise<string> {
   try {
-    if (streamCallback) {
-      const messages = [
-        await systemMessage.format({ brianai_answer: brianaiResponse }),
-        { role: "user", content: userQuery }
-      ];
-      
-      let fullResponse = '';
-      await agent.invoke(messages, {
-        callbacks: [{
-          handleLLMNewToken: async (token: string) => {
-            fullResponse += token;
-            await streamCallback(token);
-          },
-        }],
-      });
-      return fullResponse;
-    } 
-    
     const response = await app.invoke(
       {
         messages: [
@@ -241,11 +220,7 @@ async function queryOpenAI({
 }
 
 
-async function queryBrianAI(
-  prompt: string, 
-  chatId?: string, 
-  streamCallback?: (chunk: string) => Promise<void>
-): Promise<string> {
+async function queryBrianAI(prompt: string, chatId?: string): Promise<string> {
   try {
     const response = await axios.post(
       BRIAN_API_URL,
@@ -260,28 +235,22 @@ async function queryBrianAI(
         },
       }
     );
-    
     const brianaiAnswer = response.data.result.answer;
     const openaiAnswer = await queryOpenAI({
-      brianaiResponse: brianaiAnswer,
+      brianaiResponse: brianaiAnswer, 
       userQuery: prompt,
-      chatId,
-      streamCallback
+      chatId
     });
-    
     return openaiAnswer;
   } catch (error) {
     console.error("Brian AI Error:", error);
-    if (streamCallback) {
-      throw error;
-    }
     return "Sorry, I am unable to process your request at the moment.";
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const { prompt, address, messages, chatId, stream = false } = await request.json();
+    const { prompt, address, messages, chatId } = await request.json();
     const userId = address || "0x0";
     await getOrCreateUser(userId);
     
@@ -309,76 +278,32 @@ export async function POST(request: Request) {
       userId,
     });
 
-    if (stream) {
-      const encoder = new TextEncoder();
-      const stream = new TransformStream();
-      const writer = stream.writable.getWriter();
-
-      // Stream the response
-      queryBrianAI(prompt, currentChatId, async (chunk) => {
-        await writer.write(encoder.encode(`data: ${JSON.stringify({ content: chunk })}\n\n`));
-      }).then(async (fullResponse) => {
-        if (fullResponse) {
-          await storeMessage({
-            content: [{
-              role: "assistant",
-              content: fullResponse
-            }],
-            chatId: currentChatId,
-            userId,
-          });
-        }
-        await writer.write(encoder.encode('data: [DONE]\n\n'));
-        await writer.close();
-      }).catch(async (error) => {
-        console.error('Streaming error:', error);
-        const errorMessage = {
-          error: 'Unable to process request',
-          details: error.message
-        };
-        await writer.write(encoder.encode(`data: ${JSON.stringify(errorMessage)}\n\n`));
-        await writer.close();
-      });
-
-      return new Response(stream.readable, {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-        },
-      });
-    }
-
-    // Non-streaming response
     const response = await queryBrianAI(prompt, currentChatId);
-    if (!response) {
+    if (response) {
+      await storeMessage({
+        content: [{
+          role: "assistant",
+          content: response
+        }],
+        chatId: currentChatId,
+        userId,
+      });
+
+      return NextResponse.json({ 
+        answer: response,
+        chatId: currentChatId 
+      });
+    } else {
       throw new Error("Unexpected API response format");
     }
-
-    await storeMessage({
-      content: [{
-        role: "assistant",
-        content: response
-      }],
-      chatId: currentChatId,
-      userId,
-    });
-
-    return NextResponse.json({ 
-      answer: response,
-      chatId: currentChatId 
-    });
-    
   } catch (error: any) {
     console.error('Error:', error);
-    
     if (error.code === 'P2003') {
       return NextResponse.json(
         { error: 'User authentication required', details: 'Please ensure you are logged in.' }, 
         { status: 401 }
       );
     }
-    
     return NextResponse.json(
       { error: 'Unable to process request', details: error.message }, 
       { status: 500 }

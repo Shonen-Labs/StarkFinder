@@ -1,9 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Work Sans", serif;
 }
 
 @layer utilities {
@@ -77,15 +78,63 @@ body {
   }
 }
 
-.animated.fadeIn {
-  animation: fadeIn 0.3s ease-in-out;
+.btn {
+  padding: 16px 30px;
+  min-height: 50px;
+  border-radius: 100px;
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
 }
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
 
-  to {
-    opacity: 1;
+.btn.btn_2 {
+  background-color: #fff;
+  color: #000;
+}
+
+img {
+  object-fit: cover;
+}
+
+
+.hide {
+  overflow: hidden !important;
+}
+
+.hide {
+  overflow: hidden;
+}
+
+.line {
+  overflow: hidden;
+  text-align: center !important;
+}
+
+@media (max-width: 780px) {
+  .line {
+    overflow: hidden;
+    text-align: start !important;
+    width: fit-content !important;
+    /* display: inline-block; */
   }
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
