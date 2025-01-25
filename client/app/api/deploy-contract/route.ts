@@ -145,8 +145,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
+          error: 'Contract deployment failed',
+          details: error instanceof Error ? error.message : 'Unknown error',
           error: "Compilation failed",
-          details: compilation.error,
         },
         { status: 500 }
       );

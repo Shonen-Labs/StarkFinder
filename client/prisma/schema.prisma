@@ -45,6 +45,7 @@ model GeneratedContract {
   createdAt    DateTime @default(now())
   userId       String
   User         User     @relation("GeneratedContracts", fields: [userId], references: [id])
+  DeployedContracts DeployedContract[]
 }
 
 model DeployedContract {
