@@ -20,6 +20,7 @@ const openai_1 = require("@langchain/openai");
 const prompts_2 = require("@langchain/core/prompts");
 const langgraph_1 = require("@langchain/langgraph");
 const messages_1 = require("@langchain/core/messages");
+const chatHistory_1 = require("./chatHistory");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 function getEnvVar(key, isRequired = true) {
@@ -38,6 +39,7 @@ const BRIAN_API_URL = {
     parameters: "https://api.brianknows.org/api/v0/agent/parameters-extraction",
     transaction: "https://api.brianknows.org/api/v0/agent",
 };
+const chatHistoryManager = new chatHistory_1.ChatHistoryManager();
 const systemPrompt = prompts_1.ASK_OPENAI_AGENT_PROMPT + `\nThe provided chat history includes a summary of the earlier conversation.`;
 const systemMessage = prompts_2.SystemMessagePromptTemplate.fromTemplate([
     systemPrompt
@@ -64,41 +66,64 @@ const initialCallModel = (state) => __awaiter(void 0, void 0, void 0, function* 
     const response = yield agent.invoke(messages);
     return { messages: response };
 });
-const callModel = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    const messageHistory = state.messages.slice(0, -1);
-    if (messageHistory.length >= 3) {
-        const lastHumanMessage = state.messages[state.messages.length - 1];
-        const summaryPrompt = `
-    Distill the above chat messages into a single summary message. 
-    Include as many specific details as you can.
-    IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
-    `;
-        const summaryMessage = prompts_2.HumanMessagePromptTemplate.fromTemplate([summaryPrompt]);
-        const summary = yield agent.invoke([
-            ...messageHistory,
-            { role: "user", content: summaryPrompt },
-        ]);
-        const deleteMessages = state.messages.map((m) => m.id ? new messages_1.RemoveMessage({ id: m.id }) : null);
-        const humanMessage = { role: "user", content: lastHumanMessage.content };
-        const response = yield agent.invoke([
-            yield systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
-            summary,
-            humanMessage,
-        ]);
-        //console.log(response);
-        return {
-            messages: [summary, humanMessage, response, ...deleteMessages],
-        };
+class ChatWorkflowManager {
+    constructor() {
+        this.workflows = new Map();
+        this.memories = new Map();
     }
-    else {
-        return yield initialCallModel(state);
+    createWorkflow(chatId) {
+        // Create new memory instance for this chat
+        const memory = new langgraph_1.MemorySaver();
+        this.memories.set(chatId, memory);
+        // Create chat-specific call model function
+        const chatCallModel = (state) => __awaiter(this, void 0, void 0, function* () {
+            const messageHistory = state.messages.slice(0, -1);
+            if (messageHistory.length >= 3) {
+                const lastHumanMessage = state.messages[state.messages.length - 1];
+                const summaryPrompt = `
+        Distill the above chat messages into a single summary message. 
+        Include as many specific details as you can.
+        IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
+        `;
+                const summary = yield agent.invoke([
+                    ...messageHistory,
+                    { role: "user", content: summaryPrompt },
+                ]);
+                const deleteMessages = state.messages.map((m) => m.id ? new messages_1.RemoveMessage({ id: m.id }) : null);
+                const humanMessage = { role: "user", content: lastHumanMessage.content };
+                const response = yield agent.invoke([
+                    yield systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
+                    summary,
+                    humanMessage,
+                ]);
+                return {
+                    messages: [summary, humanMessage, response, ...deleteMessages],
+                };
+            }
+            else {
+                return yield initialCallModel(state);
+            }
+        });
+        const workflow = new langgraph_1.StateGraph(langgraph_1.MessagesAnnotation)
+            .addNode("model", chatCallModel)
+            .addEdge(langgraph_1.START, "model")
+            .addEdge("model", langgraph_1.END);
+        const compiledWorkflow = workflow.compile({ checkpointer: memory });
+        this.workflows.set(chatId, compiledWorkflow);
+        return compiledWorkflow;
     }
-});
-const workflow = new langgraph_1.StateGraph(langgraph_1.MessagesAnnotation)
-    .addNode("model", callModel)
-    .addEdge(langgraph_1.START, "model")
-    .addEdge("model", langgraph_1.END);
-const app = workflow.compile({ checkpointer: new langgraph_1.MemorySaver() });
+    getWorkflow(chatId) {
+        if (!this.workflows.has(chatId)) {
+            return this.createWorkflow(chatId);
+        }
+        return this.workflows.get(chatId);
+    }
+    clearMemory(chatId) {
+        this.workflows.delete(chatId);
+        this.memories.delete(chatId);
+    }
+}
+const workflowManager = new ChatWorkflowManager();
 class StarknetWallet {
     constructor() {
         this.provider = new starknet_1.RpcProvider({
@@ -229,16 +254,22 @@ function formatResponse(response) {
     });
 }
 function queryOpenAI(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ userQuery, brianaiResponse }) {
+    return __awaiter(this, arguments, void 0, function* ({ userQuery, brianaiResponse, chatId }) {
         try {
-            const response = yield app.invoke({
+            // Get chat-specific workflow
+            const workflow = workflowManager.getWorkflow(chatId);
+            const response = yield workflow.invoke({
                 messages: [
-                    yield prompt.format({ brianai_answer: brianaiResponse, user_query: userQuery })
+                    yield prompt.format({
+                        brianai_answer: brianaiResponse,
+                        user_query: userQuery
+                    })
                 ],
             }, {
-                configurable: { thread_id: "1" },
+                configurable: {
+                    thread_id: chatId,
+                },
             });
-            console.log(response);
             return response.messages[response.messages.length - 1].content;
         }
         catch (error) {
@@ -247,7 +278,7 @@ function queryOpenAI(_a) {
         }
     });
 }
-function queryBrianAI(prompt) {
+function queryBrianAI(prompt, chatId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const response = yield axios_1.default.post(BRIAN_API_URL.knowledge, {
@@ -260,7 +291,11 @@ function queryBrianAI(prompt) {
                 }
             });
             const brianaiAnswer = response.data.result.answer;
-            const openaiAnswer = yield queryOpenAI({ brianaiResponse: brianaiAnswer, userQuery: prompt });
+            const openaiAnswer = yield queryOpenAI({
+                brianaiResponse: brianaiAnswer,
+                userQuery: prompt,
+                chatId
+            });
             return yield formatResponse(openaiAnswer);
         }
         catch (error) {
@@ -326,7 +361,8 @@ bot.use((0, grammy_1.session)({
 }));
 // Command handlers
 bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
-    yield ctx.reply(`Welcome to StarkFinder! 🚀
+    try {
+        yield ctx.reply(`Welcome to StarkFinder! 🚀
 
 I can help you with:
 1️⃣ Starknet Information - Just ask any question!
@@ -337,9 +373,33 @@ Commands:
 /wallet - Create a new wallet
 /balance [token_address] - Check token balance
 /txn <description> - Create a transaction
+/clear - Clear chat memory
 /help - Show detailed help
 
 Just type naturally - no need to use commands for every interaction!`);
+        console.log(`[SUCCESS] Start message sent to chat ID: ${ctx.chat.id}`);
+    }
+    catch (error) {
+        console.error("Error sending start message:", error);
+    }
+}));
+bot.command("help", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield ctx.reply(`🚀 **StarkFinder Help Menu** 🤖\n
+Hi there! I'm **StarkFinder**, your friendly assistant for navigating the Starknet ecosystem and performing transactions. Here’s what I can do for you:\n
+**Commands:**  
+🛠️ /start – Kickstart your journey with StarkFinder and set up your session.  
+💼 /wallet – Check your wallet details, balance, and manage your funds with ease.  
+🔄 /transaction – Perform actions like swaps, deposits, investments, and transfers directly on Starknet.  
+❓ /help – Show this help menu and explore all available commands.\n
+✨ *Tip:* Stay updated on the Starknet ecosystem by asking me anything!  
+If you encounter any issues or need assistance, feel free to reach out.\n
+🌟 Let's make Starknet simple and accessible together!`);
+        console.log(`[SUCCESS] Help message sent to chat ID: ${ctx.chat.id}`);
+    }
+    catch (error) {
+        console.error("Error sending help message:", error);
+    }
 }));
 bot.command("wallet", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -347,6 +407,7 @@ bot.command("wallet", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
         const { account, privateKey, publicKey, contractAddress } = yield wallet.createWallet();
         ctx.session.connectedWallet = account.address;
         ctx.session.privateKey = privateKey;
+        console.log(`[SUCCESS] Wallet created for chat ID: ${ctx.chat.id}`);
         return ctx.reply(`🚀 New Wallet Created!
 
 *Wallet Details:*
@@ -402,6 +463,22 @@ bot.command("txn", (ctx) => {
 //    console.error('Error fetching chat details:', error);
 //  }
 //});
+// clear command
+bot.command("clear", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
+        ctx.session.connectedWallet = undefined;
+        ctx.session.privateKey = undefined;
+    }
+    catch (error) {
+        console.error('clear command error:', error);
+        return ctx.reply('❌ Unable to clear chat memory. Please try again.');
+    }
+    return ctx.reply(`
+      ✅ Wallet data has been cleared.
+      ✅ Chat memory has been cleared.
+    `);
+}));
 // Message handler
 bot.on("message:text", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -418,35 +495,37 @@ Received a message from chat:
     catch (error) {
         console.error('Error fetching chat details:', error);
     }
-    const messageText = ctx.message.text.trim();
-    ctx.session.lastActivity = Date.now();
-    if (messageText.toLowerCase() === "confirm" && ctx.session.pendingTransaction) {
-        const handler = new StarknetTransactionHandler();
-        try {
-            const result = yield handler.processTransaction(ctx.session.pendingTransaction, ctx.session.privateKey);
-            ctx.session.pendingTransaction = null;
-            return ctx.reply(`Transaction Executed! 🎉
-Hash: ${result.transactionHash}
-View on Starkscan: https://starkscan.co/tx/${result.transactionHash}`);
+    try {
+        const messageText = ctx.message.text.trim();
+        const telegramChatId = ctx.chat.id.toString();
+        ctx.session.lastActivity = Date.now();
+        // Store user message
+        yield chatHistoryManager.storeMessage(telegramChatId, [{ role: 'user', content: messageText }], 'user');
+        // Get chat history for context
+        const chatHistory = yield chatHistoryManager.getChatHistory(telegramChatId);
+        // Process message and get response
+        let response;
+        if (messageText.toLowerCase().includes("swap") ||
+            messageText.toLowerCase().includes("transfer") ||
+            messageText.toLowerCase().includes("send")) {
+            yield processTransactionRequest(ctx, messageText);
+            return;
         }
-        catch (error) {
-            return ctx.reply("Transaction failed. Please try again.");
+        else {
+            const response = yield queryBrianAI(messageText, telegramChatId);
+            const formattedResponse = yield formatResponse(response);
+            console.log(`[SUCCESS] Replied for chat ID: ${telegramChatId}`);
+            return ctx.reply(formattedResponse, { parse_mode: "Markdown" });
         }
     }
-    if (messageText.toLowerCase().includes("swap") ||
-        messageText.toLowerCase().includes("transfer") ||
-        messageText.toLowerCase().includes("send")) {
-        return yield processTransactionRequest(ctx, messageText);
-    }
-    else {
-        const response = yield queryBrianAI(messageText);
-        const formattedResponse = yield formatResponse(response);
-        return ctx.reply(formattedResponse, { parse_mode: "Markdown" });
+    catch (error) {
+        console.error("Message handling error:", error);
+        return ctx.reply("Sorry, there was an error processing your message.");
     }
 }));
 bot.catch((err) => {
     console.error("Bot error:", err);
 });
 bot.start({
-    onStart: () => __awaiter(void 0, void 0, void 0, function* () { var _a; return console.log(`\n\*******************************************\n\nBot started as ${(_a = bot.botInfo) === null || _a === void 0 ? void 0 : _a.username}\n\n*******************************************`); })
+    onStart: () => __awaiter(void 0, void 0, void 0, function* () { var _a; return console.log(`\n\n✅Bot started as ${(_a = bot.botInfo) === null || _a === void 0 ? void 0 : _a.username}!`); }),
 });

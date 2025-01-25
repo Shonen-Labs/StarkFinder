@@ -28,8 +28,14 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     },
   })
   return (
-    <div className="flex max-w-36 max-h-[50rem] rounded-lg drop-shadow-2xl">
-      <div className="bg-[#faf3dd] p-4 text-white rounded-xl ">
+    <div className="flex max-w-36 rounded-lg drop-shadow-2xl">
+      <div
+        className="bg-[#faf3dd] p-4 text-white rounded-xl overflow-y-auto overflow-x-hidden max-h-[85vh]"
+        style={{
+          msOverflowStyle: "none", // IE and Edge
+          scrollbarWidth: "none", // Firefox
+        }}
+      >
         <div className="mt-4">
           {Object.entries(groupedBlocks).map(([category, blocks]) => (
             <div key={category} className="mb-2">
