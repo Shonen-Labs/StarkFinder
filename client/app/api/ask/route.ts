@@ -197,31 +197,55 @@ async function queryOpenAI({
   brianaiResponse: string,
   chatId?: string,
   streamCallback?: (chunk: string) => Promise<void>
-}) {
-  const messages = [
-    await systemMessage.format({ brianai_answer: brianaiResponse }),
-    { role: "user", content: userQuery }
-  ];
-
-  if (streamCallback) {
-    let fullResponse = '';
-    await agent.invoke(messages, {
-      callbacks: [{
-        handleLLMNewToken: async (token: string) => {
-          fullResponse += token;
-          await streamCallback(token);
+}): Promise<string> {
+  try {
+    if (streamCallback) {
+      const messages = [
+        await systemMessage.format({ brianai_answer: brianaiResponse }),
+        { role: "user", content: userQuery }
+      ];
+      
+      let fullResponse = '';
+      await agent.invoke(messages, {
+        callbacks: [{
+          handleLLMNewToken: async (token: string) => {
+            fullResponse += token;
+            await streamCallback(token);
+          },
+        }],
+      });
+      return fullResponse;
+    } 
+    
+    const response = await app.invoke(
+      {
+        messages: [
+          await prompt.format({
+            brianai_answer: brianaiResponse,
+            user_query: userQuery,
+          }),
+        ],
+      },
+      {
+        configurable: { 
+          thread_id: chatId || "1",
+          additional_args: { chatId } 
         },
-      }],
-    });
-    return fullResponse;
-  } else {
-    const response = await agent.invoke(messages);
-    return response.content;
+      },
+    );
+    return response.messages[response.messages.length-1].content as string;
+  } catch (error) {
+    console.error("OpenAI Error:", error);
+    return "Sorry, I am unable to process your request at the moment.";
   }
 }
 
 
-async function queryBrianAI(prompt: string, chatId?: string, streamCallback?: (chunk: string) => Promise<void>) {
+async function queryBrianAI(
+  prompt: string, 
+  chatId?: string, 
+  streamCallback?: (chunk: string) => Promise<void>
+): Promise<string> {
   try {
     const response = await axios.post(
       BRIAN_API_URL,
@@ -236,16 +260,22 @@ async function queryBrianAI(prompt: string, chatId?: string, streamCallback?: (c
         },
       }
     );
+    
     const brianaiAnswer = response.data.result.answer;
-    return await queryOpenAI({
+    const openaiAnswer = await queryOpenAI({
       brianaiResponse: brianaiAnswer,
       userQuery: prompt,
       chatId,
       streamCallback
     });
+    
+    return openaiAnswer;
   } catch (error) {
     console.error("Brian AI Error:", error);
-    throw error;
+    if (streamCallback) {
+      throw error;
+    }
+    return "Sorry, I am unable to process your request at the moment.";
   }
 }
 
@@ -288,18 +318,26 @@ export async function POST(request: Request) {
       queryBrianAI(prompt, currentChatId, async (chunk) => {
         await writer.write(encoder.encode(`data: ${JSON.stringify({ content: chunk })}\n\n`));
       }).then(async (fullResponse) => {
-        await storeMessage({
-          content: [{
-            role: "assistant",
-            content: fullResponse
-          }],
-          chatId: currentChatId,
-          userId,
-        });
+        if (fullResponse) {
+          await storeMessage({
+            content: [{
+              role: "assistant",
+              content: fullResponse
+            }],
+            chatId: currentChatId,
+            userId,
+          });
+        }
+        await writer.write(encoder.encode('data: [DONE]\n\n'));
         await writer.close();
       }).catch(async (error) => {
         console.error('Streaming error:', error);
-        await writer.abort(error);
+        const errorMessage = {
+          error: 'Unable to process request',
+          details: error.message
+        };
+        await writer.write(encoder.encode(`data: ${JSON.stringify(errorMessage)}\n\n`));
+        await writer.close();
       });
 
       return new Response(stream.readable, {
@@ -311,33 +349,38 @@ export async function POST(request: Request) {
       });
     }
 
-    // Non-streaming response remains unchanged
+    // Non-streaming response
     const response = await queryBrianAI(prompt, currentChatId);
-    if (response) {
-      await storeMessage({
-        content: [{
-          role: "assistant",
-          content: response
-        }],
-        chatId: currentChatId,
-        userId,
-      });
-
-      return NextResponse.json({
-        answer: response,
-        chatId: currentChatId
-      });
+    if (!response) {
+      throw new Error("Unexpected API response format");
     }
+
+    await storeMessage({
+      content: [{
+        role: "assistant",
+        content: response
+      }],
+      chatId: currentChatId,
+      userId,
+    });
+
+    return NextResponse.json({ 
+      answer: response,
+      chatId: currentChatId 
+    });
+    
   } catch (error: any) {
     console.error('Error:', error);
+    
     if (error.code === 'P2003') {
       return NextResponse.json(
-        { error: 'User authentication required', details: 'Please ensure you are logged in.' },
+        { error: 'User authentication required', details: 'Please ensure you are logged in.' }, 
         { status: 401 }
       );
     }
+    
     return NextResponse.json(
-      { error: 'Unable to process request', details: error.message },
+      { error: 'Unable to process request', details: error.message }, 
       { status: 500 }
     );
   }
