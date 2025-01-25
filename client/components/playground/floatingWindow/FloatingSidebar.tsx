@@ -32,13 +32,8 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
   })
   return (
     <div className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg">
-      <div className="flex justify-between">
-        <h2>DevXstarck</h2>
-        <span>icon</span>
-      </div>
-
       {/* Defi Section */}
-      <div className="mt-10">
+      <div>
         <h4 className="text-gray-400">Defi</h4>
       
         <div className="mt-4 flex flex-col gap-2">
@@ -162,7 +157,13 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           </div>
         </div>
 
-       
+        <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">
+          <div>Take full control of your rewards! 🚀</div>
+          <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71]">
+            <span>icon</span>
+            <div>Claim Token</div>
+          </button>
+        </div>
       </div>
     </div>
   );
