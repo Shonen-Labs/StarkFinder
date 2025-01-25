@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Play } from "lucide-react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
 import { Code } from "lucide-react";
