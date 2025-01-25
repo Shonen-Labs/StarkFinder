@@ -37,6 +37,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
         <span>icon</span>
       </div>
 
+      {/* Defi Section */}
       <div className="mt-10">
         <h4 className="text-gray-400">Defi</h4>
       
@@ -102,10 +103,66 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 </div>  
               </div>
             </div>
+          </div> 
+        </div>
+
+        {/* Assesment Management Section */}
+        <div className="mt-8">
+          <h4 className="text-gray-400">Assesment Management</h4>
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Liquidity Management</div>
+              </div>
+              <ChevronDown/>
+            </div>
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Portfolio Management</div>
+              </div>
+              <ChevronDown/>
+            </div>
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Insight & Analytics</div>
+              </div>
+              <ChevronDown/>
+            </div>
           </div>
-          
         </div>
         
+        {/* Token Action Section  */}
+        <div className="mt-8">
+          <h4 className="text-gray-400">Token Action</h4>
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Governance</div>
+              </div>
+              <ChevronDown/>
+            </div>
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Events & Automations</div>
+              </div>
+              <ChevronDown/>
+            </div>
+            <div className="px-3 py-2">
+              <div className="flex gap-3">
+                <span>icon</span>
+                <div>Custom</div>
+              </div>
+             
+            </div>
+          </div>
+        </div>
+
+       
       </div>
     </div>
   );
