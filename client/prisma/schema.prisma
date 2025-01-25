@@ -4,8 +4,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") 
 }
+
 
 model User {
   id       String    @id @default(uuid())
@@ -19,25 +20,25 @@ model User {
 
 model Chat {
   id       String    @id @default(uuid())
-  title    String?
-  metadata Json?
-  userId   String?
-  type     ChatType  @default(GENERAL)
+  messages Message[] // The relation to Message
   User     User?     @relation(fields: [userId], references: [id])
-  Message  Message[]
+  userId   String?
 }
 
 model Message {
-  id       String  @id @default(uuid())
-  content  Json[]
-  metadata Json?
-  replyTo  String?
-  chatId   String
-  userId   String
-  createdAt DateTime @default(now())
-  Chat     Chat    @relation(fields: [chatId], references: [id])
-  User     User    @relation(fields: [userId], references: [id])
+  id        String   @id @default(uuid())
+  content   Json
+  metadata  Json?
+  userId    String
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  
+  // Add the opposite relation for Message to Chat
+  chat      Chat?    @relation(fields: [chatId], references: [id])
+  chatId    String?
 }
+
+
 
 model Transaction {
   id          String   @id @default(uuid())
