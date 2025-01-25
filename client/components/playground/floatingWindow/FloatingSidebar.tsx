@@ -81,15 +81,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                   <DropdownArrowIcon status=""/>
               </div>
           </div>
-          {false && <div className="ml-10 mt-2 flex flex-col gap-2">
-            {triggerActions.map(child =>  <div className="px-3 py-2">
-                <div className="flex gap-3">
-                  <span>{child.icon}</span>
-                  <div className="text-black">{child.text}</div>
-                </div>
-              </div>)}
-             
-            </div>}
+          {false && <div className="ml-10 mt-2 flex flex-col gap-2"></div>}
           <div>
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
@@ -102,45 +94,14 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <DropdownArrowIcon status=""/>
               </div> 
             </div>
-            {true && <div className="ml-10 mt-2 flex flex-col gap-2">
+            {false && <div className="ml-10 mt-2 flex flex-col gap-2">
               <div className="px-3 py-2">
-               {tokenActions.map(child=><div className="px-3 py-2">
+               {tokenActions.map(child=><div key={child.text} className="px-3 py-2">
                 <div className="flex gap-3">
                   <span>{child.icon}</span>
                   <div className="text-black">{child.text}</div>
                 </div>
               </div>)}
-              </div>
-              <div className="px-3 py-2 ">
-                <div className="flex gap-3">
-                  <span>icon</span>
-                  <div className="text-black">Allocate Token</div>
-                </div>
-              </div>
-              <div className="px-3 py-2 flex justify-between items-center">
-                <div className="flex gap-3">
-                  <span>icon</span>
-                  <div className="text-black">Yield Farming</div>
-                </div>
-                <ChevronDown/>
-              </div>
-              <div className="px-3 py-2 ">
-                <div className="flex gap-3">
-                  <span>icon</span>
-                  <div className="text-black">Lend Tokens</div>
-                </div>               
-              </div>
-              <div className="px-3 py-2">
-                <div className="flex gap-3">
-                  <span>icon</span>
-                  <div className="text-black">Borrow Token</div>
-                </div>
-              </div>
-              <div className="px-3 py-2 ">
-                <div className="flex gap-3">
-                  <span>icon</span>
-                  <div className="text-black">Repay Loan</div>
-                </div>  
               </div>
             </div>}
             
