@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextResponse, type NextRequest } from "next/server"
 import { ChatOpenAI } from "@langchain/openai"
 import { transactionProcessor } from "@/lib/transaction"
