@@ -3,15 +3,6 @@ import { BrianTransactionData, TransactionStep } from "../types";
 import { BaseTransactionHandler } from "./base";
 import { LayerswapClient } from "../../layerswap/client";
 
-// const NETWORK_MAPPING = {
-//   'starknet': 'STARKNET_MAINNET',
-//   'base': 'BASE_MAINNET',
-//   'ethereum': 'ETHEREUM_MAINNET',
-//   'arbitrum': 'ARBITRUM_MAINNET',
-//   'optimism': 'OPTIMISM_MAINNET'
-// } as const;
-
-
 export class BridgeHandler extends BaseTransactionHandler {
   private layerswapClient: LayerswapClient;
 
@@ -34,64 +25,65 @@ export class BridgeHandler extends BaseTransactionHandler {
     this.layerswapClient = new LayerswapClient(apiKey);
   }
 
-    private async validateRoute(
-      sourceNetwork: string,
-      destinationNetwork: string,
-      sourceToken: string,
-      destinationToken: string
-    ): Promise<void> {
-      try {
-        const routes = await this.layerswapClient.getAvailableRoutes();
-        
-        const sourceNetworkFormatted = this.formatNetwork(sourceNetwork);
-        const destNetworkFormatted = this.formatNetwork(destinationNetwork);
-  
-        if (!routes.source_networks.includes(sourceNetworkFormatted)) {
-          throw new Error(`Source network ${sourceNetwork} is not supported. Available networks: ${routes.source_networks.join(', ')}`);
-        }
-  
-        if (!routes.destination_networks.includes(destNetworkFormatted)) {
-          throw new Error(`Destination network ${destinationNetwork} is not supported. Available networks: ${routes.destination_networks.join(', ')}`);
-        }
-  
-        // Check tokens
-        const sourceNetworkTokens = routes.tokens[sourceNetworkFormatted] || [];
-        const destNetworkTokens = routes.tokens[destNetworkFormatted] || [];
-  
-        const sourceTokenFormatted = sourceToken.toUpperCase();
-        const destTokenFormatted = destinationToken.toUpperCase();
-  
-        if (!sourceNetworkTokens.includes(sourceTokenFormatted)) {
-          throw new Error(`Token ${sourceToken} is not supported on ${sourceNetwork}. Available tokens: ${sourceNetworkTokens.join(', ')}`);
-        }
-  
-        if (!destNetworkTokens.includes(destTokenFormatted)) {
-          throw new Error(`Token ${destinationToken} is not supported on ${destinationNetwork}. Available tokens: ${destNetworkTokens.join(', ')}`);
-        }
-      } catch (error) {
-        console.error('Route validation error:', error);
-        throw error;
+  private async validateRoute(
+    sourceNetwork: string,
+    destinationNetwork: string,
+    sourceToken: string,
+    destinationToken: string
+  ): Promise<void> {
+    try {
+      const routes = await this.layerswapClient.getAvailableRoutes();
+      
+      const sourceNetworkFormatted = this.formatNetwork(sourceNetwork);
+      const destNetworkFormatted = this.formatNetwork(destinationNetwork);
+
+      if (!routes.source_networks.includes(sourceNetworkFormatted)) {
+        throw new Error(`Source network ${sourceNetwork} is not supported. Available networks: ${routes.source_networks.join(', ')}`);
       }
-    }
-  
-    private formatNetwork(network: string): string {
-      const normalized = network.toLowerCase();
-      switch (normalized) {
-        case 'starknet':
-          return 'STARKNET_MAINNET';
-        case 'base':
-          return 'BASE_MAINNET';
-        case 'ethereum':
-          return 'ETHEREUM_MAINNET';
-        case 'arbitrum':
-          return 'ARBITRUM_MAINNET';
-        case 'optimism':
-          return 'OPTIMISM_MAINNET';
-        default:
-          return `${network.toUpperCase()}_MAINNET`;
+
+      if (!routes.destination_networks.includes(destNetworkFormatted)) {
+        throw new Error(`Destination network ${destinationNetwork} is not supported. Available networks: ${routes.destination_networks.join(', ')}`);
       }
+
+      // Check tokens
+      const sourceNetworkTokens = routes.tokens[sourceNetworkFormatted] || [];
+      const destNetworkTokens = routes.tokens[destNetworkFormatted] || [];
+
+      const sourceTokenFormatted = sourceToken.toUpperCase();
+      const destTokenFormatted = destinationToken.toUpperCase();
+
+      if (!sourceNetworkTokens.includes(sourceTokenFormatted)) {
+        throw new Error(`Token ${sourceToken} is not supported on ${sourceNetwork}. Available tokens: ${sourceNetworkTokens.join(', ')}`);
+      }
+
+      if (!destNetworkTokens.includes(destTokenFormatted)) {
+        throw new Error(`Token ${destinationToken} is not supported on ${destinationNetwork}. Available tokens: ${destNetworkTokens.join(', ')}`);
+      }
+    } catch (error) {
+      console.error('Route validation error:', error);
+      throw error;
     }
-    async processSteps(
+  }
+
+  private formatNetwork(network: string): string {
+    const normalized = network.toLowerCase();
+    switch (normalized) {
+      case 'starknet':
+        return 'STARKNET_MAINNET';
+      case 'base':
+        return 'BASE_MAINNET';
+      case 'ethereum':
+        return 'ETHEREUM_MAINNET';
+      case 'arbitrum':
+        return 'ARBITRUM_MAINNET';
+      case 'optimism':
+        return 'OPTIMISM_MAINNET';
+      default:
+        return `${network.toUpperCase()}_MAINNET`;
+    }
+  }
+
+  async processSteps(
     data: BrianTransactionData,
     params?: any
   ): Promise<TransactionStep[]> {
@@ -103,13 +95,20 @@ export class BridgeHandler extends BaseTransactionHandler {
 
       // Create layerswap request
       const request = {
-        sourceNetwork: this.formatNetwork(params.chain || "starknet"),
-        destinationNetwork: this.formatNetwork(params.dest_chain || "base"),
-        sourceToken: params.token1.toUpperCase(),
-        destinationToken: params.token2.toUpperCase(),
+        destination_address: destinationAddress,
+        reference_id: params.referenceId,
+        source_exchange: params.sourceExchange,
+        destination_exchange: params.destinationExchange,
+        source_network: this.formatNetwork(params.chain || "starknet"),
+        source_token: params.token1.toUpperCase(),
+        destination_network: this.formatNetwork(params.dest_chain || "base"),
+        destination_token: params.token2.toUpperCase(),
+        refuel: params.refuel,
+        use_deposit_address: params.useDepositAddress,
+        use_new_deposit_address: params.useNewDepositAddress,
         amount: parseFloat(params.amount),
-        sourceAddress,
-        destinationAddress,
+        source_address: sourceAddress,
+        slippage: params.slippage,
       };
 
       // Log request for debugging
@@ -117,10 +116,10 @@ export class BridgeHandler extends BaseTransactionHandler {
 
       // Validate route before proceeding
       await this.validateRoute(
-        request.sourceNetwork,
-        request.destinationNetwork,
-        request.sourceToken,
-        request.destinationToken
+        request.source_network,
+        request.destination_network,
+        request.source_token,
+        request.destination_token
       );
 
       try {
@@ -137,7 +136,7 @@ export class BridgeHandler extends BaseTransactionHandler {
       } catch (error: any) {
         if (error.message?.includes("ROUTE_NOT_FOUND_ERROR")) {
           throw new Error(
-            `Bridge route not available from ${request.sourceToken} on ${params.chain} to ${request.destinationToken} on ${params.dest_chain}. ` +
+            `Bridge route not available from ${request.source_token} on ${params.chain} to ${request.destination_token} on ${params.dest_chain}. ` +
               "You might need to bridge through an intermediate token like ETH."
           );
         }

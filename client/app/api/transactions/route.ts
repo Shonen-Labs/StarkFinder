@@ -1,49 +1,41 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextResponse, type NextRequest } from "next/server"
+import { ChatOpenAI } from "@langchain/openai"
+import { transactionProcessor } from "@/lib/transaction"
+import { LayerswapClient } from "@/lib/layerswap/client"
 
-import { NextResponse, NextRequest } from "next/server";
-import { ChatOpenAI } from "@langchain/openai";
-import { transactionProcessor } from "@/lib/transaction";
-
-import type {
-  BrianResponse,
-  BrianTransactionData,
-} from "@/lib/transaction/types";
-import {
-  TRANSACTION_INTENT_PROMPT,
-  transactionIntentPromptTemplate,
-} from "@/prompts/prompts";
-import { StringOutputParser } from "@langchain/core/output_parsers";
+import type { BrianResponse, BrianTransactionData } from "@/lib/transaction/types"
+import { TRANSACTION_INTENT_PROMPT, transactionIntentPromptTemplate } from "@/prompts/prompts"
+import { StringOutputParser } from "@langchain/core/output_parsers"
 
 const llm = new ChatOpenAI({
   model: "gpt-4",
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
+
+const layerswapClient = new LayerswapClient(process.env.LAYERSWAP_API_KEY as string)
 
 async function getTransactionIntentFromOpenAI(
   prompt: string,
   address: string,
   chainId: string,
-  messages: any[]
+  messages: any[],
 ): Promise<BrianResponse> {
   try {
-    const conversationHistory = messages
-      .map((msg) => `${msg.role}: ${msg.content}`)
-      .join("\n");
+    const conversationHistory = messages.map((msg) => `${msg.role}: ${msg.content}`).join("\n")
 
     const formattedPrompt = await transactionIntentPromptTemplate.format({
       TRANSACTION_INTENT_PROMPT,
       prompt,
       chainId,
       conversationHistory,
-    });
+    })
 
-    const jsonOutputParser = new StringOutputParser();
-    const response = await llm.pipe(jsonOutputParser).invoke(formattedPrompt);
-    const intentData = JSON.parse(response);
+    const jsonOutputParser = new StringOutputParser()
+    const response = await llm.pipe(jsonOutputParser).invoke(formattedPrompt)
+    const intentData = JSON.parse(response)
 
     if (!intentData.isTransactionIntent) {
-      throw new Error("Not a transaction-related prompt");
+      throw new Error("Not a transaction-related prompt")
     }
 
     const intentResponse: BrianResponse = {
@@ -60,14 +52,13 @@ async function getTransactionIntentFromOpenAI(
         address: intentData.extractedParams.address || address,
         dest_chain: intentData.extractedParams.dest_chain || "",
         destinationChain: intentData.extractedParams.dest_chain || "",
-        destinationAddress:
-          intentData.extractedParams.destinationAddress || address,
+        destinationAddress: intentData.extractedParams.destinationAddress || address,
       },
       data: {} as BrianTransactionData,
-    };
+    }
 
-    const value = 10 ** 18;
-    const weiAmount = BigInt(intentData.extractedParams.amount * value);
+    const value = 10 ** 18
+    const weiAmount = BigInt(intentData.extractedParams.amount * value)
 
     switch (intentData.action) {
       case "swap":
@@ -80,13 +71,10 @@ async function getTransactionIntentFromOpenAI(
             intentData.extractedParams.transaction?.calldata
               ? [
                   {
-                    contractAddress:
-                      intentData.extractedParams.transaction.contractAddress,
-                    entrypoint:
-                      intentData.extractedParams.transaction.entrypoint,
+                    contractAddress: intentData.extractedParams.transaction.contractAddress,
+                    entrypoint: intentData.extractedParams.transaction.entrypoint,
                     calldata: [
-                      intentData.extractedParams.destinationAddress ||
-                        intentData.extractedParams.address,
+                      intentData.extractedParams.destinationAddress || intentData.extractedParams.address,
                       weiAmount.toString(),
                       "0",
                     ],
@@ -108,8 +96,8 @@ async function getTransactionIntentFromOpenAI(
           receiver: intentData.extractedParams.address,
           amountToApprove: intentData.data?.amountToApprove,
           gasCostUSD: intentData.data?.gasCostUSD,
-        };
-        break;
+        }
+        break
 
       case "bridge":
         intentResponse.data = {
@@ -120,13 +108,12 @@ async function getTransactionIntentFromOpenAI(
             destinationNetwork: intentData.extractedParams.dest_chain || "",
             sourceToken: intentData.extractedParams.token1 || "",
             destinationToken: intentData.extractedParams.token2 || "",
-            amount: parseFloat(intentData.extractedParams.amount || "0"),
+            amount: Number.parseFloat(intentData.extractedParams.amount || "0"),
             sourceAddress: address,
-            destinationAddress:
-              intentData.extractedParams.destinationAddress || address,
+            destinationAddress: intentData.extractedParams.destinationAddress || address,
           },
-        };
-        break;
+        }
+        break
 
       case "deposit":
       case "withdraw":
@@ -137,54 +124,38 @@ async function getTransactionIntentFromOpenAI(
           fromAmount: intentData.extractedParams.amount,
           toAmount: intentData.extractedParams.amount,
           receiver: intentData.extractedParams.address || "",
-        };
-        break;
+        }
+        break
 
       default:
-        throw new Error(`Unsupported action type: ${intentData.action}`);
+        throw new Error(`Unsupported action type: ${intentData.action}`)
     }
 
-    return intentResponse;
+    return intentResponse
   } catch (error) {
-    console.error("Error fetching transaction intent:", error);
-    throw error;
+    console.error("Error fetching transaction intent:", error)
+    throw error
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { prompt, address, messages = [], chainId = "4012" } = body;
+    const body = await request.json()
+    const { prompt, address, messages = [], chainId = "4012" } = body
 
     if (!prompt || !address) {
-      return NextResponse.json(
-        { error: "Missing required parameters (prompt or address)" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required parameters (prompt or address)" }, { status: 400 })
     }
 
     try {
-      const transactionIntent = await getTransactionIntentFromOpenAI(
-        prompt,
-        address,
-        chainId,
-        messages
-      );
-      console.log(
-        "Processed Transaction Intent from OPENAI:",
-        JSON.stringify(transactionIntent, null, 2)
-      );
+      const transactionIntent = await getTransactionIntentFromOpenAI(prompt, address, chainId, messages)
+      console.log("Processed Transaction Intent from OPENAI:", JSON.stringify(transactionIntent, null, 2))
 
-      const processedTx = await transactionProcessor.processTransaction(
-        transactionIntent
-      );
-      console.log(
-        "Processed Transaction:",
-        JSON.stringify(processedTx, null, 2)
-      );
+      const processedTx = await transactionProcessor.processTransaction(transactionIntent)
+      console.log("Processed Transaction:", JSON.stringify(processedTx, null, 2))
 
       if (["deposit", "withdraw"].includes(transactionIntent.action)) {
-        processedTx.receiver = address;
+        processedTx.receiver = address
       }
 
       return NextResponse.json({
@@ -211,25 +182,19 @@ export async function POST(request: NextRequest) {
             conversationHistory: messages,
           },
         ],
-      });
+      })
     } catch (error) {
-      console.error("Transaction processing error:", error);
+      console.error("Transaction processing error:", error)
       return NextResponse.json(
         {
-          error:
-            error instanceof Error
-              ? error.message
-              : "Transaction processing failed",
+          error: error instanceof Error ? error.message : "Transaction processing failed",
           details: error instanceof Error ? error.stack : undefined,
         },
-        { status: 400 }
-      );
+        { status: 400 },
+      )
     }
   } catch (error) {
-    console.error("Request processing error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error("Request processing error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

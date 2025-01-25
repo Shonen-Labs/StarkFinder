@@ -87,16 +87,20 @@ export interface LayerswapErrorResponse {
 }
 
 export interface LayerswapCreateSwapRequest {
-  source: string;
-  destination: string;
-  amount: number;
-  source_asset: string;
-  destination_asset: string;
   destination_address: string;
+  reference_id?: string | null;
+  source_exchange?: string | null;
+  destination_exchange?: string | null;
+  source_network: string;
+  source_token: string;
+  destination_network: string;
+  destination_token: string;
   refuel: boolean;
-  reference_id?: string;
-  source_address?: string;
-  use_deposit_address?: boolean;
+  use_deposit_address: boolean;
+  use_new_deposit_address?: boolean | null;
+  amount: number;
+  source_address?: string | null;
+  slippage?: string | null;
 }
 
 export interface LayerswapCreateSwapResponse {
