@@ -117,7 +117,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <div className="text-black">Liquidity Management</div>
               </div>
               <div >
-                <ChevronDown/>
+                <DropdownArrowIcon status=""/>
               </div> 
             </div>
             {false && 
@@ -141,7 +141,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <div className="text-black">Portfolio Management</div>
               </div>
               <div>
-                <ChevronDown/>
+                <DropdownArrowIcon status=""/>
               </div> 
             </div>
             {false && 
@@ -189,7 +189,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <div className="text-black">Insight & Analytics</div>
               </div>
               <div >
-                <ChevronDown/>
+                <DropdownArrowIcon status=""/>
               </div> 
             </div>
             {false && 
@@ -220,7 +220,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <div className="text-black">Governance</div>
               </div>
               <div>
-                <ChevronDown/>
+                <DropdownArrowIcon status=""/>
               </div> 
             </div>
             {false &&
@@ -244,7 +244,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <div className="text-black">Events & Automations</div>
               </div>
               <div>
-                <ChevronDown/>
+                <DropdownArrowIcon status=""/>
               </div> 
             </div>
             {false &&
