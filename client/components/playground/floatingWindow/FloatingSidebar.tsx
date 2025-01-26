@@ -7,6 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { DIRTY, z } from "zod";
 import { toast } from 'sonner'
 
+// libraries
+import clsx from 'clsx';
+
 // icons
 import StartIcon from "@/components/svgs/StartIcon";
 import CoinIcon from "@/components/svgs/CoinIcon";
@@ -47,9 +50,9 @@ import VoteIcon from "@/components/svgs/VoteIcon";
 import { Code } from "lucide-react";
 
 // array holding data concerning  nested items 
-const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
+const triggerActions = [{icon: <FlagIcon/>, text:"Initialise", toggle:false}, {icon: <ConnectionIcon/>, text: "Connection", toggle:true}];
 
-const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token"}, {icon: <StakeTokenIcon/>, text: "StakeToken"}, {icon:<AllocateTokenIcon/>, text: "Allocate Token"}, {icon: <YieldFarmingIcon/>, text: "Yield Farming"}, {icon: <LendTokenIcon/>, text: "Lend Tokens"}, {icon: <BorrowTokenIcon/>, text:"Borrow Token"}, {icon:<RepayLoanIcon/>, text:"Repay Loan"}];
+const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token", toggle:false}, {icon: <StakeTokenIcon/>, text: "StakeToken",  toggle:false}, {icon:<AllocateTokenIcon/>, text: "Allocate Token", toggle:false}, {icon: <YieldFarmingIcon/>, text: "Yield Farming", toggle:true}, {icon: <LendTokenIcon/>, text: "Lend Tokens", toggle:false}, {icon: <BorrowTokenIcon/>, text:"Borrow Token", toggle:false}, {icon:<RepayLoanIcon/>, text:"Repay Loan", toggle:false}];
 
 const liquidityManagement  = [{icon: <AddIcon/>, text: "Add Liquidity"}, {icon: <PeopleIcon/>, text:"Create Stack Pooling"}]
 
@@ -115,6 +118,7 @@ function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
   }
 }
 
+
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
   const [{triggerActionToggle,
     tokenActionsToggle,
@@ -124,8 +128,14 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     governanceToggle,
     eventsAndAutomationToggle}, dispatch] = useReducer(toggleReducer, initialState);
 
+  const [onToggleButton, setOnToggleButton] = useState(false);
+
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
-  
+
+  function switchToggleBtn(){
+    setOnToggleButton((prev)=> !prev)
+    console.log("print")
+  }
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
@@ -140,158 +150,179 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     },
   })
   return (
-    <div className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg">
+    <div className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg transition-all duration-300 ease-out mb-5 text-sm">
       {/* Defi Section */}
       <div>
         <h4 className="text-gray-400">Defi</h4>
       
         <div className="mt-4 flex flex-col gap-2 text-gray-400">
-          <div className="px-3 py-2 flex justify-between items-center">
-              <div className="flex gap-3">
-                <span>
-                  <StartIcon/>
-                </span>
-                <div className="text-black">Trigger Actions</div>
-              </div>
-               <div onClick={() => dispatch({ type: "toggle_triggerAction" })}>
-                {triggerActionToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
-              </div>
-          </div>
-          {triggerActionToggle && <div className="ml-10 mt-2 flex flex-col gap-2">
-           {triggerActions.map(child=><div key={child.text} className="px-3 py-2">
+          <div className={clsx("hover:bg-gray-200 rounded-lg", triggerActionToggle && 'bg-gray-200')}>
+            <div className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
-                  <span>{child.icon}</span>
-                  <div className="text-black">{child.text}</div>
+                  <span>
+                    <StartIcon/>
+                  </span>
+                  <div className="text-black">Trigger Actions</div>
                 </div>
-              </div>)}
-            </div>}
-          <div>
+                <div onClick={() => dispatch({ type: "toggle_triggerAction" })}>
+                  {triggerActionToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
+                </div>
+            </div>
+            {triggerActionToggle && <div className="ml-10 my-2 mr-2 flex flex-col gap-2">
+            {triggerActions.map(child=><div key={child.text} className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-3">
+                      <span>{child.icon}</span>
+                      <div className="text-black hover:font-medium">{child.text}</div>
+                    </div>
+                    <span>{child.toggle?onToggleButton?<ToggleBtn mode="on" onClick={switchToggleBtn}/>: <ToggleBtn mode="off" onClick={switchToggleBtn}/>: ""}</span>
+                  </div>
+                </div>)}
+              </div>}
+          </div>
+          <div className={clsx("hover:bg-gray-200 rounded-lg", tokenActionsToggle && 'bg-gray-200')}>
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
                 <span>
                   <CoinIcon/>
                 </span>
-                <div className="text-black">Token Actions</div>
+                <div className="text-black ">Token Actions</div>
               </div>
               <div onClick={() => dispatch({ type: "toggle_tokenActions" })}>
                {tokenActionsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
               </div> 
             </div>
-            {tokenActionsToggle && <div className="ml-10 mt-2 flex flex-col gap-2">
+            {tokenActionsToggle && <div className="ml-10 my-2 flex flex-col gap-2 cursor-pointer">
               <div className="px-3 py-2">
-               {tokenActions.map(child=><div key={child.text} className="px-3 py-2">
-                <div className="flex gap-3">
-                  <span>{child.icon}</span>
-                  <div className="text-black">{child.text}</div>
+               {tokenActions.map(child=><div key={child.text} className="px-3 py-2 hover:bg-gray-100 rounded-md mr-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-3">
+                    <span>{child.icon}</span>
+                    <div className="text-black hover:font-medium">{child.text}</div>
+                  </div>
+                  <span>{child.toggle?onToggleButton?<ToggleBtn mode="on" onClick={switchToggleBtn}/>: <ToggleBtn mode="off" onClick={switchToggleBtn}/>: ""}</span>
                 </div>
               </div>)}
               </div>
-            </div>}
-            
-          </div> 
+            </div>} 
+          </div>
         </div>
 
         {/* Assesment Management Section */}
         <div className="mt-8 text-gray-400">
           <h4>Assesment Management</h4>
           <div className="mt-4 flex flex-col gap-2">
-            <div className="px-3 py-2 flex justify-between items-center">
-              <div className="flex gap-3">
-                <span><LiquidDropIcon/></span>
-                <div className="text-black">Liquidity Management</div>
-              </div>
-              <div onClick={() => dispatch({ type: "toggle_liquidityManagement" })}>
-                  {liquidityManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
-              </div> 
-            </div>
-            {liquidityManagementToggle && 
-              <div className="ml-10 mt-2 flex flex-col gap-2">
-                {liquidityManagement.map(child => <div className="px-3 py-2">
+          <div className={clsx("hover:bg-gray-200 rounded-lg", liquidityManagementToggle && 'bg-gray-200')}>
+              <div className="px-3 py-2 flex justify-between items-center">
                   <div className="flex gap-3">
-                    <span>{child.icon}</span>
-                    <div className="text-black">{child.text}</div>
+                    <span><LiquidDropIcon/></span>
+                    <div className="text-black">Liquidity Management</div>
                   </div>
-                </div>)}   
-              </div>}
-            <div className="px-3 py-2 flex justify-between items-center text-gray-400">
-              <div className="flex gap-3">
-                <span><BagIcon/></span>
-                <div className="text-black">Portfolio Management</div>
-              </div>
-              <div onClick={() => dispatch({ type: "toggle_portfolioManagement" })}>
-                {portfolioManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-              </div> 
+                  <div onClick={() => dispatch({ type: "toggle_liquidityManagement" })}>
+                      {liquidityManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
+                  </div> 
+                </div>
+                {liquidityManagementToggle && 
+                  <div className="ml-10 my-2 flex flex-col gap-2">
+                    {liquidityManagement.map(child => <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                      <div className="flex gap-3">
+                        <span>{child.icon}</span>
+                        <div className="text-black">{child.text}</div>
+                      </div>
+                    </div>)}   
+                  </div>}
             </div>
-            {portfolioManagementToggle && 
-              <div className="ml-10 mt-2 flex flex-col gap-2">
-                {portfolioManagement.map(child=> <div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>{child.icon}</span>
-                    <div className="text-black">{child.text}</div>
-                  </div>
-                </div>)}
-              </div>}
-            <div className="px-3 py-2 flex justify-between items-center">
-              <div className="flex gap-3">
-                <span><AnalyticsIcon/></span>
-                <div className="text-black">Insight & Analytics</div>
+          
+            <div className={clsx("hover:bg-gray-200 rounded-lg", portfolioManagementToggle && 'bg-gray-200')}>
+              <div className="px-3 py-2 flex justify-between items-center text-gray-400">
+                <div className="flex gap-3">
+                  <span><BagIcon/></span>
+                  <div className="text-black">Portfolio Management</div>
+                </div>
+                <div onClick={() => dispatch({ type: "toggle_portfolioManagement" })}>
+                  {portfolioManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
+                </div> 
               </div>
-                <div onClick={() => dispatch({ type: "toggle_insightAndAnalytics"})}>
-                {insightAndAnalyticsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-              </div> 
-            </div>
-            {insightAndAnalyticsToggle && 
-                <div className="ml-10 mt-2 flex flex-col gap-2">
-                  {insighAndAnalytics.map(child=> <div className="px-3 py-2">
+              {portfolioManagementToggle && 
+                <div className="ml-10 my-2 flex flex-col gap-2">
+                  {portfolioManagement.map(child=> <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
                     <div className="flex gap-3">
                       <span>{child.icon}</span>
                       <div className="text-black">{child.text}</div>
                     </div>
-                  </div>)}    
+                  </div>)}
                 </div>}
-          </div>
+            </div>
+
+            <div className={clsx("hover:bg-gray-200 rounded-lg", insightAndAnalyticsToggle && 'bg-gray-200')}>
+              <div className="px-3 py-2 flex justify-between items-center">
+                  <div className="flex gap-3">
+                    <span><AnalyticsIcon/></span>
+                    <div className="text-black">Insight & Analytics</div>
+                  </div>
+                    <div onClick={() => dispatch({ type: "toggle_insightAndAnalytics"})}>
+                    {insightAndAnalyticsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
+                  </div> 
+                </div>
+                {insightAndAnalyticsToggle && 
+                    <div className="ml-10 my-2 flex flex-col gap-2">
+                      {insighAndAnalytics.map(child => <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                        <div className="flex gap-3">
+                          <span>{child.icon}</span>
+                          <div className="text-black">{child.text}</div>
+                        </div>
+                      </div>)}    
+                  </div>}
+              </div>
+            </div>
         </div>
         
         {/* Token Action Section  */}
         <div className="mt-8 text-gray-400">
           <h4>Token Action</h4>
           <div className="mt-4 flex flex-col gap-2">
-            <div className="px-3 py-2 flex justify-between items-center">
-              <div className="flex gap-3">
-                <span><GovernanceIcon/></span>
-                <div className="text-black">Governance</div>
+            <div className={clsx("hover:bg-gray-200 rounded-lg", governanceToggle && 'bg-gray-200')}>
+              <div className="px-3 py-2 flex justify-between items-center">
+                <div className="flex gap-3">
+                  <span><GovernanceIcon/></span>
+                  <div className="text-black">Governance</div>
+                </div>
+                <div onClick={() => dispatch({ type: "toggle_governance"})}>
+                  {governanceToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
+                </div> 
               </div>
-              <div onClick={() => dispatch({ type: "toggle_governance"})}>
-                {governanceToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-              </div> 
+              {governanceToggle &&
+              <div className="ml-10 my-2 flex flex-col gap-2">
+                {governance.map(child=><div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                    <div className="flex gap-3">
+                      <span>{child.icon}</span>
+                      <div className="text-black">{child.text}</div>
+                    </div>
+                  </div>)}  
+              </div>}
             </div>
-            {governanceToggle &&
-             <div className="ml-10 mt-2 flex flex-col gap-2">
-              {governance.map(child=><div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>{child.icon}</span>
-                    <div className="text-black">{child.text}</div>
-                  </div>
-                </div>)}  
-            </div>}
-            <div className="px-3 py-2 flex justify-between items-center">
-              <div className="flex gap-3">
-                <span><CalenderIcon/></span>
-                <div className="text-black">Events & Automations</div>
+
+            <div className={clsx("hover:bg-gray-200 rounded-lg", eventsAndAutomationToggle && 'bg-gray-200')}>
+              <div className="px-3 py-2 flex justify-between items-center">
+                <div className="flex gap-3">
+                  <span><CalenderIcon/></span>
+                  <div className="text-black">Events & Automations</div>
+                </div>
+                <div onClick={() => dispatch({ type: "toggle_eventsAndAutomation"})}>
+                {eventsAndAutomationToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
+                </div> 
               </div>
-              <div onClick={() => dispatch({ type: "toggle_eventsAndAutomation"})}>
-              {eventsAndAutomationToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-              </div> 
+              {eventsAndAutomationToggle &&
+              <div className="ml-10 my-2 flex flex-col gap-2">
+                {eventsAndAutomation.map(child=> <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                    <div className="flex gap-3">
+                      <span>{child.icon}</span>
+                      <div className="text-black">{child.text}</div>
+                    </div>
+                  </div>)}
+              </div>}
             </div>
-            {eventsAndAutomationToggle &&
-             <div className="ml-10 mt-2 flex flex-col gap-2">
-              {eventsAndAutomation.map(child=> <div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>{child.icon}</span>
-                    <div className="text-black">{child.text}</div>
-                  </div>
-                </div>)}
-            </div>}
+            
             <div className="px-3 py-2">
               <div className="flex gap-3">
                 <span><MenuIcon/></span>
@@ -303,14 +334,14 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
         <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">
           <div>Take full control of your rewards! 🚀</div>
-          <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71]">
+          <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71] shadow-sm transition transform hover:hover:bg-opacity-80 hover:shadow-md active:shadow-lg active:scale-95 ease-out">
             <span><RewardIcon/></span>
             <div>Claim Token</div>
           </button>
         </div>
       </div>
     </div>
-  );
+  );}
 
   function onSubmitCustomBlock(values: z.infer<typeof formSchema>) {
     const newCustomBlock = {
@@ -327,5 +358,5 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     setIsCustomModalOpen(false)
     form.reset()
     toast.success('Custom block added successfully')
-  }
-};
+  };
+
