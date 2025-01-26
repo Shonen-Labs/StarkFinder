@@ -154,7 +154,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <DropdownArrowIcon status=""/>
               </div> 
             </div>
-            {true && 
+            {false && 
               <div className="ml-10 mt-2 flex flex-col gap-2">
                 {portfolioManagement.map(child=> <div className="px-3 py-2">
                   <div className="flex gap-3">
@@ -165,7 +165,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               </div>}
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
-                <span>icon</span>
+                <span><AnalyticsIcon/></span>
                 <div className="text-black">Insight & Analytics</div>
               </div>
               <div >
@@ -174,18 +174,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
             </div>
             {false && 
                 <div className="ml-10 mt-2 flex flex-col gap-2">
-                  <div className="px-3 py-2">
+                  {insighAndAnalytics.map(child=> <div className="px-3 py-2">
                     <div className="flex gap-3">
-                      <span>icon</span>
-                      <div className="text-black">Add Liquiduty</div>
+                      <span>{child.icon}</span>
+                      <div className="text-black">{child.text}</div>
                     </div>
-                  </div>
-                  <div className="px-3 py-2">
-                    <div className="flex gap-3">
-                      <span>icon</span>
-                      <div className="text-black">Create Stack Pooling</div>
-                    </div>               
-                  </div>   
+                  </div>)}    
                 </div>}
           </div>
         </div>
