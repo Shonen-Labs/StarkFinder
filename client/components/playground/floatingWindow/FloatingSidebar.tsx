@@ -42,6 +42,7 @@ import MarkedCalenderIcon from "@/components/svgs/MarkedCalenderIcon";
 import EnergyIcon from "@/components/svgs/EnergyIcon";
 import AirdropIcon from "@/components/svgs/AirdropIcon";
 import GovernanceIcon from "@/components/svgs/GovernanceIcon";
+import CalenderIcon from "@/components/svgs/CalenderIcon";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
@@ -56,7 +57,7 @@ const insighAndAnalytics =[{icon: <PieChartIcon/>, text: "Check Transaction"}, {
 
 const governance = [{icon: <VoteIcon/>, text: "Vote on Proposal"}, {icon: <PadlockIcon/>, text:"Create Vesting"}]
 
-const EventsAndAutomation = [{icon: <MarkedCalenderIcon/>, text: "On Event Outcome"}, {icon: <EnergyIcon/>, text:"Execute Flash Loan"},{icon: <AirdropIcon/>, text: "Initiate Airdrop"}]
+const eventsAndAutomation = [{icon: <MarkedCalenderIcon/>, text: "On Event Outcome"}, {icon: <EnergyIcon/>, text:"Execute Flash Loan"},{icon: <AirdropIcon/>, text: "Initiate Airdrop"}]
 
 interface FloatingSidebarProps {
   addBlock: (block: any) => void;
@@ -209,7 +210,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
             </div>}
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
-                <span>icon</span>
+                <span><CalenderIcon/></span>
                 <div className="text-black">Events & Automations</div>
               </div>
               <div>
@@ -218,24 +219,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
             </div>
             {false &&
              <div className="ml-10 mt-2 flex flex-col gap-2">
-                <div className="px-3 py-2">
+              {eventsAndAutomation.map(child=> <div className="px-3 py-2">
                   <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">On Event Outcome</div>
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
                   </div>
-                </div>
-                <div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">Execute Flash Loan</div>
-                  </div>               
-                </div>   
-                <div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">Initiate Airdrop</div>
-                  </div>               
-                </div> 
+                </div>)}
             </div>}
             <div className="px-3 py-2">
               <div className="flex gap-3">
