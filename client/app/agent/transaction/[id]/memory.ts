@@ -27,12 +27,12 @@ export class TransactionMemory extends BaseMemory {
     this.chain = new ConversationChain({ llm: model })
   }
 
-  async loadMemoryVariables(_: InputValues): Promise<{ [key: string]: string }> {
+  async loadMemoryVariables(): Promise<{ [key: string]: string }> {
     const chatHistory = await prisma.message.findMany({
       where: { chatId: this.chatId },
       orderBy: { timestamp: "asc" },
       take: 10,
-      select: { content: true, role: true },
+      select: { content: true },
     })
 
     const recentTransactions = await prisma.transaction.findMany({
@@ -42,7 +42,7 @@ export class TransactionMemory extends BaseMemory {
       select: { type: true, status: true, metadata: true },
     })
 
-    const formattedHistory = chatHistory.map((msg) => `${msg.role}: ${JSON.stringify(msg.content)}`).join("\n")
+    const formattedHistory = chatHistory.map((msg) => `${JSON.stringify(msg.content)}`).join("\n")
 
     const formattedTransactions = recentTransactions
       .map((tx) => `Transaction: ${tx.type} - Status: ${tx.status} - Details: ${JSON.stringify(tx.metadata)}`)
@@ -61,7 +61,6 @@ export class TransactionMemory extends BaseMemory {
     await prisma.message.create({
       data: {
         content: { text: input },
-        role: "USER",
         userId: this.userId,
         chatId: this.chatId,
       },
@@ -70,7 +69,6 @@ export class TransactionMemory extends BaseMemory {
     await prisma.message.create({
       data: {
         content: { text: output },
-        role: "ASSISTANT",
         userId: this.userId,
         chatId: this.chatId,
       },
@@ -84,7 +82,7 @@ export class TransactionMemory extends BaseMemory {
   }
 
   async chat(input: string): Promise<string> {
-    const context = await this.loadMemoryVariables({})
+    const context = await this.loadMemoryVariables()
     const result = await this.chain.call({
       input: `${context.chat_history}\n\nUser: ${input}\n\nRecent Transactions:\n${context.recent_transactions}\n\nAssistant:`,
     })
@@ -92,4 +90,3 @@ export class TransactionMemory extends BaseMemory {
     return result.response
   }
 }
-

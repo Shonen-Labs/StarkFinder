@@ -19,7 +19,7 @@ interface Message {
 
 interface TransactionSuggestion {
   type: "SWAP" | "TRANSFER" | "BRIDGE" | "DEPOSIT" | "WITHDRAW"
-  metadata: any
+  metadata: Record<string, unknown>
 }
 
 export default function TransactionPage() {
