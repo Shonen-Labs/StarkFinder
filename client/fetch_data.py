@@ -5,7 +5,7 @@ import requests
 YIELD_API_URL = "https://yields.llama.fi/pools"
 TOKEN_API_URL = "https://starknet.api.avnu.fi/v1/starknet/tokens"
 
-DATA_DIR = "./data"
+DATA_DIR = "../data"
 YIELD_DIR = f"{DATA_DIR}/yields"
 
 os.makedirs(YIELD_DIR, exist_ok=True)
