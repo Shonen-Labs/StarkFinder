@@ -59,4 +59,16 @@ export class ChatHistoryManager {
       return [];
     }
   }
+
+  async deleteAllChatMessages(telegramChatId: string){
+    const chat = await this.getOrCreateChat(telegramChatId);
+
+    try {
+      await prisma.chat.deleteMany({
+        where: { chatId: chat.id}
+      })
+    } catch (error) {
+      console.error('Error deleting chat messaged:', error);
+    }
+  }
 }

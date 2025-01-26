@@ -25,6 +25,18 @@ import {
     TrendingUp,
     Users,
     Zap,
+    DollarSign,
+    Shield,
+    UserCheck,
+    UserX,
+    CheckSquare,
+    Key,
+    PauseCircle,
+    PlayCircle,
+    Globe,
+    Edit,
+    Download,
+    Upload,
 } from 'lucide-react';
 
 const blockTypes = [
@@ -67,6 +79,20 @@ const blockTypes = [
     // Analytics
     { id: 'getTransactionHistory', content: 'Get Transaction History', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: History },
     { id: 'getPortfolioAnalytics', content: 'Get Portfolio Analytics', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: ChartLine },
+
+    // New Common Functions
+    { id: 'mintTokens', content: 'Mint Tokens', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: DollarSign },
+    { id: 'burnTokens', content: 'Burn Tokens', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: Shield },
+    { id: 'freezeAccount', content: 'Freeze Account', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: UserX },
+    { id: 'unfreezeAccount', content: 'Unfreeze Account', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: UserCheck },
+    { id: 'approveSpending', content: 'Approve Spending', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: CheckSquare },
+    { id: 'transferOwnership', content: 'Transfer Ownership', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: Key },
+    { id: 'pauseContract', content: 'Pause Contract', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: PauseCircle },
+    { id: 'unpauseContract', content: 'Unpause Contract', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: PlayCircle },
+    { id: 'setOracle', content: 'Set Oracle', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: Globe },
+    { id: 'updateMetadata', content: 'Update Metadata', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: Edit },
+    { id: 'withdrawFunds', content: 'Withdraw Funds', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: Download },
+    { id: 'depositFunds', content: 'Deposit Funds', color: 'bg-[#1E3A3A]', borderColor: 'border-[#2A5656]', hoverBorderColor: 'hover:border-[#3E7D7D]', icon: Upload },
 ]
 
 // Group blocks into categories for the sidebar
@@ -78,6 +104,7 @@ const groupedBlocks = {
     "Governance": blockTypes.filter(block => ['governance', 'createVesting'].includes(block.id)),
     "Events": blockTypes.filter(block => ['event', 'executeFlashLoan', 'initiateAirdrop'].includes(block.id)),
     "Analytics": blockTypes.filter(block => ['getTransactionHistory', 'getPortfolioAnalytics'].includes(block.id)),
+    "Common Functions": blockTypes.filter(block => ['mintTokens', 'burnTokens', 'freezeAccount', 'unfreezeAccount', 'approveSpending', 'transferOwnership', 'pauseContract', 'unpauseContract', 'setOracle', 'updateMetadata', 'withdrawFunds', 'depositFunds'].includes(block.id)),
     "Custom": blockTypes.filter(block => ['custom'].includes(block.id)),
 }
 
