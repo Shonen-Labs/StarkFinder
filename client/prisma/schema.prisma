@@ -4,9 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") 
+  url      = env("DATABASE_URL")
 }
-
 
 model User {
   id       String    @id @default(uuid())
@@ -20,25 +19,26 @@ model User {
 
 model Chat {
   id       String    @id @default(uuid())
-  messages Message[] // The relation to Message
-  User     User?     @relation(fields: [userId], references: [id])
+  title    String?
+  metadata Json?
   userId   String?
+  type     ChatType  @default(GENERAL)
+  User     User?     @relation(fields: [userId], references: [id])
+  Message  Message[]
 }
 
 model Message {
-  id        String   @id @default(uuid())
-  content   Json
-  metadata  Json?
-  userId    String
-  timestamp DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  
-  // Add the opposite relation for Message to Chat
-  chat      Chat?    @relation(fields: [chatId], references: [id])
-  chatId    String?
+  id       String  @id @default(uuid())
+  content  Json[]
+  metadata Json?
+  replyTo  String?
+  chatId   String
+  userId   String
+  createdAt DateTime @default(now())
+  timestamp DateTime @default(now()) // Adding timestamp back
+  Chat     Chat    @relation(fields: [chatId], references: [id])
+  User     User    @relation(fields: [userId], references: [id])
 }
-
-
 
 model Transaction {
   id          String   @id @default(uuid())
@@ -76,4 +76,3 @@ enum TxStatus {
   COMPLETED
   FAILED
 }
-

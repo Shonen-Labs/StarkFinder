@@ -1,92 +1,188 @@
-import { BaseMemory, type InputValues, type OutputValues } from "langchain/memory"
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, type Transaction, type Message } from "@prisma/client"
+import { ConversationSummaryMemory } from "langchain/memory"
 import { ChatOpenAI } from "@langchain/openai"
-import { ConversationChain } from "langchain/chains"
 
 const prisma = new PrismaClient()
 
-export class TransactionMemory extends BaseMemory {
-  get memoryKeys(): string[] {
-    return ["chat_history", "recent_transactions"]
-  }
-  userId: string
-  chatId: string
-  chain: ConversationChain
+// Helper function to format user context
+function formatUserContext(transactions: Transaction[], messages: Message[]): string {
+  const transactionHistory = transactions
+    .map((t) => `Transaction: ${t.type} (${t.status}) on ${t.createdAt.toISOString()}`)
+    .join("\n")
 
-  constructor(userId: string, chatId: string) {
-    super()
-    this.userId = userId
-    this.chatId = chatId
+  const chatHistory = messages.map((m) => `Message: ${JSON.stringify(m.content)}`).join("\n")
 
-    const model = new ChatOpenAI({
-      modelName: "gpt-4",
-      temperature: 0.7,
-      openAIApiKey: process.env.OPENAI_API_KEY,
-    })
+  return `User Context:\n${transactionHistory}\n\nChat History:\n${chatHistory}`
+}
 
-    this.chain = new ConversationChain({ llm: model })
-  }
-
-  async loadMemoryVariables(): Promise<{ [key: string]: string }> {
-    const chatHistory = await prisma.message.findMany({
-      where: { chatId: this.chatId },
-      orderBy: { timestamp: "asc" },
-      take: 10,
-      select: { content: true },
-    })
-
-    const recentTransactions = await prisma.transaction.findMany({
-      where: { userId: this.userId },
+// Create memory with user context
+export const createMemoryWithContext = async (userId: string, chatId: string) => {
+  try {
+    // Fetch recent transactions and messages for user context
+    const userTransactions = await prisma.transaction.findMany({
+      where: { userId },
       orderBy: { createdAt: "desc" },
-      take: 5,
-      select: { type: true, status: true, metadata: true },
+      take: 5, // Limit to recent transactions
     })
 
-    const formattedHistory = chatHistory.map((msg) => `${JSON.stringify(msg.content)}`).join("\n")
-
-    const formattedTransactions = recentTransactions
-      .map((tx) => `Transaction: ${tx.type} - Status: ${tx.status} - Details: ${JSON.stringify(tx.metadata)}`)
-      .join("\n")
-
-    return {
-      chat_history: formattedHistory,
-      recent_transactions: formattedTransactions,
-    }
-  }
-
-  async saveContext(inputValues: InputValues, outputValues: OutputValues): Promise<void> {
-    const input = inputValues.input as string
-    const output = outputValues.response as string
-
-    await prisma.message.create({
-      data: {
-        content: { text: input },
-        userId: this.userId,
-        chatId: this.chatId,
+    const userMessages = await prisma.message.findMany({
+      where: {
+        userId,
+        chatId,
       },
+      orderBy: { createdAt: "desc" },
+      take: 10, // Limit to recent messages
     })
 
-    await prisma.message.create({
-      data: {
-        content: { text: output },
-        userId: this.userId,
-        chatId: this.chatId,
-      },
-    })
-  }
+    // Format the context string
+    const userContext = formatUserContext(userTransactions, userMessages)
 
-  async clear(): Promise<void> {
-    await prisma.message.deleteMany({
-      where: { chatId: this.chatId },
+    // Initialize memory with the OpenAI model
+    const memory = new ConversationSummaryMemory({
+      llm: new ChatOpenAI({
+        temperature: 0.7,
+        modelName: "gpt-4",
+      }),
+      memoryKey: "chat_history", // Key for memory context
     })
-  }
 
-  async chat(input: string): Promise<string> {
-    const context = await this.loadMemoryVariables()
-    const result = await this.chain.call({
-      input: `${context.chat_history}\n\nUser: ${input}\n\nRecent Transactions:\n${context.recent_transactions}\n\nAssistant:`,
-    })
-    await this.saveContext({ input }, { response: result.response })
-    return result.response
+    // Inject user context into memory
+    await memory.saveContext({ input: "User's historical context" }, { output: userContext })
+
+    return memory
+  } catch (error) {
+    console.error("Memory creation error:", error)
+    throw error
   }
 }
+
+// Generate transaction suggestions based on user history
+export const generateTransactionSuggestions = async (userId: string) => {
+  try {
+    const recentTransactions = await prisma.transaction.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    })
+
+    return recentTransactions.map((tx) => ({
+      type: tx.type,
+      suggestedAction: `Consider repeating ${tx.type} transaction`,
+    }))
+  } catch (error) {
+    console.error("Error generating transaction suggestions:", error)
+    throw error
+  }
+}
+
+// Initialize user agent with memory and suggestions
+export const initUserAgent = async (userId: string, chatId: string) => {
+  try {
+    const memory = await createMemoryWithContext(userId, chatId) // Create memory
+    const suggestions = await generateTransactionSuggestions(userId) // Generate suggestions
+
+    return {
+      memory,
+      suggestions,
+    }
+  } catch (error) {
+    console.error("Error initializing user agent:", error)
+    throw error
+  }
+}
+
+// Export type for TransactionMemory
+export type TransactionMemory = Awaited<ReturnType<typeof createMemoryWithContext>>
+
+
+
+
+
+
+
+
+
+
+// import { PrismaClient } from "@prisma/client";
+// import { ConversationSummaryMemory } from "langchain/memory";
+// import { ChatOpenAI } from "@langchain/openai";
+
+// const prisma = new PrismaClient();
+
+// function formatUserContext(transactions: any[], messages: any[]) {
+//   const transactionHistory = transactions
+//     .map(t => `Transaction: ${t.type} (${t.status}) on ${t.createdAt.toISOString()}`)
+//     .join('\n');
+
+//   const chatHistory = messages
+//     .map(m => `Message: ${JSON.stringify(m.content)}`)
+//     .join('\n');
+
+//   return `User Context:\n${transactionHistory}\n\nChat History:\n${chatHistory}`;
+// }
+
+// export const createMemoryWithContext = async (userId: string, chatId: string) => {
+//   try {
+//     // Fetch comprehensive user context
+//     const userTransactions = await prisma.transaction.findMany({
+//       where: { userId },
+//       orderBy: { createdAt: "desc" },
+//       take: 5 // Limit to recent transactions
+//     });
+
+//     const userMessages = await prisma.message.findMany({
+//       where: { 
+//         userId, 
+//         chatId 
+//       },
+//       orderBy: { createdAt: "desc" },
+//       take: 10 // Limit to recent messages
+//     });
+
+//     // Format user context
+//     const userContext = formatUserContext(userTransactions, userMessages);
+
+//     // Initialize memory with OpenAI model
+//     const memory = new ConversationSummaryMemory({
+//       llm: new ChatOpenAI({ 
+//         temperature: 0.7,
+//         modelName: "gpt-4" 
+//       }),
+//       memoryKey: "chat_history"
+//     });
+
+//     // Inject context into memory
+//     await memory.saveContext(
+//       { input: "User's historical context" },
+//       { output: userContext }
+//     );
+
+//     return memory;
+//   } catch (error) {
+//     console.error("Memory creation error:", error);
+//     throw error;
+//   }
+// };
+
+// export const generateTransactionSuggestions = async (userId: string) => {
+//   const recentTransactions = await prisma.transaction.findMany({
+//     where: { userId },
+//     orderBy: { createdAt: "desc" },
+//     take: 3
+//   });
+
+//   return recentTransactions.map(tx => ({
+//     type: tx.type,
+//     suggestedAction: `Consider repeating ${tx.type} transaction`
+//   }));
+// };
+
+// export const initUserAgent = async (userId: string, chatId: string) => {
+//   const memory = await createMemoryWithContext(userId, chatId);
+//   const suggestions = await generateTransactionSuggestions(userId);
+
+//   return {
+//     memory,
+//     suggestions
+//   };
+// };
