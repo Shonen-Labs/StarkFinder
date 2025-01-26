@@ -2,7 +2,7 @@
 import { useState } from "react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
-import { Code } from "lucide-react";
+import { Code, VoteIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DIRTY, z } from "zod";
@@ -37,6 +37,7 @@ import ConnectionIcon from "@/components/svgs/ConnectionIcon";
 import { TokensIcon } from "@radix-ui/react-icons";
 import SetStrategyIcon from "@/components/svgs/SetStrategyIcon";
 import PortfolioIcon from "@/components/svgs/PortfolioIcon";
+import PadlockIcon from "@/components/svgs/PadlockIcon";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
@@ -49,6 +50,7 @@ const portfolioManagement = [{icon: <ClockIcon/>, text: "rebalance Portfolio"}, 
 
 const insighAndAnalytics =[{icon: <PieChartIcon/>, text: "Check Transaction"}, {icon: <PortfolioIcon/>, text:"Portfolio Analytics"}]
 
+const governance = [{icon: <VoteIcon/>, text: "Vote on Proposal"}, {icon: <PadlockIcon/>, text:"Create Vesting"}]
 
 interface FloatingSidebarProps {
   addBlock: (block: any) => void;
