@@ -35,15 +35,16 @@ import ScaleofJusticeIcon from "@/components/svgs/ScaleofJusticeICon";
 import FlagIcon from "@/components/svgs/FlagIcon";
 import ConnectionIcon from "@/components/svgs/ConnectionIcon";
 import { TokensIcon } from "@radix-ui/react-icons";
+import SetStrategyIcon from "@/components/svgs/SetStrategyIcon";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
 
 const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token"}, {icon: <StakeTokenIcon/>, text: "StakeToken"}, {icon:<AllocateTokenIcon/>, text: "Allocate Token"}, {icon: <YieldFarmingIcon/>, text: "Yield Farming"}, {icon: <LendTokenIcon/>, text: "Lend Tokens"}, {icon: <BorrowTokenIcon/>, text:"Borrow Token"}, {icon:<RepayLoanIcon/>, text:"Repay Loan"}];
 
-const LiquidityManagement  = [{icon: <AddIcon/>, text: "Add Liquidity"}, {icon: <PeopleIcon/>, text:"Create Stack Pooling"}]
+const liquidityManagement  = [{icon: <AddIcon/>, text: "Add Liquidity"}, {icon: <PeopleIcon/>, text:"Create Stack Pooling"}]
 
-
+const portfolioManagement = [{icon: <ClockIcon/>, text: "rebalance Portfolio"}, {icon: <ScaleofJusticeIcon/>, text:"Set Rebalance"},{icon: <CubeIcon/>, text: "Create Custom Index"},{icon: <LossIcon/>, text: "Set Stop Loss"},{icon: <ProfitIcon/>, text: "Set Take Profit"},{icon: <SetStrategyIcon/>, text: "Set Strategy"}]
 
 
 interface FloatingSidebarProps {
