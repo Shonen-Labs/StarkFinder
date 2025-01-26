@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
 import { useForm } from "react-hook-form";
@@ -64,8 +64,65 @@ interface FloatingSidebarProps {
   addBlock: (block: any) => void;
 }
 
+interface ToggleState {
+  triggerActionToggle: boolean,
+  tokenActionsToggle: boolean,
+  liquidityManagementToggle: boolean,
+  portfolioManagementToggle: boolean,
+  insightAndAnalyticsToggle: boolean,
+  governanceToggle: boolean,
+  eventsAndAutomationToggle: boolean
+}
+
+type ToggleAction =
+  | { type: "toggle_triggerAction" }
+  | { type: "toggle_tokenActions" }
+  | { type: "toggle_liquidityManagement" }
+  | { type: "toggle_portfolioManagement" }
+  | { type: "toggle_insightAndAnalytics" }
+  | { type: "toggle_governance" }
+  | { type: "toggle_eventsAndAutomation" }
+
+const initialState = {
+  triggerActionToggle: false,
+  tokenActionsToggle: false,
+  liquidityManagementToggle: false,
+  portfolioManagementToggle: false,
+  insightAndAnalyticsToggle: false,
+  governanceToggle: false,
+  eventsAndAutomationToggle: false
+}
+
+function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
+  switch (action.type) {
+    case "toggle_triggerAction":
+      return { ...state, triggerActionToggle: !state.triggerActionToggle };
+    case "toggle_tokenActions":
+      return { ...state, tokenActionsToggle: !state.tokenActionsToggle};
+    case "toggle_liquidityManagement":
+      return { ...state, liquidityManagementToggle: !state.liquidityManagementToggle};
+    case "toggle_portfolioManagement": 
+      return { ...state, portfolioManagementToggle: !state.portfolioManagementToggle }
+    case "toggle_insightAndAnalytics":
+      return { ...state, insightAndAnalyticsToggle: !state.insightAndAnalyticsToggle };
+    case "toggle_governance":
+      return { ...state, governanceToggle: !state.governanceToggle};
+    case "toggle_eventsAndAutomation":
+      return { ...state, eventsAndAutomationToggle: !state.eventsAndAutomationToggle };
+    default:
+      return initialState;
+  }
+}
+
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
-  const[isOpen, setIsOpen] = useState(true)
+  const [{triggerActionToggle,
+    tokenActionsToggle,
+    liquidityManagementToggle,
+    portfolioManagementToggle,
+    insightAndAnalyticsToggle,
+    governanceToggle,
+    eventsAndAutomationToggle}, dispatch] = useReducer(toggleReducer, initialState);
+
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   
 
@@ -95,11 +152,18 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 </span>
                 <div className="text-black">Trigger Actions</div>
               </div>
-              <div>
-                  <DropdownArrowIcon status=""/>
+               <div onClick={() => dispatch({ type: "toggle_triggerAction" })}>
+                {triggerActionToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
               </div>
           </div>
-          {false && <div className="ml-10 mt-2 flex flex-col gap-2"></div>}
+          {triggerActionToggle && <div className="ml-10 mt-2 flex flex-col gap-2">
+           {triggerActions.map(child=><div key={child.text} className="px-3 py-2">
+                <div className="flex gap-3">
+                  <span>{child.icon}</span>
+                  <div className="text-black">{child.text}</div>
+                </div>
+              </div>)}
+            </div>}
           <div>
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
@@ -108,11 +172,11 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 </span>
                 <div className="text-black">Token Actions</div>
               </div>
-              <div className="text-gray-400">
-                <DropdownArrowIcon status=""/>
+              <div onClick={() => dispatch({ type: "toggle_tokenActions" })}>
+               {tokenActionsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
               </div> 
             </div>
-            {false && <div className="ml-10 mt-2 flex flex-col gap-2">
+            {tokenActionsToggle && <div className="ml-10 mt-2 flex flex-col gap-2">
               <div className="px-3 py-2">
                {tokenActions.map(child=><div key={child.text} className="px-3 py-2">
                 <div className="flex gap-3">
@@ -135,11 +199,11 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span><LiquidDropIcon/></span>
                 <div className="text-black">Liquidity Management</div>
               </div>
-              <div >
-                <DropdownArrowIcon status=""/>
+              <div onClick={() => dispatch({ type: "toggle_liquidityManagement" })}>
+                  {liquidityManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
               </div> 
             </div>
-            {false && 
+            {liquidityManagementToggle && 
               <div className="ml-10 mt-2 flex flex-col gap-2">
                 {liquidityManagement.map(child => <div className="px-3 py-2">
                   <div className="flex gap-3">
@@ -153,11 +217,11 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span><BagIcon/></span>
                 <div className="text-black">Portfolio Management</div>
               </div>
-              <div>
-                <DropdownArrowIcon status=""/>
+              <div onClick={() => dispatch({ type: "toggle_portfolioManagement" })}>
+                {portfolioManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
               </div> 
             </div>
-            {false && 
+            {portfolioManagementToggle && 
               <div className="ml-10 mt-2 flex flex-col gap-2">
                 {portfolioManagement.map(child=> <div className="px-3 py-2">
                   <div className="flex gap-3">
@@ -171,11 +235,11 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span><AnalyticsIcon/></span>
                 <div className="text-black">Insight & Analytics</div>
               </div>
-              <div >
-                <DropdownArrowIcon status=""/>
+                <div onClick={() => dispatch({ type: "toggle_insightAndAnalytics"})}>
+                {insightAndAnalyticsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
               </div> 
             </div>
-            {false && 
+            {insightAndAnalyticsToggle && 
                 <div className="ml-10 mt-2 flex flex-col gap-2">
                   {insighAndAnalytics.map(child=> <div className="px-3 py-2">
                     <div className="flex gap-3">
@@ -196,11 +260,11 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span><GovernanceIcon/></span>
                 <div className="text-black">Governance</div>
               </div>
-              <div>
-                <DropdownArrowIcon status=""/>
+              <div onClick={() => dispatch({ type: "toggle_governance"})}>
+                {governanceToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
               </div> 
             </div>
-            {false &&
+            {governanceToggle &&
              <div className="ml-10 mt-2 flex flex-col gap-2">
               {governance.map(child=><div className="px-3 py-2">
                   <div className="flex gap-3">
@@ -214,11 +278,11 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span><CalenderIcon/></span>
                 <div className="text-black">Events & Automations</div>
               </div>
-              <div>
-                <DropdownArrowIcon status=""/>
+              <div onClick={() => dispatch({ type: "toggle_eventsAndAutomation"})}>
+              {eventsAndAutomationToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
               </div> 
             </div>
-            {false &&
+            {eventsAndAutomationToggle &&
              <div className="ml-10 mt-2 flex flex-col gap-2">
               {eventsAndAutomation.map(child=> <div className="px-3 py-2">
                   <div className="flex gap-3">
