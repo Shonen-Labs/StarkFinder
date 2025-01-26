@@ -1,13 +1,13 @@
 import { BaseMemory, type InputValues, type OutputValues } from "langchain/memory"
 import { PrismaClient } from "@prisma/client"
-import { ChatOpenAI } from "langchain/chat_models";
+import { ChatOpenAI } from "@langchain/openai"
 import { ConversationChain } from "langchain/chains"
 
 const prisma = new PrismaClient()
 
 export class TransactionMemory extends BaseMemory {
   get memoryKeys(): string[] {
-    throw new Error("Method not implemented.")
+    return ["chat_history", "recent_transactions"]
   }
   userId: string
   chatId: string
