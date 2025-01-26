@@ -44,6 +44,7 @@ import GovernanceIcon from "@/components/svgs/GovernanceIcon";
 import CalenderIcon from "@/components/svgs/CalenderIcon";
 import MenuIcon from "@/components/svgs/MenuIcon";
 import VoteIcon from "@/components/svgs/VoteIcon";
+import { Code } from "lucide-react";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
