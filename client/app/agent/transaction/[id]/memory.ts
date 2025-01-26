@@ -1,20 +1,33 @@
 import { BaseMemory, type InputValues, type OutputValues } from "langchain/memory"
 import { PrismaClient } from "@prisma/client"
+import { ChatOpenAI } from "langchain/chat_models";
+import { ConversationChain } from "langchain/chains"
 
 const prisma = new PrismaClient()
 
 export class TransactionMemory extends BaseMemory {
+  get memoryKeys(): string[] {
+    throw new Error("Method not implemented.")
+  }
   userId: string
   chatId: string
+  chain: ConversationChain
 
   constructor(userId: string, chatId: string) {
     super()
     this.userId = userId
     this.chatId = chatId
+
+    const model = new ChatOpenAI({
+      modelName: "gpt-4",
+      temperature: 0.7,
+      openAIApiKey: process.env.OPENAI_API_KEY,
+    })
+
+    this.chain = new ConversationChain({ llm: model })
   }
 
-  // This method loads the user's chat history and recent transaction data
-  async loadMemoryVariables(): Promise<{ [key: string]: string }> {
+  async loadMemoryVariables(_: InputValues): Promise<{ [key: string]: string }> {
     const chatHistory = await prisma.message.findMany({
       where: { chatId: this.chatId },
       orderBy: { timestamp: "asc" },
@@ -29,21 +42,15 @@ export class TransactionMemory extends BaseMemory {
       select: { type: true, status: true, metadata: true },
     })
 
-    const formattedHistory = chatHistory
-      .map((msg) => `${msg.role}: ${JSON.stringify(msg.content)}`)
-      .join("\n")
+    const formattedHistory = chatHistory.map((msg) => `${msg.role}: ${JSON.stringify(msg.content)}`).join("\n")
 
     const formattedTransactions = recentTransactions
-      .map(
-        (tx) =>
-          `Transaction: ${tx.type} - Status: ${tx.status} - Details: ${JSON.stringify(tx.metadata)}`
-      )
+      .map((tx) => `Transaction: ${tx.type} - Status: ${tx.status} - Details: ${JSON.stringify(tx.metadata)}`)
       .join("\n")
 
     return {
       chat_history: formattedHistory,
       recent_transactions: formattedTransactions,
-      suggested_transactions: recentTransactions.map((tx) => tx.type).join(", "),
     }
   }
 
@@ -76,8 +83,13 @@ export class TransactionMemory extends BaseMemory {
     })
   }
 
-  // Implementing the memoryKeys abstract method from BaseMemory
-  memoryKeys(): string[] {
-    return ["chat_history", "recent_transactions", "suggested_transactions"]
+  async chat(input: string): Promise<string> {
+    const context = await this.loadMemoryVariables({})
+    const result = await this.chain.call({
+      input: `${context.chat_history}\n\nUser: ${input}\n\nRecent Transactions:\n${context.recent_transactions}\n\nAssistant:`,
+    })
+    await this.saveContext({ input }, { response: result.response })
+    return result.response
   }
 }
+

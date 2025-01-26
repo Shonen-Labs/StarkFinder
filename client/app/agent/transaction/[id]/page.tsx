@@ -1,504 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// app/agent/transaction/[id]/page.tsx
-// "use client";
-
-// import * as React from "react";
-// import { useParams, useRouter } from "next/navigation";
-// import { v4 as uuidv4 } from "uuid";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { ScrollArea } from "@/components/ui/scroll-area";
-// import { Separator } from "@/components/ui/separator";
-// import { Plus, Send, Home } from "lucide-react";
-// import { useAccount } from "@starknet-react/core";
-// import { ConnectButton, DisconnectButton } from "@/lib/Connect";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
-// import Link from "next/link";
-// import { TransactionSuccess } from "@/components/TransactionSuccess";
-// import CommandList from "@/components/ui/command";
-
-// interface Message {
-//   role: string;
-//   id: string;
-//   content: string;
-//   timestamp: string;
-//   user: string;
-//   transaction?: {
-//     data: {
-//       transactions: Array<{
-//         contractAddress: string;
-//         entrypoint: string;
-//         calldata: string[];
-//       }>;
-//       fromToken?: any;
-//       toToken?: any;
-//       fromAmount?: string;
-//       toAmount?: string;
-//       receiver?: string;
-//       gasCostUSD?: string;
-//       solver?: string;
-//     };
-//     type: string;
-//   };
-// }
-
-// interface TransactionHandlerProps {
-//   transactions: Array<{
-//     contractAddress: string;
-//     entrypoint: string;
-//     calldata: string[];
-//   }>;
-//   description: string;
-//   onSuccess: (hash: string) => void;
-//   onError: (error: any) => void;
-// }
-
-// interface MessageContentProps {
-//   message: Message;
-//   onTransactionSuccess: (hash: string) => void;
-// }
-
-// const TransactionHandler: React.FC<TransactionHandlerProps> = ({
-//   transactions,
-//   description,
-//   onSuccess,
-//   onError,
-// }) => {
-//   const { account } = useAccount();
-//   const [isProcessing, setIsProcessing] = React.useState(false);
-
-//   const executeTransaction = async () => {
-//     if (!account) {
-//       onError(new Error('Wallet not connected'));
-//       return;
-//     }
-
-//     setIsProcessing(true);
-//     try {
-//       for (const tx of transactions) {
-//         const response = await account.execute({
-//           contractAddress: tx.contractAddress,
-//           entrypoint: tx.entrypoint,
-//           calldata: tx.calldata
-//         });
-//         await account.waitForTransaction(response.transaction_hash);
-//         if (tx === transactions[transactions.length - 1]) {
-//           onSuccess(response.transaction_hash);
-//         }
-//       }
-//     } catch (error) {
-//       console.error('Transaction failed:', error);
-//       onError(error);
-//     } finally {
-//       setIsProcessing(false);
-//     }
-//   };
-
-//   return (
-//     <div className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10">
-//       <p className="text-sm text-white/80 mb-4">{description}</p>
-//       <button
-//         onClick={executeTransaction}
-//         disabled={isProcessing}
-//         className={`w-full py-2 px-4 rounded-lg ${
-//           isProcessing
-//             ? 'bg-white/20 cursor-not-allowed'
-//             : 'bg-white/10 hover:bg-white/20'
-//         } transition-colors duration-200`}
-//       >
-//         {isProcessing ? 'Processing Transaction...' : 'Execute Transaction'}
-//       </button>
-//     </div>
-//   );
-// };
-
-// const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionSuccess }) => {
-//   const [txHash, setTxHash] = React.useState<string | null>(null);
-
-//   if (message.transaction?.data?.transactions) {
-//     return (
-//       <div className="space-y-4">
-//         <p className="text-white/80">{message.content}</p>
-//         {txHash ? (
-//           <TransactionSuccess
-//             type={message.transaction.type}
-//             hash={txHash}
-//             onNewTransaction={() => {
-//               // This keeps the success message visible but allows new transactions
-//               setTxHash(null);
-//             }}
-//           />
-//         ) : (
-//           <TransactionHandler
-//             transactions={message.transaction.data.transactions}
-//             description={`Ready to execute ${message.transaction.type} transaction`}
-//             onSuccess={(hash) => {
-//               setTxHash(hash);
-//               onTransactionSuccess(hash);
-//             }}
-//             onError={(error) => {
-//               console.error('Transaction failed:', error);
-//             }}
-//           />
-//         )}
-//       </div>
-//     );
-//   }
-//   return <p className="text-white/80">{message.content}</p>;
-// };
-// export default function TransactionPage() {
-//   const router = useRouter();
-//   const params = useParams();
-//   const txId = params.id as string;
-//   const [messages, setMessages] = React.useState<Message[]>([]);
-//   const [inputValue, setInputValue] = React.useState("");
-//   const [isLoading, setIsLoading] = React.useState(false);
-//   const { address } = useAccount();
-//   const scrollRef = React.useRef<HTMLDivElement>(null);
-//   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
-
-//   React.useEffect(() => {
-//     if (scrollRef.current) {
-//       scrollRef.current.scrollIntoView({ behavior: "smooth" });
-//     }
-//   }, [messages]);
-
-//   React.useEffect(() => {
-//     // Initial welcome message
-//     setMessages([{
-//       id: uuidv4(),
-//       role: 'agent',
-//       content: 'Hello! I can help you with the following actions:\n\n' +
-//               '• Swap tokens\n' +
-//               '• Transfer tokens\n' +
-//               '• Deposit to protocols\n' +
-//               '• Withdraw from protocols\n' +
-//               '• Bridge tokens\n\n' +
-//               'What would you like to do?',
-//       timestamp: new Date().toLocaleTimeString(),
-//       user: 'Agent'
-//     }]);
-//   }, []);
-//   const createNewChat = async () => {
-//     const id = uuidv4();
-//     await router.push(`/agent/chat/${id}`);
-//   };
-
-//   const createNewTxn = async () => {
-//     const id = uuidv4();
-//     await router.push(`/agent/transaction/${id}`);
-//   };
-
-//   const handleTransactionSuccess = (hash: string) => {
-//     const successMessage: Message = {
-//       id: uuidv4(),
-//       role: 'agent',
-//       content: 'Great! Would you like to perform another transaction? You can try swapping, transferring, depositing, or bridging tokens.',
-//       timestamp: new Date().toLocaleTimeString(),
-//       user: 'Agent'
-//     };
-//     setMessages(prev => [...prev, successMessage]);
-//   };
-  
-//   const handleSendMessage = async () => {
-//     if (!inputValue.trim()) return;
-//     if (!address) {
-//       // Add a message to connect wallet if not connected
-//       const errorMessage: Message = {
-//         id: uuidv4(),
-//         role: 'agent',
-//         content: 'Please connect your wallet first to proceed with the transaction.',
-//         timestamp: new Date().toLocaleTimeString(),
-//         user: 'Agent'
-//       };
-//       setMessages(prev => [...prev, errorMessage]);
-//       return;
-//     }
-  
-//     const userMessage: Message = {
-//       id: uuidv4(),
-//       role: 'user',
-//       content: inputValue,
-//       timestamp: new Date().toLocaleTimeString(),
-//       user: 'User'
-//     };
-  
-//     setMessages(prev => [...prev, userMessage]);
-//     setInputValue('');
-//     setIsLoading(true);
-  
-//     try {
-//       const response = await fetch('/api/transactions', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           prompt: inputValue,
-//           address: address, // Always include the wallet address
-//           chainId: '4012',
-//           messages: messages.concat(userMessage).map(msg => ({
-//             sender: msg.role === 'user' ? 'user' : 'brian',
-//             content: msg.content,
-//           })),
-//         }),
-//       });
-  
-//       const data = await response.json();
-      
-//       let agentMessage: Message;
-      
-//       // Check if it's an error message that's actually a prompt for more information
-//       if (data.error && typeof data.error === 'string' && !data.error.includes("not recognized")) {
-//         // This is a conversational prompt from Brian, not an error
-//         agentMessage = {
-//           id: uuidv4(),
-//           role: 'agent',
-//           content: data.error,  // This contains Brian's question for more details
-//           timestamp: new Date().toLocaleTimeString(),
-//           user: 'Agent'
-//         };
-//       } else if (response.ok && data.result?.[0]?.data) {
-//         // We have transaction data
-//         const { description, transaction } = data.result[0].data;
-//         agentMessage = {
-//           id: uuidv4(),
-//           role: 'agent',
-//           content: description,
-//           timestamp: new Date().toLocaleTimeString(),
-//           user: 'Agent',
-//           transaction: transaction
-//         };
-//       } else {
-//         // This is an actual error
-//         agentMessage = {
-//           id: uuidv4(),
-//           role: 'agent',
-//           content: "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
-//           timestamp: new Date().toLocaleTimeString(),
-//           user: 'Agent'
-//         };
-//       }
-
-//       setMessages(prev => [...prev, agentMessage]);
-//     } catch (error) {
-//       console.error('Error:', error);
-//       const errorMessage: Message = {
-//         id: uuidv4(),
-//         role: 'agent',
-//         content: 'Sorry, something went wrong. Please try again.',
-//         timestamp: new Date().toLocaleTimeString(),
-//         user: 'Agent'
-//       };
-//       setMessages(prev => [...prev, errorMessage]);
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-
-//   return (
-//     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
-//       {/* Dotted background */}
-//       <div
-//         className="absolute inset-0 bg-repeat opacity-5"
-//         style={{
-//           backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-//           backgroundSize: "20px 20px",
-//         }}
-//       />
-
-//       {/* Content wrapper */}
-//       <div className="flex w-full h-full relative z-10">
-//         {/* Sidebar */}
-//         <div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
-//           <h2 className="text-2xl text-white mb-4">StarkFinder</h2>
-//           <Button
-//             variant="ghost"
-//             className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-//             onClick={() => router.push("/agent/chat")}
-//           >
-//             <span>Agent Chat</span>
-//             <Plus className="h-4 w-4" />
-//           </Button>
-//           <Button
-//             variant="ghost"
-//             className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-//             onClick={() => router.push("/agent/transaction")}
-//           >
-//             <span>Agent Txn</span>
-//             <Plus className="h-4 w-4" />
-//           </Button>
-//           <Separator className="my-2 bg-white/20" />
-//           {/* <Dialog>
-//             <DialogTrigger asChild>
-//               <Button
-//                 variant="ghost"
-//                 className="justify-start gap-2 border border-white/20 hover:bg-white/10 transition-colors"
-//               >
-//                 <Plus className="h-4 w-4" /> New
-//               </Button>
-//             </DialogTrigger>
-//             <DialogContent className="bg-gray-900 border border-white/20 text-white">
-//               <DialogHeader>
-//                 <DialogTitle>Create New</DialogTitle>
-//               </DialogHeader>
-//               <div className="flex flex-col gap-2 mt-4">
-//                 <Button
-//                   variant="outline"
-//                   className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-//                   onClick={createNewChat}
-//                 >
-//                   Chat
-//                 </Button>
-//                 <Button
-//                   variant="outline"
-//                   className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-//                   onClick={createNewTxn}
-//                 >
-//                   Txn
-//                 </Button>
-//               </div>
-//             </DialogContent>
-//           </Dialog> */}
-
-//           <div className="flex flex-col gap-4">
-//             <h4 className="text-sm">Transaction History</h4>
-//             <Input
-//               placeholder="Search"
-//               className="bg-transparent border border-white/20 text-white py-4 text-sm rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-//             />
-//             <div className="overflow-y-auto h-64 flex flex-col gap-2 pr-2
-//               [&::-webkit-scrollbar]:w-2
-//               [&::-webkit-scrollbar-track]:bg-[#060606]
-//               [&::-webkit-scrollbar-thumb]:bg-white/10
-//               [&::-webkit-scrollbar-thumb]:rounded-full
-//               dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-//               dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-//               {[0, 1, 2, 4, 5].map((index) => (
-//                 <div
-//                   key={index}
-//                   className="flex flex-col p-2 px-2 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer gap-1"
-//                 >
-//                   <span>0x86ecca95fec</span>
-//                   <span className="text-[#eee] text-[0.8em]">12th Dec, 2025</span>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-
-//           <div className="mt-auto flex items-center gap-2">
-//             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-//             <span className="text-sm text-green-500">Online</span>
-//           </div>
-//         </div>
-
-//         {/* Main Content */}
-//         <div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
-//           {/* Header */}
-//           <div className="flex justify-between items-center p-4 border-b border-white/20 bg-[#010101]">
-//             <div className="flex flex-col">
-//               <Link href="/" className="flex items-center gap-2">
-//                 <Home className="h-4 w-4" />
-//                 Home
-//               </Link>
-//               <h4 className="text-xl">StarkFinder - Transactions</h4>
-//             </div>
-//             <div className="flex items-center gap-4">
-//               {address ? (
-//                 <div className="flex items-center gap-4">
-//                   <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
-//                     {address.slice(0, 5) + "..." + address.slice(-3)}
-//                   </div>
-//                   <DisconnectButton />
-//                 </div>
-//               ) : (
-//                 <ConnectButton />
-//               )}
-//             </div>
-//           </div>
-
-//           {/* Chat Area */}
-//           <ScrollArea className="flex-1 p-4">
-//             {messages.map((message) => (
-//               <div key={message.id} className="flex gap-2 mb-4 animate-fadeIn">
-//                 <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">
-//                   {message.role === "agent" ? "A" : "U"}
-//                 </div>
-//                 <div className="flex-1">
-//                   <div className="flex items-center gap-2 mb-1">
-//                     <span className="font-bold">
-//                       {message.role === "agent" ? "Transaction Agent" : "You"}
-//                     </span>
-//                     <span className="text-xs text-white/60">
-//                       ({message.timestamp})
-//                     </span>
-//                   </div>
-//                   <div className="text-white/80 bg-white/5 p-2 rounded-lg">
-//                     <MessageContent
-//                       message={message}
-//                       onTransactionSuccess={handleTransactionSuccess}
-//                     />
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//             <div ref={scrollRef} />
-//           </ScrollArea>
-          
-//           {isInputClicked && (
-//             <CommandList />
-//           )}
-//           {/* Input Area */}
-//           <div className="p-4 border-t border-white/20 bg-[#010101]">
-//             <div className="relative">
-//               <Input
-//                 placeholder="Type your message..."
-//                 className="bg-white/5 border border-white/20 text-white pl-4 pr-24 py-6 rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-//                 value={inputValue}
-//                 onChange={(e) => {
-//                   setInputValue(e.target.value)
-//                   setIsInputClicked(false)
-//                 }}
-//                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-//                 disabled={isLoading}
-//                 onClick={() => setIsInputClicked(!isInputClicked)}
-//               />
-//               <Button
-//                 variant="ghost"
-//                 size="icon"
-//                 className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
-//                 onClick={handleSendMessage}
-//                 disabled={isLoading}
-//               >
-//                 <Send className="h-5 w-5" />
-//                 <span className="sr-only">Send message</span>
-//               </Button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
@@ -543,7 +42,7 @@ export default function TransactionPage() {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [messagesEndRef]) //Corrected dependency
+  }, [messagesEndRef]) // Removed unnecessary dependency: messages
 
   useEffect(() => {
     setMessages([
@@ -571,35 +70,22 @@ export default function TransactionPage() {
     setIsLoading(true)
 
     try {
-      const context = await memory.loadMemoryVariables({})
-      const response = await fetch("/api/transactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: address,
-          userMessage: inputValue,
-          context: context,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const data = await response.json()
+      const response = await memory.chat(inputValue)
 
       const agentMessage: Message = {
         id: uuidv4(),
         role: "assistant",
-        content: data.response,
+        content: response,
         timestamp: new Date().toISOString(),
       }
 
       setMessages((prev) => [...prev, agentMessage])
-      setTransactionSuggestion(data.transactionSuggestion)
 
-      // Save the context
-      await memory.saveContext({ input: inputValue }, { response: data.response })
+      // Analyze the response for transaction suggestions
+      const suggestion = analyzeForTransactionSuggestion(response)
+      if (suggestion) {
+        setTransactionSuggestion(suggestion)
+      }
     } catch (error) {
       console.error("Error:", error)
       const errorMessage: Message = {
@@ -612,6 +98,22 @@ export default function TransactionPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const analyzeForTransactionSuggestion = (response: string): TransactionSuggestion | null => {
+    const lowerResponse = response.toLowerCase()
+    if (lowerResponse.includes("swap")) {
+      return { type: "SWAP", metadata: { suggestion: "AI suggested a token swap" } }
+    } else if (lowerResponse.includes("transfer")) {
+      return { type: "TRANSFER", metadata: { suggestion: "AI suggested a token transfer" } }
+    } else if (lowerResponse.includes("bridge")) {
+      return { type: "BRIDGE", metadata: { suggestion: "AI suggested a token bridge" } }
+    } else if (lowerResponse.includes("deposit")) {
+      return { type: "DEPOSIT", metadata: { suggestion: "AI suggested a deposit" } }
+    } else if (lowerResponse.includes("withdraw")) {
+      return { type: "WITHDRAW", metadata: { suggestion: "AI suggested a withdrawal" } }
+    }
+    return null
   }
 
   return (
