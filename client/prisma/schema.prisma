@@ -15,6 +15,7 @@ model User {
   chats    Chat[]
   messages Message[]
   transactions Transaction[]
+  contracts   Contract[]
 }
 
 model Chat {
@@ -49,6 +50,16 @@ model Transaction {
   createdAt   DateTime @default(now())
   completedAt DateTime?
   User        User     @relation(fields: [userId], references: [id])
+}
+
+model Contract {
+  id          String   @id @default(uuid())
+  name        String
+  sourceCode  String
+  deployed    Boolean  @default(false)
+  userId      String
+  User        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
 }
 
 enum Role {
