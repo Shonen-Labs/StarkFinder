@@ -172,7 +172,7 @@ export default function Playground() {
 
   return (
     <div className="flex h-screen bg-[#f9f7f3] text-black pt-8 selectable-none relative">
-      <div className='absolute z-10 left-10 my-20 h-auto max-h-72'>
+      <div className='absolute z-10 left-14 my-20 h-auto max-h-full '>
         <FloatingSidebar addBlock={addBlock} />
       </div>
 

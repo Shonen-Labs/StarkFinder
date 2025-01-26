@@ -2,18 +2,72 @@
 import { useState } from "react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
-import { Code } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod";
+import { DIRTY, z } from "zod";
 import { toast } from 'sonner'
+
+// icons
+import StartIcon from "@/components/svgs/StartIcon";
+import CoinIcon from "@/components/svgs/CoinIcon";
+import DropdownArrowIcon from "@/components/svgs/DropdownArrowIcon";
+import SwapTokenIcon from "@/components/svgs/SwapTokenIcon";
+import ToggleBtn from "@/components/svgs/ToggleBtn";
+import StakeTokenIcon from "@/components/svgs/StakeTokenIcon";
+import YieldFarmingIcon from "@/components/svgs/YieldFarmingIcon";
+import AllocateTokenIcon from "@/components/svgs/AllocateTokenIcon";
+import LendTokenIcon from "@/components/svgs/LendTokenIcon";
+import BagIcon from "@/components/svgs/BagIcon"
+import CubeIcon from "@/components/svgs/CubeIcon";
+import LiquidDropIcon from "@/components/svgs/LiquidDropIcon"
+import AddIcon from "@/components/svgs/AddIcon"
+import AnalyticsIcon from "@/components/svgs/AnalyticsIcon";
+import BorrowTokenIcon from "@/components/svgs/BorrowTokenIcon";
+import ClockIcon from "@/components/svgs/ClockIcon";
+import LossIcon from "@/components/svgs/LossIcon";
+import PeopleIcon from "@/components/svgs/PeopleIcon";
+import PieChartIcon from "@/components/svgs/PieChartIcon";
+import ProfitIcon from "@/components/svgs/ProfitIcon";
+import RepayLoanIcon from "@/components/svgs/RepayLoanIcon";
+import RewardIcon from "@/components/svgs/RewardIcon";
+import ScaleofJusticeIcon from "@/components/svgs/ScaleofJusticeICon";
+import FlagIcon from "@/components/svgs/FlagIcon";
+import ConnectionIcon from "@/components/svgs/ConnectionIcon";
+import { TokensIcon } from "@radix-ui/react-icons";
+import SetStrategyIcon from "@/components/svgs/SetStrategyIcon";
+import PortfolioIcon from "@/components/svgs/PortfolioIcon";
+import PadlockIcon from "@/components/svgs/PadlockIcon";
+import MarkedCalenderIcon from "@/components/svgs/MarkedCalenderIcon";
+import EnergyIcon from "@/components/svgs/EnergyIcon";
+import AirdropIcon from "@/components/svgs/AirdropIcon";
+import GovernanceIcon from "@/components/svgs/GovernanceIcon";
+import CalenderIcon from "@/components/svgs/CalenderIcon";
+import MenuIcon from "@/components/svgs/MenuIcon";
+import VoteIcon from "@/components/svgs/VoteIcon";
+
+// array holding data concerning  nested items 
+const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
+
+const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token"}, {icon: <StakeTokenIcon/>, text: "StakeToken"}, {icon:<AllocateTokenIcon/>, text: "Allocate Token"}, {icon: <YieldFarmingIcon/>, text: "Yield Farming"}, {icon: <LendTokenIcon/>, text: "Lend Tokens"}, {icon: <BorrowTokenIcon/>, text:"Borrow Token"}, {icon:<RepayLoanIcon/>, text:"Repay Loan"}];
+
+const liquidityManagement  = [{icon: <AddIcon/>, text: "Add Liquidity"}, {icon: <PeopleIcon/>, text:"Create Stack Pooling"}]
+
+const portfolioManagement = [{icon: <ClockIcon/>, text: "rebalance Portfolio"}, {icon: <ScaleofJusticeIcon/>, text:"Set Rebalance"},{icon: <CubeIcon/>, text: "Create Custom Index"},{icon: <LossIcon/>, text: "Set Stop Loss"},{icon: <ProfitIcon/>, text: "Set Take Profit"},{icon: <SetStrategyIcon/>, text: "Set Strategy"}]
+
+const insighAndAnalytics =[{icon: <PieChartIcon/>, text: "Check Transaction"}, {icon: <PortfolioIcon/>, text:"Portfolio Analytics"}]
+
+const governance = [{icon: <VoteIcon/>, text: "Vote on Proposal"}, {icon: <PadlockIcon/>, text:"Create Vesting"}]
+
+const eventsAndAutomation = [{icon: <MarkedCalenderIcon/>, text: "On Event Outcome"}, {icon: <EnergyIcon/>, text:"Execute Flash Loan"},{icon: <AirdropIcon/>, text: "Initiate Airdrop"}]
 
 interface FloatingSidebarProps {
   addBlock: (block: any) => void;
 }
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
+  const[isOpen, setIsOpen] = useState(true)
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
@@ -28,46 +82,167 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     },
   })
   return (
-    <div className="flex max-w-36 rounded-lg drop-shadow-2xl">
-      <div
-        className="bg-[#faf3dd] p-4 text-white rounded-xl overflow-y-auto overflow-x-hidden max-h-[85vh]"
-        style={{
-          msOverflowStyle: "none", // IE and Edge
-          scrollbarWidth: "none", // Firefox
-        }}
-      >
-        <div className="mt-4">
-          {Object.entries(groupedBlocks).map(([category, blocks]) => (
-            <div key={category} className="mb-2">
-              <h4 className="text-sm text-gray-800 my-4">{category}</h4>
-              <div className="flex gap-4 flex-wrap">
-                {blocks.map((block, index) => (
-                  <button
-                    key={index}
-                    onClick={() => addBlock(block)}
-                    className={`relative w-8 h-8 rounded flex items-center justify-center transition-colors text-gray-400 ${block.color} ${block.borderColor} ${block.hoverBorderColor} group hoverEffect`}
-                  >
-                    {<block.icon size="20" />}
-                    {/* Tooltip */}
-                    <div
-                      className="absolute top-10 left-1/2 transform -translate-x-1/3 whitespace-nowrap bg-black text-white text-xs px-2 py-1 rounded opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none z-10"
-                    >
-                      {block.content}
-                    </div>
-                  </button>
-                ))}
+    <div className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg">
+      {/* Defi Section */}
+      <div>
+        <h4 className="text-gray-400">Defi</h4>
+      
+        <div className="mt-4 flex flex-col gap-2 text-gray-400">
+          <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>
+                  <StartIcon/>
+                </span>
+                <div className="text-black">Trigger Actions</div>
               </div>
+              <div>
+                  <DropdownArrowIcon status=""/>
+              </div>
+          </div>
+          {false && <div className="ml-10 mt-2 flex flex-col gap-2"></div>}
+          <div>
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>
+                  <CoinIcon/>
+                </span>
+                <div className="text-black">Token Actions</div>
+              </div>
+              <div className="text-gray-400">
+                <DropdownArrowIcon status=""/>
+              </div> 
             </div>
-          ))}
-          <CustomBlock isOpen={isCustomModalOpen}
-            onOpenChange={setIsCustomModalOpen}
-            onSubmitCustomBlock={onSubmitCustomBlock}
-          />
+            {false && <div className="ml-10 mt-2 flex flex-col gap-2">
+              <div className="px-3 py-2">
+               {tokenActions.map(child=><div key={child.text} className="px-3 py-2">
+                <div className="flex gap-3">
+                  <span>{child.icon}</span>
+                  <div className="text-black">{child.text}</div>
+                </div>
+              </div>)}
+              </div>
+            </div>}
+            
+          </div> 
         </div>
-      </div>
 
-      <div className="flex-1 bg-gray-800">
-        {/* <!-- Canvas content --> */}
+        {/* Assesment Management Section */}
+        <div className="mt-8 text-gray-400">
+          <h4>Assesment Management</h4>
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span><LiquidDropIcon/></span>
+                <div className="text-black">Liquidity Management</div>
+              </div>
+              <div >
+                <DropdownArrowIcon status=""/>
+              </div> 
+            </div>
+            {false && 
+              <div className="ml-10 mt-2 flex flex-col gap-2">
+                {liquidityManagement.map(child => <div className="px-3 py-2">
+                  <div className="flex gap-3">
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
+                  </div>
+                </div>)}   
+              </div>}
+            <div className="px-3 py-2 flex justify-between items-center text-gray-400">
+              <div className="flex gap-3">
+                <span><BagIcon/></span>
+                <div className="text-black">Portfolio Management</div>
+              </div>
+              <div>
+                <DropdownArrowIcon status=""/>
+              </div> 
+            </div>
+            {false && 
+              <div className="ml-10 mt-2 flex flex-col gap-2">
+                {portfolioManagement.map(child=> <div className="px-3 py-2">
+                  <div className="flex gap-3">
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
+                  </div>
+                </div>)}
+              </div>}
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span><AnalyticsIcon/></span>
+                <div className="text-black">Insight & Analytics</div>
+              </div>
+              <div >
+                <DropdownArrowIcon status=""/>
+              </div> 
+            </div>
+            {false && 
+                <div className="ml-10 mt-2 flex flex-col gap-2">
+                  {insighAndAnalytics.map(child=> <div className="px-3 py-2">
+                    <div className="flex gap-3">
+                      <span>{child.icon}</span>
+                      <div className="text-black">{child.text}</div>
+                    </div>
+                  </div>)}    
+                </div>}
+          </div>
+        </div>
+        
+        {/* Token Action Section  */}
+        <div className="mt-8 text-gray-400">
+          <h4>Token Action</h4>
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span><GovernanceIcon/></span>
+                <div className="text-black">Governance</div>
+              </div>
+              <div>
+                <DropdownArrowIcon status=""/>
+              </div> 
+            </div>
+            {false &&
+             <div className="ml-10 mt-2 flex flex-col gap-2">
+              {governance.map(child=><div className="px-3 py-2">
+                  <div className="flex gap-3">
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
+                  </div>
+                </div>)}  
+            </div>}
+            <div className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span><CalenderIcon/></span>
+                <div className="text-black">Events & Automations</div>
+              </div>
+              <div>
+                <DropdownArrowIcon status=""/>
+              </div> 
+            </div>
+            {false &&
+             <div className="ml-10 mt-2 flex flex-col gap-2">
+              {eventsAndAutomation.map(child=> <div className="px-3 py-2">
+                  <div className="flex gap-3">
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
+                  </div>
+                </div>)}
+            </div>}
+            <div className="px-3 py-2">
+              <div className="flex gap-3">
+                <span><MenuIcon/></span>
+                <div className="text-black">Custom</div>
+              </div>      
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">
+          <div>Take full control of your rewards! 🚀</div>
+          <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71]">
+            <span><RewardIcon/></span>
+            <div>Claim Token</div>
+          </button>
+        </div>
       </div>
     </div>
   );
