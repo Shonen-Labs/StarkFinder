@@ -129,27 +129,21 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           <div className="mt-4 flex flex-col gap-2">
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
-                <span>icon</span>
+                <span><LiquidDropIcon/></span>
                 <div className="text-black">Liquidity Management</div>
               </div>
               <div >
                 <DropdownArrowIcon status=""/>
               </div> 
             </div>
-            {false && 
+            {true && 
               <div className="ml-10 mt-2 flex flex-col gap-2">
-                <div className="px-3 py-2">
+                {liquidityManagement.map(child => <div className="px-3 py-2">
                   <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">Add Liquiduty</div>
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
                   </div>
-                </div>
-                <div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">Create Stack Pooling</div>
-                  </div>               
-                </div>   
+                </div>)}   
               </div>}
             <div className="px-3 py-2 flex justify-between items-center text-gray-400">
               <div className="flex gap-3">
