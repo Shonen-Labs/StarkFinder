@@ -41,6 +41,7 @@ import PadlockIcon from "@/components/svgs/PadlockIcon";
 import MarkedCalenderIcon from "@/components/svgs/MarkedCalenderIcon";
 import EnergyIcon from "@/components/svgs/EnergyIcon";
 import AirdropIcon from "@/components/svgs/AirdropIcon";
+import GovernanceIcon from "@/components/svgs/GovernanceIcon";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
@@ -190,7 +191,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           <div className="mt-4 flex flex-col gap-2">
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
-                <span>icon</span>
+                <span><GovernanceIcon/></span>
                 <div className="text-black">Governance</div>
               </div>
               <div>
@@ -199,18 +200,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
             </div>
             {false &&
              <div className="ml-10 mt-2 flex flex-col gap-2">
-                <div className="px-3 py-2">
+              {governance.map(child=><div className="px-3 py-2">
                   <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">Vote on Proposal</div>
+                    <span>{child.icon}</span>
+                    <div className="text-black">{child.text}</div>
                   </div>
-                </div>
-                <div className="px-3 py-2">
-                  <div className="flex gap-3">
-                    <span>icon</span>
-                    <div className="text-black">Create Vesting</div>
-                  </div>               
-                </div>   
+                </div>)}  
             </div>}
             <div className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
