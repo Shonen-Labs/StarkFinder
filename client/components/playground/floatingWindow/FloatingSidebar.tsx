@@ -2,7 +2,6 @@
 import { useState } from "react";
 import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
-import { Code, VoteIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DIRTY, z } from "zod";
@@ -43,6 +42,8 @@ import EnergyIcon from "@/components/svgs/EnergyIcon";
 import AirdropIcon from "@/components/svgs/AirdropIcon";
 import GovernanceIcon from "@/components/svgs/GovernanceIcon";
 import CalenderIcon from "@/components/svgs/CalenderIcon";
+import MenuIcon from "@/components/svgs/MenuIcon";
+import VoteIcon from "@/components/svgs/VoteIcon";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
@@ -228,7 +229,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
             </div>}
             <div className="px-3 py-2">
               <div className="flex gap-3">
-                <span>icon</span>
+                <span><MenuIcon/></span>
                 <div className="text-black">Custom</div>
               </div>      
             </div>
