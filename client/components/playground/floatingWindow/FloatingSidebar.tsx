@@ -38,6 +38,9 @@ import { TokensIcon } from "@radix-ui/react-icons";
 import SetStrategyIcon from "@/components/svgs/SetStrategyIcon";
 import PortfolioIcon from "@/components/svgs/PortfolioIcon";
 import PadlockIcon from "@/components/svgs/PadlockIcon";
+import MarkedCalenderIcon from "@/components/svgs/MarkedCalenderIcon";
+import EnergyIcon from "@/components/svgs/EnergyIcon";
+import AirdropIcon from "@/components/svgs/AirdropIcon";
 
 // array holding data concerning  nested items 
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise"}, {icon: <ConnectionIcon/>, text: "Connection"}];
@@ -51,6 +54,8 @@ const portfolioManagement = [{icon: <ClockIcon/>, text: "rebalance Portfolio"}, 
 const insighAndAnalytics =[{icon: <PieChartIcon/>, text: "Check Transaction"}, {icon: <PortfolioIcon/>, text:"Portfolio Analytics"}]
 
 const governance = [{icon: <VoteIcon/>, text: "Vote on Proposal"}, {icon: <PadlockIcon/>, text:"Create Vesting"}]
+
+const EventsAndAutomation = [{icon: <MarkedCalenderIcon/>, text: "On Event Outcome"}, {icon: <EnergyIcon/>, text:"Execute Flash Loan"},{icon: <AirdropIcon/>, text: "Initiate Airdrop"}]
 
 interface FloatingSidebarProps {
   addBlock: (block: any) => void;
