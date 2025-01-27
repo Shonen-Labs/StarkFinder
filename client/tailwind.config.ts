@@ -19,6 +19,8 @@ const config: Config = {
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
         "spin-around": "spin-around calc(var(--speed) * 2) infinite linear",
         slide: "slide var(--speed) ease-in-out infinite alternate",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       keyframes: {
         scroll: {
@@ -52,6 +54,14 @@ const config: Config = {
           to: {
             transform: "translate(calc(100cqw - 100%), 0)",
           },
+        },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       colors: {
@@ -98,6 +108,8 @@ const config: Config = {
         "orange-bright": "#FFAE63",
         "blue-navy": "#053382",
         "blue-dark": "#080B2A",
+        "green-dark": "#152329",
+        "violet-light": "#C77DFB",
         grayscale: {
           100: "#F0F4F8",
           200: "#F2FCF9",
@@ -106,7 +118,11 @@ const config: Config = {
           500: "#E1E1E1",
           600: "#D0D6E0",
           800: "#8A8F98",
-          900: "#121319"
+        },
+        "black-scale": {  
+          300: "#121319",
+          400: "#040F15",
+          500: "#152329"
         },
       },
       borderRadius: {
