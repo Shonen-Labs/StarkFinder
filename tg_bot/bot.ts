@@ -1,6 +1,6 @@
 import { Bot, Context, session, SessionFlavor } from "grammy";
 import { ASK_OPENAI_AGENT_PROMPT } from "./prompts/prompts";
-import { Account, Contract, RpcProvider, stark, ec, hash, CallData } from "starknet";
+import { Account, Contract, RpcProvider, stark, ec, hash, CallData,  CairoOption, CairoOptionVariant, CairoCustomEnum } from "starknet";
 import axios from "axios";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate } from "@langchain/core/prompts";
@@ -158,13 +158,22 @@ class StarknetWallet {
     publicKey: string,
     contractAddress: string
   }> {
+    // initialize existing Argent X testnet  account
+    const existingAccountAddress = "0x06CFffa3b51bCa2cA7B0e7871E90f607B6aA24A9eB0A94ef34f1574B219a5862";
+    const existingAccountPrivateKey = "";
+
+    // Initialize Existing Account
+    const existingAccount = new Account(this.provider, existingAccountAddress, existingAccountPrivateKey);
+
+
     const argentXaccountClassHash = "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f";
     const privateKeyAX = stark.randomAddress();
     const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
-    
+    const axSigner = new CairoCustomEnum({ Starknet: { pubkey: starkKeyPubAX } });
+    const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
     const AXConstructorCallData = CallData.compile({
-      owner: starkKeyPubAX,
-      guardian: "0x0",
+        owner: axSigner,
+        guardian: axGuardian,
     });
     
     const AXcontractAddress = hash.calculateContractAddressFromHash(
@@ -184,7 +193,7 @@ class StarknetWallet {
     };
     
     const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } =
-      await accountAX.deployAccount(deployAccountPayload);
+      await existingAccount.deployContract(deployAccountPayload);
     
     console.log("✅ ArgentX wallet deployed at:", AXcontractFinalAddress);
     
