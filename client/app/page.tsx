@@ -1,15 +1,13 @@
-import { BentoDemo } from "@/components/landing/BentoGrid";
-import { Background } from "@/components/landing/DotPattern";
-import { GridPatternDemo } from "@/components/landing/gridbackground";
+import { Hero, Header, Feature, Footer, Offer } from '@/components/landing/home'
 
-import { NavbarDemo } from "@/components/landing/Navbar";
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <div>
-      <Background />
-      <BentoDemo />
-      <NavbarDemo />
-      <GridPatternDemo />
-    </div>);
+    <main>
+      <Header />
+      <Hero />
+      <Feature />
+      <Offer />
+      <Footer />
+    </main>
+  )
 }
