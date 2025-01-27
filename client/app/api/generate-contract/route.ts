@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
             // Save the contract source code
             const savedPath = await generator.saveContract(result.sourceCode, 'lib');
 
-            await prisma.contract.create({
+            await prisma.generatedContract.create({
               data: {
                 name: 'Generated Contract',
                 sourceCode: result.sourceCode,

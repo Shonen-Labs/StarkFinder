@@ -232,12 +232,14 @@ export async function POST(req: NextRequest) {
 
     console.log('Contract deployment successful!');
 
-    await prisma.contract.create({
+    await prisma.deployedContract.create({
       data: {
         name: contractName,
         sourceCode: JSON.stringify(sierraCode),
         userId,
-        deployed: true,
+        contractAddress: contract.address,
+        classHash: declareResponse.class_hash,
+        transactionHash: deployResponse.transaction_hash,
       },
     });
 
