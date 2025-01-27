@@ -4,7 +4,7 @@ import { XIcon, TelegramIcon, GithubIcon } from '@/components/icons'
 
 export function Footer() {
   return (
-    <footer className="bg-blue-dark text-white pt-20 px-4 pb-10">
+    <footer className="bg-blue-dark text-white pt-20 px-5 pb-10">
       <div className="max-w-[70.75rem] mx-auto">
         <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-24">
           <InfoFooter />
