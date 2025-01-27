@@ -1,4 +1,11 @@
-import { Hero, Header, Feature, Footer, Offer } from '@/components/landing/home'
+import {
+  Hero,
+  Header,
+  Feature,
+  Footer,
+  Offer,
+  Question,
+} from '@/components/landing/home'
 
 export default function HomePage() {
   return (
@@ -7,6 +14,7 @@ export default function HomePage() {
       <Hero />
       <Feature />
       <Offer />
+      <Question />
       <Footer />
     </main>
   )
