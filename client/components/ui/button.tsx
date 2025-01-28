@@ -31,11 +31,12 @@ const buttonVariants = cva(
         landing:
           "h-11 rounded-[1.75rem] px-[1.5rem] py-2.5 gap-2.5 [&_svg]:size-max",
         "landing-lg": "px-12 h-14 font-medium text-xl rounded-[1.875rem]",
-        "landing-xl": "px-20 h-14 rounded-[1.875rem] py-4"
+        "landing-xl": "px-20 h-14 rounded-[1.875rem] py-4",
+        "landing-2xl": "px-5 h-[3.125rem] rounded-sm py-4"
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "default", 
       size: "default",
     },
   }
