@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@langchain/openai": "^0.4.2",
+    "@prisma/client": "^6.2.1",
+    "dotenv": "^16.4.7",
+    "langchain": "^0.3.13"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}

@@ -154,6 +154,42 @@ export default function ChatPage() {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let accumulatedResponse = '';
+
+try {
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    const chunk = decoder.decode(value);
+    const lines = chunk.split('\n').filter(Boolean);
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          // Slice off the 'data: ' prefix and parse the JSON
+          const lineData = line.slice(5);
+          console.log('Received data:', lineData); // Log the data to check its format
+
+          // Attempt to parse the JSON
+          const data = JSON.parse(lineData);
+
+          if (data.content) {
+            accumulatedResponse += data.content;
+            setStreamedResponse(accumulatedResponse);
+          } else if (data.error) {
+            throw new Error(data.error);
+          }
+        } catch (e) {
+          console.error('Error parsing JSON:', e); // Log the error
+          console.error('Malformed data:', line.slice(5)); // Log the malformed data
+        }
+      }
+    }
+  }
+} catch (e) {
+  console.error('Error processing the stream:', e); // General error handling for stream processing
+}
+
   
         try {
           while (true) {

@@ -153,6 +153,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionS
   }
   return <p className="text-white/80">{message.content}</p>;
 };
+
 export default function TransactionPage() {
   const router = useRouter();
   const params = useParams();
@@ -186,6 +187,7 @@ export default function TransactionPage() {
       user: 'Agent'
     }]);
   }, []);
+  
   const createNewChat = async () => {
     const id = uuidv4();
     await router.push(`/agent/chat/${id}`);
@@ -303,186 +305,87 @@ export default function TransactionPage() {
     }
   };
 
-
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
       {/* Dotted background */}
       <div
-        className="absolute inset-0 bg-repeat opacity-5"
-        style={{
-          backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-          backgroundSize: "20px 20px",
-        }}
-      />
+        className="absolute inset-0 bg-repeat opacity-30"
+        style={{ backgroundImage: 'url(/images/dots-pattern.png)' }}
+      ></div>
 
-      {/* Content wrapper */}
-      <div className="flex w-full h-full relative z-10">
-        {/* Sidebar */}
-        <div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
-          <h2 className="text-2xl text-white mb-4">StarkFinder</h2>
-          <Button
-            variant="ghost"
-            className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-            onClick={() => router.push("/agent/chat")}
-          >
-            <span>Agent Chat</span>
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={() => router.push("/agent/transaction")}
-          >
-            <span>Agent Txn</span>
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Separator className="my-2 bg-white/20" />
-          {/* <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                className="justify-start gap-2 border border-white/20 hover:bg-white/10 transition-colors"
-              >
-                <Plus className="h-4 w-4" /> New
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-gray-900 border border-white/20 text-white">
-              <DialogHeader>
-                <DialogTitle>Create New</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewChat}
-                >
-                  Chat
+      {/* Main content */}
+      <div className="flex flex-col h-full w-full px-6 py-8 space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div className="space-x-2">
+            <Link href="/" className="flex items-center">
+              <Home className="w-6 h-6 text-white" />
+              <span className="ml-2">Home</span>
+            </Link>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="ghost">
+                  <Plus className="w-6 h-6" />
                 </Button>
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewTxn}
-                >
-                  Txn
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog> */}
-
-          <div className="flex flex-col gap-4">
-            <h4 className="text-sm">Transaction History</h4>
-            <Input
-              placeholder="Search"
-              className="bg-transparent border border-white/20 text-white py-4 text-sm rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-            />
-            <div className="overflow-y-auto h-64 flex flex-col gap-2 pr-2
-              [&::-webkit-scrollbar]:w-2
-              [&::-webkit-scrollbar-track]:bg-[#060606]
-              [&::-webkit-scrollbar-thumb]:bg-white/10
-              [&::-webkit-scrollbar-thumb]:rounded-full
-              dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-              dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-              {[0, 1, 2, 4, 5].map((index) => (
-                <div
-                  key={index}
-                  className="flex flex-col p-2 px-2 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer gap-1"
-                >
-                  <span>0x86ecca95fec</span>
-                  <span className="text-[#eee] text-[0.8em]">12th Dec, 2025</span>
+              </DialogTrigger>
+              <DialogContent className="w-96">
+                <DialogHeader>
+                  <DialogTitle>Create new</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <Button
+                    className="w-full"
+                    onClick={createNewChat}
+                  >
+                    Chat
+                  </Button>
+                  <Button
+                    className="w-full"
+                    onClick={createNewTxn}
+                  >
+                    Transaction
+                  </Button>
                 </div>
-              ))}
-            </div>
+              </DialogContent>
+            </Dialog>
           </div>
-
-          <div className="mt-auto flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm text-green-500">Online</span>
+          <div className="flex items-center space-x-2">
+            {address ? (
+              <DisconnectButton />
+            ) : (
+              <ConnectButton />
+            )}
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
-          {/* Header */}
-          <div className="flex justify-between items-center p-4 border-b border-white/20 bg-[#010101]">
-            <div className="flex flex-col">
-              <Link href="/" className="flex items-center gap-2">
-                <Home className="h-4 w-4" />
-                Home
-              </Link>
-              <h4 className="text-xl">StarkFinder - Transactions</h4>
-            </div>
-            <div className="flex items-center gap-4">
-              {address ? (
-                <div className="flex items-center gap-4">
-                  <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
-                    {address.slice(0, 5) + "..." + address.slice(-3)}
-                  </div>
-                  <DisconnectButton />
-                </div>
-              ) : (
-                <ConnectButton />
-              )}
-            </div>
-          </div>
-
-          {/* Chat Area */}
-          <ScrollArea className="flex-1 p-4">
+        {/* Messages */}
+        <ScrollArea className="h-full" ref={scrollRef}>
+          <div className="space-y-4">
             {messages.map((message) => (
-              <div key={message.id} className="flex gap-2 mb-4 animate-fadeIn">
-                <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">
-                  {message.role === "agent" ? "A" : "U"}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold">
-                      {message.role === "agent" ? "Transaction Agent" : "You"}
-                    </span>
-                    <span className="text-xs text-white/60">
-                      ({message.timestamp})
-                    </span>
-                  </div>
-                  <div className="text-white/80 bg-white/5 p-2 rounded-lg">
-                    <MessageContent
-                      message={message}
-                      onTransactionSuccess={handleTransactionSuccess}
-                    />
-                  </div>
-                </div>
+              <div key={message.id}>
+                <MessageContent message={message} onTransactionSuccess={handleTransactionSuccess} />
               </div>
             ))}
-            <div ref={scrollRef} />
-          </ScrollArea>
-          
-          {isInputClicked && (
-            <CommandList />
-          )}
-          {/* Input Area */}
-          <div className="p-4 border-t border-white/20 bg-[#010101]">
-            <div className="relative">
-              <Input
-                placeholder="Type your message..."
-                className="bg-white/5 border border-white/20 text-white pl-4 pr-24 py-6 rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value)
-                  setIsInputClicked(false)
-                }}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                disabled={isLoading}
-                onClick={() => setIsInputClicked(!isInputClicked)}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
-                onClick={handleSendMessage}
-                disabled={isLoading}
-              >
-                <Send className="h-5 w-5" />
-                <span className="sr-only">Send message</span>
-              </Button>
-            </div>
           </div>
+        </ScrollArea>
+
+        {/* Input */}
+        <div className="flex items-center space-x-2">
+          <Input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-grow"
+            onFocus={() => setIsInputClicked(true)}
+            onBlur={() => setIsInputClicked(false)}
+          />
+          <Button
+            variant="ghost"
+            onClick={handleSendMessage}
+            disabled={isLoading}
+          >
+            <Send className="w-5 h-5 text-white" />
+          </Button>
         </div>
       </div>
     </div>

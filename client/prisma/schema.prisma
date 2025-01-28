@@ -35,6 +35,7 @@ model Message {
   chatId   String
   userId   String
   createdAt DateTime @default(now())
+  timestamp DateTime @default(now()) // Adding timestamp back
   Chat     Chat    @relation(fields: [chatId], references: [id])
   User     User    @relation(fields: [userId], references: [id])
 }
@@ -75,4 +76,3 @@ enum TxStatus {
   COMPLETED
   FAILED
 }
-
