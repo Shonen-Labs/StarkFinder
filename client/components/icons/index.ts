@@ -9,3 +9,6 @@ export * from './file.icon'
 export * from './notification.icon'
 export * from './calendar.icon'
 export * from './integration.icon'
+
+export * from './chat.icon'
+export * from './contract.icon'
