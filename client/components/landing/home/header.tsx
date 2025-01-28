@@ -1,6 +1,5 @@
-import { RocketLaunchIcon } from '@/components/icons'
-import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { ModalLanding } from './modal-landing'
 
 export function Header() {
   return (
@@ -18,10 +17,8 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <Button size="landing" variant="primary">
-          Launch App
-          <RocketLaunchIcon />
-        </Button>
+
+        <ModalLanding />
       </div>
     </header>
   )
