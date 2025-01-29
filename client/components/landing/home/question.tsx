@@ -3,7 +3,10 @@ import { HeaderSection } from './header-section'
 
 export function Question() {
   return (
-    <section className="bg-black-scale-400 pt-14 px-4 pb-[7.25rem]">
+    <section
+      id="faq"
+      className="bg-black-scale-400 pt-14 px-4 pb-[7.25rem] scroll-mt-[3.6rem]"
+    >
       <HeaderSection
         title=" Frequently asked Questions"
         description="We know you might have a few questions—here are some of the most

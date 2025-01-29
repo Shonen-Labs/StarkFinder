@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { ModalLanding } from './modal-landing'
 
 export function Header() {
@@ -8,13 +7,13 @@ export function Header() {
         <h1 className="text-blue-navy font-bold text-[2rem]">StarkFinder</h1>
         <nav className="flex gap-11 max-md:hidden">
           {menuItems.map((item, index) => (
-            <Link
+            <a
               key={`${index}-${item.name}`}
               href={item.href}
               className="text-black hover:text-orange-bright text-base font-bold transition-colors"
             >
               {item.name}
-            </Link>
+            </a>
           ))}
         </nav>
 
@@ -25,7 +24,7 @@ export function Header() {
 }
 
 const menuItems = [
-  { name: 'How It Works', href: '#' },
-  { name: 'Our Features', href: '#' },
-  { name: 'FAQ', href: '#' },
+  { name: 'How It Works', href: '#offer' },
+  { name: 'Our Features', href: '#feature' },
+  { name: 'FAQ', href: '#faq' },
 ]
