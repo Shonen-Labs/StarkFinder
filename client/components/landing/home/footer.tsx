@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { ExternalLink } from '@/components/base'
 import { XIcon, TelegramIcon, GithubIcon } from '@/components/icons'
 
 export function Footer() {
@@ -49,14 +48,13 @@ function InfoFooter() {
       </p>
       <div className="flex items-center max-md:justify-center gap-6">
         {socialMedia.map((social, index) => (
-          <ExternalLink
+          <Link
             key={`${index}-${social.name}`}
             href={social.href}
             className="cursor-pointer [&_path]:hover:fill-grayscale-100 [&_path]:transition-colors"
           >
-            <span className="sr-only">(opens in a new tab)</span>
             <social.icon />
-          </ExternalLink>
+          </Link>
         ))}
       </div>
     </div>
@@ -67,7 +65,7 @@ const menuItems = [
   {
     title: 'Site Map',
     subItems: [
-      { name: 'Home', url: '#' },
+      { name: 'Home', url: '/' },
       { name: 'Launch TG Bot', url: '#' },
       { name: 'About', url: '#' },
     ],
