@@ -21,6 +21,8 @@
     - [Exploration Agent](#exploration-agent)
     - [Research Agent](#research-agent)
 - [Design](#design)
+   - [Landing Page](#landing-page)
+   - [Starkfinder Transaction Page](#starkfinder-transaction-page)
 - [Future Plans](#future-plans)
 - [Contributing](#contributing)
 - [License](#license)
@@ -98,7 +100,12 @@ The Exploration Agent helps users discover new Starknet-based projects, protocol
 The Research Agent provides in-depth analysis and insights about the Starknet ecosystem. Users can interact with this agent using the `/research` command.
 
 ## Design
+
+### Landing Page
 Kindly refer to the following for the [landing page](https://www.figma.com/design/pfxBpMpBiiJvXQtF7zUgFy/Starkfinder?node-id=0-1&t=sgOod3BsqDHeHuhC-1) design.
+
+### Starkfinder Transaction Page
+Kindly refer to [web app](https://www.figma.com/file/AJEN6n4Wi8ltjYW7mNSPKX?node-id=0:1&locale=en&type=design) for the web application transaction page.
 
 ## Future Plans
 In the future, the StarkFinder team plans to expand the application's capabilities by integrating with more Starknet-based protocols and services. Additionally, the team aims to explore the integration of XMTP (Cross-Message Transport Protocol) to enhance the decentralized and secure communication between the agents and users.
