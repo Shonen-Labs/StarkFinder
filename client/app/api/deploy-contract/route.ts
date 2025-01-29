@@ -28,7 +28,7 @@ async function compileCairo(): Promise<CompilationResult> {
     console.log(chalk.blue("📦 Starting Cairo compilation..."));
     const startTime = Date.now();
 
-    const { stdout, stderr } = await execAsync("scarb build", {
+    const { stderr } = await execAsync("scarb build", {
       cwd: getContractsPath(),
     });
 
