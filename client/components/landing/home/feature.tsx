@@ -3,15 +3,42 @@ import { Button } from '@/components/ui/button'
 import secure from '@/public/img/secure-blockchain.png'
 import ai from '@/public//img/ai-powered.png'
 import realTime from '@/public/img/real-time.png'
+import star from '@/public/img/star.svg'
+import star2 from '@/public/img/star2.svg'
+import star3 from '@/public/img/star3.svg'
 import { cn } from '@/lib/utils'
+import { SectionBackground } from './section-background'
 
 export function Feature() {
   return (
-    <section className="pt-[6rem] bg-[#7e3dff] px-4">
-      <h2 className="text-orange-bright font-bold text-lp-h2 leading-none text-center mb-[8.875rem]">
-        Our Features
-      </h2>
-      <div className="max-w-[75rem] mx-auto">
+    <section
+      id="feature"
+      className="pt-[6rem] bg-[#7e3dff] px-4 scroll-mt-[1.25rem] relative"
+    >
+      <SectionBackground id="particles2" />
+      <div className="flex justify-center items-center">
+        <div className="relative mb-[8.875rem]">
+          <Image
+            src={star}
+            alt="bg-title"
+            className="absolute -left-[1.875rem] -top-[0.938rem]"
+          />
+          <Image
+            src={star2}
+            alt="bg-title"
+            className="absolute -left-[0.625rem] -bottom-[2.188rem]"
+          />
+          <Image
+            src={star3}
+            alt="bg-title"
+            className="absolute -top-[2.813rem] -right-[3.938rem]"
+          />
+          <h2 className="text-orange-bright font-bold text-lp-h2 leading-none text-center">
+            Our Features
+          </h2>
+        </div>
+      </div>
+      <div className="max-w-[75rem] mx-auto relative">
         {itemFeatures.map((feature, index) => (
           <FeatureSection
             key={`${index}-${feature.title}`}

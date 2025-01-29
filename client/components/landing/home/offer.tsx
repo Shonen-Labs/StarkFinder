@@ -12,10 +12,15 @@ import {
   NotificationIcon,
 } from '@/components/icons'
 import { HeaderSection } from './header-section'
+import { SectionBackground } from './section-background'
 
 export function Offer() {
   return (
-    <section className="bg-[#5530d6] px-4 pt-14 pb-[7.25rem]">
+    <section
+      id="offer"
+      className="bg-[#5530d6] scroll-mt-[4rem] px-4 pt-14 pb-[7.25rem] relative"
+    >
+      <SectionBackground id="particles1" />
       <HeaderSection
         title="What can we offer"
         description=" At StarkFinder, we provide a comprehensive suite of tools and features
