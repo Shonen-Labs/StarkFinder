@@ -14,10 +14,12 @@ pub trait IStarkfinder<TContractState> {
     fn get_user(self: @TContractState, account: ContractAddress) -> User;
     fn send_transaction(ref self: TContractState, to: ContractAddress, amount: u128);
     fn set_admin_wallet(ref self: TContractState, new_admin_wallet: ContractAddress);
+    fn get_admin_wallet(self: @TContractState) -> ContractAddress;
+    fn get_token_address(self: @TContractState) -> ContractAddress;
 }
 
 #[starknet::contract]
-mod starkfinder {
+pub mod starkfinder {
     use super::{User};
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use starknet::{ContractAddress, get_block_timestamp, get_caller_address, get_contract_address};
@@ -30,33 +32,33 @@ mod starkfinder {
 
     #[storage]
     struct Storage {
-        users: Map<ContractAddress, User>,
-        admin_wallet: ContractAddress,
-        token_address: ContractAddress,
+        pub users: Map<ContractAddress, User>,
+        pub admin_wallet: ContractAddress,
+        pub token_address: ContractAddress,
     }
 
     #[event]
     #[derive(Drop, starknet::Event)]
-    enum Event {
+    pub enum Event {
         TransactionExecuted: TransactionExecuted,
         UserRegistered: UserRegistered,
         AdminWalletChanged: AdminWalletChanged,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct TransactionExecuted {
-        from: ContractAddress,
-        to: ContractAddress,
-        amount: u128,
-        fee: u128,
-        timestamp: u64,
+    pub struct TransactionExecuted {
+        pub from: ContractAddress,
+        pub to: ContractAddress,
+        pub amount: u128,
+        pub fee: u128,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct UserRegistered {
-        user: ContractAddress,
-        username: felt252,
-        timestamp: u64,
+    pub struct UserRegistered {
+        pub user: ContractAddress,
+        pub username: felt252,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -167,5 +169,13 @@ mod starkfinder {
 
             self.admin_wallet.write(new_admin_wallet);
         }
+
+        fn get_admin_wallet(self: @ContractState) -> ContractAddress {
+            self.admin_wallet.read()
+        }
+
+        fn get_token_address(self: @ContractState) -> ContractAddress {
+            self.token_address.read()
+        } 
     }
 }
