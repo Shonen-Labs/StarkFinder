@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import { TransactionSuccess } from "@/components/TransactionSuccess";
 import CommandList from "@/components/ui/command";
+import { getAIResponse, suggestTransactions } from "./langchainContext";
 
 interface Message {
   role: string;
@@ -153,6 +154,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionS
   }
   return <p className="text-white/80">{message.content}</p>;
 };
+
 export default function TransactionPage() {
   const router = useRouter();
   const params = useParams();
@@ -185,7 +187,22 @@ export default function TransactionPage() {
       timestamp: new Date().toLocaleTimeString(),
       user: 'Agent'
     }]);
-  }, []);
+
+    // Add transaction suggestions if the user has a history
+    if (address) {
+      suggestTransactions(address).then((suggestions) => {
+        const suggestionMessage: Message = {
+          id: uuidv4(),
+          role: 'agent',
+          content: suggestions,
+          timestamp: new Date().toLocaleTimeString(),
+          user: 'Agent',
+        };
+        setMessages(prev => [...prev, suggestionMessage]);
+      });
+    }
+  }, [address]);
+
   const createNewChat = async () => {
     const id = uuidv4();
     await router.push(`/agent/chat/${id}`);
@@ -235,57 +252,15 @@ export default function TransactionPage() {
     setIsLoading(true);
   
     try {
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: inputValue,
-          address: address, // Always include the wallet address
-          chainId: '4012',
-          messages: messages.concat(userMessage).map(msg => ({
-            sender: msg.role === 'user' ? 'user' : 'brian',
-            content: msg.content,
-          })),
-        }),
-      });
-  
-      const data = await response.json();
-      
-      let agentMessage: Message;
-      
-      // Check if it's an error message that's actually a prompt for more information
-      if (data.error && typeof data.error === 'string' && !data.error.includes("not recognized")) {
-        // This is a conversational prompt from Brian, not an error
-        agentMessage = {
-          id: uuidv4(),
-          role: 'agent',
-          content: data.error,  // This contains Brian's question for more details
-          timestamp: new Date().toLocaleTimeString(),
-          user: 'Agent'
-        };
-      } else if (response.ok && data.result?.[0]?.data) {
-        // We have transaction data
-        const { description, transaction } = data.result[0].data;
-        agentMessage = {
-          id: uuidv4(),
-          role: 'agent',
-          content: description,
-          timestamp: new Date().toLocaleTimeString(),
-          user: 'Agent',
-          transaction: transaction
-        };
-      } else {
-        // This is an actual error
-        agentMessage = {
-          id: uuidv4(),
-          role: 'agent',
-          content: "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
-          timestamp: new Date().toLocaleTimeString(),
-          user: 'Agent'
-        };
-      }
+      const aiResponse = await getAIResponse(address, inputValue);
+
+      const agentMessage: Message = {
+        id: uuidv4(),
+        role: 'agent',
+        content: aiResponse,
+        timestamp: new Date().toLocaleTimeString(),
+        user: 'Agent',
+      };
 
       setMessages(prev => [...prev, agentMessage]);
     } catch (error) {
@@ -302,7 +277,6 @@ export default function TransactionPage() {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
@@ -337,37 +311,6 @@ export default function TransactionPage() {
             <Plus className="h-4 w-4" />
           </Button>
           <Separator className="my-2 bg-white/20" />
-          {/* <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                className="justify-start gap-2 border border-white/20 hover:bg-white/10 transition-colors"
-              >
-                <Plus className="h-4 w-4" /> New
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-gray-900 border border-white/20 text-white">
-              <DialogHeader>
-                <DialogTitle>Create New</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewChat}
-                >
-                  Chat
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewTxn}
-                >
-                  Txn
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog> */}
 
           <div className="flex flex-col gap-4">
             <h4 className="text-sm">Transaction History</h4>
