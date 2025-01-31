@@ -9,7 +9,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
 title: "Stark Finder",
-description: "Discover and interact with Starknet applications effortlessly",
+description: "The only platform you need for all things Starknet. Discover and interact with Starknet applications effortlessly",
 };
 
 export default function RootLayout({
