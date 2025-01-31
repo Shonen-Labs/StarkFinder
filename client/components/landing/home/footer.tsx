@@ -1,12 +1,15 @@
 import Link from 'next/link'
 import { XIcon, TelegramIcon, GithubIcon } from '@/components/icons'
+import { MotionBox } from './motion-box'
 
 export function Footer() {
   return (
     <footer className="bg-blue-dark text-white pt-20 px-5 pb-10">
       <div className="max-w-[70.75rem] mx-auto">
         <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-24">
-          <InfoFooter />
+          <MotionBox>
+            <InfoFooter />
+          </MotionBox>
           <MenuFooter />
         </div>
         <p className="text-sm pt-10 max-md:text-center">
@@ -20,9 +23,15 @@ export function Footer() {
 
 function MenuFooter() {
   return (
-    <div className="flex justify-between md:max-w-[39.063rem] w-full">
+    <nav
+      className="flex justify-between md:max-w-[39.063rem] w-full"
+      role="menu"
+    >
       {menuItems.map((menu, index) => (
-        <div key={`${index}-${menu.title}`} className="flex flex-col gap-5 ">
+        <MotionBox
+          key={`${index}-${menu.title}`}
+          className="flex flex-col gap-5 "
+        >
           <h3 className="text-lp-text2 leading-7">{menu.title}</h3>
           {menu.subItems.map((subItem, index) => (
             <Link
@@ -33,9 +42,9 @@ function MenuFooter() {
               {subItem.name}
             </Link>
           ))}
-        </div>
+        </MotionBox>
       ))}
-    </div>
+    </nav>
   )
 }
 
@@ -52,6 +61,7 @@ function InfoFooter() {
             key={`${index}-${social.name}`}
             href={social.href}
             className="cursor-pointer [&_path]:hover:fill-grayscale-100 [&_path]:transition-colors"
+            role="menuitem"
           >
             <social.icon />
           </Link>

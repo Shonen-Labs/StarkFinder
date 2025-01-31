@@ -4,46 +4,60 @@ import calendar from '@/public/img/calendar.png'
 import notification from '@/public/img/notification.png'
 import files from '@/public/img/files.png'
 import social from '@/public/img/social.png'
-
+import { HeaderSection } from './header-section'
+import { SectionBackground } from './section-background'
 import {
   CalendarIcon,
   FileIcon,
   IntegrationIcon,
   NotificationIcon,
 } from '@/components/icons'
-import { HeaderSection } from './header-section'
-import { SectionBackground } from './section-background'
+import { MotionBox } from './motion-box'
 
 export function Offer() {
   return (
     <section
       id="offer"
-      className="bg-[#5530d6] scroll-mt-[4rem] px-4 pt-14 pb-[7.25rem] relative"
+      className="bg-purple scroll-mt-[4rem] px-4 pt-14 pb-[7.25rem] relative"
     >
       <SectionBackground id="particles1" />
-      <HeaderSection
-        title="What can we offer"
-        description=" At StarkFinder, we provide a comprehensive suite of tools and features
-          tailored for both users and developers in the Starknet ecosystem"
-      />
 
-      <div className="grid max-md:place-items-center grid-cols-1 md:grid-cols-2 gap-4 max-w-[61.625rem] mx-auto">
+      <MotionBox>
+        <HeaderSection
+          title="What can we offer"
+          description=" At StarkFinder, we provide a comprehensive suite of tools and features
+          tailored for both users and developers in the Starknet ecosystem"
+        />
+      </MotionBox>
+
+      <div className="grid max-md:place-items-center grid-cols-1 md:grid-cols-2 gap-4 max-w-[61.625rem] mx-auto overflow-hidden">
         {itemOffer.map((offer, index) => (
-          <SectionOffer
+          <MotionBox
             key={`${index}-${offer.title}`}
-            title={offer.title}
-            description={offer.description}
-            src={offer.src}
-            icon={offer.icon}
-          />
+            motionProps={{
+              initial: { opacity: 0, x: index % 2 !== 0 ? 40 : -40 },
+              whileInView: { opacity: 1, x: 0 },
+              transition: { duration: 0.8, delay: 0.2 },
+            }}
+          >
+            <SectionOffer
+              title={offer.title}
+              description={offer.description}
+              src={offer.src}
+              icon={offer.icon}
+            />
+          </MotionBox>
         ))}
       </div>
 
-      <div className="text-center pt-14">
+      <MotionBox
+        className="text-center pt-14"
+        motionProps={{ initial: { opacity: 0, y: 30 } }}
+      >
         <Button size="landing-xl" variant="tertiary">
           Launch App
         </Button>
-      </div>
+      </MotionBox>
     </section>
   )
 }

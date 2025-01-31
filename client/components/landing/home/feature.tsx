@@ -6,18 +6,21 @@ import realTime from '@/public/img/real-time.png'
 import star from '@/public/img/star.svg'
 import star2 from '@/public/img/star2.svg'
 import star3 from '@/public/img/star3.svg'
+import bgTop from '@/public/img/top.png'
+import bgLeft from '@/public/img/left.png'
 import { cn } from '@/lib/utils'
 import { SectionBackground } from './section-background'
+import { MotionBox } from './motion-box'
 
 export function Feature() {
   return (
     <section
       id="feature"
-      className="pt-[6rem] bg-[#7e3dff] px-4 scroll-mt-[1.25rem] relative"
+      className="pt-[6rem] bg-purple-light px-4 scroll-mt-[1.25rem] relative overflow-x-clip"
     >
       <SectionBackground id="particles2" />
       <div className="flex justify-center items-center">
-        <div className="relative mb-[8.875rem]">
+        <MotionBox className="relative mb-[8.875rem]  z-10">
           <Image
             src={star}
             alt="bg-title"
@@ -36,19 +39,28 @@ export function Feature() {
           <h2 className="text-orange-bright font-bold text-lp-h2 leading-none text-center">
             Our Features
           </h2>
-        </div>
+        </MotionBox>
       </div>
-      <div className="max-w-[75rem] mx-auto relative">
+
+      <div className="max-w-[75rem] mx-auto relative z-10">
         {itemFeatures.map((feature, index) => (
-          <FeatureSection
-            key={`${index}-${feature.title}`}
-            title={feature.title}
-            description={feature.description}
-            image={feature.img}
-            position={feature?.position as 'left' | 'right'}
-          />
+          <MotionBox key={`${index}-${feature.title}`}>
+            <FeatureSection
+              title={feature.title}
+              description={feature.description}
+              image={feature.img}
+              position={feature?.position as 'left' | 'right'}
+            />
+          </MotionBox>
         ))}
       </div>
+
+      <Image src={bgLeft} alt="bg-title" className="absolute bottom-0 left-0" />
+      <Image
+        src={bgTop}
+        alt="bg-title"
+        className="absolute -top-[23.75rem] right-0"
+      />
     </section>
   )
 }

@@ -1,5 +1,6 @@
 import { AccordionLanding } from './accordion-landing'
 import { HeaderSection } from './header-section'
+import { MotionBox } from './motion-box'
 
 export function Question() {
   return (
@@ -7,19 +8,22 @@ export function Question() {
       id="faq"
       className="bg-black-scale-400 pt-14 px-4 pb-[7.25rem] scroll-mt-[3.6rem]"
     >
-      <HeaderSection
-        title=" Frequently asked Questions"
-        description="We know you might have a few questions—here are some of the most
+      <MotionBox>
+        <HeaderSection
+          title=" Frequently asked Questions"
+          description="We know you might have a few questions—here are some of the most
           common ones about StarkFinder and how it can help you navigate the
           Starknet ecosystem"
-      />
+        />
+      </MotionBox>
       <div className="flex flex-col  text-white gap-[2.125rem] max-w-[50.438rem] mx-auto">
         {itemsAccordion.map((item, index) => (
-          <AccordionLanding
-            key={index}
-            title={item.title}
-            content={item.content}
-          />
+          <MotionBox
+            key={`${index}-${item.title}`}
+            motionProps={{ transition: { duration: 0.5, delay: index * 0.1 } }}
+          >
+            <AccordionLanding title={item.title} content={item.content} />
+          </MotionBox>
         ))}
       </div>
     </section>
