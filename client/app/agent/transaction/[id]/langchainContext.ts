@@ -1,4 +1,3 @@
-// app/agent/transaction/langchainContext.ts
 import { BufferMemory } from 'langchain/memory';
 import { ConversationChain } from 'langchain/chains';
 import { OpenAI } from '@langchain/openai';
