@@ -9,13 +9,15 @@ import {
 
 export default function HomePage() {
   return (
-    <main>
+    <>
       <Header />
-      <Hero />
-      <Feature />
-      <Offer />
-      <Question />
+      <main>
+        <Hero />
+        <Feature />
+        <Offer />
+        <Question />
+      </main>
       <Footer />
-    </main>
+    </>
   )
 }
