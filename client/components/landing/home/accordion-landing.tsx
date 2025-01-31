@@ -16,7 +16,7 @@ export function AccordionLanding({ title, content }: AccordionLandingProps) {
         className="border-2 border-green-dark rounded-lg [&[data-state=open]_.contain-icons]:bg-violet-light [&[data-state=closed]_.icon-minus]:hidden [&[data-state=open]_.icon-plus]:hidden"
       >
         <AccordionTrigger
-          className="relative text-2xl pl-10 py-6 pr-24"
+          className="relative text-xl sm:text-2xl pl-10 py-6 pr-24"
           hasIcon={false}
         >
           {title}
@@ -25,7 +25,7 @@ export function AccordionLanding({ title, content }: AccordionLandingProps) {
             <Minus className="size-6 shrink-0 transition-transform duration-200 icon-minus" />
           </div>
         </AccordionTrigger>
-        <AccordionContent className="pl-24 pt-5 pb-8 text-xl leading-9">
+        <AccordionContent className="pl-24 pt-5 pb-8 p-9 text-base sm:text-xl sm:leading-9">
           {content}
         </AccordionContent>
       </AccordionItem>
