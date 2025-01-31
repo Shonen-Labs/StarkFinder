@@ -110,6 +110,8 @@ const config: Config = {
         "blue-dark": "#080B2A",
         "green-dark": "#152329",
         "violet-light": "#C77DFB",
+        purple: "#5530d6",
+        "purple-light": "#7e3dff",
         grayscale: {
           100: "#F0F4F8",
           200: "#F2FCF9",
