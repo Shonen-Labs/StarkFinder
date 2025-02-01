@@ -49,8 +49,22 @@ import MenuIcon from "@/components/svgs/MenuIcon";
 import VoteIcon from "@/components/svgs/VoteIcon";
 import { Code } from "lucide-react";
 
-// array holding data concerning  nested items 
-const triggerActions = [{icon: <FlagIcon/>, text:"Initialise", toggle:false}, {icon: <ConnectionIcon/>, text: "Connection", toggle:true}];
+// array holding data concerning  nested items
+interface FloatingSidebarProps {
+  addBlock: (block: any) => void;
+}
+const formSchema = z.object({
+  blockName: z.string().min(1, "Block name is required"),
+  solidityCode: z.string().min(1, "Solidity code is required"),
+})
+let greg=groupedBlocks["Trigger Actions"]
+let token=groupedBlocks["Token Actions"]
+let li=groupedBlocks["Liquidity"]
+let po=groupedBlocks["Portfolio Management"]
+let inst=groupedBlocks["Analytics"]
+let go=groupedBlocks["Governance"]
+let ev=groupedBlocks["Events"]
+const triggerActions = [{icon: <FlagIcon/>, text:"Initialise", toggle:false,groupedBlock:groupedBlocks["Trigger Actions"]}, {icon: <ConnectionIcon/>, text: "Connection", toggle:true,groupedBlock:groupedBlocks["Trigger Actions"]}];
 
 const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token", toggle:false}, {icon: <StakeTokenIcon/>, text: "StakeToken",  toggle:false}, {icon:<AllocateTokenIcon/>, text: "Allocate Token", toggle:false}, {icon: <YieldFarmingIcon/>, text: "Yield Farming", toggle:true}, {icon: <LendTokenIcon/>, text: "Lend Tokens", toggle:false}, {icon: <BorrowTokenIcon/>, text:"Borrow Token", toggle:false}, {icon:<RepayLoanIcon/>, text:"Repay Loan", toggle:false}];
 
@@ -96,6 +110,11 @@ const initialState = {
   governanceToggle: false,
   eventsAndAutomationToggle: false
 }
+const combined = triggerActions.map((action, index) => ({
+  ...action,
+  block: greg[index],
+}));
+
 
 function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
   switch (action.type) {
@@ -169,15 +188,34 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 </div>
             </div>
             {triggerActionToggle && <div className="ml-10 my-2 mr-2 flex flex-col gap-2">
-            {triggerActions.map(child=><div key={child.text} className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-3">
-                      <span>{child.icon}</span>
-                      <div className="text-black hover:font-medium">{child.text}</div>
-                    </div>
-                    <span>{child.toggle?onToggleButton?<ToggleBtn mode="on" onClick={switchToggleBtn}/>: <ToggleBtn mode="off" onClick={switchToggleBtn}/>: ""}</span>
-                  </div>
-                </div>)}
+              {combined.map((item) => (
+      <div 
+        key={item.text}  // ensure key is unique; consider using a unique id if available
+        className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2"
+      >
+        <div 
+          className="flex justify-between items-center"
+          onClick={() => item.block && addBlock(item.block)}  // only call addBlock if block exists
+        >
+          <div className="flex gap-3">
+            <span>{item.icon}</span>
+            <div className="text-black hover:font-medium">{item.text}</div>
+          </div>
+          <span>
+            {item.toggle && (
+              onToggleButton ? (
+                <ToggleBtn mode="on" onClick={switchToggleBtn} />
+              ) : (
+                <ToggleBtn mode="off" onClick={switchToggleBtn} />
+              )
+            )}
+          </span>
+        </div>
+        {/* If you need to render extra details from the block */}
+        {/*item.block && ()*/}
+      </div>
+    ))}
+
               </div>}
           </div>
           <div className={clsx("hover:bg-gray-200 rounded-lg", tokenActionsToggle && 'bg-gray-200')}>
@@ -192,19 +230,42 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                {tokenActionsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
               </div> 
             </div>
-            {tokenActionsToggle && <div className="ml-10 my-2 flex flex-col gap-2 cursor-pointer">
-              <div className="px-3 py-2">
-               {tokenActions.map(child=><div key={child.text} className="px-3 py-2 hover:bg-gray-100 rounded-md mr-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex gap-3">
-                    <span>{child.icon}</span>
-                    <div className="text-black hover:font-medium">{child.text}</div>
-                  </div>
-                  <span>{child.toggle?onToggleButton?<ToggleBtn mode="on" onClick={switchToggleBtn}/>: <ToggleBtn mode="off" onClick={switchToggleBtn}/>: ""}</span>
-                </div>
-              </div>)}
-              </div>
-            </div>} 
+            {tokenActionsToggle && (
+  <div className="ml-10 my-2 flex flex-col gap-2 cursor-pointer">
+    {tokenActions.map((child, index) => {
+      // Get the corresponding token item by index.
+      const block = token[index];
+      
+      return (
+        <div
+          key={child.text} // Consider using a unique identifier if available
+          className="px-3 py-2 hover:bg-gray-100 rounded-md mr-2"
+        >
+          <div className="flex justify-between items-center" onClick={() => block && addBlock(block)}>
+            <div className="flex gap-3">
+              <span>{child.icon}</span>
+              <div className="text-black hover:font-medium">{child.text}</div>
+            </div>
+            <span>
+              {child.toggle &&
+                (onToggleButton ? (
+                  <ToggleBtn mode="on" onClick={switchToggleBtn} />
+                ) : (
+                  <ToggleBtn mode="off" onClick={switchToggleBtn} />
+                ))}
+            </span>
+          </div>
+
+          {/* Render details from the corresponding token item if needed */}
+          {/*block && (
+          
+          )*/}
+        </div>
+      );
+    })}
+  </div>
+)}
+
           </div>
         </div>
 
@@ -224,12 +285,16 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 </div>
                 {liquidityManagementToggle && 
                   <div className="ml-10 my-2 flex flex-col gap-2">
-                    {liquidityManagement.map(child => <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                      <div className="flex gap-3">
+                    {liquidityManagement.map((child,index) => {
+                      const block = li[index];
+                      return(
+                    <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2" key={child.text}>
+                      
+                      <div className="flex gap-3" onClick={() => block && addBlock(block)}>
                         <span>{child.icon}</span>
                         <div className="text-black">{child.text}</div>
                       </div>
-                    </div>)}   
+                    </div>)})}   
                   </div>}
             </div>
           
@@ -245,12 +310,15 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               </div>
               {portfolioManagementToggle && 
                 <div className="ml-10 my-2 flex flex-col gap-2">
-                  {portfolioManagement.map(child=> <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                    <div className="flex gap-3">
+                  {portfolioManagement.map((child,index)=>{
+                    const block = po[index];
+                     return(
+                     <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                    <div className="flex gap-3" onClick={() => block && addBlock(block)}>
                       <span>{child.icon}</span>
                       <div className="text-black">{child.text}</div>
                     </div>
-                  </div>)}
+                  </div>)})}
                 </div>}
             </div>
 
@@ -266,12 +334,15 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 </div>
                 {insightAndAnalyticsToggle && 
                     <div className="ml-10 my-2 flex flex-col gap-2">
-                      {insighAndAnalytics.map(child => <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                        <div className="flex gap-3">
+                      {insighAndAnalytics.map((child,index) =>{ 
+                        const block = inst[index];
+                        return(
+                         <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                        <div className="flex gap-3"onClick={() => block && addBlock(block)}>
                           <span>{child.icon}</span>
                           <div className="text-black">{child.text}</div>
                         </div>
-                      </div>)}    
+                      </div>)})}    
                   </div>}
               </div>
             </div>
@@ -293,12 +364,15 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               </div>
               {governanceToggle &&
               <div className="ml-10 my-2 flex flex-col gap-2">
-                {governance.map(child=><div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                    <div className="flex gap-3">
+                {governance.map((child,index)=>{
+                   const block = go[index];
+                  return(
+                <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                    <div className="flex gap-3" onClick={() => block && addBlock(block)}>
                       <span>{child.icon}</span>
                       <div className="text-black">{child.text}</div>
                     </div>
-                  </div>)}  
+                  </div>)})}  
               </div>}
             </div>
 
@@ -314,12 +388,15 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               </div>
               {eventsAndAutomationToggle &&
               <div className="ml-10 my-2 flex flex-col gap-2">
-                {eventsAndAutomation.map(child=> <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                    <div className="flex gap-3">
+                {eventsAndAutomation.map((child,index)=>{
+                  const block = ev[index];
+                  return(
+                  <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                    <div className="flex gap-3" onClick={() => block && addBlock(block)}>
                       <span>{child.icon}</span>
                       <div className="text-black">{child.text}</div>
                     </div>
-                  </div>)}
+                  </div>)})}
               </div>}
             </div>
             
@@ -341,7 +418,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
         </div>
       </div>
     </div>
-  );}
+  );
 
   function onSubmitCustomBlock(values: z.infer<typeof formSchema>) {
     const newCustomBlock = {
@@ -353,10 +430,9 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       icon: Code,
       code: values.solidityCode,
     }
-
+  
     addBlock(newCustomBlock)
     setIsCustomModalOpen(false)
     form.reset()
-    toast.success('Custom block added successfully')
-  };
-
+    toast.success('Custom block added successfully')}
+  }
