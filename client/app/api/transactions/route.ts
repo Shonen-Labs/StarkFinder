@@ -16,18 +16,214 @@ import {
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
 import { TxType } from "@prisma/client";
+import { ASK_OPENAI_AGENT_PROMPT } from "@/prompts/prompts";
+import axios from "axios";
+import {
+  ChatPromptTemplate,
+  SystemMessagePromptTemplate,
+  HumanMessagePromptTemplate,
+} from "@langchain/core/prompts";
+import { START, END, MessagesAnnotation, MemorySaver, StateGraph } from "@langchain/langgraph";
 
-const llm = new ChatOpenAI({
+const agent = new ChatOpenAI({
   model: "gpt-4",
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const BRIAN_API_KEY = process.env.BRIAN_API_KEY || "";
+const BRIAN_API_URL = "https://api.brianknows.org/api/v0/agent/knowledge";
+const BRIAN_DEFAULT_RESPONSE = "🤖 Sorry, I don't know how to answer. The AskBrian feature allows you to ask for information on a custom-built knowledge base of resources. Contact the Brian team if you want to add new resources!";
+
+// Add new prompt templates for Q&A
+const systemPrompt = ASK_OPENAI_AGENT_PROMPT +
+  `\nThe provided chat history includes a summary of the earlier conversation.`;
+const systemMessage = SystemMessagePromptTemplate.fromTemplate(systemPrompt);
+const userMessage = HumanMessagePromptTemplate.fromTemplate("{user_query}");
+const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([
+  systemMessage,
+  userMessage,
+]);
+
+async function getChatHistory(chatId: string | { configurable?: { additional_args?: { chatId?: string } } }) {
+  try {
+    const actualChatId = typeof chatId === 'object' && chatId.configurable?.additional_args?.chatId
+      ? chatId.configurable.additional_args.chatId
+      : chatId;
+
+    if (!actualChatId || typeof actualChatId !== 'string') {
+      console.warn('Invalid chat ID provided:', chatId);
+      return [];
+    }
+
+    const messages = await prisma.message.findMany({
+      where: {
+        chatId: actualChatId
+      },
+      orderBy: {
+        id: 'asc'
+      }
+    });
+
+    const formattedHistory = messages.flatMap((msg: any) => {
+      const content = msg.content as any[];
+      return content.map(c => ({
+        role: c.role,
+        content: c.content
+      }));
+    });
+
+    return formattedHistory;
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    return [];
+  }
+}
+
+// Add LangGraph workflow setup
+const initialCallModel = async (state: typeof MessagesAnnotation.State) => {
+  const messages = [
+    await systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
+    ...state.messages,
+  ];
+  const response = await agent.invoke(messages);
+  return { messages: response };
+};
+
+const callModel = async (state: typeof MessagesAnnotation.State, chatId?: any) => {
+  if (!chatId) {
+    return await initialCallModel(state);
+  }
+  const actualChatId = chatId?.configurable?.additional_args?.chatId || chatId;
+  const chatHistory = await getChatHistory(actualChatId);
+  const currentMessage = state.messages[state.messages.length - 1];
+
+  if (chatHistory.length > 0) {
+    const summaryPrompt = `
+    Distill the following chat history into a single summary message. 
+    Include as many specific details as you can.
+    IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
+    `;
+
+    const summary = await agent.invoke([
+      ...chatHistory,
+      { role: "user", content: summaryPrompt },
+    ]);
+
+    const response = await agent.invoke([
+      await systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
+      summary,
+      currentMessage,
+    ]);
+
+    return {
+      messages: [summary, currentMessage, response],
+    };
+  } else {
+    return await initialCallModel(state);
+  }
+};
+
+const workflow = new StateGraph(MessagesAnnotation)
+  .addNode("model", callModel)
+  .addEdge(START, "model")
+  .addEdge("model", END);
+const app = workflow.compile({ checkpointer: new MemorySaver() });
+
+async function queryOpenAI({
+  userQuery,
+  brianaiResponse,
+  chatId,
+  streamCallback
+}: {
+  userQuery: string,
+  brianaiResponse: string,
+  chatId?: string,
+  streamCallback?: (chunk: string) => Promise<void>
+}): Promise<string> {
+  try {
+    if (streamCallback) {
+      const messages = [
+        await systemMessage.format({ brianai_answer: brianaiResponse }),
+        { role: "user", content: userQuery }
+      ];
+
+      let fullResponse = '';
+      await agent.invoke(messages, {
+        callbacks: [{
+          handleLLMNewToken: async (token: string) => {
+            fullResponse += token;
+            await streamCallback(token);
+          },
+        }],
+      });
+      return fullResponse;
+    }
+
+    const response = await app.invoke(
+      {
+        messages: [
+          await askAgentPromptTemplate.format({
+            brianai_answer: brianaiResponse,
+            user_query: userQuery,
+          }),
+        ],
+      },
+      {
+        configurable: {
+          thread_id: chatId || "1",
+          additional_args: { chatId }
+        },
+      },
+    );
+    return response.messages[response.messages.length - 1].content as string;
+  } catch (error) {
+    console.error("OpenAI Error:", error);
+    return "Sorry, I am unable to process your request at the moment.";
+  }
+}
+// Modify queryBrianAI to support streaming
+async function queryBrianAI(
+  prompt: string,
+  chatId?: string,
+  streamCallback?: (chunk: string) => Promise<void>
+): Promise<string> {
+  try {
+    const response = await axios.post(
+      BRIAN_API_URL,
+      {
+        prompt,
+        kb: "starknet_kb",
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-brian-api-key": BRIAN_API_KEY,
+        },
+      }
+    );
+
+    const brianaiAnswer = response.data.result.answer;
+
+    const openaiAnswer = await queryOpenAI({
+      brianaiResponse: brianaiAnswer,
+      userQuery: prompt,
+      chatId,
+      streamCallback
+    });
+
+    return openaiAnswer;
+  } catch (error) {
+    console.error("Brian AI Error:", error);
+    return "Sorry, I am unable to process your request at the moment.";
+  }
+}
 
 async function getTransactionIntentFromOpenAI(
   prompt: string,
   address: string,
   chainId: string,
   messages: any[]
-): Promise<BrianResponse> {
+): Promise<BrianResponse | null> {
   try {
     const conversationHistory = messages
       .map((msg) => `${msg.role}: ${msg.content}`)
@@ -41,11 +237,11 @@ async function getTransactionIntentFromOpenAI(
     });
 
     const jsonOutputParser = new StringOutputParser();
-    const response = await llm.pipe(jsonOutputParser).invoke(formattedPrompt);
+    const response = await agent.pipe(jsonOutputParser).invoke(formattedPrompt);
     const intentData = JSON.parse(response);
 
     if (!intentData.isTransactionIntent) {
-      throw new Error("Not a transaction-related prompt");
+      return null
     }
 
     const intentResponse: BrianResponse = {
@@ -78,22 +274,22 @@ async function getTransactionIntentFromOpenAI(
           description: intentData.data?.description || "",
           steps:
             intentData.extractedParams.transaction?.contractAddress ||
-            intentData.extractedParams.transaction?.entrypoint ||
-            intentData.extractedParams.transaction?.calldata
+              intentData.extractedParams.transaction?.entrypoint ||
+              intentData.extractedParams.transaction?.calldata
               ? [
-                  {
-                    contractAddress:
-                      intentData.extractedParams.transaction.contractAddress,
-                    entrypoint:
-                      intentData.extractedParams.transaction.entrypoint,
-                    calldata: [
-                      intentData.extractedParams.destinationAddress ||
-                        intentData.extractedParams.address,
-                      weiAmount.toString(),
-                      "0",
-                    ],
-                  },
-                ]
+                {
+                  contractAddress:
+                    intentData.extractedParams.transaction.contractAddress,
+                  entrypoint:
+                    intentData.extractedParams.transaction.entrypoint,
+                  calldata: [
+                    intentData.extractedParams.destinationAddress ||
+                    intentData.extractedParams.address,
+                    weiAmount.toString(),
+                    "0",
+                  ],
+                },
+              ]
               : [],
           fromToken: {
             symbol: intentData.extractedParams.token1 || "",
@@ -149,7 +345,7 @@ async function getTransactionIntentFromOpenAI(
     return intentResponse;
   } catch (error) {
     console.error("Error fetching transaction intent:", error);
-    throw error;
+    return null;
   }
 }
 
@@ -245,6 +441,26 @@ export async function POST(request: NextRequest) {
         chatId: chat.id,
         userId: user.id,
       })
+
+      if (!transactionIntent) {
+        const brianAnswer = await queryBrianAI(prompt);
+
+        await storeMessage({
+          content: [{ role: "assistant", content: brianAnswer }],
+          chatId: chat.id,
+          userId: user.id,
+        });
+
+        return NextResponse.json({
+          result: [{
+            data: {
+              type: "question",
+              answer: brianAnswer
+            },
+            conversationHistory: messages
+          }]
+        });
+      }
 
       console.log(
         "Processed Transaction Intent from OPENAI:",

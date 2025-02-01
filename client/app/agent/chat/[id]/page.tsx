@@ -93,7 +93,7 @@ export default function ChatPage() {
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
-  
+
     const newMessage = {
       id: uuidv4(),
       role: "user",
@@ -101,13 +101,13 @@ export default function ChatPage() {
       timestamp: new Date().toLocaleTimeString(),
       user: "User",
     };
-  
+
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setInputValue("");
     setIsLoading(true);
     setStreamedResponse("");
     setError("");
-  
+
     try {
       // Format messages for the API - only include unique user messages
       const formattedMessages = Array.from(
@@ -120,7 +120,7 @@ export default function ChatPage() {
         sender: "user",
         content
       }));
-  
+
       // Add the current message if it's not already included
       if (!formattedMessages.some(msg => msg.content === inputValue)) {
         formattedMessages.push({
@@ -128,41 +128,41 @@ export default function ChatPage() {
           content: inputValue
         });
       }
-  
+
       const requestBody = {
         prompt: inputValue,
         address: address || "0x0",
         messages: formattedMessages,
         stream: true
       };
-  
-      const response = await fetch("/api/ask", {
+
+      const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.details?.message || 'Failed to get response');
       }
-  
+
       // Check if the response is a stream (has body readable)
       if (response.body) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let accumulatedResponse = '';
-  
+
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-  
+
             const chunk = decoder.decode(value);
             const lines = chunk.split('\n').filter(Boolean);
-  
+
             for (const line of lines) {
               if (line.startsWith('data: ')) {
                 try {
@@ -182,7 +182,7 @@ export default function ChatPage() {
         } finally {
           reader.releaseLock();
         }
-  
+
         // Add final message to chat
         if (accumulatedResponse) {
           setMessages(prev => [...prev, {
@@ -197,11 +197,11 @@ export default function ChatPage() {
       } else {
         // Fallback to non-streaming response
         const data = await response.json();
-        
+
         if (data.error) {
           throw new Error(data.error);
         }
-  
+
         setMessages((prevMessages) => [
           ...prevMessages,
           {
@@ -214,7 +214,7 @@ export default function ChatPage() {
         ]);
         setAnswer(data.answer);
       }
-      
+
     } catch (err: any) {
       console.error('Chat error:', err);
       setError(err.message || "Unable to get response");
@@ -295,10 +295,10 @@ export default function ChatPage() {
         <div className="flex-1 flex flex-col bg-black/30 backdrop-blur-sm">
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-white/20 bg-black/50">
-              <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               Home
-              </Link>
+            </Link>
             <div className="flex items-center gap-4">
               {address ? (
                 <div className="flex items-center gap-4">
