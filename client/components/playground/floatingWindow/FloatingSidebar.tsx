@@ -119,19 +119,19 @@ const combined = triggerActions.map((action, index) => ({
 function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
   switch (action.type) {
     case "toggle_triggerAction":
-      return { ...state, triggerActionToggle: !state.triggerActionToggle };
+      return { ...initialState, triggerActionToggle: !state.triggerActionToggle };
     case "toggle_tokenActions":
-      return { ...state, tokenActionsToggle: !state.tokenActionsToggle};
+      return { ...initialState, tokenActionsToggle: !state.tokenActionsToggle};
     case "toggle_liquidityManagement":
-      return { ...state, liquidityManagementToggle: !state.liquidityManagementToggle};
+      return { ...initialState, liquidityManagementToggle: !state.liquidityManagementToggle};
     case "toggle_portfolioManagement": 
-      return { ...state, portfolioManagementToggle: !state.portfolioManagementToggle }
+      return { ...initialState, portfolioManagementToggle: !state.portfolioManagementToggle }
     case "toggle_insightAndAnalytics":
-      return { ...state, insightAndAnalyticsToggle: !state.insightAndAnalyticsToggle };
+      return { ...initialState, insightAndAnalyticsToggle: !state.insightAndAnalyticsToggle };
     case "toggle_governance":
-      return { ...state, governanceToggle: !state.governanceToggle};
+      return { ...initialState, governanceToggle: !state.governanceToggle};
     case "toggle_eventsAndAutomation":
-      return { ...state, eventsAndAutomationToggle: !state.eventsAndAutomationToggle };
+      return { ...initialState, eventsAndAutomationToggle: !state.eventsAndAutomationToggle };
     default:
       return initialState;
   }
