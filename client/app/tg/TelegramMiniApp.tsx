@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -79,18 +80,162 @@ const MessageContent: React.FC<MessageContentProps> = ({
   return <p className="text-[var(--tg-theme-text-color)]">{message.content}</p>;
 };
 
+
+
+
+interface ButtonAction {
+  label: string;
+  type: 'wallet' | 'transaction' | 'balance' | 'general';
+  action: () => void;
+}
+
 function TelegramMiniApp(): JSX.Element {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [account, setAccount] = useState<SessionAccountInterface | null>(null);
+  const [availableActions, setAvailableActions] = useState<ButtonAction[]>([]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
+  const handleConnect = async () => {
+    try {
+      const argentTMA = getArgentTMA();
+
+      if (!argentTMA) {
+        const errorMessage: Message = {
+          id: uuidv4(),
+          role: "agent",
+          content: "Failed to initialize wallet. Please try again.",
+          timestamp: new Date().toLocaleTimeString(),
+          user: "Agent",
+        };
+        setMessages(prev => [...prev, errorMessage]);
+        return;
+      }
+
+      await argentTMA.requestConnection({ callbackData: 'test' });
+      const connection = await argentTMA.connect();
+
+      if (connection && connection.account.getSessionStatus() === "VALID") {
+        setAccount(connection.account);
+        const successMessage: Message = {
+          id: uuidv4(),
+          role: "agent",
+          content: "Wallet connected successfully! You can now proceed with transactions.",
+          timestamp: new Date().toLocaleTimeString(),
+          user: "Agent",
+        };
+        setMessages(prev => [...prev, successMessage]);
+      } else {
+        throw new Error("Invalid session after connection");
+      }
+    } catch (error) {
+      console.error('Connection failed:', error);
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content: "Failed to connect wallet. Please try again.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
+  };
+
+  // New method for generating context-sensitive buttons
+  const generateContextButtons = () => {
+    const buttons: ButtonAction[] = [
+      {
+        label: account ? "Connected Wallet" : "Connect Wallet",
+        type: 'wallet',
+        action: handleConnect
+      },
+      {
+        label: "Check Balance",
+        type: 'balance',
+        action: handleCheckBalance
+      }
+    ];
+
+    if (account) {
+      buttons.push({
+        label: "New Transaction",
+        type: 'transaction',
+        action: () => setInputValue("/txn")
+      });
+    }
+
+    setAvailableActions(buttons);
+  };
+
+  // New method to handle balance check
+  const handleCheckBalance = async () => {
+    if (!account) {
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content: "Please connect your wallet first.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/balance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: account.address,
+          chainId: "4012"
+        }),
+      });
+
+      const data = await response.json();
+      const balanceMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content: `Your wallet balance:\n${JSON.stringify(data.balances, null, 2)}`,
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages(prev => [...prev, balanceMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content: "Failed to retrieve balance. Please try again.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
+  };
+
+  // Render buttons in UI
+  const renderActionButtons = () => (
+    <div className="flex flex-wrap gap-2 mb-4 p-2">
+      {availableActions.map((action) => (
+        <button
+          key={action.label}
+          onClick={action.action}
+          className="px-3 py-2 rounded bg-[var(--tg-theme-button-color)] text-[var(--tg-theme-button-text-color)] hover:opacity-90 transition-opacity"
+        >
+          {action.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  // Existing useEffect hooks
   useEffect(() => {
     if (typeof window !== "undefined") {
       initWebApp();
       const argentTMA = getArgentTMA();
-      
+
       if (argentTMA) {
         argentTMA.connect()
           .then((res) => {
@@ -120,73 +265,15 @@ function TelegramMiniApp(): JSX.Element {
     ]);
   }, []);
 
+  // Update buttons when account changes
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  const handleConnect = async () => {
-    console.log("Connect button clicked");
-      
-    try {
-      const argentTMA = getArgentTMA();
-      console.log("ArgentTMA instance:", argentTMA);
-      
-      if (!argentTMA) {
-        console.error("Failed to get ArgentTMA instance");
-        const errorMessage: Message = {
-          id: uuidv4(),
-          role: "agent",
-          content: "Failed to initialize wallet. Please try again.",
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-        };
-        setMessages(prev => [...prev, errorMessage]);
-        return;
-      }
-  
-      console.log('Requesting connection...');
-      await argentTMA.requestConnection({callbackData: 'test'});
-      console.log('Connection requested successfully');
-  
-      console.log('Attempting to connect...');
-      const connection = await argentTMA.connect();
-      console.log('Connection response:', connection);
-  
-      if (connection && connection.account.getSessionStatus() === "VALID") {
-        console.log('Account details:', connection.account);
-        setAccount(connection.account);
-        const successMessage: Message = {
-          id: uuidv4(),
-          role: "agent",
-          content: "Wallet connected successfully! You can now proceed with transactions.",
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-        };
-        setMessages(prev => [...prev, successMessage]);
-      } else {
-        throw new Error("Invalid session after connection");
-      }
-    } catch (error) {
-      console.error('Connection failed:', error);
-      // Add more detailed error logging
-      if (error instanceof Error) {
-        console.error('Error details:', {
-          message: error.message,
-          stack: error.stack,
-          name: error.name
-        });
-      }
-    }
-  };
-
+    generateContextButtons();
+  }, [account]);
   const handleTransactionSuccess = (hash: string) => {
     const successMessage: Message = {
       id: uuidv4(),
       role: "agent",
-      content:
-        "Transaction successful! Would you like to perform another transaction?",
+      content: `Transaction successful! Hash: ${hash}. Would you like to do another transaction?`,
       timestamp: new Date().toLocaleTimeString(),
       user: "Agent",
     };
@@ -288,23 +375,18 @@ function TelegramMiniApp(): JSX.Element {
     }
   };
 
+
+
+  // Rest of the existing component methods remain the same
+  // (handleConnect, handleSendMessage, etc.)
+
   return (
     <div className="flex flex-col h-screen">
       <div className="flex-none p-4 border-b border-white/20">
-        {account ? (
-          <div className="px-3 py-1 bg-white/10 rounded inline-block">
-            {account.address.slice(0, 5)}...{account.address.slice(-3)}
-          </div>
-        ) : (
-          <button
-            onClick={handleConnect}
-            className="px-4 py-2 rounded bg-[var(--tg-theme-button-color)] text-[var(--tg-theme-button-text-color)]"
-          >
-            Connect Argent Wallet
-          </button>
-        )}
+        {renderActionButtons()}
       </div>
 
+      {/* Rest of the existing return statement */}
       <ScrollArea className="flex-1 p-4">
         {messages.map((message) => (
           <div key={message.id} className="mb-4">
