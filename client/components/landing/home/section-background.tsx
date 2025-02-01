@@ -7,7 +7,7 @@ import {
   MoveDirection,
   OutMode,
 } from '@tsparticles/engine'
-import { loadAll } from '@tsparticles/all'
+import { loadSlim } from '@tsparticles/slim'
 
 type StarBackgroundProps = {
   id: string
@@ -18,7 +18,7 @@ export const SectionBackground = ({ id }: StarBackgroundProps) => {
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
-      await loadAll(engine)
+      await loadSlim(engine)
     }).then(() => {
       setInit(true)
     })
@@ -55,22 +55,17 @@ export const SectionBackground = ({ id }: StarBackgroundProps) => {
       },
       particles: {
         color: {
-          value: '#ffb0ff',
+          value: '#ffffff',
         },
         move: {
           direction: MoveDirection.none,
           enable: true,
           outModes: {
-            default: OutMode.out,
+            default: OutMode.none,
           },
-          random: false,
           speed: { min: 0.1, max: 0.3 },
-          straight: false,
         },
         number: {
-          density: {
-            enable: true,
-          },
           value: 200,
         },
         opacity: {
@@ -79,27 +74,30 @@ export const SectionBackground = ({ id }: StarBackgroundProps) => {
             max: 1,
           },
         },
+        size: {
+          value: { min: 1, max: 5 },
+        },
+        shadow: {
+          blur: 15,
+          color: {
+            value: '#FF00FF',
+          },
+          enable: true,
+          offset: {
+            x: 0,
+            y: 0,
+          },
+        },
         shape: {
           type: 'circle',
           close: true,
           fill: true,
         },
-        size: {
-          value: { min: 1, max: 6 },
-        },
-      },
-      shadow: {
-        blur: 6,
-        color: {
-          value: '#ff5fff',
-        },
-        enable: true,
-        offset: {
-          x: 0,
-          y: 0,
-        },
+        stroke: { width: 0 },
       },
 
+      smooth: true,
+      zLayers: 100,
       detectRetina: true,
       fullScreen: false,
       pauseOnOutsideViewport: true,
