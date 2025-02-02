@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(uuid())
-  email    String?   @unique
-  name     String?
-  address      String?       @unique
-  chats    Chat[]
-  messages Message[]
-  transactions Transaction[]
+  id                String              @id @default(uuid())
+  email             String?             @unique
+  name              String?
+  address           String?             @unique
+  chats             Chat[]
+  messages          Message[]
+  transactions      Transaction[]
+  generatedContracts GeneratedContract[]
+  deployedContracts DeployedContract[]
 }
 
 model Chat {
@@ -51,6 +53,27 @@ model Transaction {
   User        User     @relation(fields: [userId], references: [id])
 }
 
+model GeneratedContract {
+  id          String   @id @default(uuid())
+  name        String
+  sourceCode  String
+  userId      String
+  User        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model DeployedContract {
+  id          String   @id @default(uuid())
+  name        String
+  sourceCode  String
+  userId      String
+  contractAddress String
+  classHash   String
+  transactionHash String
+  User        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
 enum Role {
   USER
   ASSISTANT
@@ -75,4 +98,3 @@ enum TxStatus {
   COMPLETED
   FAILED
 }
-

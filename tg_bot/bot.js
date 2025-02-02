@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.agent = void 0;
 const grammy_1 = require("grammy");
 const prompts_1 = require("./prompts/prompts");
 const starknet_1 = require("starknet");
@@ -22,6 +23,7 @@ const langgraph_1 = require("@langchain/langgraph");
 const messages_1 = require("@langchain/core/messages");
 const chatHistory_1 = require("./chatHistory");
 const dotenv_1 = __importDefault(require("dotenv"));
+const investmentBot_1 = require("./investmentBot");
 dotenv_1.default.config();
 function getEnvVar(key, isRequired = true) {
     const value = process.env[key];
@@ -40,30 +42,27 @@ const BRIAN_API_URL = {
     transaction: "https://api.brianknows.org/api/v0/agent",
 };
 const chatHistoryManager = new chatHistory_1.ChatHistoryManager();
-const systemPrompt = prompts_1.ASK_OPENAI_AGENT_PROMPT + `\nThe provided chat history includes a summary of the earlier conversation.`;
-const systemMessage = prompts_2.SystemMessagePromptTemplate.fromTemplate([
-    systemPrompt
-]);
-const userMessage = prompts_2.HumanMessagePromptTemplate.fromTemplate([
-    "{user_query}"
-]);
+const systemPrompt = prompts_1.ASK_OPENAI_AGENT_PROMPT +
+    `\nThe provided chat history includes a summary of the earlier conversation.`;
+const systemMessage = prompts_2.SystemMessagePromptTemplate.fromTemplate([systemPrompt]);
+const userMessage = prompts_2.HumanMessagePromptTemplate.fromTemplate(["{user_query}"]);
 const askAgentPromptTemplate = prompts_2.ChatPromptTemplate.fromMessages([
     systemMessage,
-    userMessage
+    userMessage,
 ]);
-const agent = new openai_1.ChatOpenAI({
+exports.agent = new openai_1.ChatOpenAI({
     modelName: "gpt-4o",
     temperature: 0.5,
-    openAIApiKey: OPENAI_API_KEY
+    openAIApiKey: OPENAI_API_KEY,
 });
 const prompt = askAgentPromptTemplate;
-const chain = prompt.pipe(agent);
+const chain = prompt.pipe(exports.agent);
 const initialCallModel = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const messages = [
         yield systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
-        ...state.messages
+        ...state.messages,
     ];
-    const response = yield agent.invoke(messages);
+    const response = yield exports.agent.invoke(messages);
     return { messages: response };
 });
 class ChatWorkflowManager {
@@ -85,14 +84,19 @@ class ChatWorkflowManager {
         Include as many specific details as you can.
         IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
         `;
-                const summary = yield agent.invoke([
+                const summary = yield exports.agent.invoke([
                     ...messageHistory,
                     { role: "user", content: summaryPrompt },
                 ]);
                 const deleteMessages = state.messages.map((m) => m.id ? new messages_1.RemoveMessage({ id: m.id }) : null);
-                const humanMessage = { role: "user", content: lastHumanMessage.content };
-                const response = yield agent.invoke([
-                    yield systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
+                const humanMessage = {
+                    role: "user",
+                    content: lastHumanMessage.content,
+                };
+                const response = yield exports.agent.invoke([
+                    yield systemMessage.format({
+                        brianai_answer: BRIAN_DEFAULT_RESPONSE,
+                    }),
                     summary,
                     humanMessage,
                 ]);
@@ -127,7 +131,8 @@ const workflowManager = new ChatWorkflowManager();
 class StarknetWallet {
     constructor() {
         this.provider = new starknet_1.RpcProvider({
-            nodeUrl: process.env.STARKNET_RPC_URL || "https://free-rpc.nethermind.io/sepolia-juno"
+            nodeUrl: process.env.STARKNET_RPC_URL ||
+                "https://free-rpc.nethermind.io/sepolia-juno",
         });
     }
     createWallet() {
@@ -147,13 +152,13 @@ class StarknetWallet {
                 contractAddress: AXcontractAddress,
                 addressSalt: starkKeyPubAX,
             };
-            const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } = yield accountAX.deployAccount(deployAccountPayload);
+            const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress, } = yield accountAX.deployAccount(deployAccountPayload);
             console.log("✅ ArgentX wallet deployed at:", AXcontractFinalAddress);
             return {
                 account: accountAX,
                 privateKey: privateKeyAX,
                 publicKey: starkKeyPubAX,
-                contractAddress: AXcontractFinalAddress
+                contractAddress: AXcontractFinalAddress,
             };
         });
     }
@@ -174,7 +179,8 @@ class StarknetWallet {
 class StarknetTransactionHandler {
     constructor() {
         this.provider = new starknet_1.RpcProvider({
-            nodeUrl: process.env.STARKNET_RPC_URL || "https://starknet-mainnet.public.blastapi.io"
+            nodeUrl: process.env.STARKNET_RPC_URL ||
+                "https://starknet-mainnet.public.blastapi.io",
         });
         this.wallet = new StarknetWallet();
     }
@@ -187,8 +193,8 @@ class StarknetTransactionHandler {
                         type: "function",
                         inputs: [{ name: "account", type: "felt" }],
                         outputs: [{ name: "balance", type: "Uint256" }],
-                        stateMutability: "view"
-                    }
+                        stateMutability: "view",
+                    },
                 ];
                 const contract = new starknet_1.Contract(erc20Abi, tokenAddress, this.provider);
                 const balance = yield contract.balanceOf(userAddress);
@@ -207,7 +213,7 @@ class StarknetTransactionHandler {
                 const transactions = brianResponse.data.steps.map((step) => ({
                     contractAddress: step.contractAddress,
                     entrypoint: step.entrypoint,
-                    calldata: step.calldata
+                    calldata: step.calldata,
                 }));
                 const txHash = yield this.wallet.executeTransaction(account.account, transactions);
                 return {
@@ -222,7 +228,7 @@ class StarknetTransactionHandler {
                     toAmount: brianResponse.data.toAmount,
                     receiver: brianResponse.data.receiver,
                     estimatedGas: brianResponse.data.gasCostUSD,
-                    transactionHash: txHash
+                    transactionHash: txHash,
                 };
             }
             catch (error) {
@@ -238,15 +244,8 @@ function formatResponse(response) {
         formattedText = formattedText.replace(/(\n*)###\s*/g, "\n\n### ");
         formattedText = formattedText.replace(/### ([\w\s&()-]+)/g, "### **$1**");
         formattedText = formattedText.replace(/\n{3,}/g, "\n\n");
-        const keyTerms = [
-            "Layer 2",
-            "zk-rollups",
-            "Cairo",
-            "DeFi",
-            "Web3",
-            "dApps"
-        ];
-        keyTerms.forEach(term => {
+        const keyTerms = ["Layer 2", "zk-rollups", "Cairo", "DeFi", "Web3", "dApps"];
+        keyTerms.forEach((term) => {
             const regex = new RegExp(`\\b${term}\\b(?![^<]*>)`, "g");
             formattedText = formattedText.replace(regex, `_${term}_`);
         });
@@ -254,7 +253,7 @@ function formatResponse(response) {
     });
 }
 function queryOpenAI(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ userQuery, brianaiResponse, chatId }) {
+    return __awaiter(this, arguments, void 0, function* ({ userQuery, brianaiResponse, chatId, }) {
         try {
             // Get chat-specific workflow
             const workflow = workflowManager.getWorkflow(chatId);
@@ -262,8 +261,8 @@ function queryOpenAI(_a) {
                 messages: [
                     yield prompt.format({
                         brianai_answer: brianaiResponse,
-                        user_query: userQuery
-                    })
+                        user_query: userQuery,
+                    }),
                 ],
             }, {
                 configurable: {
@@ -273,8 +272,8 @@ function queryOpenAI(_a) {
             return response.messages[response.messages.length - 1].content;
         }
         catch (error) {
-            console.error('OpenAI Error:', error);
-            return 'Sorry, I am unable to process your request at the moment.';
+            console.error("OpenAI Error:", error);
+            return "Sorry, I am unable to process your request at the moment.";
         }
     });
 }
@@ -283,18 +282,18 @@ function queryBrianAI(prompt, chatId) {
         try {
             const response = yield axios_1.default.post(BRIAN_API_URL.knowledge, {
                 prompt,
-                kb: "starknet_kb"
+                kb: "starknet_kb",
             }, {
                 headers: {
                     "Content-Type": "application/json",
                     "x-brian-api-key": BRIAN_API_KEY,
-                }
+                },
             });
             const brianaiAnswer = response.data.result.answer;
             const openaiAnswer = yield queryOpenAI({
                 brianaiResponse: brianaiAnswer,
                 userQuery: prompt,
-                chatId
+                chatId,
             });
             return yield formatResponse(openaiAnswer);
         }
@@ -333,9 +332,15 @@ Address: \`${contractAddress}\``);
             }
             const txPreview = `Transaction Preview:
 Type: ${data.result[0].action}
-${data.result[0].data.fromToken ? `From: ${data.result[0].data.fromAmount} ${data.result[0].data.fromToken.symbol}` : ""}
-${data.result[0].data.toToken ? `To: ${data.result[0].data.toAmount} ${data.result[0].data.toToken.symbol}` : ""}
-${data.result[0].data.receiver ? `Receiver: ${data.result[0].data.receiver}` : ""}
+${data.result[0].data.fromToken
+                ? `From: ${data.result[0].data.fromAmount} ${data.result[0].data.fromToken.symbol}`
+                : ""}
+${data.result[0].data.toToken
+                ? `To: ${data.result[0].data.toAmount} ${data.result[0].data.toToken.symbol}`
+                : ""}
+${data.result[0].data.receiver
+                ? `Receiver: ${data.result[0].data.receiver}`
+                : ""}
 Estimated Gas: ${data.result[0].data.gasCostUSD || "Unknown"} USD
 
 Reply with "confirm" to execute this transaction.`;
@@ -356,8 +361,8 @@ bot.use((0, grammy_1.session)({
         pendingTransaction: null,
         mode: "none",
         lastActivity: Date.now(),
-        groupChat: false
-    })
+        groupChat: false,
+    }),
 }));
 // Command handlers
 bot.command("start", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
@@ -392,6 +397,8 @@ Hi there! I'm **StarkFinder**, your friendly assistant for navigating the Starkn
 💼 /wallet – Check your wallet details, balance, and manage your funds with ease.  
 🔄 /transaction – Perform actions like swaps, deposits, investments, and transfers directly on Starknet.  
 ❓ /help – Show this help menu and explore all available commands.\n
+** /setpreferences – Set your investment preferences to receive personalized recommendations.
+** /recommend – Get investment recommendations based on your preferences.\n
 ✨ *Tip:* Stay updated on the Starknet ecosystem by asking me anything!  
 If you encounter any issues or need assistance, feel free to reach out.\n
 🌟 Let's make Starknet simple and accessible together!`);
@@ -420,7 +427,7 @@ bot.command("wallet", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
 3. This is a one-time display of your keys
 
 Your wallet is now ready for transactions!`, {
-            parse_mode: "Markdown"
+            parse_mode: "Markdown",
         });
     }
     catch (error) {
@@ -469,10 +476,11 @@ bot.command("clear", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
         yield chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
         ctx.session.connectedWallet = undefined;
         ctx.session.privateKey = undefined;
+        workflowManager.clearMemory(ctx.chat.id.toString());
     }
     catch (error) {
-        console.error('clear command error:', error);
-        return ctx.reply('❌ Unable to clear chat memory. Please try again.');
+        console.error("clear command error:", error);
+        return ctx.reply("❌ Unable to clear chat memory. Please try again.");
     }
     return ctx.reply(`
       ✅ Wallet data has been cleared.
@@ -487,24 +495,19 @@ bot.on("message:text", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
 Received a message from chat:
 - ID: ${chat.id}
 - Type: ${chat.type}
-- Title: ${chat.title || 'N/A'}
-- Username: ${chat.username || 'N/A'}
-- Description: ${chat.description || 'N/A'}
+- Title: ${chat.title || "N/A"}
+- Username: ${chat.username || "N/A"}
+- Description: ${chat.description || "N/A"}
     `);
     }
     catch (error) {
-        console.error('Error fetching chat details:', error);
+        console.error("Error fetching chat details:", error);
     }
     try {
         const messageText = ctx.message.text.trim();
         const telegramChatId = ctx.chat.id.toString();
         ctx.session.lastActivity = Date.now();
-        // Store user message
-        yield chatHistoryManager.storeMessage(telegramChatId, [{ role: 'user', content: messageText }], 'user');
-        // Get chat history for context
-        const chatHistory = yield chatHistoryManager.getChatHistory(telegramChatId);
-        // Process message and get response
-        let response;
+        yield chatHistoryManager.storeMessage(telegramChatId, [{ role: "user", content: messageText }], "user");
         if (messageText.toLowerCase().includes("swap") ||
             messageText.toLowerCase().includes("transfer") ||
             messageText.toLowerCase().includes("send")) {
@@ -512,10 +515,17 @@ Received a message from chat:
             return;
         }
         else {
-            const response = yield queryBrianAI(messageText, telegramChatId);
-            const formattedResponse = yield formatResponse(response);
-            console.log(`[SUCCESS] Replied for chat ID: ${telegramChatId}`);
-            return ctx.reply(formattedResponse, { parse_mode: "Markdown" });
+            const advisor = investmentBot_1.InvestmentAdvisor.getInstance();
+            const response = yield advisor.processMessage(telegramChatId, messageText);
+            if (response) {
+                yield ctx.reply(response, { parse_mode: "Markdown" });
+            }
+            else {
+                const response = yield queryBrianAI(messageText, telegramChatId);
+                const formattedResponse = yield formatResponse(response);
+                console.log(`[SUCCESS] Replied for chat ID: ${telegramChatId}`);
+                return ctx.reply(formattedResponse, { parse_mode: "Markdown" });
+            }
         }
     }
     catch (error) {
