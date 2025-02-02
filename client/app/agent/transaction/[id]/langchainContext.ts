@@ -1,7 +1,7 @@
 import { BufferMemory } from 'langchain/memory';
 import { ConversationChain } from 'langchain/chains';
 import { OpenAI } from '@langchain/openai';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Transaction } from '@prisma/client';
 
 let model: OpenAI | null = null;
 let chain: ConversationChain | null = null;
@@ -38,12 +38,10 @@ const initializeAI = () => {
   }
 };
 
-// Initialize on import, but only if we're on the server side
 if (typeof window === 'undefined') {
   initializeAI();
 }
 
-// Fetch user context from Prisma
 async function fetchUserContext(userId: string) {
   if (!prisma) {
     if (typeof window === 'undefined') {
@@ -56,20 +54,19 @@ async function fetchUserContext(userId: string) {
 
   const transactions = await prisma.transaction.findMany({
     where: { userId },
-    orderBy: { timestamp: 'desc' },
+    orderBy: { createdAt: 'desc' },
     take: 10,
   });
 
   const messages = await prisma.message.findMany({
     where: { userId },
-    orderBy: { timestamp: 'desc' },
+    orderBy: { createdAt: 'desc' },
     take: 10,
   });
 
   return { transactions, messages };
 }
 
-// Add user context to LangChain memory
 async function addUserContextToMemory(userId: string) {
   if (!memory) {
     if (typeof window === 'undefined') {
@@ -84,10 +81,13 @@ async function addUserContextToMemory(userId: string) {
 
   const contextString = `
     Past Transactions:
-    ${transactions.map((txn) => `- ${txn.details}`).join('\n')}
+    ${transactions.map((txn: Transaction) => `- ${getTransactionDetails(txn)}`).join('\n')}
 
     Past Messages:
-    ${messages.map((msg) => `- ${msg.content}`).join('\n')}
+    ${messages.map((msg) => {
+      const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+      return `- ${content}`;
+    }).join('\n')}
   `;
 
   await memory.saveContext(
@@ -96,7 +96,11 @@ async function addUserContextToMemory(userId: string) {
   );
 }
 
-// Get AI response with user context
+function getTransactionDetails(txn: Transaction): string {
+  // Adjust this function based on your Transaction type structure
+  return `${txn.type} - ${txn.status} - ${txn.hash || 'No hash'} - ${txn.createdAt.toISOString()}`;
+}
+
 export async function getAIResponse(userId: string, userInput: string) {
   if (!chain) {
     if (typeof window === 'undefined') {
@@ -112,14 +116,18 @@ export async function getAIResponse(userId: string, userInput: string) {
   return response.response;
 }
 
-// Suggest transactions based on user history
 export async function suggestTransactions(userId: string) {
   const { transactions } = await fetchUserContext(userId);
 
   if (transactions.length > 0) {
-    const suggestions = transactions.map((txn) => `- ${txn.details}`).join('\n');
-    return `Based on your history, you might want to repeat these transactions:\n${suggestions}`;
-  } else {
-    return "You don't have any past transactions to suggest.";
+    const suggestions = transactions
+      .map(txn => `- ${getTransactionDetails(txn)}`)
+      .join('\n');
+    
+    return suggestions 
+      ? `Based on your history, here are your recent transactions:\n${suggestions}`
+      : "No detailed transactions available for suggestions.";
   }
+  
+  return "You don't have any past transactions to suggest.";
 }
