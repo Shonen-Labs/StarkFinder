@@ -1,0 +1,14 @@
+{
+  "riskTolerance": "low",
+  "preferredAssets": [
+    "ETH",
+    "USDC"
+  ],
+  "preferredChains": [
+    "Ethereum"
+  ],
+  "investmentHorizon": "long",
+  "minTVL": 1000000,
+  "targetAPY": 3,
+  "timestamp": "2025-02-01T19:48:04.911Z"
+}

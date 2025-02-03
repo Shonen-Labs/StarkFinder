@@ -19,6 +19,8 @@ const config: Config = {
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
         "spin-around": "spin-around calc(var(--speed) * 2) infinite linear",
         slide: "slide var(--speed) ease-in-out infinite alternate",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       keyframes: {
         scroll: {
@@ -52,6 +54,14 @@ const config: Config = {
           to: {
             transform: "translate(calc(100cqw - 100%), 0)",
           },
+        },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       colors: {
@@ -95,11 +105,40 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        "orange-bright": "#FFAE63",
+        "blue-navy": "#053382",
+        "blue-dark": "#080B2A",
+        "green-dark": "#152329",
+        "violet-light": "#C77DFB",
+        purple: "#5530d6",
+        "purple-light": "#7e3dff",
+        grayscale: {
+          100: "#F0F4F8",
+          200: "#F2FCF9",
+          300: "#F7F8F8",
+          400: "#E8F1F2",
+          500: "#E1E1E1",
+          600: "#D0D6E0",
+          800: "#8A8F98",
+        },
+        "black-scale": {  
+          300: "#121319",
+          400: "#040F15",
+          500: "#152329"
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontSize: {
+        "lp-h2": ["4rem", { lineHeight: "5.4rem" }],
+        "lp-sub": ["2rem", { lineHeight: "2.688rem" }],
+        "lp-sub2": ["2.5rem", { lineHeight: "3.375rem" }],
+        "lp-text": ["1.5rem", { lineHeight: "2.025rem" }],
+        "lp-text2": ["1.302rem", { lineHeight: "2.213rem" }],
+        "lp-text3": ["1.25rem", { lineHeight: "1.688rem" }],
       },
     },
   },

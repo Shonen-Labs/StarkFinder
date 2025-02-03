@@ -35,40 +35,48 @@ export class CairoContractGenerator {
         }
       }
 
-      const sourceCode = chunks.join('');
-      
+      const sourceCode = chunks.join("");
+
       if (!sourceCode.trim()) {
-        throw new Error('Generated source code is empty');
+        throw new Error("Generated source code is empty");
       }
 
       return {
         success: true,
-        sourceCode
+        sourceCode,
       };
     } catch (error) {
       console.error("Error generating contract:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : "Unknown error occurred"
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   }
 
-  async saveContract(sourceCode: string, contractName: string): Promise<string> {
+  async saveContract(
+    sourceCode: string,
+    contractName: string
+  ): Promise<string> {
     if (!sourceCode?.trim()) {
-      throw new Error('Cannot save empty contract source code');
+      throw new Error("Cannot save empty contract source code");
     }
 
-    const contractsDir = path.resolve(process.cwd(), 'contracts', 'src');
-    
+    const contractsDir = path.join(process.cwd(), "..", "contracts", "src");
+
     try {
       await fs.mkdir(contractsDir, { recursive: true });
       const filePath = path.join(contractsDir, `${contractName}.cairo`);
       await fs.writeFile(filePath, sourceCode);
       return filePath;
     } catch (error) {
-      console.error('Error saving contract:', error);
-      throw new Error(`Failed to save contract: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error("Error saving contract:", error);
+      throw new Error(
+        `Failed to save contract: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }
 }

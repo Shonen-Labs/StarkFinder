@@ -3,21 +3,35 @@ import { ASK_OPENAI_AGENT_PROMPT } from "./prompts/prompts";
 import { Account, Contract, RpcProvider, stark, ec, hash, CallData,  CairoOption, CairoOptionVariant, CairoCustomEnum } from "starknet";
 import axios from "axios";
 import { ChatOpenAI } from "@langchain/openai";
-import { ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate } from "@langchain/core/prompts";
-import { START, END, MessagesAnnotation, MemorySaver, StateGraph } from "@langchain/langgraph";
+import {
+  ChatPromptTemplate,
+  PromptTemplate,
+  SystemMessagePromptTemplate,
+  HumanMessagePromptTemplate,
+} from "@langchain/core/prompts";
+import {
+  START,
+  END,
+  MessagesAnnotation,
+  MemorySaver,
+  StateGraph,
+} from "@langchain/langgraph";
 import { RemoveMessage } from "@langchain/core/messages";
 import { ChatHistoryManager } from "./chatHistory";
 import dotenv from "dotenv";
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+import { InvestmentAdvisor, UserPreferences } from "./investmentBot";
 
 dotenv.config();
 
 function getEnvVar(key: string, isRequired = true): string {
   const value = process.env[key];
   if (isRequired && !value) {
-    throw new Error(`Environment variable "${key}" is required but not defined.`);
+    throw new Error(
+      `Environment variable "${key}" is required but not defined.`
+    );
   }
   return value || "";
 }
@@ -25,7 +39,8 @@ function getEnvVar(key: string, isRequired = true): string {
 const BOT_TOKEN: string = getEnvVar("MY_TOKEN");
 const OPENAI_API_KEY: string = getEnvVar("OPENAI_API_KEY");
 const BRIAN_API_KEY: string = getEnvVar("BRIAN_API_KEY");
-const BRIAN_DEFAULT_RESPONSE: string = "🤖 Sorry, I don’t know how to answer. The AskBrian feature allows you to ask for information on a custom-built knowledge base of resources. Contact the Brian team if you want to add new resources!";
+const BRIAN_DEFAULT_RESPONSE: string =
+  "🤖 Sorry, I don’t know how to answer. The AskBrian feature allows you to ask for information on a custom-built knowledge base of resources. Contact the Brian team if you want to add new resources!";
 const BRIAN_API_URL = {
   knowledge: "https://api.brianknows.org/api/v0/agent/knowledge",
   parameters: "https://api.brianknows.org/api/v0/agent/parameters-extraction",
@@ -34,31 +49,29 @@ const BRIAN_API_URL = {
 
 const chatHistoryManager = new ChatHistoryManager();
 
-const systemPrompt = ASK_OPENAI_AGENT_PROMPT + `\nThe provided chat history includes a summary of the earlier conversation.`;
+const systemPrompt =
+  ASK_OPENAI_AGENT_PROMPT +
+  `\nThe provided chat history includes a summary of the earlier conversation.`;
 
-const systemMessage = SystemMessagePromptTemplate.fromTemplate([
-  systemPrompt
-]);
+const systemMessage = SystemMessagePromptTemplate.fromTemplate([systemPrompt]);
 
-const userMessage = HumanMessagePromptTemplate.fromTemplate([
-  "{user_query}"
-]);
+const userMessage = HumanMessagePromptTemplate.fromTemplate(["{user_query}"]);
 
 const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([
   systemMessage,
-  userMessage
+  userMessage,
 ]);
-const agent = new ChatOpenAI({
+export const agent = new ChatOpenAI({
   modelName: "gpt-4o",
   temperature: 0.5,
-  openAIApiKey: OPENAI_API_KEY
+  openAIApiKey: OPENAI_API_KEY,
 });
 const prompt = askAgentPromptTemplate;
 const chain = prompt.pipe(agent);
 const initialCallModel = async (state: typeof MessagesAnnotation.State) => {
   const messages = [
-    await systemMessage.format({brianai_answer: BRIAN_DEFAULT_RESPONSE}),
-    ...state.messages
+    await systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }),
+    ...state.messages,
   ];
   const response = await agent.invoke(messages);
   return { messages: response };
@@ -66,6 +79,8 @@ const initialCallModel = async (state: typeof MessagesAnnotation.State) => {
 class ChatWorkflowManager {
   private workflows: Map<string, any>;
   private memories: Map<string, MemorySaver>;
+
+  private static instance: InvestmentAdvisor;
 
   constructor() {
     this.workflows = new Map();
@@ -93,13 +108,18 @@ class ChatWorkflowManager {
           { role: "user", content: summaryPrompt },
         ]);
 
-        const deleteMessages = state.messages.map(
-          (m) => m.id ? new RemoveMessage({ id: m.id }) : null
+        const deleteMessages = state.messages.map((m) =>
+          m.id ? new RemoveMessage({ id: m.id }) : null
         );
 
-        const humanMessage = { role: "user", content: lastHumanMessage.content };
+        const humanMessage = {
+          role: "user",
+          content: lastHumanMessage.content,
+        };
         const response = await agent.invoke([
-          await systemMessage.format({brianai_answer: BRIAN_DEFAULT_RESPONSE}),
+          await systemMessage.format({
+            brianai_answer: BRIAN_DEFAULT_RESPONSE,
+          }),
           summary,
           humanMessage,
         ]);
@@ -113,9 +133,9 @@ class ChatWorkflowManager {
     };
 
     const workflow = new StateGraph(MessagesAnnotation)
-    .addNode("model", chatCallModel)
-    .addEdge(START, "model")
-    .addEdge("model", END);
+      .addNode("model", chatCallModel)
+      .addEdge(START, "model")
+      .addEdge("model", END);
     const compiledWorkflow = workflow.compile({ checkpointer: memory });
     this.workflows.set(chatId, compiledWorkflow);
     return compiledWorkflow;
@@ -142,6 +162,7 @@ interface SessionData {
   groupChat?: boolean;
   connectedWallet?: string;
   privateKey?: string;
+  investmentPreferences?: UserPreferences;
 }
 
 type MyContext = Context & SessionFlavor<SessionData>;
@@ -151,15 +172,17 @@ class StarknetWallet {
 
   constructor() {
     this.provider = new RpcProvider({
-      nodeUrl: process.env.STARKNET_RPC_URL || "https://free-rpc.nethermind.io/sepolia-juno"
+      nodeUrl:
+        process.env.STARKNET_RPC_URL ||
+        "https://free-rpc.nethermind.io/sepolia-juno",
     });
   }
 
   async createWallet(): Promise<{
-    account: Account,
-    privateKey: string,
-    publicKey: string,
-    contractAddress: string
+    account: Account;
+    privateKey: string;
+    publicKey: string;
+    contractAddress: string;
   }> {
     // initialize existing Argent X testnet  account
     const existingAccountAddress = "0x06CFffa3b51bCa2cA7B0e7871E90f607B6aA24A9eB0A94ef34f1574B219a5862";
@@ -174,11 +197,12 @@ class StarknetWallet {
     const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
     const axSigner = new CairoCustomEnum({ Starknet: { pubkey: starkKeyPubAX } });
     const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
+
     const AXConstructorCallData = CallData.compile({
         owner: axSigner,
         guardian: axGuardian,
     });
-    
+
     const AXcontractAddress = hash.calculateContractAddressFromHash(
       starkKeyPubAX,
       argentXaccountClassHash,
@@ -186,8 +210,12 @@ class StarknetWallet {
       0
     );
 
-    const accountAX = new Account(this.provider, AXcontractAddress, privateKeyAX);
-    
+    const accountAX = new Account(
+      this.provider,
+      AXcontractAddress,
+      privateKeyAX
+    );
+
     const deployAccountPayload = {
       classHash: argentXaccountClassHash,
       constructorCalldata: AXConstructorCallData,
@@ -199,12 +227,12 @@ class StarknetWallet {
       await existingAccount.deployContract(deployAccountPayload);
     
     console.log("✅ ArgentX wallet deployed at:", AXcontractFinalAddress);
-    
+
     return {
       account: accountAX,
       privateKey: privateKeyAX,
       publicKey: starkKeyPubAX,
-      contractAddress: AXcontractFinalAddress
+      contractAddress: AXcontractFinalAddress,
     };
   }
 
@@ -226,12 +254,17 @@ class StarknetTransactionHandler {
 
   constructor() {
     this.provider = new RpcProvider({
-      nodeUrl: process.env.STARKNET_RPC_URL || "https://starknet-mainnet.public.blastapi.io"
+      nodeUrl:
+        process.env.STARKNET_RPC_URL ||
+        "https://starknet-mainnet.public.blastapi.io",
     });
     this.wallet = new StarknetWallet();
   }
 
-  async getTokenBalance(tokenAddress: string, userAddress: string): Promise<string> {
+  async getTokenBalance(
+    tokenAddress: string,
+    userAddress: string
+  ): Promise<string> {
     try {
       const erc20Abi = [
         {
@@ -239,8 +272,8 @@ class StarknetTransactionHandler {
           type: "function",
           inputs: [{ name: "account", type: "felt" }],
           outputs: [{ name: "balance", type: "Uint256" }],
-          stateMutability: "view"
-        }
+          stateMutability: "view",
+        },
       ];
 
       const contract = new Contract(erc20Abi, tokenAddress, this.provider);
@@ -258,10 +291,13 @@ class StarknetTransactionHandler {
       const transactions = brianResponse.data.steps.map((step: any) => ({
         contractAddress: step.contractAddress,
         entrypoint: step.entrypoint,
-        calldata: step.calldata
+        calldata: step.calldata,
       }));
 
-      const txHash = await this.wallet.executeTransaction(account.account, transactions);
+      const txHash = await this.wallet.executeTransaction(
+        account.account,
+        transactions
+      );
 
       return {
         success: true,
@@ -275,7 +311,7 @@ class StarknetTransactionHandler {
         toAmount: brianResponse.data.toAmount,
         receiver: brianResponse.data.receiver,
         estimatedGas: brianResponse.data.gasCostUSD,
-        transactionHash: txHash
+        transactionHash: txHash,
       };
     } catch (error) {
       console.error("Error processing transaction:", error);
@@ -289,56 +325,49 @@ async function formatResponse(response: string): Promise<string> {
   formattedText = formattedText.replace(/(\n*)###\s*/g, "\n\n### ");
   formattedText = formattedText.replace(/### ([\w\s&()-]+)/g, "### **$1**");
   formattedText = formattedText.replace(/\n{3,}/g, "\n\n");
-  
-  const keyTerms = [
-    "Layer 2",
-    "zk-rollups",
-    "Cairo",
-    "DeFi",
-    "Web3",
-    "dApps"
-  ];
-  
-  keyTerms.forEach(term => {
+
+  const keyTerms = ["Layer 2", "zk-rollups", "Cairo", "DeFi", "Web3", "dApps"];
+
+  keyTerms.forEach((term) => {
     const regex = new RegExp(`\\b${term}\\b(?![^<]*>)`, "g");
     formattedText = formattedText.replace(regex, `_${term}_`);
   });
-  
+
   return formattedText;
 }
 
 async function queryOpenAI({
-  userQuery, 
-  brianaiResponse, 
-  chatId
+  userQuery,
+  brianaiResponse,
+  chatId,
 }: {
-  userQuery: string, 
-  brianaiResponse: string,
-  chatId: string
+  userQuery: string;
+  brianaiResponse: string;
+  chatId: string;
 }): Promise<string> {
   try {
     // Get chat-specific workflow
     const workflow = workflowManager.getWorkflow(chatId);
-    
+
     const response = await workflow.invoke(
       {
         messages: [
           await prompt.format({
-            brianai_answer: brianaiResponse, 
-            user_query: userQuery
-          })
+            brianai_answer: brianaiResponse,
+            user_query: userQuery,
+          }),
         ],
       },
       {
-        configurable: { 
+        configurable: {
           thread_id: chatId,
         },
-      },
+      }
     );
-    return response.messages[response.messages.length-1].content as string;
+    return response.messages[response.messages.length - 1].content as string;
   } catch (error) {
-    console.error('OpenAI Error:', error);
-    return 'Sorry, I am unable to process your request at the moment.';
+    console.error("OpenAI Error:", error);
+    return "Sorry, I am unable to process your request at the moment.";
   }
 }
 
@@ -348,20 +377,20 @@ async function queryBrianAI(prompt: string, chatId: string): Promise<string> {
       BRIAN_API_URL.knowledge,
       {
         prompt,
-        kb: "starknet_kb"
+        kb: "starknet_kb",
       },
       {
         headers: {
           "Content-Type": "application/json",
           "x-brian-api-key": BRIAN_API_KEY,
-        }
+        },
       }
     );
     const brianaiAnswer = response.data.result.answer;
     const openaiAnswer = await queryOpenAI({
-      brianaiResponse: brianaiAnswer, 
+      brianaiResponse: brianaiAnswer,
       userQuery: prompt,
-      chatId
+      chatId,
     });
     return await formatResponse(openaiAnswer);
   } catch (error) {
@@ -374,11 +403,12 @@ async function processTransactionRequest(ctx: MyContext, prompt: string) {
   try {
     if (!ctx.session.connectedWallet || !ctx.session.privateKey) {
       const wallet = new StarknetWallet();
-      const { account, privateKey, publicKey, contractAddress } = await wallet.createWallet();
-      
+      const { account, privateKey, publicKey, contractAddress } =
+        await wallet.createWallet();
+
       ctx.session.connectedWallet = account.address;
       ctx.session.privateKey = privateKey;
-      
+
       await ctx.reply(`🔑 Wallet Automatically Created for Transaction
 Address: \`${contractAddress}\``);
     }
@@ -397,16 +427,28 @@ Address: \`${contractAddress}\``);
     });
 
     const data = await response.json();
-    
+
     if (!response.ok || data.error) {
       return ctx.reply(data.error || "Failed to process transaction request");
     }
 
     const txPreview = `Transaction Preview:
 Type: ${data.result[0].action}
-${data.result[0].data.fromToken ? `From: ${data.result[0].data.fromAmount} ${data.result[0].data.fromToken.symbol}` : ""}
-${data.result[0].data.toToken ? `To: ${data.result[0].data.toAmount} ${data.result[0].data.toToken.symbol}` : ""}
-${data.result[0].data.receiver ? `Receiver: ${data.result[0].data.receiver}` : ""}
+${
+  data.result[0].data.fromToken
+    ? `From: ${data.result[0].data.fromAmount} ${data.result[0].data.fromToken.symbol}`
+    : ""
+}
+${
+  data.result[0].data.toToken
+    ? `To: ${data.result[0].data.toAmount} ${data.result[0].data.toToken.symbol}`
+    : ""
+}
+${
+  data.result[0].data.receiver
+    ? `Receiver: ${data.result[0].data.receiver}`
+    : ""
+}
 Estimated Gas: ${data.result[0].data.gasCostUSD || "Unknown"} USD
 
 Reply with "confirm" to execute this transaction.`;
@@ -470,14 +512,16 @@ async function getWalletByChatId(chatId: string) {
 const bot = new Bot<MyContext>(BOT_TOKEN);
 
 // Initialize session
-bot.use(session({
-  initial: (): SessionData => ({
-    pendingTransaction: null,
-    mode: "none",
-    lastActivity: Date.now(),
-    groupChat: false
+bot.use(
+  session({
+    initial: (): SessionData => ({
+      pendingTransaction: null,
+      mode: "none",
+      lastActivity: Date.now(),
+      groupChat: false,
+    }),
   })
-}));
+);
 
 // Command handlers
 bot.command("start", async (ctx) => {
@@ -497,10 +541,10 @@ Commands:
 /help - Show detailed help
 
 Just type naturally - no need to use commands for every interaction!`);
-console.log(`[SUCCESS] Start message sent to chat ID: ${ctx.chat.id}`);
-    } catch (error) {
-      console.error("Error sending start message:", error);
-    }
+    console.log(`[SUCCESS] Start message sent to chat ID: ${ctx.chat.id}`);
+  } catch (error) {
+    console.error("Error sending start message:", error);
+  }
 });
 
 bot.command("help", async (ctx) => {
@@ -512,12 +556,13 @@ Hi there! I'm **StarkFinder**, your friendly assistant for navigating the Starkn
 💼 /wallet – Check your wallet details, balance, and manage your funds with ease.  
 🔄 /transaction – Perform actions like swaps, deposits, investments, and transfers directly on Starknet.  
 ❓ /help – Show this help menu and explore all available commands.\n
+** /setpreferences – Set your investment preferences to receive personalized recommendations.
+** /recommend – Get investment recommendations based on your preferences.\n
 ✨ *Tip:* Stay updated on the Starknet ecosystem by asking me anything!  
 If you encounter any issues or need assistance, feel free to reach out.\n
 🌟 Let's make Starknet simple and accessible together!`);
-console.log(`[SUCCESS] Help message sent to chat ID: ${ctx.chat.id}`);
-  }
-  catch (error) {
+    console.log(`[SUCCESS] Help message sent to chat ID: ${ctx.chat.id}`);
+  } catch (error) {
     console.error("Error sending help message:", error);
   }
 });
@@ -546,8 +591,9 @@ bot.command("wallet", async (ctx) => {
     ctx.session.connectedWallet = account.address;
     ctx.session.privateKey = privateKey;
     console.log(`[SUCCESS] Wallet created for chat ID: ${ctx.chat.id}`);
-    
-    return ctx.reply(`🚀 New Wallet Created!
+
+    return ctx.reply(
+      `🚀 New Wallet Created!
 
 *Wallet Details:*
 • Address: \`${contractAddress}\`
@@ -558,18 +604,22 @@ bot.command("wallet", async (ctx) => {
 2. Do not share your private key with anyone
 3. This is a one-time display of your keys
 
-Your wallet is now ready for transactions!`, {
-      parse_mode: "Markdown"
-    });
+Your wallet is now ready for transactions!`,
+      {
+        parse_mode: "Markdown",
+      }
+    );
   } catch (error) {
-    console.error("========================================================================================================================================================================================");
+    console.error(
+      "========================================================================================================================================================================================"
+    );
     console.error("Wallet creation error here:", error);
     return ctx.reply("Error creating wallet. Please try again.");
   }
 });
 
 bot.command("txn", (ctx) => {
-    return ctx.reply(`🚀 Transaction Processing via Mini App 📱
+  return ctx.reply(`🚀 Transaction Processing via Mini App 📱
   
   To create and execute transactions, please use our Telegram Mini App: [AppLink](https://t.me/strkfinder1511_bot/strk_1511)
   
@@ -585,42 +635,42 @@ bot.command("txn", (ctx) => {
   ✅ User-friendly interface
   
   Need help? Contact our support team!`);
-  });
-  
-  //bot.on('message', async (ctx) => {
-  //  try {
-  //    const chat = await ctx.api.getChat(ctx.chat.id);
-  //
-  //    console.log(`
-  //Received a message from chat:
-  //- ID: ${chat.id}
-  //- Type: ${chat.type}
-  //- Title: ${chat.title || 'N/A'}
-  //- Username: ${chat.username || 'N/A'}
-  //- Description: ${chat.description || 'N/A'}
-  //    `);
-  //  } catch (error) {
-  //    console.error('Error fetching chat details:', error);
-  //  }
-  //});
+});
 
-  // clear command
-  bot.command("clear",  async (ctx) => {
-    try{
-        await chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
-        ctx.session.connectedWallet = undefined;
-        ctx.session.privateKey = undefined;
-        workflowManager.clearMemory(ctx.chat.id.toString());
-    }catch (error) {
-        console.error('clear command error:', error);
-        return ctx.reply('❌ Unable to clear chat memory. Please try again.');
-    }
-    return ctx.reply(`
+//bot.on('message', async (ctx) => {
+//  try {
+//    const chat = await ctx.api.getChat(ctx.chat.id);
+//
+//    console.log(`
+//Received a message from chat:
+//- ID: ${chat.id}
+//- Type: ${chat.type}
+//- Title: ${chat.title || 'N/A'}
+//- Username: ${chat.username || 'N/A'}
+//- Description: ${chat.description || 'N/A'}
+//    `);
+//  } catch (error) {
+//    console.error('Error fetching chat details:', error);
+//  }
+//});
+
+// clear command
+bot.command("clear", async (ctx) => {
+  try {
+    await chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
+    ctx.session.connectedWallet = undefined;
+    ctx.session.privateKey = undefined;
+    workflowManager.clearMemory(ctx.chat.id.toString());
+  } catch (error) {
+    console.error("clear command error:", error);
+    return ctx.reply("❌ Unable to clear chat memory. Please try again.");
+  }
+  return ctx.reply(`
       ✅ Wallet data has been cleared.
       ✅ Chat memory has been cleared.
-    `)
+    `);
 });
-  
+
 // Message handler
 bot.on("message:text", async (ctx) => {
   try {
@@ -629,45 +679,51 @@ bot.on("message:text", async (ctx) => {
 Received a message from chat:
 - ID: ${chat.id}
 - Type: ${chat.type}
-- Title: ${chat.title || 'N/A'}
-- Username: ${chat.username || 'N/A'}
-- Description: ${chat.description || 'N/A'}
+- Title: ${chat.title || "N/A"}
+- Username: ${chat.username || "N/A"}
+- Description: ${chat.description || "N/A"}
     `);
   } catch (error) {
-    console.error('Error fetching chat details:', error);
+    console.error("Error fetching chat details:", error);
   }
   try {
     const messageText = ctx.message.text.trim();
     const telegramChatId = ctx.chat.id.toString();
     ctx.session.lastActivity = Date.now();
 
-    // Store user message
     await chatHistoryManager.storeMessage(
       telegramChatId,
-      [{ role: 'user', content: messageText }],
-      'user'
+      [{ role: "user", content: messageText }],
+      "user"
     );
 
-    // Get chat history for context
-    const chatHistory = await chatHistoryManager.getChatHistory(telegramChatId);
-
-    // Process message and get response
-    let response: string;
-    if (messageText.toLowerCase().includes("swap") || 
-        messageText.toLowerCase().includes("transfer") ||
-        messageText.toLowerCase().includes("send")) {
+    if (
+      messageText.toLowerCase().includes("swap") ||
+      messageText.toLowerCase().includes("transfer") ||
+      messageText.toLowerCase().includes("send")
+    ) {
       await processTransactionRequest(ctx, messageText);
       return;
+    } else {
+      const advisor = InvestmentAdvisor.getInstance();
+      const response = await advisor.processMessage(
+        telegramChatId,
+        messageText
+      );
+
+      if (response) {
+        await ctx.reply(response, { parse_mode: "Markdown" });
       } else {
         const response = await queryBrianAI(messageText, telegramChatId);
         const formattedResponse = await formatResponse(response);
         console.log(`[SUCCESS] Replied for chat ID: ${telegramChatId}`);
         return ctx.reply(formattedResponse, { parse_mode: "Markdown" });
       }
-    } catch (error) {
-      console.error("Message handling error:", error);
-      return ctx.reply("Sorry, there was an error processing your message.");
     }
+  } catch (error) {
+    console.error("Message handling error:", error);
+    return ctx.reply("Sorry, there was an error processing your message.");
+  }
 });
 
 bot.catch((err) => {
@@ -675,5 +731,6 @@ bot.catch((err) => {
 });
 
 bot.start({
-  onStart: async () => console.log(`\n\n✅Bot started as ${bot.botInfo?.username}!`),
+  onStart: async () =>
+    console.log(`\n\n✅Bot started as ${bot.botInfo?.username}!`),
 });

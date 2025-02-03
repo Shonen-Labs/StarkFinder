@@ -1,0 +1,66 @@
+[
+  {
+    "message": "I am looking for medium-risk investment in ETH and USDC on Ethereum.",
+    "intent": "set_preferences",
+    "preferences": {
+      "riskTolerance": "medium",
+      "preferredAssets": [
+        "ETH",
+        "USDC"
+      ],
+      "preferredChains": [
+        "Ethereum"
+      ],
+      "investmentHorizon": "medium",
+      "minTVL": 500000,
+      "targetAPY": 10,
+      "timestamp": "2025-02-01T19:45:38.461Z"
+    },
+    "timestamp": "2025-02-01T19:45:38.461Z"
+  },
+  {
+    "message": "🎯 Top Recommendations:\n\n1. ETH-OP Pool (dYdX)\n   • APY: 13.87%\n   • Risk Level: Medium\n   • Assets: ETH, OP\n   • TVL: $1,775,398.28\n\n2. BTC-ARB-ETH Pool (Aave)\n   • APY: 11.07%\n   • Risk Level: Medium\n   • Assets: BTC, ARB, ETH\n   • TVL: $1,434,310.23\n\n💡 These options match your preferences for medium-risk investments in ETH and USDC on the Ethereum chain, with a medium investment horizon and a target APY of 10%.",
+    "timestamp": "2025-02-01T19:45:40.553Z"
+  },
+  {
+    "message": "Can you recommend me some investment based on my history?",
+    "intent": "get_recommendations",
+    "timestamp": "2025-02-01T19:45:54.289Z"
+  },
+  {
+    "message": "🎯 Top Recommendations:\n\n1. ETH-OP Pool (dYdX)\n   • APY: 13.87%\n   • Risk Level: Medium\n   • Assets: ETH, OP\n   • TVL: $1,775,398.28\n\n2. BTC-ARB-ETH Pool (Aave)\n   • APY: 11.07%\n   • Risk Level: Medium\n   • Assets: BTC, ARB, ETH\n   • TVL: $1,434,310.23\n\n💡 These options match your preferences for medium-risk investments in ETH and USDC on the Ethereum chain, with a medium investment horizon and a target APY of 10%.",
+    "timestamp": "2025-02-01T19:45:56.413Z"
+  },
+  {
+    "message": "I am looking for low-risk investment in ETH and USDC on Ethereum.",
+    "intent": "set_preferences",
+    "preferences": {
+      "riskTolerance": "low",
+      "preferredAssets": [
+        "ETH",
+        "USDC"
+      ],
+      "preferredChains": [
+        "Ethereum"
+      ],
+      "investmentHorizon": "long",
+      "minTVL": 1000000,
+      "targetAPY": 3,
+      "timestamp": "2025-02-01T19:48:04.911Z"
+    },
+    "timestamp": "2025-02-01T19:48:04.913Z"
+  },
+  {
+    "message": "🎯 Top Recommendations:\n\n1. MATIC-OP-USDC Pool (ZkSync)\n   • APY: 6.9%\n   • Risk Level: Low\n   • Assets: MATIC, OP, USDC\n   • TVL: $7,221,743.48\n\n2. ARB-USDC-WBTC Pool (Aave)\n   • APY: 9.06%\n   • Risk Level: Low\n   • Assets: ARB, USDC, WBTC\n   • TVL: $9,230,896.77\n\n3. DAI-USDC-USDT Pool (Uniswap)\n   • APY: 6.66%\n   • Risk Level: Low\n   • Assets: DAI, USDC, USDT\n   • TVL: $5,889,126.60\n\n💡 These options match your preferences for low-risk investments in ETH and USDC on the Ethereum chain, with a long investment horizon and a target APY of 3%.",
+    "timestamp": "2025-02-01T19:48:07.927Z"
+  },
+  {
+    "message": "Can you recommend me some investment based on my history",
+    "intent": "get_recommendations",
+    "timestamp": "2025-02-01T19:48:34.106Z"
+  },
+  {
+    "message": "🎯 Top Recommendations:\n\n1. MATIC-OP-USDC Pool (ZkSync)\n   • APY: 6.9%\n   • Risk Level: Low\n   • Assets: MATIC, OP, USDC\n   • TVL: $7,221,743.48\n\n2. ARB-USDC-WBTC Pool (Aave)\n   • APY: 9.06%\n   • Risk Level: Low\n   • Assets: ARB, USDC, WBTC\n   • TVL: $9,230,896.77\n\n3. DAI-USDC-USDT Pool (Uniswap)\n   • APY: 6.66%\n   • Risk Level: Low\n   • Assets: DAI, USDC, USDT\n   • TVL: $5,889,126.60\n\n💡 These options match your preferences for low-risk investments in ETH and USDC on the Ethereum chain, with a long investment horizon and a target APY of 3%.",
+    "timestamp": "2025-02-01T19:48:40.018Z"
+  }
+]
