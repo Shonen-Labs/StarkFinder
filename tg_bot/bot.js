@@ -22,6 +22,8 @@ const langgraph_1 = require("@langchain/langgraph");
 const messages_1 = require("@langchain/core/messages");
 const chatHistory_1 = require("./chatHistory");
 const dotenv_1 = __importDefault(require("dotenv"));
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
 dotenv_1.default.config();
 function getEnvVar(key, isRequired = true) {
     const value = process.env[key];
@@ -132,12 +134,19 @@ class StarknetWallet {
     }
     createWallet() {
         return __awaiter(this, void 0, void 0, function* () {
+            // initialize existing Argent X testnet  account
+            const existingAccountAddress = "0x06CFffa3b51bCa2cA7B0e7871E90f607B6aA24A9eB0A94ef34f1574B219a5862";
+            const existingAccountPrivateKey = "0x0538e98380d3997b150bb68e82a51b05790b21db9cb1d1cc92c3721410d6f1a6";
+            // Initialize Existing Account
+            const existingAccount = new starknet_1.Account(this.provider, existingAccountAddress, existingAccountPrivateKey);
             const argentXaccountClassHash = "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f";
             const privateKeyAX = starknet_1.stark.randomAddress();
             const starkKeyPubAX = starknet_1.ec.starkCurve.getStarkKey(privateKeyAX);
+            const axSigner = new starknet_1.CairoCustomEnum({ Starknet: { pubkey: starkKeyPubAX } });
+            const axGuardian = new starknet_1.CairoOption(starknet_1.CairoOptionVariant.None);
             const AXConstructorCallData = starknet_1.CallData.compile({
-                owner: starkKeyPubAX,
-                guardian: "0x0",
+                owner: axSigner,
+                guardian: axGuardian,
             });
             const AXcontractAddress = starknet_1.hash.calculateContractAddressFromHash(starkKeyPubAX, argentXaccountClassHash, AXConstructorCallData, 0);
             const accountAX = new starknet_1.Account(this.provider, AXcontractAddress, privateKeyAX);
@@ -147,7 +156,7 @@ class StarknetWallet {
                 contractAddress: AXcontractAddress,
                 addressSalt: starkKeyPubAX,
             };
-            const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } = yield accountAX.deployAccount(deployAccountPayload);
+            const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } = yield existingAccount.deployContract(deployAccountPayload);
             console.log("✅ ArgentX wallet deployed at:", AXcontractFinalAddress);
             return {
                 account: accountAX,
@@ -348,6 +357,52 @@ Reply with "confirm" to execute this transaction.`;
         }
     });
 }
+function saveWallet(chatId, walletDetails) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // Check if the Chat record exists, and create it if it doesn't
+            const chat = yield prisma.chat.upsert({
+                where: { id: chatId },
+                update: {}, // No updates needed if the record exists
+                create: { id: chatId, chatId }, // Create the Chat record if it doesn't exist
+            });
+            const wallet = yield prisma.wallet.create({
+                data: {
+                    chat: {
+                        connect: {
+                            id: chatId
+                        }
+                    },
+                    walletAddress: walletDetails.walletAddress,
+                    privateKey: walletDetails.privateKey,
+                    publicKey: walletDetails.publicKey,
+                }
+            });
+            return wallet;
+        }
+        catch (error) {
+            console.error('Error creating wallet:', error);
+            throw error;
+        }
+    });
+}
+// Get wallet by chatId
+function getWalletByChatId(chatId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const wallet = yield prisma.wallet.findFirst({
+                where: {
+                    chatId: chatId
+                }
+            });
+            return wallet;
+        }
+        catch (error) {
+            console.error('Error fetching wallet:', error);
+            throw error;
+        }
+    });
+}
 // Initialize bot
 const bot = new grammy_1.Bot(BOT_TOKEN);
 // Initialize session
@@ -403,8 +458,22 @@ If you encounter any issues or need assistance, feel free to reach out.\n
 }));
 bot.command("wallet", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const userId = ctx.chat.id.toString();
+        // Check if wallet already exists
+        const existingWallet = yield getWalletByChatId(userId);
+        if (existingWallet) {
+            return ctx.reply("You already have a wallet registered.", {
+                parse_mode: "Markdown"
+            });
+        }
         const wallet = new StarknetWallet();
         const { account, privateKey, publicKey, contractAddress } = yield wallet.createWallet();
+        // Create new wallet in database
+        const savedWallet = yield saveWallet(userId, {
+            walletAddress: account.address,
+            privateKey: privateKey,
+            publicKey: publicKey,
+        });
         ctx.session.connectedWallet = account.address;
         ctx.session.privateKey = privateKey;
         console.log(`[SUCCESS] Wallet created for chat ID: ${ctx.chat.id}`);
@@ -469,6 +538,7 @@ bot.command("clear", (ctx) => __awaiter(void 0, void 0, void 0, function* () {
         yield chatHistoryManager.deleteAllChatMessages(ctx.chat.id.toString());
         ctx.session.connectedWallet = undefined;
         ctx.session.privateKey = undefined;
+        workflowManager.clearMemory(ctx.chat.id.toString());
     }
     catch (error) {
         console.error('clear command error:', error);
