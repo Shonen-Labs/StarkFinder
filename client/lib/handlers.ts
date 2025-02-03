@@ -5,15 +5,17 @@ import {
   BrianTransactionData, 
   BrianResponse, 
   ProcessedTransaction,
-  BrianToken
+  BrianToken,
+  LayerswapSwapStatus
 } from './transaction/types';
+import { LayerswapClient } from './layerswap/client';
 
 abstract class BaseTransactionHandler {
-  abstract processSteps(data: BrianTransactionData, params?: any): TransactionStep[];
+  abstract processSteps(data: BrianTransactionData, params?: any): Promise<TransactionStep[]>;
 }
 
 class SwapHandler extends BaseTransactionHandler {
-  processSteps(data: BrianTransactionData): TransactionStep[] {
+  async processSteps(data: BrianTransactionData): Promise<TransactionStep[]> {
     const transactions: TransactionStep[] = [];
     
     for (const step of data.steps) {
@@ -33,7 +35,7 @@ class SwapHandler extends BaseTransactionHandler {
 }
 
 class TransferHandler extends BaseTransactionHandler {
-  processSteps(data: BrianTransactionData): TransactionStep[] {
+  async processSteps(data: BrianTransactionData): Promise<TransactionStep[]> {
     const transactions: TransactionStep[] = [];
     
     for (const step of data.steps) {
@@ -86,7 +88,7 @@ class NostraBaseHandler {
 }
 
 class NostraDepositHandler extends NostraBaseHandler implements BaseTransactionHandler {
-  processSteps(data: BrianTransactionData, params?: any): TransactionStep[] {
+  async processSteps(data: BrianTransactionData, params?: any): Promise<TransactionStep[]> {
     if (!params?.amount || !params?.token1 || params?.protocol?.toLowerCase() !== 'nostra') {
       throw new Error('Missing required parameters for Nostra deposit');
     }
@@ -100,23 +102,20 @@ class NostraDepositHandler extends NostraBaseHandler implements BaseTransactionH
 
     const amountWithDecimals = (BigInt(params.amount) * BigInt(10 ** 18)).toString();
 
-    return [
-      {
-        contractAddress: addresses.token,
-        entrypoint: 'approve',
-        calldata: [addresses.iToken, amountWithDecimals, '0']
-      },
-      {
-        contractAddress: addresses.iToken,
-        entrypoint: 'mint',
-        calldata: [params.address || '0x0', amountWithDecimals, '0']
-      }
-    ];
+    return [{
+      contractAddress: addresses.token,
+      entrypoint: 'approve',
+      calldata: [addresses.iToken, amountWithDecimals, '0']
+    }, {
+      contractAddress: addresses.iToken,
+      entrypoint: 'deposit',
+      calldata: [amountWithDecimals]
+    }];
   }
 }
 
 class NostraWithdrawHandler extends NostraBaseHandler implements BaseTransactionHandler {
-  processSteps(data: BrianTransactionData, params?: any): TransactionStep[] {
+  async processSteps(data: BrianTransactionData, params?: any): Promise<TransactionStep[]> {
     if (!params?.amount || !params?.token1 || params?.protocol?.toLowerCase() !== 'nostra') {
       throw new Error('Missing required parameters for Nostra withdraw');
     }
@@ -130,23 +129,114 @@ class NostraWithdrawHandler extends NostraBaseHandler implements BaseTransaction
 
     const amountWithDecimals = (BigInt(params.amount) * BigInt(10 ** 18)).toString();
 
-    return [
-      {
-        contractAddress: addresses.iToken,
-        entrypoint: 'burn',
-        calldata: [
-          params.address || '0x0',
-          params.address || '0x0',
-          amountWithDecimals,
-          '0'
-        ]
-      }
-    ];
+    return [{
+      contractAddress: addresses.iToken,
+      entrypoint: 'withdraw',
+      calldata: [amountWithDecimals]
+    }];
   }
 }
 
-// lib/transaction/processor.ts
-export class TransactionProcessor {
+class BridgeHandler extends BaseTransactionHandler {
+  private readonly layerswapClient: LayerswapClient;
+
+  constructor() {
+    super();
+    if (!process.env.LAYERSWAP_API_KEY) {
+      throw new Error('LAYERSWAP_API_KEY environment variable is required');
+    }
+    this.layerswapClient = new LayerswapClient(process.env.LAYERSWAP_API_KEY);
+  }
+
+  async processSteps(data: BrianTransactionData): Promise<TransactionStep[]> {
+    if (!data.bridge) {
+      throw new Error('Bridge data is required for bridge transactions');
+    }
+
+    const { sourceNetwork, destinationNetwork, sourceToken, destinationToken, amount, sourceAddress, destinationAddress } = data.bridge;
+
+    try {
+      // First verify the route is available
+      const routes = await this.layerswapClient.getAvailableRoutes();
+      
+      if (!routes.source_networks.includes(sourceNetwork.toLowerCase())) {
+        throw new Error(`Source network ${sourceNetwork} is not supported`);
+      }
+      if (!routes.destination_networks.includes(destinationNetwork.toLowerCase())) {
+        throw new Error(`Destination network ${destinationNetwork} is not supported`);
+      }
+      if (!routes.tokens[sourceNetwork.toLowerCase()]?.includes(sourceToken.toUpperCase())) {
+        throw new Error(`Token ${sourceToken} is not supported on ${sourceNetwork}`);
+      }
+
+      // Create the swap
+      const response = await this.layerswapClient.createSwap({
+        sourceNetwork,
+        destinationNetwork,
+        sourceToken,
+        destinationToken: destinationToken || sourceToken,
+        amount,
+        sourceAddress,
+        destinationAddress: destinationAddress || sourceAddress
+      });
+
+      if (!response.data.deposit_actions || response.data.deposit_actions.length === 0) {
+        throw new Error('No deposit actions received from Layerswap');
+      }
+
+      // Convert Layerswap actions to TransactionSteps
+      const transactions: TransactionStep[] = [];
+      for (const action of response.data.deposit_actions) {
+        if (action.call_data) {
+          try {
+            const callData = JSON.parse(action.call_data);
+            if (Array.isArray(callData)) {
+              transactions.push(...callData);
+            }
+          } catch (error) {
+            console.error('Error parsing call data:', error);
+            throw new Error('Invalid call data received from Layerswap');
+          }
+        }
+      }
+
+      return transactions;
+    } catch (error) {
+      console.error('Layerswap bridge error:', error);
+      throw error;
+    }
+  }
+
+  private async waitForSwapCompletion(swapId: string, maxAttempts = 10): Promise<LayerswapSwapStatus> {
+    let attempts = 0;
+    const minDelay = 3000; // Minimum 3 seconds
+    const maxDelay = 7000; // Maximum 7 seconds
+    
+    while (attempts < maxAttempts) {
+      const status = await this.layerswapClient.getSwapStatus(swapId);
+      
+      if (status.status === 'completed') {
+        return status;
+      }
+      if (status.status === 'failed' || status.status === 'cancelled') {
+        throw new Error(`Swap ${status.status}`);
+      }
+      
+      // Random delay between minDelay and maxDelay
+      const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      attempts++;
+      if (attempts === maxAttempts) {
+        throw new Error('Swap verification timed out. Please check the status manually.');
+      }
+    }
+    
+    throw new Error('Swap timed out');
+  }
+}
+
+class TransactionProcessor {
   private provider: Provider;
   private handlers: Record<string, BaseTransactionHandler>;
 
@@ -159,51 +249,37 @@ export class TransactionProcessor {
       'swap': new SwapHandler(),
       'transfer': new TransferHandler(),
       'deposit': new NostraDepositHandler(),
-      'withdraw': new NostraWithdrawHandler()
+      'withdraw': new NostraWithdrawHandler(),
+      'bridge': new BridgeHandler()
     };
   }
 
   async processTransaction(response: BrianResponse): Promise<ProcessedTransaction> {
     try {
-      if (!response.extractedParams?.protocol && ['deposit', 'withdraw'].includes(response.action)) {
-        throw new Error('Protocol must be specified for deposits and withdrawals');
-      }
-
       const handler = this.handlers[response.action];
       if (!handler) {
-        throw new Error(`Unsupported action type: ${response.action}`);
+        throw new Error(`Unsupported action: ${response.action}`);
       }
 
-      const transactions = handler.processSteps(response.data, response.extractedParams);
-
-      let fromToken, toToken;
-      if (['deposit', 'withdraw'].includes(response.action) && response.extractedParams?.protocol === 'nostra') {
-        const nostraHandler = handler as unknown as NostraBaseHandler;
-        if (response.action === 'deposit') {
-          fromToken = nostraHandler.getTokenDetails(response.extractedParams.token1);
-          toToken = nostraHandler.getTokenDetails(response.extractedParams.token1, true);
-        } else {
-          fromToken = nostraHandler.getTokenDetails(response.extractedParams.token1, true);
-          toToken = nostraHandler.getTokenDetails(response.extractedParams.token1);
-        }
-      }
+      const transactions = await handler.processSteps(response.data, response.extractedParams);
 
       return {
         success: true,
-        description: response.data.description,
+        description: response.data.description || `${response.action} transaction`,
         transactions,
         action: response.action,
         solver: response.solver,
-        fromToken,
-        toToken,
-        fromAmount: response.extractedParams?.amount,
-        toAmount: response.extractedParams?.amount,
-        receiver: response.extractedParams?.address,
-        estimatedGas: '0',
-        protocol: response.extractedParams?.protocol
+        fromToken: response.data.fromToken,
+        toToken: response.data.toToken,
+        fromAmount: response.data.fromAmount,
+        toAmount: response.data.toAmount,
+        receiver: response.data.receiver,
+        estimatedGas: "0",
+        protocol: response.extractedParams?.protocol,
+        bridge: response.data.bridge
       };
     } catch (error) {
-      console.error('Error processing transaction:', error);
+      console.error('Transaction processing error:', error);
       throw error;
     }
   }

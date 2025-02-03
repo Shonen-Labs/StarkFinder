@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { CairoContractGenerator } from '@/lib/devxstark/contract-generator1';
 import { NextRequest, NextResponse } from 'next/server';
+import { CairoContractGenerator } from '@/lib/devxstark/contract-generator1';
+import prisma from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   const controller = new AbortController();
@@ -10,9 +11,7 @@ export async function POST(req: NextRequest) {
   const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
   try {
-
-    const { nodes, edges, flowSummary } = await req.json();
-
+    const { nodes, edges, flowSummary, userId } = await req.json();
     // Validate input
     if (!Array.isArray(nodes) || !Array.isArray(edges) || typeof flowSummary !== 'string') {
       return NextResponse.json(
@@ -65,6 +64,13 @@ export async function POST(req: NextRequest) {
             // Save the contract source code
             const savedPath = await generator.saveContract(result.sourceCode, 'lib');
 
+            await prisma.generatedContract.create({
+              data: {
+                name: 'Generated Contract',
+                sourceCode: result.sourceCode,
+                userId,
+              },
+            });
             // Send final success message
             controller.enqueue(
               new TextEncoder().encode(
@@ -103,7 +109,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
-    
+
     console.error('API error:', error);
     return NextResponse.json(
       {

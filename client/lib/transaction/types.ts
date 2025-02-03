@@ -6,9 +6,14 @@ export type TransactionAction =
   | "bridge";
 
 export interface TransactionStep {
-  contractAddress: string;
-  entrypoint: string;
-  calldata: string[];
+  type: string;
+  description: string;
+  status: 'pending' | 'completed' | 'failed';
+  url?: string;
+  error?: string;
+  contractAddress?: string;
+  entrypoint?: string;
+  calldata?: string[];
 }
 
 export interface BrianStep {
@@ -50,32 +55,23 @@ export interface LayerswapAction {
   type: string;
 }
 
-export interface LayerswapResponse {
-  data: {
-    id: string;
-    status: string;
-    created_date: string;
-    deposit_actions: LayerswapAction[];
-    source_network: string;
-    destination_network: string;
-    source_token: string;
-    destination_token: string;
-    source_amount: number;
-    destination_amount: number;
-    source_address: string;
-    destination_address: string;
-  };
+export interface LayerswapSwapStatus {
+  id: string;
+  status: string;
+  created_date: string;
+  source_network: string;
+  destination_network: string;
+  source_token: string;
+  destination_token: string;
+  source_amount: number;
+  destination_amount: number;
+  source_address: string;
+  destination_address: string;
+  deposit_actions: LayerswapAction[];
 }
 
-// lib/layerswap/types.ts
-export interface LayerswapRequest {
-  sourceAddress: string;
-  destinationAddress: string;
-  sourceNetwork: string;
-  destinationNetwork: string;
-  sourceToken: string;
-  destinationToken: string;
-  amount: number;
+export interface LayerswapSuccessResponse {
+  data: LayerswapSwapStatus;
 }
 
 export interface LayerswapErrorResponse {
@@ -87,67 +83,56 @@ export interface LayerswapErrorResponse {
 }
 
 export interface LayerswapCreateSwapRequest {
-  source: string;
-  destination: string;
-  amount: number;
-  source_asset: string;
-  destination_asset: string;
+  source_network: string;
+  destination_network: string;
+  source_token: string;
+  destination_token: string;
   destination_address: string;
-  refuel: boolean;
-  reference_id?: string;
+  amount: number;
   source_address?: string;
   use_deposit_address?: boolean;
 }
 
-export interface LayerswapCreateSwapResponse {
-  data: {
-    swap_id: string;
-  };
-  error: null | {
-    message: string;
-  };
-}
-
-export interface LayerswapAction {
-  call_data: string;
-  chain_id: string;
-  created_date: string;
-  network: string;
-  status: string;
-  type: string;
-}
-
-export interface LayerswapSuccessResponse {
-  data: {
-    id: string;
-    status: string;
-    created_date: string;
-    deposit_actions: LayerswapAction[];
-    source_network: string;
-    destination_network: string;
-    source_token: string;
-    destination_token: string;
-    source_amount: number;
-    destination_amount: number;
-    source_address: string;
-    destination_address: string;
-  };
-}
-
-export interface BridgeTransactionData {
+export interface LayerswapRequest {
+  sourceAddress: string;
+  destinationAddress: string;
   sourceNetwork: string;
   destinationNetwork: string;
   sourceToken: string;
   destinationToken: string;
   amount: number;
-  sourceAddress: string;
-  destinationAddress: string;
+}
+
+export interface LayerswapRoutes {
+  source_networks: string[];
+  destination_networks: string[];
+  tokens: {
+    [network: string]: string[];
+  };
+}
+
+export interface LayerswapError {
+  code: string;
+  message: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface BridgeTransactionData {
+  sourceAddress?: string;
+  destinationAddress?: string;
+  sourceNetwork?: string;
+  destinationNetwork?: string;
+  sourceToken?: string;
+  destinationToken?: string;
+  amount?: number;
   depositActions?: TransactionStep[];
 }
 
 export interface BrianTransactionData {
-  description: string;
-  steps: BrianStep[];
+  type?: TransactionAction;
+  description?: string;
+  steps?: TransactionStep[];
+  bridge?: BridgeTransactionData;
   fromToken?: BrianToken;
   toToken?: BrianToken;
   fromAmount?: string;
@@ -156,7 +141,6 @@ export interface BrianTransactionData {
   amountToApprove?: string;
   gasCostUSD?: string;
   protocol?: string;
-  bridge?: BridgeTransactionData;
 }
 
 export interface BrianResponse {
@@ -200,18 +184,4 @@ export interface NostraTokenAddresses {
     token: string;
     iToken: string;
   };
-}
-
-export interface LayerswapRoutes {
-  source_networks: string[];
-  destination_networks: string[];
-  tokens: {
-    [network: string]: string[];
-  };
-}
-
-export interface LayerswapError {
-  code: string;
-  message: string;
-  metadata?: Record<string, unknown>;
 }

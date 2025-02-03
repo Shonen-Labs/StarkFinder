@@ -59,7 +59,7 @@ Transaction Analysis Guidelines:
 2. Extract precise transaction parameters
 3. Include transaction details in the 'transaction' field when applicable
 4. Use empty strings for parameters that cannot be determined
-5. Akways convert the given amount to ETh or STRK as input might be in wei
+5. Always convert the given amount to ETH or STRK as input might be in wei
 
 Examples:
 1. "Send 0.1 ETH to 0x123..." 
@@ -84,19 +84,46 @@ Examples:
        calldata: ["0x123...", "0.1","0"]
      }
 
-2. "Bridge 50 USDC from Ethereum to Arbitrum"
+3. "Bridge 50 USDC from Ethereum to Arbitrum"
    - action: "bridge"
    - token1: "USDC"
-   - chain: "Ethereum"
-   - dest_chain: "Arbitrum"
+   - token2: "USDC"  // Optional, if destination token is different
+   - chain: "ethereum"  // Use lowercase for network names
+   - dest_chain: "arbitrum"
    - amount: "50"
-   - transaction: {
-       contractAddress: "<bridge contract address>",
-       entrypoint: "bridge",
-       calldata: ["USDC", "50", "Ethereum", "Arbitrum"]
-     }
+   - protocol: "layerswap"  // Default bridging protocol
+   - address: "<source wallet address>"
+   - destinationAddress: "<destination wallet address>"  // Optional, defaults to source address
 
-remember to take contract address based on type of token as there are different address for STRK and ETH that i have provided
+4. "Bridge 0.5 ETH from Starknet to Ethereum using Layerswap"
+   - action: "bridge"
+   - token1: "ETH"
+   - chain: "starknet"
+   - dest_chain: "ethereum"
+   - amount: "0.5"
+   - protocol: "layerswap"
+   - address: "<source wallet address>"
+   - destinationAddress: "<destination wallet address>"
+
+5. "Bridge 1000 USDT from Starknet to Arbitrum"
+   - action: "bridge"
+   - token1: "USDT"
+   - chain: "starknet"
+   - dest_chain: "arbitrum"
+   - amount: "1000"
+   - protocol: "layerswap"
+   - address: "<source wallet address>"
+   - destinationAddress: "<destination wallet address>"
+
+Remember:
+1. For bridging:
+   - Always use lowercase for network names (ethereum, starknet, arbitrum, etc.)
+   - Default to "layerswap" as the protocol if not specified
+   - If destination token is not specified, use the same as source token
+   - If destination address is not specified, use the source address
+2. For token addresses:
+   - ETH: "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7"
+   - STRK: "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
 
 Current Context:
 - User Prompt: {prompt}
@@ -116,7 +143,7 @@ export const transactionIntentPromptTemplate = new PromptTemplate({
   template: `
   {TRANSACTION_INTENT_PROMPT}
 
-  dditional Context:
+  Additional Context:
   Current Chain ID: {chainId}
 
   Conversation History:

@@ -5,16 +5,62 @@ import usdt from "../public/crypto-icons/usdt.svg";
 import tron from "../public/crypto-icons/trx.svg";
 import bch from "../public/crypto-icons/bch.svg";
 
-export type CryptoCoin = {
-  id: string;
+export interface CryptoCoin {
   name: string;
   logo: string;
-};
+  network: string;
+  chainId: string;
+  symbol: string;
+  decimals: number;
+}
+
 export const CoinsLogo: CryptoCoin[] = [
-  { id: "1", name: "XRP", logo: xrp },
-  { id: "2", name: "ALGO", logo: algo },
-  { id: "3", name: "USDC", logo: usdc },
-  { id: "4", name: "USDT", logo: usdt },
-  { id: "5", name: "TRON", logo: tron },
-  { id: "6", name: "BCH", logo: bch },
+  {
+    name: "XRP",
+    logo: xrp,
+    network: "ripple_mainnet",
+    chainId: "XRP",
+    symbol: "XRP",
+    decimals: 6
+  },
+  {
+    name: "ALGO",
+    logo: algo,
+    network: "algorand_mainnet",
+    chainId: "ALGO",
+    symbol: "ALGO",
+    decimals: 6
+  },
+  {
+    name: "USDC",
+    logo: usdc,
+    network: "ethereum_mainnet",
+    chainId: "1",
+    symbol: "USDC",
+    decimals: 6
+  },
+  {
+    name: "USDT",
+    logo: usdt,
+    network: "ethereum_mainnet",
+    chainId: "1",
+    symbol: "USDT",
+    decimals: 6
+  },
+  {
+    name: "TRON",
+    logo: tron,
+    network: "tron_mainnet",
+    chainId: "TRX",
+    symbol: "TRX",
+    decimals: 6
+  },
+  {
+    name: "BCH",
+    logo: bch,
+    network: "bitcoin_cash_mainnet",
+    chainId: "BCH",
+    symbol: "BCH",
+    decimals: 8
+  },
 ];
