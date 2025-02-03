@@ -23,6 +23,14 @@ import {
 import Link from "next/link";
 import { TransactionSuccess } from "@/components/TransactionSuccess";
 import CommandList from "@/components/ui/command";
+import { useState } from "react";
+
+interface UserPreferences {
+  riskTolerance: "low" | "medium" | "high";
+  preferredAssets: string[];
+  preferredChains: string[];
+  investmentHorizon: "short" | "medium" | "long";
+}
 
 interface Message {
   role: string;
@@ -46,6 +54,18 @@ interface Message {
       solver?: string;
     };
     type: string;
+  };
+  recommendations?: {
+    pools: Array<{
+      name: string;
+      apy: number;
+      tvl: number;
+      riskLevel: string;
+      impermanentLoss: string;
+      chain: string;
+      protocol: string;
+    }>;
+    strategy: string;
   };
 }
 
@@ -76,7 +96,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
 
   const executeTransaction = async () => {
     if (!account) {
-      onError(new Error('Wallet not connected'));
+      onError(new Error("Wallet not connected"));
       return;
     }
 
@@ -86,7 +106,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
         const response = await account.execute({
           contractAddress: tx.contractAddress,
           entrypoint: tx.entrypoint,
-          calldata: tx.calldata
+          calldata: tx.calldata,
         });
         await account.waitForTransaction(response.transaction_hash);
         if (tx === transactions[transactions.length - 1]) {
@@ -94,7 +114,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
         }
       }
     } catch (error) {
-      console.error('Transaction failed:', error);
+      console.error("Transaction failed:", error);
       onError(error);
     } finally {
       setIsProcessing(false);
@@ -109,19 +129,99 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
         disabled={isProcessing}
         className={`w-full py-2 px-4 rounded-lg ${
           isProcessing
-            ? 'bg-white/20 cursor-not-allowed'
-            : 'bg-white/10 hover:bg-white/20'
+            ? "bg-white/20 cursor-not-allowed"
+            : "bg-white/10 hover:bg-white/20"
         } transition-colors duration-200`}
       >
-        {isProcessing ? 'Processing Transaction...' : 'Execute Transaction'}
+        {isProcessing ? "Processing Transaction..." : "Execute Transaction"}
       </button>
     </div>
   );
 };
 
-const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionSuccess }) => {
+const PreferencesDialog: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (preferences: UserPreferences) => void;
+}> = ({ open, onClose, onSubmit }) => {
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    riskTolerance: "medium",
+    preferredAssets: [],
+    preferredChains: [],
+    investmentHorizon: "medium",
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="bg-gray-900 border border-white/20 text-white">
+        <DialogHeader>
+          <DialogTitle>Investment Preferences</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label>Risk Tolerance</label>
+            <select
+              className="w-full bg-white/5 border border-white/20 rounded-md p-2"
+              value={preferences.riskTolerance}
+              onChange={(e) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  riskTolerance: e.target
+                    .value as UserPreferences["riskTolerance"],
+                }))
+              }
+            >
+              <option value="low">Low Risk</option>
+              <option value="medium">Medium Risk</option>
+              <option value="high">High Risk</option>
+            </select>
+          </div>
+          {/* Add similar inputs for other preferences */}
+          <Button
+            onClick={() => onSubmit(preferences)}
+            className="w-full bg-white/10 hover:bg-white/20"
+          >
+            Save Preferences
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const MessageContent: React.FC<MessageContentProps> = ({
+  message,
+  onTransactionSuccess,
+}) => {
   const [txHash, setTxHash] = React.useState<string | null>(null);
 
+  if (message.recommendations) {
+    return (
+      <div className="space-y-4">
+        <p className="text-white/80">{message.content}</p>
+        <div className="grid gap-4">
+          <h3 className="font-bold">Recommended Strategy:</h3>
+          <p>{message.recommendations.strategy}</p>
+          <h3 className="font-bold">Recommended Pools:</h3>
+          {message.recommendations.pools.map((pool, index) => (
+            <div key={index} className="bg-white/5 p-4 rounded-lg">
+              <div className="flex justify-between">
+                <span>Pool: {pool.name}</span>
+                <span>APY: {pool.apy}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>TVL: ${pool.tvl.toLocaleString()}</span>
+                <span>Risk: {pool.riskLevel}</span>
+              </div>
+              <div className="text-sm text-white/60">
+                IL Risk: {pool.impermanentLoss}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (message.transaction?.data?.transactions) {
     return (
       <div className="space-y-4">
@@ -144,7 +244,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionS
               onTransactionSuccess(hash);
             }}
             onError={(error) => {
-              console.error('Transaction failed:', error);
+              console.error("Transaction failed:", error);
             }}
           />
         )}
@@ -163,6 +263,13 @@ export default function TransactionPage() {
   const { address } = useAccount();
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({
+    riskTolerance: "medium",
+    preferredAssets: [],
+    preferredChains: [],
+    investmentHorizon: "medium",
+  });
 
   React.useEffect(() => {
     if (scrollRef.current) {
@@ -172,19 +279,22 @@ export default function TransactionPage() {
 
   React.useEffect(() => {
     // Initial welcome message
-    setMessages([{
-      id: uuidv4(),
-      role: 'agent',
-      content: 'Hello! I can help you with the following actions:\n\n' +
-              '• Swap tokens\n' +
-              '• Transfer tokens\n' +
-              '• Deposit to protocols\n' +
-              '• Withdraw from protocols\n' +
-              '• Bridge tokens\n\n' +
-              'What would you like to do?',
-      timestamp: new Date().toLocaleTimeString(),
-      user: 'Agent'
-    }]);
+    setMessages([
+      {
+        id: uuidv4(),
+        role: "agent",
+        content:
+          "Hello! I can help you with the following actions:\n\n" +
+          "• Swap tokens\n" +
+          "• Transfer tokens\n" +
+          "• Deposit to protocols\n" +
+          "• Withdraw from protocols\n" +
+          "• Bridge tokens\n\n" +
+          "What would you like to do?",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      },
+    ]);
   }, []);
   const createNewChat = async () => {
     const id = uuidv4();
@@ -199,110 +309,114 @@ export default function TransactionPage() {
   const handleTransactionSuccess = (hash: string) => {
     const successMessage: Message = {
       id: uuidv4(),
-      role: 'agent',
-      content: 'Great! Would you like to perform another transaction? You can try swapping, transferring, depositing, or bridging tokens.',
+      role: "agent",
+      content:
+        "Great! Would you like to perform another transaction? You can try swapping, transferring, depositing, or bridging tokens.",
       timestamp: new Date().toLocaleTimeString(),
-      user: 'Agent'
+      user: "Agent",
     };
-    setMessages(prev => [...prev, successMessage]);
+    setMessages((prev) => [...prev, successMessage]);
   };
-  
+
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
     if (!address) {
       // Add a message to connect wallet if not connected
       const errorMessage: Message = {
         id: uuidv4(),
-        role: 'agent',
-        content: 'Please connect your wallet first to proceed with the transaction.',
+        role: "agent",
+        content:
+          "Please connect your wallet first to proceed with the transaction.",
         timestamp: new Date().toLocaleTimeString(),
-        user: 'Agent'
+        user: "Agent",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
       return;
     }
-  
+
     const userMessage: Message = {
       id: uuidv4(),
-      role: 'user',
+      role: "user",
       content: inputValue,
       timestamp: new Date().toLocaleTimeString(),
-      user: 'User'
+      user: "User",
     };
-  
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
     setIsLoading(true);
-  
+
     try {
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
+      const response = await fetch("/api/ask", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           prompt: inputValue,
-          address: address, // Always include the wallet address
-          chainId: '4012',
-          messages: messages.concat(userMessage).map(msg => ({
-            sender: msg.role === 'user' ? 'user' : 'brian',
-            content: msg.content,
-          })),
+          address: address,
+          messages: messages,
+          userPreferences,
+          stream: true,
         }),
       });
-  
+
       const data = await response.json();
-      
+
       let agentMessage: Message;
-      
+
       // Check if it's an error message that's actually a prompt for more information
-      if (data.error && typeof data.error === 'string' && !data.error.includes("not recognized")) {
+      if (
+        data.error &&
+        typeof data.error === "string" &&
+        !data.error.includes("not recognized")
+      ) {
         // This is a conversational prompt from Brian, not an error
         agentMessage = {
           id: uuidv4(),
-          role: 'agent',
-          content: data.error,  // This contains Brian's question for more details
+          role: "agent",
+          content: data.error, // This contains Brian's question for more details
           timestamp: new Date().toLocaleTimeString(),
-          user: 'Agent'
+          user: "Agent",
         };
       } else if (response.ok && data.result?.[0]?.data) {
         // We have transaction data
         const { description, transaction } = data.result[0].data;
         agentMessage = {
           id: uuidv4(),
-          role: 'agent',
+          role: "agent",
           content: description,
           timestamp: new Date().toLocaleTimeString(),
-          user: 'Agent',
-          transaction: transaction
+          user: "Agent",
+          transaction: transaction,
         };
       } else {
         // This is an actual error
         agentMessage = {
           id: uuidv4(),
-          role: 'agent',
-          content: "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
+          role: "agent",
+          content:
+            "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
           timestamp: new Date().toLocaleTimeString(),
-          user: 'Agent'
+          user: "Agent",
         };
       }
 
-      setMessages(prev => [...prev, agentMessage]);
+      setMessages((prev) => [...prev, agentMessage]);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       const errorMessage: Message = {
         id: uuidv4(),
-        role: 'agent',
-        content: 'Sorry, something went wrong. Please try again.',
+        role: "agent",
+        content: "Sorry, something went wrong. Please try again.",
         timestamp: new Date().toLocaleTimeString(),
-        user: 'Agent'
+        user: "Agent",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
@@ -375,20 +489,24 @@ export default function TransactionPage() {
               placeholder="Search"
               className="bg-transparent border border-white/20 text-white py-4 text-sm rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
             />
-            <div className="overflow-y-auto h-64 flex flex-col gap-2 pr-2
+            <div
+              className="overflow-y-auto h-64 flex flex-col gap-2 pr-2
               [&::-webkit-scrollbar]:w-2
               [&::-webkit-scrollbar-track]:bg-[#060606]
               [&::-webkit-scrollbar-thumb]:bg-white/10
               [&::-webkit-scrollbar-thumb]:rounded-full
               dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-              dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+              dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+            >
               {[0, 1, 2, 4, 5].map((index) => (
                 <div
                   key={index}
                   className="flex flex-col p-2 px-2 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer gap-1"
                 >
                   <span>0x86ecca95fec</span>
-                  <span className="text-[#eee] text-[0.8em]">12th Dec, 2025</span>
+                  <span className="text-[#eee] text-[0.8em]">
+                    12th Dec, 2025
+                  </span>
                 </div>
               ))}
             </div>
@@ -452,10 +570,8 @@ export default function TransactionPage() {
             ))}
             <div ref={scrollRef} />
           </ScrollArea>
-          
-          {isInputClicked && (
-            <CommandList />
-          )}
+
+          {isInputClicked && <CommandList />}
           {/* Input Area */}
           <div className="p-4 border-t border-white/20 bg-[#010101]">
             <div className="relative">
@@ -464,8 +580,8 @@ export default function TransactionPage() {
                 className="bg-white/5 border border-white/20 text-white pl-4 pr-24 py-6 rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
                 value={inputValue}
                 onChange={(e) => {
-                  setInputValue(e.target.value)
-                  setIsInputClicked(false)
+                  setInputValue(e.target.value);
+                  setIsInputClicked(false);
                 }}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 disabled={isLoading}
@@ -485,6 +601,21 @@ export default function TransactionPage() {
           </div>
         </div>
       </div>
+      <Button
+        onClick={() => setShowPreferences(true)}
+        className="absolute right-20 top-4"
+      >
+        Investment Preferences
+      </Button>
+
+      <PreferencesDialog
+        open={showPreferences}
+        onClose={() => setShowPreferences(false)}
+        onSubmit={(prefs) => {
+          setUserPreferences(prefs);
+          setShowPreferences(false);
+        }}
+      />
     </div>
   );
 }

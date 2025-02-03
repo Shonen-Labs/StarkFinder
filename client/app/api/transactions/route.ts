@@ -160,11 +160,11 @@ async function getOrCreateTransactionChat(userId: string) {
         userId,
         type: "TRANSACTION",
       },
-    })
-    return chat
+    });
+    return chat;
   } catch (error) {
-    console.error("Error creating transaction chat:", error)
-    throw error
+    console.error("Error creating transaction chat:", error);
+    throw error;
   }
 }
 
@@ -176,11 +176,11 @@ async function storeTransaction(userId: string, type: string, metadata: any) {
         type: type as TxType,
         metadata,
       },
-    })
-    return transaction
+    });
+    return transaction;
   } catch (error) {
-    console.error("Error storing transaction:", error)
-    throw error
+    console.error("Error storing transaction:", error);
+    throw error;
   }
 }
 
@@ -189,9 +189,9 @@ async function storeMessage({
   chatId,
   userId,
 }: {
-  content: any[]
-  chatId: string
-  userId: string
+  content: any[];
+  chatId: string;
+  userId: string;
 }) {
   try {
     const message = await prisma.message.create({
@@ -200,11 +200,11 @@ async function storeMessage({
         chatId,
         userId,
       },
-    })
-    return message
+    });
+    return message;
   } catch (error) {
-    console.error("Error storing message:", error)
-    throw error
+    console.error("Error storing message:", error);
+    throw error;
   }
 }
 
@@ -222,15 +222,15 @@ export async function POST(request: NextRequest) {
 
     let user = await prisma.user.findFirst({
       where: { address },
-    })
+    });
 
     if (!user) {
       user = await prisma.user.create({
         data: { address },
-      })
+      });
     }
 
-    const chat = await getOrCreateTransactionChat(user.id)
+    const chat = await getOrCreateTransactionChat(user.id);
 
     try {
       const transactionIntent = await getTransactionIntentFromOpenAI(
@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
         content: [{ role: "user", content: prompt }],
         chatId: chat.id,
         userId: user.id,
-      })
+      });
 
       console.log(
         "Processed Transaction Intent from OPENAI:",
@@ -263,11 +263,15 @@ export async function POST(request: NextRequest) {
         processedTx.receiver = address;
       }
 
-      const transaction = await storeTransaction(user.id, transactionIntent.action, {
-        ...processedTx,
-        chainId,
-        originalIntent: transactionIntent,
-      })
+      const transaction = await storeTransaction(
+        user.id,
+        transactionIntent.action,
+        {
+          ...processedTx,
+          chainId,
+          originalIntent: transactionIntent,
+        }
+      );
 
       await storeMessage({
         content: [
@@ -279,7 +283,7 @@ export async function POST(request: NextRequest) {
         ],
         chatId: chat.id,
         userId: user.id,
-      })
+      });
 
       return NextResponse.json({
         result: [
