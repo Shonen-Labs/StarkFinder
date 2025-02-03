@@ -8,6 +8,9 @@ import { START, END, MessagesAnnotation, MemorySaver, StateGraph } from "@langch
 import { RemoveMessage } from "@langchain/core/messages";
 import { ChatHistoryManager } from "./chatHistory";
 import dotenv from "dotenv";
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 dotenv.config();
 
@@ -160,7 +163,7 @@ class StarknetWallet {
   }> {
     // initialize existing Argent X testnet  account
     const existingAccountAddress = "0x06CFffa3b51bCa2cA7B0e7871E90f607B6aA24A9eB0A94ef34f1574B219a5862";
-    const existingAccountPrivateKey = "";
+    const existingAccountPrivateKey = "0x0538e98380d3997b150bb68e82a51b05790b21db9cb1d1cc92c3721410d6f1a6";
 
     // Initialize Existing Account
     const existingAccount = new Account(this.provider, existingAccountAddress, existingAccountPrivateKey);
@@ -416,6 +419,53 @@ Reply with "confirm" to execute this transaction.`;
   }
 }
 
+async function saveWallet(chatId: string, walletDetails: {
+  walletAddress: string,
+  privateKey: string,
+  publicKey: string,
+}) {
+  try {
+        // Check if the Chat record exists, and create it if it doesn't
+        const chat = await prisma.chat.upsert({
+          where: { id: chatId },
+          update: {}, 
+          create: { id: chatId, chatId },
+        });
+
+    const wallet = await prisma.wallet.create({
+      data: {
+        chat: {
+          connect: {
+            id: chatId
+          }
+        },
+        walletAddress: walletDetails.walletAddress,
+        privateKey: walletDetails.privateKey,
+        publicKey: walletDetails.publicKey,
+      }
+    });
+    return wallet;
+  } catch (error) {
+    console.error('Error creating wallet:', error);
+    throw error;
+  }
+}
+
+// Get wallet by chatId
+async function getWalletByChatId(chatId: string) {
+  try {
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        chatId: chatId
+      }
+    });
+    return wallet;
+  } catch (error) {
+    console.error('Error fetching wallet:', error);
+    throw error;
+  }
+}
+
 // Initialize bot
 const bot = new Bot<MyContext>(BOT_TOKEN);
 
@@ -474,8 +524,24 @@ console.log(`[SUCCESS] Help message sent to chat ID: ${ctx.chat.id}`);
 
 bot.command("wallet", async (ctx) => {
   try {
+    const userId = ctx.chat.id.toString();
+    // Check if wallet already exists
+    const existingWallet = await getWalletByChatId(userId);
+    if (existingWallet) {
+      return ctx.reply("You already have a wallet registered.", {
+        parse_mode: "Markdown"
+      });
+    }
+
     const wallet = new StarknetWallet();
     const { account, privateKey, publicKey, contractAddress } = await wallet.createWallet();
+
+    // Create new wallet in database
+    const savedWallet = await saveWallet(userId, {
+      walletAddress: account.address,
+      privateKey: privateKey,
+      publicKey: publicKey,
+    });
     
     ctx.session.connectedWallet = account.address;
     ctx.session.privateKey = privateKey;
