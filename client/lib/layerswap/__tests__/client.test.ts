@@ -7,6 +7,7 @@ describe('LayerswapClient', () => {
 
   beforeEach(() => {
     client = new LayerswapClient(mockApiKey);
+    global.fetch = jest.fn() as jest.Mock;
   });
 
   describe('constructor', () => {
@@ -26,6 +27,7 @@ describe('LayerswapClient', () => {
       sourceToken: 'ETH',
       destinationToken: 'ETH',
       amount: 0.1,
+      sourceAddress: '0x1234567890123456789012345678901234567890',
       destinationAddress: '0x1234567890123456789012345678901234567890',
     };
 
@@ -44,7 +46,7 @@ describe('LayerswapClient', () => {
     });
 
     it('should handle route not found error', async () => {
-      global.fetch = jest.fn().mockImplementationOnce(() =>
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           ok: false,
           json: () => Promise.resolve({
@@ -58,7 +60,7 @@ describe('LayerswapClient', () => {
     });
 
     it('should handle insufficient liquidity error', async () => {
-      global.fetch = jest.fn().mockImplementationOnce(() =>
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           ok: false,
           json: () => Promise.resolve({
@@ -80,7 +82,7 @@ describe('LayerswapClient', () => {
         },
       };
 
-      global.fetch = jest.fn().mockImplementationOnce(() =>
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve(mockResponse),
@@ -99,7 +101,7 @@ describe('LayerswapClient', () => {
 
     it('should get swap status successfully', async () => {
       const mockStatus = { status: 'completed' };
-      global.fetch = jest.fn().mockImplementationOnce(() =>
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve(mockStatus),
@@ -112,17 +114,19 @@ describe('LayerswapClient', () => {
   });
 
   describe('getAvailableRoutes', () => {
-    it('should get available routes successfully', async () => {
+    it('should get routes successfully', async () => {
       const mockRoutes = {
-        source_networks: ['ethereum_mainnet'],
-        destination_networks: ['starknet_mainnet'],
-        tokens: {
-          ethereum_mainnet: ['ETH', 'USDC'],
-          starknet_mainnet: ['ETH', 'USDC'],
-        },
+        routes: [
+          {
+            source_network: 'ethereum_mainnet',
+            destination_network: 'starknet_mainnet',
+            source_tokens: ['ETH'],
+            destination_tokens: ['ETH'],
+          },
+        ],
       };
 
-      global.fetch = jest.fn().mockImplementationOnce(() =>
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           ok: true,
           json: () => Promise.resolve(mockRoutes),
@@ -133,12 +137,12 @@ describe('LayerswapClient', () => {
       expect(result).toEqual(mockRoutes);
     });
 
-    it('should handle API errors', async () => {
-      global.fetch = jest.fn().mockImplementationOnce(() =>
+    it('should handle error getting routes', async () => {
+      (global.fetch as jest.Mock).mockImplementationOnce(() =>
         Promise.resolve({
           ok: false,
           json: () => Promise.resolve({
-            error: 'API_ERROR',
+            error: 'Failed to get routes',
           }),
         })
       );

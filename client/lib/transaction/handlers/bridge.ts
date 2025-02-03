@@ -139,7 +139,7 @@ export class BridgeHandler extends BaseTransactionHandler {
       return [
         {
           type: 'bridge',
-          status: 'success',
+          status: 'completed',
           message: `Bridge transaction created from ${sourceNetwork} to ${destinationNetwork}`,
           data: response,
           url: `https://www.layerswap.io/track/${response.id}`,
