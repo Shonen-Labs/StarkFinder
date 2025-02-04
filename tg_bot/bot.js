@@ -368,8 +368,8 @@ function saveWallet(chatId, walletDetails) {
             // Check if the Chat record exists, and create it if it doesn't
             const chat = yield prisma.chat.upsert({
                 where: { id: chatId },
-                update: {}, // No updates needed if the record exists
-                create: { id: chatId, chatId }, // Create the Chat record if it doesn't exist
+                update: {},
+                create: { id: chatId, chatId },
             });
             const wallet = yield prisma.wallet.create({
                 data: {
@@ -586,7 +586,7 @@ Received a message from chat:
         else {
             const advisor = investmentBot_1.InvestmentAdvisor.getInstance();
             const response = yield advisor.processMessage(telegramChatId, messageText);
-            if (response) {
+            if (response != "agent_control") {
                 yield ctx.reply(response, { parse_mode: "Markdown" });
             }
             else {
@@ -605,6 +605,31 @@ Received a message from chat:
 bot.catch((err) => {
     console.error("Bot error:", err);
 });
-bot.start({
-    onStart: () => __awaiter(void 0, void 0, void 0, function* () { var _a; return console.log(`\n\n✅Bot started as ${(_a = bot.botInfo) === null || _a === void 0 ? void 0 : _a.username}!`); }),
-});
+function startBot() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            bot.start({
+                onStart: () => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
+                    console.log(`✅ Bot started as ${(_a = bot.botInfo) === null || _a === void 0 ? void 0 : _a.username}!`);
+                }),
+            });
+        }
+        catch (err) {
+            if (err instanceof grammy_1.GrammyError) {
+                console.error("❌ Grammy Error:", err.description);
+                if (err.error_code === 409) {
+                    console.log("⚠️ Another bot instance is running. Retrying in 5 seconds...");
+                    setTimeout(startBot, 5000);
+                }
+            }
+            else if (err instanceof grammy_1.HttpError) {
+                console.error("❌ HTTP Error:", err);
+            }
+            else {
+                console.error("❌ Unknown Error:", err);
+            }
+        }
+    });
+}
+// startBot();

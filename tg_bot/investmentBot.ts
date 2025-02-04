@@ -191,7 +191,7 @@ export class InvestmentAdvisor {
       }
 
       const response =
-        "I can help you find investment opportunities. Just tell me what kind of investments you're looking for, including your preferred assets and risk tolerance.";
+        "agent_control";
       this.storeChatHistory(userId, response);
       return response;
     } catch (error) {

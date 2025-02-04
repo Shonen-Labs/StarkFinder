@@ -1,4 +1,4 @@
-import { Bot, Context, session, SessionFlavor } from "grammy";
+import { Bot, Context, session, SessionFlavor, GrammyError, HttpError } from "grammy";
 import { ASK_OPENAI_AGENT_PROMPT } from "./prompts/prompts";
 import { Account, Contract, RpcProvider, stark, ec, hash, CallData,  CairoOption, CairoOptionVariant, CairoCustomEnum } from "starknet";
 import axios from "axios";
@@ -711,7 +711,7 @@ Received a message from chat:
         messageText
       );
 
-      if (response) {
+      if (response != "agent_control") {
         await ctx.reply(response, { parse_mode: "Markdown" });
       } else {
         const response = await queryBrianAI(messageText, telegramChatId);
@@ -730,7 +730,26 @@ bot.catch((err) => {
   console.error("Bot error:", err);
 });
 
-bot.start({
-  onStart: async () =>
-    console.log(`\n\n✅Bot started as ${bot.botInfo?.username}!`),
-});
+async function startBot() {
+  try {
+    bot.start({
+      onStart: async () => {
+        console.log(`✅ Bot started as ${bot.botInfo?.username}!`);
+      },
+    });
+  } catch (err) {
+    if (err instanceof GrammyError) {
+      console.error("❌ Grammy Error:", err.description);
+      if (err.error_code === 409) {
+        console.log("⚠️ Another bot instance is running. Retrying in 5 seconds...");
+        setTimeout(startBot, 5000);
+      }
+    } else if (err instanceof HttpError) {
+      console.error("❌ HTTP Error:", err);
+    } else {
+      console.error("❌ Unknown Error:", err);
+    }
+  }
+}
+
+startBot();

@@ -1,7 +1,7 @@
 {
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "prisma": "^6.2.1",
+    "@types/node": "^22.13.1",
+    "prisma": "^6.3.1",
     "typescript": "^5.7.3"
   },
   "scripts": {
@@ -11,7 +11,7 @@
   "dependencies": {
     "@langchain/core": "^0.3.27",
     "@langchain/langgraph": "^0.2.38",
-    "@prisma/client": "^6.2.1",
+    "@prisma/client": "^6.3.1",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
     "grammy": "^1.33.0",
