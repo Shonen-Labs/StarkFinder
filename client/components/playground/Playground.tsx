@@ -1,3 +1,4 @@
+
 "use client";
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -188,7 +189,7 @@ export default function Playground() {
 
   return (
     <div className="flex h-screen bg-[#f9f7f3] text-black pt-8 selectable-none relative">
-      <div className="absolute z-10 left-10 my-20 h-auto max-h-72">
+      <div className='absolute z-10 left-10 my-20 h-[850px] w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent'>
         <FloatingSidebar addBlock={addBlock} />
       </div>
 
