@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/lib/db";
 import axios from "axios";
 import { Pool } from "./types";

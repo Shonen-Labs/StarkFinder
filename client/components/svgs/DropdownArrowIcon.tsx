@@ -1,5 +1,3 @@
-import { DropdownProps } from "react-day-picker";
-
 interface DropdownArrowIconProps{
     status: string;
 }

@@ -1,11 +1,12 @@
+/* eslint-disable react/jsx-key */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useReducer } from "react";
-import CustomBlock from "../Modal/CustomBlock";
 import groupedBlocks from "./data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { DIRTY, z } from "zod";
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 // libraries
 import clsx from 'clsx';
@@ -36,7 +37,6 @@ import RewardIcon from "@/components/svgs/RewardIcon";
 import ScaleofJusticeIcon from "@/components/svgs/ScaleofJusticeICon";
 import FlagIcon from "@/components/svgs/FlagIcon";
 import ConnectionIcon from "@/components/svgs/ConnectionIcon";
-import { TokensIcon } from "@radix-ui/react-icons";
 import SetStrategyIcon from "@/components/svgs/SetStrategyIcon";
 import PortfolioIcon from "@/components/svgs/PortfolioIcon";
 import PadlockIcon from "@/components/svgs/PadlockIcon";
@@ -53,17 +53,17 @@ import { Code } from "lucide-react";
 interface FloatingSidebarProps {
   addBlock: (block: any) => void;
 }
-const formSchema = z.object({
-  blockName: z.string().min(1, "Block name is required"),
-  solidityCode: z.string().min(1, "Solidity code is required"),
-})
-let greg=groupedBlocks["Trigger Actions"]
-let token=groupedBlocks["Token Actions"]
-let li=groupedBlocks["Liquidity"]
-let po=groupedBlocks["Portfolio Management"]
-let inst=groupedBlocks["Analytics"]
-let go=groupedBlocks["Governance"]
-let ev=groupedBlocks["Events"]
+// const formSchema = z.object({
+//   blockName: z.string().min(1, "Block name is required"),
+//   solidityCode: z.string().min(1, "Solidity code is required"),
+// })
+const greg=groupedBlocks["Trigger Actions"]
+const token=groupedBlocks["Token Actions"]
+const li=groupedBlocks["Liquidity"]
+const po=groupedBlocks["Portfolio Management"]
+const inst=groupedBlocks["Analytics"]
+const go=groupedBlocks["Governance"]
+const ev=groupedBlocks["Events"]
 const triggerActions = [{icon: <FlagIcon/>, text:"Initialise", toggle:false,groupedBlock:groupedBlocks["Trigger Actions"]}, {icon: <ConnectionIcon/>, text: "Connection", toggle:true,groupedBlock:groupedBlocks["Trigger Actions"]}];
 
 const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token", toggle:false}, {icon: <StakeTokenIcon/>, text: "StakeToken",  toggle:false}, {icon:<AllocateTokenIcon/>, text: "Allocate Token", toggle:false}, {icon: <YieldFarmingIcon/>, text: "Yield Farming", toggle:true}, {icon: <LendTokenIcon/>, text: "Lend Tokens", toggle:false}, {icon: <BorrowTokenIcon/>, text:"Borrow Token", toggle:false}, {icon:<RepayLoanIcon/>, text:"Repay Loan", toggle:false}];
