@@ -50,18 +50,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # - name: Type check
-      #   run: npm run type-check || npm run tsc
-        
-      # - name: Run tests
-      #   run: npm test
-
       - name: Build
         run: npm run build
-        env:
-        NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
-        OPENAI_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.OPENAI_API_KEY }}
-        BRIAN_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.BRIAN_API_KEY }}
+        env:  # Proper indentation here
+          NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
+          OPENAI_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.OPENAI_API_KEY }}
+          BRIAN_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.BRIAN_API_KEY }}
 
       - name: Cache build output
         uses: actions/cache@v4
