@@ -137,6 +137,74 @@ function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
   }
 }
 
+interface CustomBlockModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (values: { blockName: string; cairoCode: string }) => void;
+}
+
+const formSchema = z.object({
+  blockName: z.string().min(1, "Block name is required"),
+  cairoCode: z.string().min(1, "Cairo code is required"),
+});
+
+function CustomBlockModal({ isOpen, onClose, onSubmit }: CustomBlockModalProps) {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      blockName: "",
+      cairoCode: "",
+    },
+  });
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded-lg w-96">
+        <h2 className="text-lg font-bold mb-4">Create Custom Block</h2>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Block Name</label>
+            <input
+              {...form.register("blockName")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+            {form.formState.errors.blockName && (
+              <p className="text-red-500 text-sm">{form.formState.errors.blockName.message}</p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Cairo Code</label>
+            <textarea
+              {...form.register("cairoCode")}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              rows={4}
+            />
+            {form.formState.errors.cairoCode && (
+              <p className="text-red-500 text-sm">{form.formState.errors.cairoCode.message}</p>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="mr-2 px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Create
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
   const [{triggerActionToggle,
@@ -158,14 +226,14 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
-    solidityCode: z.string().min(1, "Solidity code is required"),
+    cairoCode: z.string().min(1, "Cairo code is required"),
   })
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       blockName: "",
-      solidityCode: "",
+      cairoCode: "",
     },
   })
   return (
@@ -400,12 +468,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               </div>}
             </div>
             
-            <div className="px-3 py-2">
-              <div className="flex gap-3">
-                <span><MenuIcon/></span>
-                <div className="text-black">Custom</div>
-              </div>      
+            <div className="px-3 py-2 cursor-pointer" onClick={() => setIsCustomModalOpen(true)}>
+            <div className="flex gap-3">
+              <span><MenuIcon /></span>
+              <div className="text-black">Custom</div>
             </div>
+          </div>
           </div>
         </div>
 
@@ -417,6 +485,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           </button>
         </div>
       </div>
+
+      <CustomBlockModal
+        isOpen={isCustomModalOpen}
+        onClose={() => setIsCustomModalOpen(false)}
+        onSubmit={onSubmitCustomBlock}
+      />
     </div>
   );
 
@@ -428,7 +502,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       borderColor: 'border-[#6C6C6C]',
       hoverBorderColor: 'hover:border-[#9C9C9C]',
       icon: Code,
-      code: values.solidityCode,
+      code: values.cairoCode,
     }
   
     addBlock(newCustomBlock)
