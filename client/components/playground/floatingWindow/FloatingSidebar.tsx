@@ -140,12 +140,12 @@ function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
 interface CustomBlockModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: { blockName: string; solidityCode: string }) => void;
+  onSubmit: (values: { blockName: string; cairoCode: string }) => void;
 }
 
 const formSchema = z.object({
   blockName: z.string().min(1, "Block name is required"),
-  solidityCode: z.string().min(1, "Solidity code is required"),
+  cairoCode: z.string().min(1, "Cairo code is required"),
 });
 
 function CustomBlockModal({ isOpen, onClose, onSubmit }: CustomBlockModalProps) {
@@ -153,7 +153,7 @@ function CustomBlockModal({ isOpen, onClose, onSubmit }: CustomBlockModalProps) 
     resolver: zodResolver(formSchema),
     defaultValues: {
       blockName: "",
-      solidityCode: "",
+      cairoCode: "",
     },
   });
 
@@ -175,14 +175,14 @@ function CustomBlockModal({ isOpen, onClose, onSubmit }: CustomBlockModalProps) 
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Solidity Code</label>
+            <label className="block text-sm font-medium text-gray-700">Cairo Code</label>
             <textarea
-              {...form.register("solidityCode")}
+              {...form.register("cairoCode")}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               rows={4}
             />
-            {form.formState.errors.solidityCode && (
-              <p className="text-red-500 text-sm">{form.formState.errors.solidityCode.message}</p>
+            {form.formState.errors.cairoCode && (
+              <p className="text-red-500 text-sm">{form.formState.errors.cairoCode.message}</p>
             )}
           </div>
           <div className="flex justify-end">
@@ -226,14 +226,14 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
-    solidityCode: z.string().min(1, "Solidity code is required"),
+    cairoCode: z.string().min(1, "Cairo code is required"),
   })
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       blockName: "",
-      solidityCode: "",
+      cairoCode: "",
     },
   })
   return (
@@ -502,7 +502,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       borderColor: 'border-[#6C6C6C]',
       hoverBorderColor: 'hover:border-[#9C9C9C]',
       icon: Code,
-      code: values.solidityCode,
+      code: values.cairoCode,
     }
   
     addBlock(newCustomBlock)
