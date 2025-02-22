@@ -83,7 +83,6 @@ fn test_crowdfunding_fund_success() {
     // mint user2
     let token_dispatcher = IERC20Dispatcher { contract_address: token_contract };
     token_dispatcher.mint(USER2(), 1000);
-    println!("User 2 balance: {}", token_dispatcher.balance_of(USER2()));
 
     cheat_caller_address(token_contract, USER2(), CheatSpan::TargetCalls(1));
     token_dispatcher.approve(contract, 1000);
