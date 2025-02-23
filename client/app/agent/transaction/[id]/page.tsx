@@ -418,6 +418,8 @@ export default function TransactionPage() {
     }
   };
 
+  
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
       {/* Dotted background */}
@@ -437,7 +439,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-            onClick={() => router.push("/agent/chat")}
+            onClick={createNewChat}
           >
             <span>Agent Chat</span>
             <Plus className="h-4 w-4" />
@@ -445,7 +447,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={() => router.push("/agent/transaction")}
+            onClick={createNewTxn}
           >
             <span>Agent Txn</span>
             <Plus className="h-4 w-4" />
