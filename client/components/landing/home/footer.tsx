@@ -99,7 +99,7 @@ const menuItems = [
 ]
 
 const socialMedia = [
-  { name: 'Twitter', icon: XIcon, href: '#' },
-  { name: 'Github', icon: GithubIcon, href: '#' },
-  { name: 'Telegram', icon: TelegramIcon, href: '#' },
+  { name: 'Twitter', icon: XIcon, href: 'https://x.com/StrkFinder' },
+  { name: 'Github', icon: GithubIcon, href: 'https://github.com/Shonen-Labs/StarkFinder' },
+  { name: 'Telegram', icon: TelegramIcon, href: 'https://t.me/starkfinder_bot/' },
 ]
