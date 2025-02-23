@@ -14,7 +14,7 @@
     "delete-webhook": "ts-node scripts/tg-set-webhook.ts"
   },
   "dependencies": {
-    "@argent/tma-wallet": "^1.17.1",
+    "@argent/tma-wallet": "^1.19.3",
     "@brian-ai/langchain": "^1.2.9",
     "@brian-ai/sdk": "^0.3.6",
     "@hookform/resolvers": "^3.10.0",
@@ -85,6 +85,7 @@
     "vite": "^6.0.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.21.0",
     "@types/dotenv-safe": "^8.1.6",
     "@types/node": "^20",
     "@types/prismjs": "^1.26.5",
@@ -92,13 +93,16 @@
     "@types/react-dom": "^18",
     "@types/react-syntax-highlighter": "^15.5.13",
     "concurrently": "^9.1.2",
-    "eslint": "^8",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.2.17",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^16.0.0",
     "postcss": "^8",
     "prisma": "^6.3.1",
     "raw-loader": "^4.0.2",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1"
   },
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "main": "index.js",
