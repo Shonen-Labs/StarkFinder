@@ -5,14 +5,39 @@ import { NextResponse, NextRequest } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { transactionProcessor } from "@/lib/transaction";
 
+
 import type {
   BrianResponse,
   BrianTransactionData,
 } from "@/lib/transaction/types";
 import {
+  ASK_OPENAI_AGENT_PROMPT,
   TRANSACTION_INTENT_PROMPT,
   transactionIntentPromptTemplate,
+  investmentRecommendationPromptTemplate,
 } from "@/prompts/prompts";
+import { 
+  MessagesAnnotation, 
+  StateGraph, 
+  MemorySaver 
+} from "@langchain/langgraph";
+import { 
+  ChatPromptTemplate, 
+  SystemMessagePromptTemplate, 
+  HumanMessagePromptTemplate 
+} from "@langchain/core/prompts";
+import { 
+  UserPreferences, 
+  InvestmentRecommendation  
+} from "../ask/types";
+import { 
+  fetchTokenData, 
+  fetchYieldData, 
+  getOrCreateUser, 
+  createOrGetChat, 
+  storeMessage 
+} from "../ask/heper";
+
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
 import { TxType } from "@prisma/client";
@@ -20,7 +45,23 @@ import { TxType } from "@prisma/client";
 const llm = new ChatOpenAI({
   model: "gpt-4",
   apiKey: process.env.OPENAI_API_KEY,
+  streaming: true,
 });
+
+const systemPrompt =
+  ASK_OPENAI_AGENT_PROMPT +
+  `\nThe provided chat history includes a summary of the earlier conversation.`;
+
+const systemMessage = SystemMessagePromptTemplate.fromTemplate([systemPrompt]);
+
+const userMessage = HumanMessagePromptTemplate.fromTemplate(["{user_query}"]);
+
+const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([
+  systemMessage,
+  userMessage,
+]);
+const prompt = askAgentPromptTemplate;
+// const chain = prompt.pipe(agent);
 
 async function getTransactionIntentFromOpenAI(
   prompt: string,
@@ -153,6 +194,114 @@ async function getTransactionIntentFromOpenAI(
   }
 }
 
+// Chat and Transaction Handler
+async function handleMessage({
+  prompt,
+  address,
+  chainId = "4012",
+  messages = [],
+  userPreferences,
+}: {
+  prompt: string;
+  address: string;
+  chainId?: string;
+  messages?: any[];
+  userPreferences?: UserPreferences;
+}): Promise<NextResponse> {
+  try {
+    const userId = address || "0x0";
+    await getOrCreateUser(userId);
+
+    const chat = await createOrGetChat(userId);
+
+    // Store the user's message
+    await storeMessage({
+      content: [{ role: "user", content: prompt }],
+      chatId: chat.id,
+      userId,
+    });
+    // Check if the prompt is transaction-related
+    if (
+      prompt.toLowerCase().includes("swap") ||
+      prompt.toLowerCase().includes("transfer") ||
+      prompt.toLowerCase().includes("bridge") ||
+      prompt.toLowerCase().includes("deposit") ||
+      prompt.toLowerCase().includes("withdraw")
+    ) {
+      const transactionIntent = await getTransactionIntentFromOpenAI(
+        prompt,
+        address,
+        chainId,
+        messages
+      );
+      const processedTx = await transactionProcessor.processTransaction(transactionIntent);
+
+      if (["deposit", "withdraw"].includes(transactionIntent.action)) {
+        processedTx.receiver = address;
+      }
+      const transaction = await storeTransaction(
+        userId,
+        transactionIntent.action,
+        {
+          ...processedTx,
+          chainId,
+          originalIntent: transactionIntent,
+        }
+      );
+      await storeMessage({
+        content: [
+          {
+            role: "assistant",
+            content: JSON.stringify(processedTx),
+            transactionId: transaction.id,
+          },
+        ],
+        chatId: chat.id,
+        userId,
+      });
+      return NextResponse.json({
+        result: [
+          {
+            data: {
+              description: processedTx.description,
+              transaction: {
+                type: processedTx.action,
+                data: processedTx,
+              },
+            },
+            conversationHistory: messages,
+          },
+        ],
+      });
+    } else {
+      // Handle general chat messages
+      const response = await llm.invoke([
+        await systemMessage.format({ brianai_answer: "How can I assist you?" }),
+        { role: "user", content: prompt },
+      ]);
+      await storeMessage({
+        content: [
+          {
+            role: "assistant",
+            content: response.content,
+          },
+        ],
+        chatId: chat.id,
+        userId,
+      });
+      return NextResponse.json({
+        answer: response.content,
+        chatId: chat.id,
+      });
+    }
+  } catch (error) {
+    console.error("Error handling message:", error);
+    return NextResponse.json(
+      { status: 500 }
+    );
+  }
+}
+
 async function getOrCreateTransactionChat(userId: string) {
   try {
     const chat = await prisma.chat.create({
@@ -180,30 +329,6 @@ async function storeTransaction(userId: string, type: string, metadata: any) {
     return transaction;
   } catch (error) {
     console.error("Error storing transaction:", error);
-    throw error;
-  }
-}
-
-async function storeMessage({
-  content,
-  chatId,
-  userId,
-}: {
-  content: any[];
-  chatId: string;
-  userId: string;
-}) {
-  try {
-    const message = await prisma.message.create({
-      data: {
-        content,
-        chatId,
-        userId,
-      },
-    });
-    return message;
-  } catch (error) {
-    console.error("Error storing message:", error);
     throw error;
   }
 }
