@@ -34,14 +34,18 @@ jobs:
         
       - name: Install snforge 0.33.0
         run: |
-          mkdir -p "${HOME}/.local/bin"
-          curl -L https://github.com/foundry-rs/starknet-foundry/releases/download/v0.33.0/starknet-foundry-0.33.0-x86_64-unknown-linux-gnu.tar.gz | tar xz -C "${HOME}/.local/bin" --strip-components=1
-          echo "${HOME}/.local/bin" >> $GITHUB_PATH
-      
-      - name: Verify installations
-        run: |
-          scarb --version
-          snforge --version
+              # Install Rust toolchain
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              source $HOME/.cargo/env
+    
+              # Add required target
+              rustup target add wasm32-unknown-unknown
+    
+              # Install specific snforge version using cargo
+              cargo install --locked --version 0.33.0 snforge --features=rust-serde
+    
+              # Verify installation
+              snforge --version
           
       - name: Install dependencies
         run: scarb clean && scarb fetch
