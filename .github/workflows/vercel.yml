@@ -3,7 +3,7 @@ name: Deploy Preview to Vercel
 on:
   pull_request:
     branches:
-      - main  # Change this if needed
+      - main  # Change if needed
 
 jobs:
   preview-deploy:
@@ -15,13 +15,10 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Change based on your project
+          node-version: 18  # Adjust based on your project
 
       - name: Install Vercel CLI
         run: npm install -g vercel
-
-      - name: Authenticate Vercel CLI
-        run: vercel login --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Pull Environment Variables
         run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
