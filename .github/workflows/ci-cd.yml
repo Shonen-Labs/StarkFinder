@@ -32,19 +32,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-scarb-
         
-      - name: Install snforge
-        env:
-          SNFORGE_VERSION: "0.33.0"
+      - name: Install snforge 0.33.0
         run: |
-          curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/v${SNFORGE_VERSION}/scripts/install.sh | sh
-          export PATH="${HOME}/.local/bin:${PATH}"
-          ${HOME}/.local/bin/snforge --version
-      
-      - name: Add snforge to PATH
-        run: |
+          mkdir -p "${HOME}/.local/bin"
+          curl -L https://github.com/foundry-rs/starknet-foundry/releases/download/v0.33.0/starknet-foundry-0.33.0-x86_64-unknown-linux-gnu.tar.gz | tar xz -C "${HOME}/.local/bin" --strip-components=1
           echo "${HOME}/.local/bin" >> $GITHUB_PATH
-          export PATH="${HOME}/.local/bin:${PATH}"
-
+      
+      - name: Verify installations
+        run: |
+          scarb --version
+          snforge --version
+          
       - name: Install dependencies
         run: scarb clean && scarb fetch
 
@@ -52,9 +50,7 @@ jobs:
         run: scarb build
 
       - name: Run snforge tests
-        run: snforge test
-        working-directory: contracts
-        
+        run: snforge test        
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
