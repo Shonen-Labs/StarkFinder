@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  email             String?             @unique
-  name              String?
-  address           String?             @unique
-  chats             Chat[]
-  messages          Message[]
-  transactions      Transaction[]
+  id                 String              @id @default(uuid())
+  email              String?             @unique
+  name               String?
+  address            String?             @unique
+  chats              Chat[]
+  deployedContracts  DeployedContract[]
   generatedContracts GeneratedContract[]
-  deployedContracts DeployedContract[]
+  messages           Message[]
+  transactions       Transaction[]
 }
 
 model Chat {
@@ -30,48 +30,48 @@ model Chat {
 }
 
 model Message {
-  id       String  @id @default(uuid())
-  content  Json[]
-  metadata Json?
-  replyTo  String?
-  chatId   String
-  userId   String
+  id        String   @id @default(uuid())
+  metadata  Json?
+  replyTo   String?
+  chatId    String
+  userId    String
+  content   Json[]
   createdAt DateTime @default(now())
-  Chat     Chat    @relation(fields: [chatId], references: [id])
-  User     User    @relation(fields: [userId], references: [id])
+  Chat      Chat     @relation(fields: [chatId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   type        TxType
-  status      TxStatus @default(PENDING)
+  status      TxStatus  @default(PENDING)
   metadata    Json?
   hash        String?
   userId      String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
-  User        User     @relation(fields: [userId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
 }
 
 model GeneratedContract {
-  id          String   @id @default(uuid())
-  name        String
-  sourceCode  String
-  userId      String
-  User        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
+  id         String   @id @default(uuid())
+  name       String
+  sourceCode String
+  userId     String
+  createdAt  DateTime @default(now())
+  User       User     @relation(fields: [userId], references: [id])
 }
 
 model DeployedContract {
-  id          String   @id @default(uuid())
-  name        String
-  sourceCode  String
-  userId      String
+  id              String   @id @default(uuid())
+  name            String
+  sourceCode      String
+  userId          String
   contractAddress String
-  classHash   String
+  classHash       String
   transactionHash String
-  User        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  User            User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {
