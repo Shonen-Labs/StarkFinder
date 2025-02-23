@@ -69,7 +69,7 @@ fn test_register() {
 
     // Spy events
     let mut spy = spy_events();
-    
+
     // Register user
     start_cheat_caller_address(starkfinder_address, USER1());
     start_cheat_block_timestamp(starkfinder_address, 86400);
@@ -84,11 +84,7 @@ fn test_register() {
 
     // Check emitted event
     let expected_event = starkfinder::Event::UserRegistered(
-        starkfinder::UserRegistered {
-            user: USER1(),
-            username: username,
-            timestamp: 86400,
-        }
+        starkfinder::UserRegistered { user: USER1(), username: username, timestamp: 86400 },
     );
     spy.assert_emitted(@array![(starkfinder_address, expected_event)]);
 }
@@ -123,7 +119,7 @@ fn test_send_transaction_should_panic_with_insufficient_balance() {
     let starkfinder = IStarkfinderDispatcher { contract_address: starkfinder_address };
 
     let amount = ONE_E18;
-    
+
     // Register user
     start_cheat_caller_address(starkfinder_address, USER1());
     start_cheat_block_timestamp(starkfinder_address, 86400);
@@ -205,12 +201,8 @@ fn test_send_transaction() {
     // Check emitted event
     let expected_event = starkfinder::Event::TransactionExecuted(
         starkfinder::TransactionExecuted {
-            from: USER1(),
-            to: USER2(),
-            amount,
-            fee: fee_amount,
-            timestamp: 86400
-        }
+            from: USER1(), to: USER2(), amount, fee: fee_amount, timestamp: 86400,
+        },
     );
     spy.assert_emitted(@array![(starkfinder_address, expected_event)]);
 }

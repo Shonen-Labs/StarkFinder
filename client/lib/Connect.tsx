@@ -101,9 +101,29 @@ const ConnectButton: React.FC<ConnectButtonProps> = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className={`bg-blue-600 hover:bg-blue-700 text-white ${className}`}>
-          <Wallet className="mr-2 h-4 w-4" />
-          {text}
+        <Button
+          className={`relative
+            bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500
+            hover:bg-gradient-to-br
+            shadow-lg shadow-blue-500/30
+            hover:shadow-xl hover:shadow-indigo-500/40
+            text-white
+            font-semibold
+            py-3 px-6
+            rounded-xl
+            transition-all
+            duration-300
+            hover:scale-105
+            active:scale-100
+            ${className}`}
+        >
+          <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 rounded-xl transition-all"></div>
+          <div className="relative flex items-center">
+            <Wallet className="mr-2 h-5 w-5 transition-transform group-hover:scale-110 group-hover:animate-bounce" />
+            <span className="text-sm tracking-wide group-hover:tracking-wider transition-all">
+              {text}
+            </span>
+          </div>
         </Button>
       </DialogTrigger>
       <ConnectModal />
