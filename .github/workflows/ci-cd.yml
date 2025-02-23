@@ -21,21 +21,6 @@ jobs:
 
       - name: Add Scarb to PATH
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
-        
-      - name: Install snforge
-        run: curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh
-      
-      - name: Add snforge to PATH
-        run: echo "${HOME}/.local/bin" >> $GITHUB_PATH
-
-      - name: Install dependencies
-        run: scarb clean && scarb fetch
-
-      - name: Build Starknet contracts
-        run: scarb build
-
-      - name: Run snforge tests
-        run: snforge test
 
       - name: Cache Scarb dependencies
         uses: actions/cache@v4
@@ -46,6 +31,30 @@ jobs:
           key: ${{ runner.os }}-scarb-${{ hashFiles('**/Scarb.toml') }}
           restore-keys: |
             ${{ runner.os }}-scarb-
+        
+      - name: Install snforge
+        env:
+          SNFORGE_VERSION: "0.33.0"
+        run: |
+          curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/v${SNFORGE_VERSION}/scripts/install.sh | sh
+          export PATH="${HOME}/.local/bin:${PATH}"
+          ${HOME}/.local/bin/snforge --version
+      
+      - name: Add snforge to PATH
+        run: |
+          echo "${HOME}/.local/bin" >> $GITHUB_PATH
+          export PATH="${HOME}/.local/bin:${PATH}"
+
+      - name: Install dependencies
+        run: scarb clean && scarb fetch
+
+      - name: Build Starknet contracts
+        run: scarb build
+
+      - name: Run snforge tests
+        run: snforge test
+        working-directory: contracts
+        
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
