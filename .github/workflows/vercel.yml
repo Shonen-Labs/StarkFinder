@@ -3,7 +3,7 @@ name: Deploy Preview to Vercel
 on:
   pull_request:
     branches:
-      - main  # Change if needed
+      - main
 
 jobs:
   preview-deploy:
@@ -15,7 +15,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Adjust based on your project
+          node-version: 20
 
       - name: Install Vercel CLI
         run: npm install -g vercel
@@ -25,7 +25,7 @@ jobs:
 
       - name: Deploy Preview to Vercel
         run: |
-          DEPLOY_URL=$(vercel --token=${{ secrets.VERCEL_TOKEN }})
+          DEPLOY_URL=$(vercel --token=${{ secrets.VERCEL_TOKEN }} --confirm)
           echo "DEPLOYMENT_URL=$DEPLOY_URL" >> $GITHUB_ENV
 
       - name: Comment Preview URL on PR
