@@ -44,7 +44,15 @@ const blockTypes = [
     { id: 'start', content: 'Upon Initialise', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Flag },
     { id: 'end', content: 'Disconnect', color: 'bg-[#451805]', borderColor: 'border-[#8A5035]', hoverBorderColor: 'hover:border-[#BE5B2A]', icon: Power },
 
-    // Token Actions
+    { 
+        id: 'custom', 
+        content: 'Custom Block', 
+        color: 'bg-[#1E3A3A]', 
+        borderColor: 'border-[#2A5656]', 
+        hoverBorderColor: 'hover:border-[#3E7D7D]', 
+        icon: Edit // Puedes usar otro ícono si prefieres
+    },
+    
     { id: 'swap', content: 'Swap Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: ArrowRightLeft },
     { id: 'stake', content: 'Stake Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: Landmark },
     { id: 'allocate', content: 'Allocate Tokens', color: 'bg-[#142321]', borderColor: 'border-[#245C3D]', hoverBorderColor: 'hover:border-[#6AFB8E]', icon: HandCoins },

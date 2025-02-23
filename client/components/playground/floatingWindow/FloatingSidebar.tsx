@@ -493,7 +493,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       />
     </div>
   );
-
+// function to addBlock.
   function onSubmitCustomBlock(values: z.infer<typeof formSchema>) {
     const newCustomBlock = {
       id: 'custom',
@@ -504,9 +504,27 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       icon: Code,
       code: values.cairoCode,
     }
-  
+    console.log("IT´S SEND TO BACKEND")
     addBlock(newCustomBlock)
     setIsCustomModalOpen(false)
     form.reset()
+    sendBlockToBackend(newCustomBlock)
     toast.success('Custom block added successfully')}
+
+    //Function to send the block code to API
+    async function sendBlockToBackend(block: any) {
+      try {
+          const response = await fetch("/api/custom-blocks", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(block),
+          });
+          if (!response.ok) throw new Error("Failed to send block to backend");
+  
+          console.log("✅ Block successfully sent to backend");
+      } catch (error) {
+          console.error("❌ Error sending block:", error);
+      }
+  }
+  
   }
