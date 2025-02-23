@@ -36,13 +36,17 @@ jobs:
         run: |
               # Install Rust toolchain
               curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-              source $HOME/.cargo/env
+              source "$HOME/.cargo/env"
     
-              # Add required target
-              rustup target add wasm32-unknown-unknown
+              # Install build dependencies
+              sudo apt-get update
+              sudo apt-get install -y build-essential pkg-config libssl-dev
     
-              # Install specific snforge version using cargo
-              cargo install --locked --version 0.33.0 snforge --features=rust-serde
+              # Install specific snforge version from source
+              cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
+              --tag v0.33.0 \
+              --bin snforge \
+              --features=rust-serde
     
               # Verify installation
               snforge --version
