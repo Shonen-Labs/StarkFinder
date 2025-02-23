@@ -486,6 +486,8 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           </button>
         </div>
       </div>
+
+      {/* Link to Example contracts page */}
       <div className="mt-4">
         <Link href="/devx/contracts"  className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium">
           Contracts
