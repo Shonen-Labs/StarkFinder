@@ -116,7 +116,7 @@ Contributions to the StarkFinder project are welcome. If you'd like to contribut
 Refer to [Contributing](./CONTRIBUTING.md) for contributing.
 
 ## License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://opensource.org/license/mit).
 
 
 
