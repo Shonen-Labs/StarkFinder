@@ -127,11 +127,10 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
       <button
         onClick={executeTransaction}
         disabled={isProcessing}
-        className={`w-full py-2 px-4 rounded-lg ${
-          isProcessing
-            ? "bg-white/20 cursor-not-allowed"
-            : "bg-white/10 hover:bg-white/20"
-        } transition-colors duration-200`}
+        className={`w-full py-2 px-4 rounded-lg ${isProcessing
+          ? "bg-white/20 cursor-not-allowed"
+          : "bg-white/10 hover:bg-white/20"
+          } transition-colors duration-200`}
       >
         {isProcessing ? "Processing Transaction..." : "Execute Transaction"}
       </button>
@@ -360,10 +359,10 @@ export default function TransactionPage() {
           prompt: inputValue,
           address: address,
           messages: messages,
-          userPreferences
-          // stream: true,
+          userPreferences,
+          stream: true,
         }),
-        signal: controller.signal, 
+        signal: controller.signal,
       });
 
       const data = await response.json();

@@ -96,6 +96,9 @@ Examples:
        calldata: ["USDC", "50", "Ethereum", "Arbitrum"]
      }
 
+If only one token is mentioned in a bridge request, assume the destination token (token2) is the same as the source token (token1). 
+For example, if a user says bridge 0.01 ETH from Ethereum to Arbitrum, interpret it as token1 = ETH and token2 = ETH.
+
 remember to take contract address based on type of token as there are different address for STRK and ETH that i have provided
 
 Current Context:
@@ -116,7 +119,7 @@ export const transactionIntentPromptTemplate = new PromptTemplate({
   template: `
   {TRANSACTION_INTENT_PROMPT}
 
-  dditional Context:
+  additional Context:
   Current Chain ID: {chainId}
 
   Conversation History:

@@ -1,87 +1,178 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BrianTransactionData, LayerswapNetwork, TransactionStep } from "../types";
+import type {
+  BrianTransactionData,
+  LayerswapNetwork,
+  TransactionStep,
+} from "../types";
 import { BaseTransactionHandler } from "./base";
 import { LayerswapClient } from "../../layerswap/client";
-import { StarknetChainId } from "@argent/tma-wallet";
-import { tokenize } from "prismjs";
 
 export class BridgeHandler extends BaseTransactionHandler {
   private layerswapClient: LayerswapClient;
-  private chainId: StarknetChainId;
 
-  constructor(apiKey: string, chainId: StarknetChainId) {
+  constructor(apiKey: string) {
     super();
-    this.chainId = chainId;
     this.layerswapClient = new LayerswapClient(apiKey);
   }
 
-    private async validateRoute(
-      sourceNetwork: string,
-      destinationNetwork: string,
-      sourceToken: string,
-      destinationToken: string
-    ): Promise<void> {
-      try {
-        const networks = await this.layerswapClient.getNetworks();
+  private async validateRoute(
+    sourceNetwork: string,
+    destinationNetwork: string,
+    sourceToken: string,
+    destinationToken: string,
+    amount: number
+  ): Promise<{
+    sourceNetwork: string;
+    sourceToken: string;
+    destinationNetwork: string;
+    destinationToken: string;
+  }> {
+    try {
+      const networks = await this.layerswapClient.getNetworks();
 
-        const sourceNetworkFormatted = await this.checkNetwork(sourceNetwork, networks);
-        const destinationNetworkFormatted = await this.checkNetwork(destinationNetwork, networks);
+      const sourceNetworkFormatted = await this.checkNetwork(
+        sourceNetwork,
+        networks
+      );
+      const destinationNetworkFormatted = await this.checkNetwork(
+        destinationNetwork,
+        networks
+      );
 
-        const sourceTokenFormatted = this.checkToken(sourceToken, sourceNetworkFormatted);
-        const destinationTokenFormatted = this.checkToken(destinationToken, destinationNetworkFormatted);
+      const sourceTokenFormatted = this.checkToken(
+        sourceToken,
+        sourceNetworkFormatted
+      );
+      const destinationTokenFormatted = this.checkToken(
+        destinationToken,
+        destinationNetworkFormatted
+      );
 
-        await this.checkDestination(sourceNetworkFormatted, sourceTokenFormatted, destinationNetworkFormatted, destinationTokenFormatted);
-      } catch (error) {
-        console.error('Route validation error:', error);
-        throw error;
+      await this.checkDestination(
+        sourceNetworkFormatted,
+        sourceTokenFormatted,
+        destinationNetworkFormatted,
+        destinationTokenFormatted
+      );
+
+      const limits = await this.layerswapClient.getLimits({
+        sourceNetwork: sourceNetworkFormatted.name,
+        sourceToken: sourceTokenFormatted,
+        destinationNetwork: destinationNetworkFormatted.name,
+        destinationToken: destinationTokenFormatted,
+      });
+
+      if (amount < limits.min_amount) {
+        throw new Error(`Bridge amount below min amount ${limits.min_amount}`);
+      }
+
+      if (amount > limits.max_amount) {
+        throw new Error(`Brigde amount above max amount ${limits.max_amount}`);
+      }
+
+      return {
+        sourceNetwork: sourceNetworkFormatted.name,
+        sourceToken: sourceTokenFormatted,
+        destinationNetwork: destinationNetworkFormatted.name,
+        destinationToken: destinationTokenFormatted,
+      };
+    } catch (error) {
+      console.error("Route validation error:", error);
+      throw error;
+    }
+  }
+
+  private async checkNetwork(
+    network: string,
+    networks: LayerswapNetwork[]
+  ): Promise<LayerswapNetwork> {
+    const normalized = network.toLowerCase();
+    for (const network of networks) {
+      if (network.name.toLowerCase().includes(normalized)) {
+        return network;
       }
     }
-  
-    private async checkNetwork(network: string, networks: LayerswapNetwork[]): Promise<LayerswapNetwork> {
-      const normalized = network.toLowerCase();
-      for (const network of networks){
-        if(network.name.toLowerCase().includes(normalized)){
-          return network;
+    throw new Error("Network not supported");
+  }
+
+  private checkToken(token: string, network: LayerswapNetwork): string {
+    const normalized = token.toLowerCase();
+    if (!network.tokens) {
+      throw new Error(`Tokens not available for ${network.display_name}`);
+    }
+    for (const token of network.tokens) {
+      const networkToken = token.symbol.toLowerCase();
+
+      if (
+        networkToken == normalized ||
+        networkToken.includes(normalized) ||
+        normalized.includes(networkToken)
+      ) {
+        return token.symbol;
+      }
+    }
+
+    throw new Error("Token not supported");
+  }
+
+  private async checkDestination(
+    sourceNetwork: LayerswapNetwork,
+    sourceToken: string,
+    destinationNetwork: LayerswapNetwork,
+    destinationToken: string
+  ) {
+    const destinations = await this.layerswapClient.getDestinations({
+      sourceNetwork: sourceNetwork.name,
+      sourceToken,
+    });
+
+    const accepted_destination = destinations.map(
+      (destination) => destination.display_name
+    );
+
+    for (const destination of destinations) {
+      if (destination.name === destinationNetwork.name) {
+        if (!destination.tokens) {
+          throw new Error("Tokens not available");
         }
-      }
-      throw new Error('Network not supported');
-    }
 
-    private checkToken(token: string, network: LayerswapNetwork): string {
-      const normalized = token.toLowerCase();
-      if(!network.tokens){
-        throw new Error('Tokens not available')
-      }
-      for (const token of network.tokens){
-        const networkToken = token.symbol.toLowerCase();
+        const accepted_destination_tokens = destination.tokens.map(
+          (token) => token.symbol
+        );
+        const token = destination.tokens.find(
+          (token) => token.symbol === destinationToken
+        );
 
-        if(networkToken == normalized || networkToken.includes(normalized) || normalized.includes(networkToken)){
-          return token.symbol
+        if (!token) {
+          throw new Error(
+            `${sourceToken} to ${destinationToken} bridge not supported. Supported tokens are: ${accepted_destination_tokens.join(
+              ", "
+            )}`
+          );
         }
+
+        return;
       }
-     
-      throw new Error('Token not supported');
     }
 
-    private async checkDestination(sourceNetwork: LayerswapNetwork, sourceToken: string, destinationNetwork: LayerswapNetwork, destinationToken: string) {
-      const destinations  = await this.layerswapClient.getDestinations({sourceNetwork: sourceNetwork.name, sourceToken});
+    const sources = await this.layerswapClient.getSources({
+      destinationNetwork: destinationNetwork.name,
+      destinationToken,
+    });
+    const accepted_sources = sources.map((source) => source.display_name);
 
-      for (const destination of destinations ){
-        if (destination.name == destinationNetwork.name){
-          if(!destination.tokens){
-            throw new Error('Tokens not available')
-          }
-          const token = destination.tokens.find((token) => { token.symbol == destinationToken });
-          if (!token) {
-            throw new Error(`${sourceNetwork.display_name} cannot bridge to ${destinationToken}`);
-          }
-        }
-      }
+    throw new Error(
+      `${sourceNetwork.display_name} to ${destinationNetwork.display_name} bridge not supported. ` +
+        `Supported bridges from source network ${
+          sourceNetwork.display_name
+        }: ${accepted_destination.join(", ")}. ` +
+        `Supported bridges to  destination network ${
+          destinationNetwork.display_name
+        }: ${accepted_sources.join(", ")}.`
+    );
+  }
 
-      throw new Error(`${sourceNetwork.display_name} - ${destinationNetwork.display_name} bridge not supported`);
-    }
-
-    async processSteps(
+  async processSteps(
     data: BrianTransactionData,
     params?: any
   ): Promise<TransactionStep[]> {
@@ -91,27 +182,29 @@ export class BridgeHandler extends BaseTransactionHandler {
       const destinationAddress =
         data.bridge?.destinationAddress || params.address;
 
+      // Validate route before proceeding
+      const formattedData = await this.validateRoute(
+        params.chain || "starknet",
+        params.dest_chain || "base",
+        params.token1.toUpperCase(),
+        params.token2.toUpperCase(),
+        Number.parseFloat(params.amount)
+      );
+
       // Create layerswap request
       const request = {
-        sourceNetwork: this.formatNetwork(params.chain || "starknet"),
-        destinationNetwork: this.formatNetwork(params.dest_chain || "base"),
-        sourceToken: params.token1.toUpperCase(),
-        destinationToken: params.token2.toUpperCase(),
+        sourceNetwork: formattedData.sourceNetwork,
+        destinationNetwork: formattedData.destinationNetwork,
+        sourceToken: formattedData.sourceToken,
+        destinationToken: formattedData.destinationToken,
         amount: Number.parseFloat(params.amount),
         sourceAddress,
         destinationAddress,
+        referenceId: params.reference_id,
       };
 
       // Log request for debugging
       console.log("Layerswap Request:", JSON.stringify(request, null, 2));
-
-      // Validate route before proceeding
-      await this.validateRoute(
-        request.sourceNetwork,
-        request.destinationNetwork,
-        request.sourceToken,
-        request.destinationToken
-      );
 
       try {
         const response = await this.layerswapClient.createSwap(request);

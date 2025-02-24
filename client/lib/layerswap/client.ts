@@ -18,11 +18,11 @@ export class LayerswapClient {
   async getNetworks(): Promise<LayerswapNetwork[]> {
     try {
       const response = await fetch(`${this.API_URL}/networks`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'X-LS-APIKEY': this.API_KEY,
-          'accept': 'application/json'
-        }
+          "X-LS-APIKEY": this.API_KEY,
+          accept: "application/json",
+        },
       });
 
       const data = await response.json();
@@ -32,9 +32,9 @@ export class LayerswapClient {
         throw new Error(`Failed to get available routes: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
-      console.error('Error getting available routes:', error);
+      console.error("Error getting available routes:", error);
       throw error;
     }
   }
@@ -50,14 +50,16 @@ export class LayerswapClient {
   }): Promise<LayerswapQuoteResponse> {
     try {
       // Format request to match their implementation
-      const useDepositAddress = params.sourceAddress.toLowerCase() == params.destinationAddress.toLowerCase();
+      const useDepositAddress =
+        params.sourceAddress.toLowerCase() ==
+        params.destinationAddress.toLowerCase();
       const reqParams = {
         source_network: params.sourceNetwork,
         source_token: params.sourceToken,
         destination_network: params.destinationNetwork,
         destination_token: params.destinationToken,
         source_address: params.sourceAddress,
-        use_deposit_address: useDepositAddress? "true" : "false",
+        use_deposit_address: useDepositAddress ? "true" : "false",
         amount: params.amount.toString(),
       };
 
@@ -69,7 +71,7 @@ export class LayerswapClient {
           "X-LS-APIKEY": this.API_KEY,
           "Content-Type": "application/json",
           accept: "application/json",
-        }
+        },
       });
 
       const data = await response.json();
@@ -79,9 +81,9 @@ export class LayerswapClient {
         throw new Error(`Failed to get transaction quote: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
-      console.error('Error getting transaction quote details:', error);
+      console.error("Error getting transaction quote details:", error);
       throw error;
     }
   }
@@ -99,14 +101,17 @@ export class LayerswapClient {
 
       const urlParams = new URLSearchParams(reqParams).toString();
 
-      const response = await fetch(`${this.API_URL}/destinations?` + urlParams, {
-        method: "GET",
-        headers: {
-          "X-LS-APIKEY": this.API_KEY,
-          "Content-Type": "application/json",
-          accept: "application/json",
+      const response = await fetch(
+        `${this.API_URL}/destinations?` + urlParams,
+        {
+          method: "GET",
+          headers: {
+            "X-LS-APIKEY": this.API_KEY,
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
         }
-      });
+      );
 
       const data = await response.json();
 
@@ -115,9 +120,12 @@ export class LayerswapClient {
         throw new Error(`Failed to get destinations: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
-      console.error('Error getting supported bridge destination routes:', error);
+      console.error(
+        "Error getting supported bridge destination routes:",
+        error
+      );
       throw error;
     }
   }
@@ -141,7 +149,7 @@ export class LayerswapClient {
           "X-LS-APIKEY": this.API_KEY,
           "Content-Type": "application/json",
           accept: "application/json",
-        }
+        },
       });
 
       const data = await response.json();
@@ -151,9 +159,12 @@ export class LayerswapClient {
         throw new Error(`Failed to get destinations: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
-      console.error('Error getting supported bridge destination routes:', error);
+      console.error(
+        "Error getting supported bridge destination routes:",
+        error
+      );
       throw error;
     }
   }
@@ -180,7 +191,7 @@ export class LayerswapClient {
           "X-LS-APIKEY": this.API_KEY,
           "Content-Type": "application/json",
           accept: "application/json",
-        }
+        },
       });
 
       const data = await response.json();
@@ -190,13 +201,13 @@ export class LayerswapClient {
         throw new Error(`Failed to get limits: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
-      console.error('Error getting route limits:', error);
+      console.error("Error getting route limits:", error);
       throw error;
     }
   }
-  
+
   async createSwap(params: {
     sourceNetwork: string;
     destinationNetwork: string;
@@ -209,7 +220,10 @@ export class LayerswapClient {
   }): Promise<LayerswapResponse> {
     try {
       // Format request to match their implementation
-      const useDepositAddress = params.sourceAddress.toLowerCase() == params.destinationAddress.toLowerCase();
+      const useDepositAddress =
+        params.sourceAddress.toLowerCase() ==
+        params.destinationAddress.toLowerCase();
+
       const formattedRequest = {
         destination_address: params.destinationAddress,
         reference_id: params.referenceId,
@@ -221,6 +235,11 @@ export class LayerswapClient {
         amount: params.amount,
         source_address: params.sourceAddress,
       };
+
+      console.log(
+        "Creating Layerswap request:",
+        JSON.stringify(formattedRequest, null, 2)
+      );
 
       const response = await fetch(`${this.API_URL}/swaps`, {
         method: "POST",
@@ -257,7 +276,7 @@ export class LayerswapClient {
         );
       }
 
-      return data;
+      return data.data;
     } catch (error) {
       if (error instanceof Error) {
         console.error("Layerswap error details:", {
@@ -271,9 +290,7 @@ export class LayerswapClient {
     }
   }
 
-  async getSwapInfo(
-    swapId: string
-  ): Promise<LayerswapResponse> {
+  async getSwapInfo(swapId: string): Promise<LayerswapResponse> {
     try {
       const response = await fetch(`${this.API_URL}/swaps/${swapId}`, {
         method: "GET",
@@ -281,7 +298,7 @@ export class LayerswapClient {
           "X-LS-APIKEY": this.API_KEY,
           "Content-Type": "application/json",
           accept: "application/json",
-        }
+        },
       });
 
       const data = await response.json();
@@ -291,12 +308,10 @@ export class LayerswapClient {
         throw new Error(`Failed to get limits: ${error.message}`);
       }
 
-      return data;
+      return data.data;
     } catch (error) {
-      console.error('Error getting route limits:', error);
+      console.error("Error getting route limits:", error);
       throw error;
     }
   }
-
-
 }

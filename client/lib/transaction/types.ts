@@ -172,7 +172,7 @@ export interface LayerswapNetwork{
   display_name: string;
   chain_id: string;
   token:  LayerswapToken;
-  transaction_explorer_template: String;
+  transaction_explorer_template: string;
   type: string;
   metadata?: Record<string, string>;
   deposit_methods?:  Record<string, string>;

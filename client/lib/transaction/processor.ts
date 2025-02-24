@@ -142,12 +142,9 @@ export class TransactionProcessor {
         throw new Error(`Unsupported action type: ${response.action}`);
       }
 
-
       const transactionData = this.createTransactionData(response);
 
-
       const transactions = await handler.processSteps(transactionData, response.extractedParams);
-
 
       const description = this.generateDescription(response);
 
