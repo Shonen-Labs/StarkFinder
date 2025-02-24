@@ -68,7 +68,7 @@ const Transfer: React.FC<TransferProps> = ({ setSelectedCommand }) => {
         </div>
 
         <div className="mt-4">
-          <p className="text-gray-400 text-sm mb-2">Receiver's Address</p>
+          <p className="text-gray-400 text-sm mb-2">Receiver&apos;s Address</p>
           <div className="bg-[#242424] rounded-lg p-4">
             <input
               type="text"
