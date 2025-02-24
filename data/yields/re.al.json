@@ -1,0 +1,430 @@
+[
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "ARCUSD-USDC",
+        "tvlUsd": 791541,
+        "apyBase": null,
+        "apyReward": 55.34305,
+        "apy": 55.34305,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "0df58858-b4f3-427c-95a9-c72d06bc1e45",
+        "apyPct1D": 0.82683,
+        "apyPct7D": 22.03153,
+        "apyPct30D": -36.85326,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 86,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 51.76623,
+        "sigma": 1.02547,
+        "count": 222,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xAEC9e50e3397f9ddC635C6c429C8C7eca418a143",
+            "0xc518A88c67CECA8B3f24c4562CB71deeB2AF86B7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 48.49642,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "tangible-arcana",
+        "symbol": "ARCUSD",
+        "tvlUsd": 683478,
+        "apyBase": 11.86551,
+        "apyReward": 0,
+        "apy": 11.86551,
+        "rewardTokens": [
+            "0xAEC9e50e3397f9ddC635C6c429C8C7eca418a143"
+        ],
+        "pool": "f6a1dfb8-8fde-4272-a4c2-1460f3ebd097",
+        "apyPct1D": -3.33482,
+        "apyPct7D": -6.40314,
+        "apyPct30D": -59.7627,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 29.03495,
+        "sigma": 0.96664,
+        "count": 256,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x83feDBc0B85c6e29B589aA6BdefB1Cc581935ECD"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 45.52271,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "CVR-PEARL",
+        "tvlUsd": 540039,
+        "apyBase": null,
+        "apyReward": 10.73098,
+        "apy": 10.73098,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "7134c1f8-5a23-472b-9499-f055618ae353",
+        "apyPct1D": 0.01804,
+        "apyPct7D": -0.12039,
+        "apyPct30D": -25.74532,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 41.78914,
+        "sigma": 1.69778,
+        "count": 251,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xB08F026f8a096E6d92eb5BcbE102c273A7a2d51C",
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 10.05336,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "DAI-USDC",
+        "tvlUsd": 228864,
+        "apyBase": null,
+        "apyReward": 53.11426,
+        "apy": 53.11426,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "9dafe441-df44-49fd-9ee1-92c11ce93c8c",
+        "apyPct1D": 1.05701,
+        "apyPct7D": 14.83081,
+        "apyPct30D": -26.15262,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 96,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 26.82543,
+        "sigma": 1.03251,
+        "count": 166,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x75d0cBF342060b14c2fC756fd6E717dFeb5B1B70",
+            "0xc518A88c67CECA8B3f24c4562CB71deeB2AF86B7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 32.49473,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "WREETH-USDC",
+        "tvlUsd": 189946,
+        "apyBase": null,
+        "apyReward": 105.40729,
+        "apy": 105.40729,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "ab7faa79-0460-4034-99dc-d19db1d4108e",
+        "apyPct1D": 6.72664,
+        "apyPct7D": 56.80992,
+        "apyPct30D": -145.39363,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 95,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 57.161,
+        "sigma": 1.50971,
+        "count": 145,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x90c6E93849E06EC7478ba24522329d14A5954Df4",
+            "0xc518A88c67CECA8B3f24c4562CB71deeB2AF86B7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 49.82672,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "USDC-PEARL",
+        "tvlUsd": 28899,
+        "apyBase": null,
+        "apyReward": 174.77611,
+        "apy": 174.77611,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "fc29b447-7d7b-40c5-a939-a7432810d7f2",
+        "apyPct1D": 8.14921,
+        "apyPct7D": -58.06302,
+        "apyPct30D": -462.84496,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 87,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 1351.69022,
+        "sigma": 6.95867,
+        "count": 153,
+        "outlier": true,
+        "underlyingTokens": [
+            "0xc518A88c67CECA8B3f24c4562CB71deeB2AF86B7",
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 414.7039,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "USTB-ARCUSD",
+        "tvlUsd": 24677,
+        "apyBase": null,
+        "apyReward": 60.11704,
+        "apy": 60.11704,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "8147a152-6f68-4b73-abef-7cfe8e5c79e9",
+        "apyPct1D": 3.31747,
+        "apyPct7D": 21.39095,
+        "apyPct30D": -58.99041,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 94,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 50.54859,
+        "sigma": 1.19742,
+        "count": 251,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x83feDBc0B85c6e29B589aA6BdefB1Cc581935ECD",
+            "0xAEC9e50e3397f9ddC635C6c429C8C7eca418a143"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 56.73078,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "USTB-WREETH",
+        "tvlUsd": 19068,
+        "apyBase": null,
+        "apyReward": 15.98363,
+        "apy": 15.98363,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "db5b0500-429b-4d55-ae39-a339f3659a88",
+        "apyPct1D": 1.06209,
+        "apyPct7D": -6.86548,
+        "apyPct30D": -177.11428,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 61.90822,
+        "sigma": 1.53094,
+        "count": 251,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x83feDBc0B85c6e29B589aA6BdefB1Cc581935ECD",
+            "0x90c6E93849E06EC7478ba24522329d14A5954Df4"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 47.78509,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "UKRE-ARCUSD",
+        "tvlUsd": 15544,
+        "apyBase": null,
+        "apyReward": 27.35735,
+        "apy": 27.35735,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "af7247a8-47e4-4b72-ab5d-d0c79adfa712",
+        "apyPct1D": null,
+        "apyPct7D": -1.59176,
+        "apyPct30D": null,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 61,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 59.7505,
+        "sigma": 1.8314,
+        "count": 183,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x835d3E1C0aA079C6164AAd21DCb23E60eb71AF48",
+            "0xAEC9e50e3397f9ddC635C6c429C8C7eca418a143"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 36.19575,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "USTB-PEARL",
+        "tvlUsd": 14821,
+        "apyBase": null,
+        "apyReward": 388.15111,
+        "apy": 388.15111,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "f36170db-3396-4b4c-887b-2a7c06fd1875",
+        "apyPct1D": 10.15473,
+        "apyPct7D": 27.20409,
+        "apyPct30D": 53.1537,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 98,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 197.8058,
+        "sigma": 2.13197,
+        "count": 244,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x83feDBc0B85c6e29B589aA6BdefB1Cc581935ECD",
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 265.7801,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Re.al",
+        "project": "pearl-v2",
+        "symbol": "RWA-WREETH",
+        "tvlUsd": 14641,
+        "apyBase": null,
+        "apyReward": 8.44491,
+        "apy": 8.44491,
+        "rewardTokens": [
+            "0xCE1581d7b4bA40176f0e219b2CaC30088Ad50C7A"
+        ],
+        "pool": "16c6e18b-1c6e-4957-b537-02aa82f8ecf3",
+        "apyPct1D": 1.17768,
+        "apyPct7D": -4.70188,
+        "apyPct30D": -192.06588,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 52,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 171.17758,
+        "sigma": 2.77171,
+        "count": 251,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x4644066f535Ead0cde82D209dF78d94572fCbf14",
+            "0x90c6E93849E06EC7478ba24522329d14A5954Df4"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 102.34084,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

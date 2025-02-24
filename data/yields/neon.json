@@ -1,0 +1,116 @@
+[
+    {
+        "chain": "Neon",
+        "project": "lendos",
+        "symbol": "WNEON",
+        "tvlUsd": 196347,
+        "apyBase": 1e-05,
+        "apyReward": 19.99999,
+        "apy": 20,
+        "rewardTokens": [
+            "0x202C35e517Fa803B537565c40F0a6965D7204609"
+        ],
+        "pool": "13b2fb86-708d-47cf-bd1a-e91856fe58cc",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 64,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 21.5587,
+        "sigma": 0.20733,
+        "count": 220,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x202C35e517Fa803B537565c40F0a6965D7204609"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 20,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neon",
+        "project": "lendos",
+        "symbol": "USDC",
+        "tvlUsd": 13051,
+        "apyBase": 0.5068,
+        "apyReward": 14.4932,
+        "apy": 15,
+        "rewardTokens": [
+            "0xEA6B04272f9f62F997F666F07D3a974134f7FFb9"
+        ],
+        "pool": "f08a0990-62fd-4d90-9243-8e3a9baa5772",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": null,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 56.99999999999999,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 14.8385,
+        "sigma": 0.07114,
+        "count": 188,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xEA6B04272f9f62F997F666F07D3a974134f7FFb9"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 15,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neon",
+        "project": "lendos",
+        "symbol": "SOL",
+        "tvlUsd": 11168,
+        "apyBase": 0,
+        "apyReward": 20,
+        "apy": 20,
+        "rewardTokens": [
+            "0x5f38248f339Bf4e84A2caf4e4c0552862dC9F82a"
+        ],
+        "pool": "27e06a5a-f80e-44e7-b814-1fdb517d413a",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 55.00000000000001,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 23.16955,
+        "sigma": 0.39613,
+        "count": 182,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x5f38248f339Bf4e84A2caf4e4c0552862dC9F82a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 20,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

@@ -1,0 +1,1245 @@
+[
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "NEAR-WETH",
+        "tvlUsd": 298157,
+        "apyBase": null,
+        "apyReward": 1.28871,
+        "apy": 1.28871,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "18844044-cd09-4085-865b-3ce584ce0779",
+        "apyPct1D": 0.01995,
+        "apyPct7D": 0.00246,
+        "apyPct30D": -0.1229,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 74,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 7.91406,
+        "sigma": 0.25919,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d",
+            "0xC9BdeEd33CD01541e1eeD10f90519d2C06Fe3feB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.31019,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "WETH",
+        "tvlUsd": 291117,
+        "apyBase": 0.84662,
+        "apyReward": 0,
+        "apy": 0.84662,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "1ee8d252-1677-4e84-8f8a-f052517893a5",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0.00331,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 93,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 2.77392,
+        "sigma": 0.14098,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xc9bdeed33cd01541e1eed10f90519d2c06fe3feb"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.84564,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "STNEAR",
+        "tvlUsd": 262376,
+        "apyBase": 5e-05,
+        "apyReward": 0,
+        "apy": 5e-05,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "64f9ed96-879f-4064-abd9-f29f6eac8a20",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 81,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.8793,
+        "sigma": 0.05323,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x07F9F7f963C5cD2BBFFd30CcfB964Be114332E30"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 5e-05,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "WBTC",
+        "tvlUsd": 205697,
+        "apyBase": 0.01905,
+        "apyReward": 0,
+        "apy": 0.01905,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "de293a32-2aac-41a7-b104-027e9ee2a4d4",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": -3e-05,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 1.62346,
+        "sigma": 0.10323,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xF4eB217Ba2454613b15dBdea6e5f22276410e89e"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.01905,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDT.E-NEAR",
+        "tvlUsd": 182867,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "25fbb9db-b4da-4bd0-92db-3fab14caedcc",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDC.E-NEAR",
+        "tvlUsd": 116885,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "4925a663-c8cb-481e-bd63-eed0bd2750cf",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDT.E-USDC.E",
+        "tvlUsd": 111867,
+        "apyBase": null,
+        "apyReward": 1.56126,
+        "apy": 1.56126,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "cafaa726-24ed-4626-b30c-a91a4b1caa46",
+        "apyPct1D": -0.06088,
+        "apyPct7D": -0.00709,
+        "apyPct30D": -0.79214,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 55.00000000000001,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 5.24996,
+        "sigma": 0.19827,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
+            "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.74402,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "USDT.E",
+        "tvlUsd": 93923,
+        "apyBase": 0.71395,
+        "apyReward": 0,
+        "apy": 0.71395,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "86892379-36f9-4d3d-9b8f-c12c6a2ed1af",
+        "apyPct1D": 0,
+        "apyPct7D": -0.01211,
+        "apyPct30D": -0.13272,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 88,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 4.05932,
+        "sigma": 0.19913,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x4988a896b1227218e4A686fdE5EabdcAbd91571f"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.75944,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "NEAR-WBTC",
+        "tvlUsd": 79774,
+        "apyBase": null,
+        "apyReward": 4.81658,
+        "apy": 4.81658,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "026e2ec6-06b2-467f-a67f-1522932ca028",
+        "apyPct1D": -0.01169,
+        "apyPct7D": -0.01307,
+        "apyPct30D": -0.79235,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 53,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 13.82852,
+        "sigma": 0.37498,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d",
+            "0xF4eB217Ba2454613b15dBdea6e5f22276410e89e"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.95834,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "NEAR",
+        "tvlUsd": 78100,
+        "apyBase": 1.16939,
+        "apyReward": 0,
+        "apy": 1.16939,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "81fe1f49-03eb-400d-b8b3-533ebbef535b",
+        "apyPct1D": 0,
+        "apyPct7D": 0.01559,
+        "apyPct30D": 0.06505,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 56.00000000000001,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 2.18019,
+        "sigma": 0.12788,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.14517,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "NEAR-TRI",
+        "tvlUsd": 57457,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "4c50259e-75c3-44c4-a8af-ec514c22e2b2",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 3.6051,
+        "sigma": 0.68086,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d",
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "NEAR-TRI",
+        "tvlUsd": 57176,
+        "apyBase": null,
+        "apyReward": 12.44436,
+        "apy": 12.44436,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "f39895c5-23ba-48df-9154-8d55b329ca97",
+        "apyPct1D": 0.05538,
+        "apyPct7D": -0.07985,
+        "apyPct30D": 0.27415,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 41.70294,
+        "sigma": 0.8194,
+        "count": 872,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d",
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 12.35456,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "PAD-NEAR",
+        "tvlUsd": 54185,
+        "apyBase": null,
+        "apyReward": 14.61238,
+        "apy": 14.61238,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB",
+            "0x34F291934b88c7870B7A17835B926B264fc13a81"
+        ],
+        "pool": "c4ad7fd9-657e-4843-a2d0-3a3715af3a59",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": -0.0628,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 26.49654,
+        "sigma": 0.29329,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x34F291934b88c7870B7A17835B926B264fc13a81",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 14.63857,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "STNEAR-NEAR",
+        "tvlUsd": 50019,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "e1ce68bf-cd8d-4611-a705-062bc0a41256",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 3.04833,
+        "sigma": 0.19149,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x07F9F7f963C5cD2BBFFd30CcfB964Be114332E30",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDC.E-NEAR",
+        "tvlUsd": 38749,
+        "apyBase": null,
+        "apyReward": 9.88729,
+        "apy": 9.88729,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "aa07ad44-1598-4222-85cb-ad3fd73a421e",
+        "apyPct1D": -0.14846,
+        "apyPct7D": -0.08247,
+        "apyPct30D": -2.55693,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 52,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 21.66728,
+        "sigma": 0.55568,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 10.56183,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "LINEAR-NEAR",
+        "tvlUsd": 37436,
+        "apyBase": null,
+        "apyReward": 122.96036,
+        "apy": 122.96036,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB",
+            "0x918dBe087040A41b786f0Da83190c293DAe24749"
+        ],
+        "pool": "8579e56e-3aca-478e-bdfe-82a46e8e95ef",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 65,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 113.52606,
+        "sigma": 0.32557,
+        "count": 935,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x918dBe087040A41b786f0Da83190c293DAe24749",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 122.96036,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDC-USDT",
+        "tvlUsd": 36067,
+        "apyBase": null,
+        "apyReward": 4.29959,
+        "apy": 4.29959,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "e3201350-cd83-4335-bfd2-88da279b4d50",
+        "apyPct1D": -0.16889,
+        "apyPct7D": -0.01415,
+        "apyPct30D": -2.204,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 52,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 9.62181,
+        "sigma": 0.32781,
+        "count": 842,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x3fADE6094373f7A91A91D4607b226791fB3BCEAf"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.79062,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "STAUR-AURORA",
+        "tvlUsd": 33078,
+        "apyBase": null,
+        "apyReward": 3.30931,
+        "apy": 3.30931,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "4f1e129b-7add-4930-b0e6-77cec1b8303c",
+        "apyPct1D": -0.09625,
+        "apyPct7D": -0.01097,
+        "apyPct30D": -0.00976,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 11.1586,
+        "sigma": 0.45196,
+        "count": 564,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x8A7feB26ee5b202804AC11Dd5a739A945C5De11d",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 3.24888,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "USDC.E",
+        "tvlUsd": 32427,
+        "apyBase": 4.03429,
+        "apyReward": 0,
+        "apy": 4.03429,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "2573bfd8-1f72-4911-9c8b-881acbb32f56",
+        "apyPct1D": 0,
+        "apyPct7D": -0.03742,
+        "apyPct30D": -0.11423,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 66,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 5.32664,
+        "sigma": 0.10539,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xB12BFcA5A55806AaF64E99521918A4bf0fC40802"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.07279,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "NEAR-FLX",
+        "tvlUsd": 31558,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "bfcb6f88-0e9c-4e55-a620-8c7fd3ad867e",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 6.94681,
+        "sigma": 0.65422,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d",
+            "0xea62791aa682d455614eaA2A12Ba3d9A2fD197af"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDT-USDT.E",
+        "tvlUsd": 26839,
+        "apyBase": null,
+        "apyReward": 11.4182,
+        "apy": 11.4182,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "pool": "05376b7e-4359-466c-87f4-d0a56a56e01b",
+        "apyPct1D": -0.23949,
+        "apyPct7D": -0.01902,
+        "apyPct30D": -4.20296,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 19.89853,
+        "sigma": 0.29027,
+        "count": 315,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x261ed544822455101F5D2Baa66ED5C7A004A42C7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 12.50847,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDT.E-NEAR",
+        "tvlUsd": 26287,
+        "apyBase": null,
+        "apyReward": 14.57484,
+        "apy": 14.57484,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "7be4da26-101b-4de7-8430-32d6408debe6",
+        "apyPct1D": -0.19785,
+        "apyPct7D": -0.12628,
+        "apyPct30D": -3.45558,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 53,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 21.95854,
+        "sigma": 0.56362,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 15.37961,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDT.E-TRI",
+        "tvlUsd": 25397,
+        "apyBase": null,
+        "apyReward": 15.08563,
+        "apy": 15.08563,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "c8296616-cde5-415b-a50e-d7ff4a7d4336",
+        "apyPct1D": -0.23589,
+        "apyPct7D": -0.02937,
+        "apyPct30D": -3.29283,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 36.81204,
+        "sigma": 0.54241,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x4988a896b1227218e4A686fdE5EabdcAbd91571f",
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 15.83965,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "AURORA-NEAR",
+        "tvlUsd": 23020,
+        "apyBase": null,
+        "apyReward": 4.75525,
+        "apy": 4.75525,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "f18de520-a118-49cc-a7d3-2f2015d61600",
+        "apyPct1D": -0.03654,
+        "apyPct7D": 0.06697,
+        "apyPct30D": 0.0356,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 53,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 19.04153,
+        "sigma": 0.38638,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.62807,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "ATUST-NEAR",
+        "tvlUsd": 22117,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "8e6476e5-02bb-457f-9fe1-ae59d812c37a",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 869,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x5ce9F0B6AFb36135b5ddBF11705cEB65E634A9dC",
+            "0xC42C30aC6Cc15faC9bD938618BcaA1a1FaE8501d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDC-USDC.E",
+        "tvlUsd": 18077,
+        "apyBase": null,
+        "apyReward": 16.95291,
+        "apy": 16.95291,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "pool": "0a6bfca7-0715-4c45-b9af-0a5914621aa5",
+        "apyPct1D": -0.35741,
+        "apyPct7D": 1.15368,
+        "apyPct30D": -4.03412,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 22.04617,
+        "sigma": 0.24505,
+        "count": 315,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x19e91C9b155D2A8B47B74e9e100f28355AC13879"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 17.39771,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "AURORA-TRI",
+        "tvlUsd": 17533,
+        "apyBase": null,
+        "apyReward": 8.84455,
+        "apy": 8.84455,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "c58d3242-7cdf-415b-a0df-015a5acd2e79",
+        "apyPct1D": -0.08001,
+        "apyPct7D": -0.01365,
+        "apyPct30D": -0.69437,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 31.77156,
+        "sigma": 0.61461,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79",
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 8.91544,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDT-AURORA",
+        "tvlUsd": 15229,
+        "apyBase": null,
+        "apyReward": 20.12308,
+        "apy": 20.12308,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "pool": "61d1c73d-262f-4384-b988-d6ab7084c6d5",
+        "apyPct1D": -0.29284,
+        "apyPct7D": 0.34271,
+        "apyPct30D": -4.38932,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 56.00000000000001,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 36.68908,
+        "sigma": 0.63945,
+        "count": 315,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x80Da25Da4D783E57d2FCdA0436873A193a4BEccF",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 21.00988,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDC-USDT-USN",
+        "tvlUsd": 13174,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "78f76a75-8ed3-4ad9-8e2e-3c3f295363d3",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 3.27,
+        "sigma": 0.4441,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x87BCC091d0A7F9352728100268Ac8D25729113bB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "USDC-AURORA",
+        "tvlUsd": 12768,
+        "apyBase": null,
+        "apyReward": 24.00174,
+        "apy": 24.00174,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "pool": "7b707722-3823-4d81-8ee1-f5e3728f3de7",
+        "apyPct1D": -0.33364,
+        "apyPct7D": -0.20086,
+        "apyPct30D": -0.16839,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 60,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 35.60974,
+        "sigma": 0.62353,
+        "count": 315,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x368EBb46ACa6b8D0787C96B2b20bD3CC3F2c45F7",
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 24.21009,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "aurigami",
+        "symbol": "PLY",
+        "tvlUsd": 12403,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x09c9d464b58d96837f8d8b6f4d9fe4ad408d3a4f"
+        ],
+        "pool": "84739767-8237-4e44-8b77-eb820aebfc2f",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 7.90824,
+        "sigma": 0.61115,
+        "count": 944,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x09C9D464b58d96837f8d8b6f4d9fE4aD408d3A4f"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Aurora",
+        "project": "trisolaris",
+        "symbol": "AURORA-WETH",
+        "tvlUsd": 11402,
+        "apyBase": null,
+        "apyReward": 3.20008,
+        "apy": 3.20008,
+        "rewardTokens": [
+            "0xFa94348467f64D5A457F75F8bc40495D33c65aBB"
+        ],
+        "pool": "ae6b4465-984c-4bd0-aae1-b20c05c3dcbd",
+        "apyPct1D": -0.02607,
+        "apyPct7D": 0.04902,
+        "apyPct30D": -0.33355,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 9.62113,
+        "sigma": 0.28221,
+        "count": 935,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x8BEc47865aDe3B172A928df8f990Bc7f2A3b9f79",
+            "0xC9BdeEd33CD01541e1eeD10f90519d2C06Fe3feB"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 3.22668,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

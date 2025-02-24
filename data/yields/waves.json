@@ -1,0 +1,426 @@
+[
+    {
+        "chain": "Waves",
+        "project": "pepeteam-swaves",
+        "symbol": "SWAVES",
+        "tvlUsd": 3163453,
+        "apyBase": 7.2825,
+        "apyReward": null,
+        "apy": 7.2825,
+        "rewardTokens": null,
+        "pool": "7701206b-170e-4439-8943-5c0f6cb3b8ca",
+        "apyPct1D": -1.61474,
+        "apyPct7D": -1.33642,
+        "apyPct30D": -5.47423,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 8.14575,
+        "sigma": 0.20516,
+        "count": 786,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 11.44531,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "WAVES-XTN",
+        "tvlUsd": 146195,
+        "apyBase": 9.83,
+        "apyReward": 4.9,
+        "apy": 14.73,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "90c5fa01-37b2-45bf-9c35-5bae52ed3e18",
+        "apyPct1D": 0.4,
+        "apyPct7D": 0.88,
+        "apyPct30D": -4.24,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 15.75545,
+        "sigma": 0.2572,
+        "count": 334,
+        "outlier": false,
+        "underlyingTokens": [
+            "WAVES",
+            "DG2xFkPdDwKUoBkzGAhQtLpSGzfXLiCYPEzeKH2Ad24p"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 19.32767,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "SWOP-XTN",
+        "tvlUsd": 23579,
+        "apyBase": 1.14,
+        "apyReward": 4.69,
+        "apy": 5.83,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "889a7f2a-5307-4c16-9dbb-bc7eba48a378",
+        "apyPct1D": 1.46,
+        "apyPct7D": 1.53,
+        "apyPct30D": -3.52,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 72,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 7.54262,
+        "sigma": 0.35778,
+        "count": 334,
+        "outlier": false,
+        "underlyingTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT",
+            "DG2xFkPdDwKUoBkzGAhQtLpSGzfXLiCYPEzeKH2Ad24p"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 6.34839,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "BTC-WXG-XTN",
+        "tvlUsd": 23313,
+        "apyBase": 0.81,
+        "apyReward": 2.96,
+        "apy": 3.77,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "6f9788e3-ccc6-4fc0-b192-a2409aeaee89",
+        "apyPct1D": 0.83,
+        "apyPct7D": -1.32,
+        "apyPct30D": null,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 75,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 5.13799,
+        "sigma": 0.45218,
+        "count": 15,
+        "outlier": false,
+        "underlyingTokens": [
+            "8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS",
+            "DG2xFkPdDwKUoBkzGAhQtLpSGzfXLiCYPEzeKH2Ad24p"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.81423,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "EGG-WAVES",
+        "tvlUsd": 22719,
+        "apyBase": 3.91,
+        "apyReward": 0.53,
+        "apy": 4.44,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "128d0ce3-629c-4623-97e8-ff7c6557d65d",
+        "apyPct1D": -3.15,
+        "apyPct7D": -8.9,
+        "apyPct30D": 2.44,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 60,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 9.7772,
+        "sigma": 0.52307,
+        "count": 334,
+        "outlier": false,
+        "underlyingTokens": [
+            "C1iWsKGqLwjHUndiQ7iXpdmPum9PeCDFfyXBdJJosDRS",
+            "WAVES"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 12.73098,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "PETE-WAVES",
+        "tvlUsd": 13912,
+        "apyBase": 7.3,
+        "apyReward": 0.02,
+        "apy": 7.32,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "35cd41a8-eeee-4721-aa8f-e792c73614fd",
+        "apyPct1D": -1.21,
+        "apyPct7D": 0.49,
+        "apyPct30D": 1.42,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 54,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 25.89613,
+        "sigma": 1.61782,
+        "count": 98,
+        "outlier": false,
+        "underlyingTokens": [
+            "GAzAEjApmjMYZKPzri2g2VUXNvTiQGF7KDYZFFsP3AEq",
+            "WAVES"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 20.92737,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "USDTU-WAVES",
+        "tvlUsd": 13161,
+        "apyBase": 4.38,
+        "apyReward": 0,
+        "apy": 4.38,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "badb8024-1a62-4db0-8ab4-cf2c0afd74eb",
+        "apyPct1D": -2.55,
+        "apyPct7D": -1.24,
+        "apyPct30D": 3.05,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 54,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 9.72981,
+        "sigma": 0.68423,
+        "count": 88,
+        "outlier": false,
+        "underlyingTokens": [
+            "B45iYkZVC9cudR2yxrsJnrM75StiTrwphbfQ7xkyisip",
+            "WAVES"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 8.33436,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "WBTCU-WAVES",
+        "tvlUsd": 12882,
+        "apyBase": 3.49,
+        "apyReward": 0,
+        "apy": 3.49,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "3a13b4a3-7dbf-47a2-a33c-be40902ab27c",
+        "apyPct1D": -1.74,
+        "apyPct7D": -4,
+        "apyPct30D": 2.39,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 65,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 5.50222,
+        "sigma": 0.3963,
+        "count": 88,
+        "outlier": false,
+        "underlyingTokens": [
+            "CPhNn4f754kvEvt7UFbC5NScGT7BNWuZivuEwPF2BpPY",
+            "WAVES"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 5.17146,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "WAVES-EURN",
+        "tvlUsd": 12707,
+        "apyBase": 4.35,
+        "apyReward": 0.09,
+        "apy": 4.44,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "3d8e99b2-8959-4c5d-b48e-9392f14384b3",
+        "apyPct1D": 4.35,
+        "apyPct7D": 0.97,
+        "apyPct30D": 1.62,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 69,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 2.68758,
+        "sigma": 0.18625,
+        "count": 170,
+        "outlier": false,
+        "underlyingTokens": [
+            "WAVES",
+            "DUk2YTxhRoAqMJLus4G2b3fR8hMHVh6eiyFx5r29VR6t"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.0089,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "BURN-XTN-WAVES",
+        "tvlUsd": 12027,
+        "apyBase": 3.12,
+        "apyReward": 0.11,
+        "apy": 3.23,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "892b52df-f4a5-42a5-93d0-79727099e258",
+        "apyPct1D": -0.22,
+        "apyPct7D": -16.41,
+        "apyPct30D": 2.82,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 71,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 4.38557,
+        "sigma": 0.32043,
+        "count": 61,
+        "outlier": false,
+        "underlyingTokens": [
+            "3SjxA2YLdfF9fTRbzLm9xFn27C6MW34W1YsdJ6Axefns",
+            "WAVES"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 5.53348,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Waves",
+        "project": "swop",
+        "symbol": "WAVES-USDT-ERC20",
+        "tvlUsd": 11490,
+        "apyBase": 19.99,
+        "apyReward": 33.17,
+        "apy": 53.16,
+        "rewardTokens": [
+            "Ehie5xYpeN8op1Cctc6aGUrqx8jq3jtf1DSjXDbfm7aT"
+        ],
+        "pool": "f4dbb620-e71b-488f-9413-927de0d8b422",
+        "apyPct1D": -65.91,
+        "apyPct7D": 15.79,
+        "apyPct30D": 20.6,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 93,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 50.74143,
+        "sigma": 1.03283,
+        "count": 99,
+        "outlier": false,
+        "underlyingTokens": [
+            "WAVES",
+            "9wc3LXNA4TEBsXyKtoLE9mrbDD7WMHXvXrCjZvabLAsi"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 57.0294,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

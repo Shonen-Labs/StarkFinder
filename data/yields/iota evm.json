@@ -1,0 +1,154 @@
+[
+    {
+        "chain": "IOTA EVM",
+        "project": "iolend",
+        "symbol": "WIOTA",
+        "tvlUsd": 5082322,
+        "apyBase": 0.00442,
+        "apyReward": 0.7834,
+        "apy": 0.78782,
+        "rewardTokens": [
+            "0xF5755e48B6F2F06F8ea904bdA26177CB3ca06Ff0"
+        ],
+        "pool": "eec098a8-6516-448c-ac70-77615c0bd02b",
+        "apyPct1D": -0.00229,
+        "apyPct7D": -0.0138,
+        "apyPct30D": -0.12495,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 93,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 5.29882,
+        "sigma": 0.35322,
+        "count": 178,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x6e47f8d48a01b44DF3fFF35d258A10A3AEdC114c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.8456,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "IOTA EVM",
+        "project": "iolend",
+        "symbol": "USDT",
+        "tvlUsd": 413256,
+        "apyBase": 3.60878,
+        "apyReward": 49.9581,
+        "apy": 53.56687,
+        "rewardTokens": [
+            "0xF5755e48B6F2F06F8ea904bdA26177CB3ca06Ff0"
+        ],
+        "pool": "341a959d-8ed9-4a18-955c-e54dfb4361b7",
+        "apyPct1D": -2.83791,
+        "apyPct7D": -4.67744,
+        "apyPct30D": -11.22482,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 84,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 64.8489,
+        "sigma": 0.47949,
+        "count": 178,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xC1B8045A6ef2934Cf0f78B0dbD489969Fa9Be7E4"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 60.56037,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "IOTA EVM",
+        "project": "iolend",
+        "symbol": "WETH",
+        "tvlUsd": 384106,
+        "apyBase": 1.12723,
+        "apyReward": 38.28888,
+        "apy": 39.4161,
+        "rewardTokens": [
+            "0xF5755e48B6F2F06F8ea904bdA26177CB3ca06Ff0"
+        ],
+        "pool": "fcfbdf16-a121-4909-a0a3-665f0a4ca57c",
+        "apyPct1D": 0.1059,
+        "apyPct7D": -0.18981,
+        "apyPct30D": -2.61585,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 85,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 44.12157,
+        "sigma": 0.35447,
+        "count": 178,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x160345fC359604fC6e70E3c5fAcbdE5F7A9342d8"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 40.44577,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "IOTA EVM",
+        "project": "iolend",
+        "symbol": "USDC.E",
+        "tvlUsd": 252146,
+        "apyBase": 3.38819,
+        "apyReward": 48.3078,
+        "apy": 51.69599,
+        "rewardTokens": [
+            "0xF5755e48B6F2F06F8ea904bdA26177CB3ca06Ff0"
+        ],
+        "pool": "e8d6f558-e0a1-453a-bd8b-f7e7129cc6dd",
+        "apyPct1D": -2.42327,
+        "apyPct7D": -1.78949,
+        "apyPct30D": -13.83316,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 72,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 66.91916,
+        "sigma": 0.43832,
+        "count": 109,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xFbDa5F676cB37624f28265A144A48B0d6e87d3b6"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 56.99071,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
