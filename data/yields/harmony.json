@@ -1,0 +1,36 @@
+[
+    {
+        "chain": "Harmony",
+        "project": "acryptos",
+        "symbol": "ONE",
+        "tvlUsd": 13952,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 1129.37,
+        "rewardTokens": null,
+        "pool": "f534c91a-4497-40e2-8b30-091385c4d0ad",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 80,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Aave",
+        "mu": 1129.37,
+        "sigma": 0,
+        "count": 912,
+        "outlier": true,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1129.37,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
