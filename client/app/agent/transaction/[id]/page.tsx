@@ -93,7 +93,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
 }) => {
   const { account } = useAccount();
   const [isProcessing, setIsProcessing] = React.useState(false);
-
+  console.log(transactions);
   const executeTransaction = async () => {
     if (!account) {
       onError(new Error("Wallet not connected"));
@@ -346,8 +346,11 @@ export default function TransactionPage() {
     setInputValue("");
     setIsLoading(true);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
+
     try {
-      const response = await fetch("/api/ask", {
+      const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -356,12 +359,16 @@ export default function TransactionPage() {
           prompt: inputValue,
           address: address,
           messages: messages,
-          userPreferences,
-          stream: true,
+          userPreferences
+          // stream: true,
         }),
+        signal: controller.signal, 
       });
 
       const data = await response.json();
+      console.log(data);
+
+      clearTimeout(timeoutId); // Clear timeout if fetch succeeds
 
       let agentMessage: Message;
 
@@ -404,7 +411,11 @@ export default function TransactionPage() {
 
       setMessages((prev) => [...prev, agentMessage]);
     } catch (error) {
-      console.error("Error:", error);
+      if ((error instanceof Error) && error.name === "AbortError") {
+        console.error("Frontend fetch request timed out");
+      } else {
+        console.error("Error:", error);
+      }
       const errorMessage: Message = {
         id: uuidv4(),
         role: "agent",

@@ -155,6 +155,8 @@ async function queryOpenAI({
   streamCallback?: (chunk: string) => Promise<void>;
 }): Promise<string> {
   try {
+    console.log("im in open ai now")
+    console.error(streamCallback === undefined);
     if (streamCallback) {
       const messages = [
         await systemMessage.format({ brianai_answer: brianaiResponse }),
@@ -191,6 +193,7 @@ async function queryOpenAI({
         },
       }
     );
+
     return response.messages[response.messages.length - 1].content as string;
   } catch (error) {
     console.error("OpenAI Error:", error);
@@ -204,6 +207,7 @@ async function queryBrianAI(
   streamCallback?: (chunk: string) => Promise<void>
 ): Promise<string> {
   try {
+    console.log("im in brian")
     const response = await axios.post(
       BRIAN_API_URL,
       {
@@ -215,6 +219,7 @@ async function queryBrianAI(
           "Content-Type": "application/json",
           "x-brian-api-key": BRIAN_API_KEY,
         },
+        timeout: 30000, // Increase timeout to 10 seconds (10000 ms)
       }
     );
 
@@ -289,6 +294,8 @@ async function generateInvestmentRecommendations(
     throw error;
   }
 }
+
+export const maxDuration = 500
 
 export async function POST(request: Request) {
   try {
@@ -391,6 +398,7 @@ export async function POST(request: Request) {
 
     // Non-streaming response
     const response = await queryBrianAI(prompt, currentChatId);
+    // console.log(response);
     if (!response) {
       throw new Error("Unexpected API response format");
     }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { transactionProcessor } from "@/lib/transaction";
 
@@ -15,7 +15,7 @@ import {
 } from "@/prompts/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
-import { TxType } from "@prisma/client";
+import type { TxType } from "@prisma/client";
 
 const llm = new ChatOpenAI({
   model: "gpt-4",
@@ -265,11 +265,11 @@ export async function POST(request: NextRequest) {
 
       const transaction = await storeTransaction(
         user.id,
-        transactionIntent.action,
+        transactionIntent.action.toUpperCase(),
         {
           ...processedTx,
           chainId,
-          originalIntent: transactionIntent,
+          originalIntent: transactionIntent
         }
       );
 

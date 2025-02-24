@@ -1,16 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BrianTransactionData, TransactionStep } from "../types";
+import type { BrianTransactionData, TransactionStep } from "../types";
 import { BaseTransactionHandler } from "./base";
 import { LayerswapClient } from "../../layerswap/client";
-
-// const NETWORK_MAPPING = {
-//   'starknet': 'STARKNET_MAINNET',
-//   'base': 'BASE_MAINNET',
-//   'ethereum': 'ETHEREUM_MAINNET',
-//   'arbitrum': 'ARBITRUM_MAINNET',
-//   'optimism': 'OPTIMISM_MAINNET'
-// } as const;
-
 
 export class BridgeHandler extends BaseTransactionHandler {
   private layerswapClient: LayerswapClient;
@@ -107,7 +98,7 @@ export class BridgeHandler extends BaseTransactionHandler {
         destinationNetwork: this.formatNetwork(params.dest_chain || "base"),
         sourceToken: params.token1.toUpperCase(),
         destinationToken: params.token2.toUpperCase(),
-        amount: parseFloat(params.amount),
+        amount: Number.parseFloat(params.amount),
         sourceAddress,
         destinationAddress,
       };
@@ -137,8 +128,7 @@ export class BridgeHandler extends BaseTransactionHandler {
       } catch (error: any) {
         if (error.message?.includes("ROUTE_NOT_FOUND_ERROR")) {
           throw new Error(
-            `Bridge route not available from ${request.sourceToken} on ${params.chain} to ${request.destinationToken} on ${params.dest_chain}. ` +
-              "You might need to bridge through an intermediate token like ETH."
+            `Bridge route not available from ${request.sourceToken} on ${params.chain} to ${request.destinationToken} on ${params.dest_chain}. You might need to bridge through an intermediate token like ETH.`
           );
         }
         throw error;

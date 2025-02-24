@@ -8,7 +8,7 @@ import type {
 } from "@/lib/transaction/types";
 
 export class LayerswapClient {
-  private readonly API_URL = "https://api.layerswap.io/api/v2/swaps";
+  private readonly API_URL = "https://api.layerswap.io/api/v2";
   private readonly API_KEY: string;
 
   constructor(apiKey: string) {
@@ -100,6 +100,8 @@ export class LayerswapClient {
           'accept': 'application/json'
         }
       });
+
+
 
       const data = await response.json();
 
