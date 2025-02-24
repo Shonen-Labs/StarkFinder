@@ -9,10 +9,42 @@ import type {
   BrianResponse,
   BrianTransactionData,
 } from "@/lib/transaction/types";
+
 import {
+  ASK_OPENAI_AGENT_PROMPT,
   TRANSACTION_INTENT_PROMPT,
+  INVESTMENT_RECOMMENDATION_PROMPT,
   transactionIntentPromptTemplate,
+  investmentRecommendationPromptTemplate,
 } from "@/prompts/prompts";
+
+import { 
+  START,
+  END,
+  MessagesAnnotation, 
+  StateGraph, 
+  MemorySaver 
+} from "@langchain/langgraph";
+
+import { 
+  ChatPromptTemplate, 
+  SystemMessagePromptTemplate, 
+  HumanMessagePromptTemplate 
+} from "@langchain/core/prompts";
+
+import { 
+  UserPreferences, 
+  InvestmentRecommendation  
+} from "../ask/types";
+
+import { 
+  fetchTokenData, 
+  fetchYieldData, 
+  getOrCreateUser, 
+  createOrGetChat, 
+  storeMessage 
+} from "../ask/heper";
+
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
 import { TxType } from "@prisma/client";
@@ -20,7 +52,97 @@ import { TxType } from "@prisma/client";
 const llm = new ChatOpenAI({
   model: "gpt-4",
   apiKey: process.env.OPENAI_API_KEY,
+  streaming: true,
 });
+
+const systemPrompt =
+  ASK_OPENAI_AGENT_PROMPT +
+  `\nThe provided chat history includes a summary of the earlier conversation.`;
+
+const systemMessage = SystemMessagePromptTemplate.fromTemplate([systemPrompt]);
+
+const userMessage = HumanMessagePromptTemplate.fromTemplate(["{user_query}"]);
+
+const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([
+  systemMessage,
+  userMessage,
+]);
+const prompt = askAgentPromptTemplate;
+
+// LangGraph workflow setup
+const initialCallModel = async (state: typeof MessagesAnnotation.State) => {
+  const messages = [
+    await systemMessage.format({ brianai_answer: "How can I assist you?" }),
+    ...state.messages,
+  ];
+  const response = await llm.invoke(messages);
+  return { messages: response };
+};
+
+const callModel = async (
+  state: typeof MessagesAnnotation.State,
+  chatId?: any
+) => {
+  if (!chatId) {
+    return await initialCallModel(state);
+  }
+  const actualChatId = chatId?.configurable?.additional_args?.chatId || chatId;
+  const chatHistory = await getChatHistory(actualChatId);
+  const currentMessage = state.messages[state.messages.length - 1];
+
+  if (chatHistory.length > 0) {
+    const summaryPrompt = `
+    Distill the following chat history into a single summary message. 
+    Include as many specific details as you can.
+    IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
+    `;
+    const summary = await llm.invoke([
+      ...chatHistory,
+      { role: "user", content: summaryPrompt },
+    ]);
+
+    const response = await llm.invoke([
+      await systemMessage.format({ brianai_answer: "How can I assist you?" }),
+      summary,
+      currentMessage,
+    ]);
+
+    return {
+      messages: [summary, currentMessage, response],
+    };
+  } else {
+    return await initialCallModel(state);
+  }
+};
+
+const workflow = new StateGraph(MessagesAnnotation)
+  .addNode("model", callModel)
+  .addEdge(START, "model")
+  .addEdge("model", END);
+const app = workflow.compile({ checkpointer: new MemorySaver() });
+
+// Fetch chat history
+async function getChatHistory(chatId: string) {
+  try {
+    const messages = await prisma.message.findMany({
+      where: { chatId },
+      orderBy: { id: "asc" },
+    });
+
+    const formattedHistory = messages.flatMap((msg: any) => {
+      const content = msg.content as any[];
+      return content.map((c) => ({
+        role: c.role,
+        content: c.content,
+      }));
+    });
+
+    return formattedHistory;
+  } catch (error) {
+    console.error("Error fetching chat history:", error);
+    return [];
+  }
+}
 
 async function getTransactionIntentFromOpenAI(
   prompt: string,
@@ -153,17 +275,232 @@ async function getTransactionIntentFromOpenAI(
   }
 }
 
+// Investment Recommendation Logic
+async function generateInvestmentRecommendations(
+  userPreferences: UserPreferences,
+  tokens: any[],
+  yields: any[],
+  messages: any[] = []
+): Promise<InvestmentRecommendation> {
+  try {
+    const conversationHistory = messages
+      .map((msg) => `${msg.role}: ${msg.content}`)
+      .join("\n");
+
+    const formattedPrompt = await investmentRecommendationPromptTemplate.format(
+      {
+        INVESTMENT_RECOMMENDATION_PROMPT,
+        userPreferences: JSON.stringify(userPreferences),
+        tokens: JSON.stringify(tokens),
+        yields: JSON.stringify(yields),
+        conversationHistory,
+      }
+    );
+
+    const jsonOutputParser = new StringOutputParser();
+    const response = await llm.pipe(jsonOutputParser).invoke(formattedPrompt);
+    const recommendationData = JSON.parse(response);
+
+    if (!recommendationData.data?.pools || !recommendationData.data?.strategy) {
+      throw new Error("Invalid recommendation format");
+    }
+
+    return {
+      solver: recommendationData.solver || "OpenAI-Investment-Advisor",
+      type: "recommendation",
+      extractedParams: {
+        riskTolerance:
+          recommendationData.extractedParams.riskTolerance ||
+          userPreferences.riskTolerance,
+        investmentHorizon:
+          recommendationData.extractedParams.investmentHorizon ||
+          userPreferences.investmentHorizon,
+        preferredAssets:
+          recommendationData.extractedParams.preferredAssets ||
+          userPreferences.preferredAssets,
+        preferredChains:
+          recommendationData.extractedParams.preferredChains ||
+          userPreferences.preferredChains,
+      },
+      data: recommendationData.data,
+    };
+  } catch (error) {
+    console.error("Error generating investment recommendations:", error);
+    throw error;
+  }
+}
+
+// Chat and Transaction Handler
+async function handleMessage({
+  prompt,
+  address,
+  chainId = "4012",
+  messages = [],
+  userPreferences,
+}: {
+  prompt: string;
+  address: string;
+  chainId?: string;
+  messages?: any[];
+  userPreferences?: UserPreferences;
+}): Promise<NextResponse> {
+  try {
+    const userId = address || "0x0";
+    await getOrCreateUser(userId);
+
+    // Determine if the prompt is transaction-related
+    const isTransactionPrompt =
+      prompt.toLowerCase().includes("swap") ||
+      prompt.toLowerCase().includes("transfer") ||
+      prompt.toLowerCase().includes("bridge") ||
+      prompt.toLowerCase().includes("deposit") ||
+      prompt.toLowerCase().includes("withdraw");
+
+    // Use getOrCreateTransactionChat for transaction prompts, otherwise use createOrGetChat
+    const chat = isTransactionPrompt
+      ? await getOrCreateTransactionChat(userId)
+      : await createOrGetChat(userId);
+
+    // Store the user's message
+    await storeMessage({
+      content: [{ role: "user", content: prompt }],
+      chatId: chat.id,
+      userId,
+    });
+
+    if (isTransactionPrompt) {
+      // Handle transaction-related prompts
+      const transactionIntent = await getTransactionIntentFromOpenAI(
+        prompt,
+        address,
+        chainId,
+        messages
+      );
+
+      const processedTx = await transactionProcessor.processTransaction(transactionIntent);
+
+      if (["deposit", "withdraw"].includes(transactionIntent.action)) {
+        processedTx.receiver = address;
+      }
+
+      const transaction = await storeTransaction(
+        userId,
+        transactionIntent.action,
+        {
+          ...processedTx,
+          chainId,
+          originalIntent: transactionIntent,
+        }
+      );
+      await storeMessage({
+        content: [
+          {
+            role: "assistant",
+            content: JSON.stringify(processedTx),
+            transactionId: transaction.id,
+          },
+        ],
+        chatId: chat.id,
+        userId,
+      });
+      return NextResponse.json({
+        result: [
+          {
+            data: {
+              description: processedTx.description,
+              transaction: {
+                type: processedTx.action,
+                data: processedTx,
+              },
+            },
+            conversationHistory: messages,
+          },
+        ],
+      });
+    } else if (prompt.toLowerCase().includes("recommend") || prompt.toLowerCase().includes("invest")) 
+      {
+        // Handle investment recommendations
+        const tokens = await fetchTokenData();
+        const yields = await fetchYieldData();
+
+        if (!userPreferences) {
+          throw new Error("User preferences are required for investment recommendations");
+        }
+
+        const recommendations = await generateInvestmentRecommendations(
+          userPreferences,
+          tokens,
+          yields,
+          messages
+        );
+
+        await storeMessage({
+          content: [
+            {
+              role: "assistant",
+              content: recommendations.data.description,
+              recommendationData: recommendations,
+            },
+          ],
+          chatId: chat.id,
+          userId,
+        });
+
+        return NextResponse.json({
+          result: [
+            {
+              data: {
+                description: recommendations.data.description,
+                recommendations,
+              },
+              conversationHistory: messages,
+            },
+          ],
+        });
+      } else {
+        
+      // Handle general chat messages
+      const response = await llm.invoke([
+        await systemMessage.format({ brianai_answer: "How can I assist you?" }),
+        { role: "user", content: prompt },
+      ]);
+      
+      await storeMessage({
+        content: [
+          {
+            role: "assistant",
+            content: response.content,
+          },
+        ],
+        chatId: chat.id,
+        userId,
+      });
+      return NextResponse.json({
+        answer: response.content,
+        chatId: chat.id,
+      });
+    }
+  } catch (error) {
+    console.error("Error handling message:", error);
+    return NextResponse.json(
+      { status: 500 }
+    );
+  }
+}
+
 async function getOrCreateTransactionChat(userId: string) {
   try {
-    const chat = await prisma.chat.create({
-      data: {
+    const chat = await prisma.chat.upsert({
+      where: { userId_type: { userId, type: "TRANSACTION" } },
+      update: {}, // No updates needed if the chat already exists
+      create: {
         userId,
         type: "TRANSACTION",
       },
     });
     return chat;
   } catch (error) {
-    console.error("Error creating transaction chat:", error);
+    console.error("Error creating or fetching transaction chat:", error);
     throw error;
   }
 }
@@ -184,34 +521,10 @@ async function storeTransaction(userId: string, type: string, metadata: any) {
   }
 }
 
-async function storeMessage({
-  content,
-  chatId,
-  userId,
-}: {
-  content: any[];
-  chatId: string;
-  userId: string;
-}) {
-  try {
-    const message = await prisma.message.create({
-      data: {
-        content,
-        chatId,
-        userId,
-      },
-    });
-    return message;
-  } catch (error) {
-    console.error("Error storing message:", error);
-    throw error;
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt, address, messages = [], chainId = "4012" } = body;
+    const { prompt, address, messages = [], chainId = process.env.DEFAULT_CHAIN_ID || "4012", userPreferences } = body;
 
     if (!prompt || !address) {
       return NextResponse.json(
@@ -220,109 +533,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let user = await prisma.user.findFirst({
-      where: { address },
+    return await handleMessage({
+      prompt,
+      address,
+      chainId,
+      messages,
+      userPreferences,
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: { address },
-      });
-    }
-
-    const chat = await getOrCreateTransactionChat(user.id);
-
-    try {
-      const transactionIntent = await getTransactionIntentFromOpenAI(
-        prompt,
-        address,
-        chainId,
-        messages
-      );
-
-      await storeMessage({
-        content: [{ role: "user", content: prompt }],
-        chatId: chat.id,
-        userId: user.id,
-      });
-
-      console.log(
-        "Processed Transaction Intent from OPENAI:",
-        JSON.stringify(transactionIntent, null, 2)
-      );
-
-      const processedTx = await transactionProcessor.processTransaction(
-        transactionIntent
-      );
-      console.log(
-        "Processed Transaction:",
-        JSON.stringify(processedTx, null, 2)
-      );
-
-      if (["deposit", "withdraw"].includes(transactionIntent.action)) {
-        processedTx.receiver = address;
-      }
-
-      const transaction = await storeTransaction(
-        user.id,
-        transactionIntent.action,
-        {
-          ...processedTx,
-          chainId,
-          originalIntent: transactionIntent,
-        }
-      );
-
-      await storeMessage({
-        content: [
-          {
-            role: "assistant",
-            content: JSON.stringify(processedTx),
-            transactionId: transaction.id,
-          },
-        ],
-        chatId: chat.id,
-        userId: user.id,
-      });
-
-      return NextResponse.json({
-        result: [
-          {
-            data: {
-              description: processedTx.description,
-              transaction: {
-                type: processedTx.action,
-                data: {
-                  transactions: processedTx.transactions,
-                  fromToken: processedTx.fromToken,
-                  toToken: processedTx.toToken,
-                  fromAmount: processedTx.fromAmount,
-                  toAmount: processedTx.toAmount,
-                  receiver: processedTx.receiver,
-                  gasCostUSD: processedTx.estimatedGas,
-                  solver: processedTx.solver,
-                  protocol: processedTx.protocol,
-                  bridge: processedTx.bridge,
-                },
-              },
-            },
-            conversationHistory: messages,
-          },
-        ],
-      });
-    } catch (error) {
-      console.error("Transaction processing error:", error);
-      return NextResponse.json(
-        {
-          error:
-            error instanceof Error
-              ? error.message
-              : "Transaction processing failed",
-          details: error instanceof Error ? error.stack : undefined,
-        },
-        { status: 400 }
-      );
-    }
   } catch (error) {
     console.error("Request processing error:", error);
     return NextResponse.json(

@@ -27,6 +27,8 @@ model Chat {
   type     ChatType  @default(GENERAL)
   User     User?     @relation(fields: [userId], references: [id])
   Message  Message[]
+
+  @@unique([userId, type])
 }
 
 model Message {
