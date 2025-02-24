@@ -304,20 +304,19 @@ export default function Playground() {
   }
 
   // Function to add a block to the canvas
-  function addBlock(block: { id: string; content: any }) {
+  function addBlock(block: { id: string; content: any; code?: string }) {
     const newNodeId = Date.now().toString();
     const newNode = {
       id: newNodeId,
-      type:
-        block.id === "stake"
-          ? "stakeNode"
-          : block.id === "swap"
-          ? "swapNode"
-          : block.id === "liquidity"
-          ? "liquidityNode"
-          : block.id === "event"
-          ? "eventNode"
-          : "blockNode",
+      type: block.id === "custom" ? "blockNode" : block.id === "stake"
+        ? "stakeNode"
+        : block.id === "swap"
+        ? "swapNode"
+        : block.id === "liquidity"
+        ? "liquidityNode"
+        : block.id === "event"
+        ? "eventNode"
+        : "blockNode",
       position: { x: 500, y: 100 + nodes.length * 100 },
       data: {
         ...block,
@@ -325,12 +324,13 @@ export default function Playground() {
         uniqueId: newNodeId,
         handleDeleteNode,
         handleAddNode,
+        code: block.code || "", // 🔹 For cairo code
       },
     };
     setNodes((nds) => [...nds, newNode]);
     toast.success(`${block.content} block added`);
   }
-
+  
   // Function to add a new node connected to a source node
   function handleAddNode(sourceNodeId: string, block: any) {
     const newNodeId = Date.now().toString();
