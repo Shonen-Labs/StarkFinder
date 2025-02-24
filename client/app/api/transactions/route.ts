@@ -13,6 +13,7 @@ import type {
 import {
   ASK_OPENAI_AGENT_PROMPT,
   TRANSACTION_INTENT_PROMPT,
+  INVESTMENT_RECOMMENDATION_PROMPT,
   transactionIntentPromptTemplate,
   investmentRecommendationPromptTemplate,
 } from "@/prompts/prompts";
@@ -193,6 +194,60 @@ async function getTransactionIntentFromOpenAI(
     throw error;
   }
 }
+// Investment Recommendation Logic
+async function generateInvestmentRecommendations(
+  userPreferences: UserPreferences,
+  tokens: any[],
+  yields: any[],
+  messages: any[] = []
+): Promise<InvestmentRecommendation> {
+  try {
+    const conversationHistory = messages
+      .map((msg) => `${msg.role}: ${msg.content}`)
+      .join("\n");
+
+    const formattedPrompt = await investmentRecommendationPromptTemplate.format(
+      {
+        INVESTMENT_RECOMMENDATION_PROMPT,
+        userPreferences: JSON.stringify(userPreferences),
+        tokens: JSON.stringify(tokens),
+        yields: JSON.stringify(yields),
+        conversationHistory,
+      }
+    );
+
+    const jsonOutputParser = new StringOutputParser();
+    const response = await llm.pipe(jsonOutputParser).invoke(formattedPrompt);
+    const recommendationData = JSON.parse(response);
+
+    if (!recommendationData.data?.pools || !recommendationData.data?.strategy) {
+      throw new Error("Invalid recommendation format");
+    }
+
+    return {
+      solver: recommendationData.solver || "OpenAI-Investment-Advisor",
+      type: "recommendation",
+      extractedParams: {
+        riskTolerance:
+          recommendationData.extractedParams.riskTolerance ||
+          userPreferences.riskTolerance,
+        investmentHorizon:
+          recommendationData.extractedParams.investmentHorizon ||
+          userPreferences.investmentHorizon,
+        preferredAssets:
+          recommendationData.extractedParams.preferredAssets ||
+          userPreferences.preferredAssets,
+        preferredChains:
+          recommendationData.extractedParams.preferredChains ||
+          userPreferences.preferredChains,
+      },
+      data: recommendationData.data,
+    };
+  } catch (error) {
+    console.error("Error generating investment recommendations:", error);
+    throw error;
+  }
+}
 
 // Chat and Transaction Handler
 async function handleMessage({
@@ -212,7 +267,18 @@ async function handleMessage({
     const userId = address || "0x0";
     await getOrCreateUser(userId);
 
-    const chat = await createOrGetChat(userId);
+    // Determine if the prompt is transaction-related
+    const isTransactionPrompt =
+      prompt.toLowerCase().includes("swap") ||
+      prompt.toLowerCase().includes("transfer") ||
+      prompt.toLowerCase().includes("bridge") ||
+      prompt.toLowerCase().includes("deposit") ||
+      prompt.toLowerCase().includes("withdraw");
+
+    // Use getOrCreateTransactionChat for transaction prompts, otherwise use createOrGetChat
+    const chat = isTransactionPrompt
+      ? await getOrCreateTransactionChat(userId)
+      : await createOrGetChat(userId);
 
     // Store the user's message
     await storeMessage({
@@ -220,20 +286,16 @@ async function handleMessage({
       chatId: chat.id,
       userId,
     });
-    // Check if the prompt is transaction-related
-    if (
-      prompt.toLowerCase().includes("swap") ||
-      prompt.toLowerCase().includes("transfer") ||
-      prompt.toLowerCase().includes("bridge") ||
-      prompt.toLowerCase().includes("deposit") ||
-      prompt.toLowerCase().includes("withdraw")
-    ) {
+
+    if (isTransactionPrompt) {
+      // Handle transaction-related prompts
       const transactionIntent = await getTransactionIntentFromOpenAI(
         prompt,
         address,
         chainId,
         messages
       );
+
       const processedTx = await transactionProcessor.processTransaction(transactionIntent);
 
       if (["deposit", "withdraw"].includes(transactionIntent.action)) {
@@ -273,7 +335,48 @@ async function handleMessage({
           },
         ],
       });
-    } else {
+    } else if (prompt.toLowerCase().includes("recommend") || prompt.toLowerCase().includes("invest")) 
+      {
+        // Handle investment recommendations
+        const tokens = await fetchTokenData();
+        const yields = await fetchYieldData();
+
+        if (!userPreferences) {
+          throw new Error("User preferences are required for investment recommendations");
+        }
+
+        const recommendations = await generateInvestmentRecommendations(
+          userPreferences,
+          tokens,
+          yields,
+          messages
+        );
+
+        await storeMessage({
+          content: [
+            {
+              role: "assistant",
+              content: recommendations.data.description,
+              recommendationData: recommendations,
+            },
+          ],
+          chatId: chat.id,
+          userId,
+        });
+
+        return NextResponse.json({
+          result: [
+            {
+              data: {
+                description: recommendations.data.description,
+                recommendations,
+              },
+              conversationHistory: messages,
+            },
+          ],
+        });
+      } else {
+        
       // Handle general chat messages
       const response = await llm.invoke([
         await systemMessage.format({ brianai_answer: "How can I assist you?" }),
@@ -304,15 +407,17 @@ async function handleMessage({
 
 async function getOrCreateTransactionChat(userId: string) {
   try {
-    const chat = await prisma.chat.create({
-      data: {
+    const chat = await prisma.chat.upsert({
+      where: { userId_type: { userId, type: "TRANSACTION" } },
+      update: {}, // No updates needed if the chat already exists
+      create: {
         userId,
         type: "TRANSACTION",
       },
     });
     return chat;
   } catch (error) {
-    console.error("Error creating transaction chat:", error);
+    console.error("Error creating or fetching transaction chat:", error);
     throw error;
   }
 }
@@ -336,7 +441,7 @@ async function storeTransaction(userId: string, type: string, metadata: any) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prompt, address, messages = [], chainId = "4012" } = body;
+    const { prompt, address, messages = [], chainId = process.env.DEFAULT_CHAIN_ID || "4012", userPreferences } = body;
 
     if (!prompt || !address) {
       return NextResponse.json(
@@ -345,109 +450,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let user = await prisma.user.findFirst({
-      where: { address },
+    return await handleMessage({
+      prompt,
+      address,
+      chainId,
+      messages,
+      userPreferences,
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: { address },
-      });
-    }
-
-    const chat = await getOrCreateTransactionChat(user.id);
-
-    try {
-      const transactionIntent = await getTransactionIntentFromOpenAI(
-        prompt,
-        address,
-        chainId,
-        messages
-      );
-
-      await storeMessage({
-        content: [{ role: "user", content: prompt }],
-        chatId: chat.id,
-        userId: user.id,
-      });
-
-      console.log(
-        "Processed Transaction Intent from OPENAI:",
-        JSON.stringify(transactionIntent, null, 2)
-      );
-
-      const processedTx = await transactionProcessor.processTransaction(
-        transactionIntent
-      );
-      console.log(
-        "Processed Transaction:",
-        JSON.stringify(processedTx, null, 2)
-      );
-
-      if (["deposit", "withdraw"].includes(transactionIntent.action)) {
-        processedTx.receiver = address;
-      }
-
-      const transaction = await storeTransaction(
-        user.id,
-        transactionIntent.action,
-        {
-          ...processedTx,
-          chainId,
-          originalIntent: transactionIntent,
-        }
-      );
-
-      await storeMessage({
-        content: [
-          {
-            role: "assistant",
-            content: JSON.stringify(processedTx),
-            transactionId: transaction.id,
-          },
-        ],
-        chatId: chat.id,
-        userId: user.id,
-      });
-
-      return NextResponse.json({
-        result: [
-          {
-            data: {
-              description: processedTx.description,
-              transaction: {
-                type: processedTx.action,
-                data: {
-                  transactions: processedTx.transactions,
-                  fromToken: processedTx.fromToken,
-                  toToken: processedTx.toToken,
-                  fromAmount: processedTx.fromAmount,
-                  toAmount: processedTx.toAmount,
-                  receiver: processedTx.receiver,
-                  gasCostUSD: processedTx.estimatedGas,
-                  solver: processedTx.solver,
-                  protocol: processedTx.protocol,
-                  bridge: processedTx.bridge,
-                },
-              },
-            },
-            conversationHistory: messages,
-          },
-        ],
-      });
-    } catch (error) {
-      console.error("Transaction processing error:", error);
-      return NextResponse.json(
-        {
-          error:
-            error instanceof Error
-              ? error.message
-              : "Transaction processing failed",
-          details: error instanceof Error ? error.stack : undefined,
-        },
-        { status: 400 }
-      );
-    }
   } catch (error) {
     console.error("Request processing error:", error);
     return NextResponse.json(
