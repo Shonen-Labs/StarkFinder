@@ -87,6 +87,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/dotenv-safe": "^8.1.6",
+    "@types/jest": "^29.5.14",
     "@types/node": "^20",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^18",
@@ -97,10 +98,13 @@
     "eslint-config-next": "14.2.17",
     "eslint-plugin-react": "^7.37.4",
     "globals": "^16.0.0",
+    "jest": "^29.7.0",
     "postcss": "^8",
     "prisma": "^6.3.1",
     "raw-loader": "^4.0.2",
     "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.2.6",
+    "tsconfig-paths-jest": "^0.0.1",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1"
   },

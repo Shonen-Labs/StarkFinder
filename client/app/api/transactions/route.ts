@@ -5,11 +5,11 @@ import { NextResponse, NextRequest } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { transactionProcessor } from "@/lib/transaction";
 
-
 import type {
   BrianResponse,
   BrianTransactionData,
 } from "@/lib/transaction/types";
+
 import {
   ASK_OPENAI_AGENT_PROMPT,
   TRANSACTION_INTENT_PROMPT,
@@ -17,20 +17,26 @@ import {
   transactionIntentPromptTemplate,
   investmentRecommendationPromptTemplate,
 } from "@/prompts/prompts";
+
 import { 
+  START,
+  END,
   MessagesAnnotation, 
   StateGraph, 
   MemorySaver 
 } from "@langchain/langgraph";
+
 import { 
   ChatPromptTemplate, 
   SystemMessagePromptTemplate, 
   HumanMessagePromptTemplate 
 } from "@langchain/core/prompts";
+
 import { 
   UserPreferences, 
   InvestmentRecommendation  
 } from "../ask/types";
+
 import { 
   fetchTokenData, 
   fetchYieldData, 
@@ -62,7 +68,81 @@ const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([
   userMessage,
 ]);
 const prompt = askAgentPromptTemplate;
-// const chain = prompt.pipe(agent);
+
+// LangGraph workflow setup
+const initialCallModel = async (state: typeof MessagesAnnotation.State) => {
+  const messages = [
+    await systemMessage.format({ brianai_answer: "How can I assist you?" }),
+    ...state.messages,
+  ];
+  const response = await llm.invoke(messages);
+  return { messages: response };
+};
+
+const callModel = async (
+  state: typeof MessagesAnnotation.State,
+  chatId?: any
+) => {
+  if (!chatId) {
+    return await initialCallModel(state);
+  }
+  const actualChatId = chatId?.configurable?.additional_args?.chatId || chatId;
+  const chatHistory = await getChatHistory(actualChatId);
+  const currentMessage = state.messages[state.messages.length - 1];
+
+  if (chatHistory.length > 0) {
+    const summaryPrompt = `
+    Distill the following chat history into a single summary message. 
+    Include as many specific details as you can.
+    IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
+    `;
+    const summary = await llm.invoke([
+      ...chatHistory,
+      { role: "user", content: summaryPrompt },
+    ]);
+
+    const response = await llm.invoke([
+      await systemMessage.format({ brianai_answer: "How can I assist you?" }),
+      summary,
+      currentMessage,
+    ]);
+
+    return {
+      messages: [summary, currentMessage, response],
+    };
+  } else {
+    return await initialCallModel(state);
+  }
+};
+
+const workflow = new StateGraph(MessagesAnnotation)
+  .addNode("model", callModel)
+  .addEdge(START, "model")
+  .addEdge("model", END);
+const app = workflow.compile({ checkpointer: new MemorySaver() });
+
+// Fetch chat history
+async function getChatHistory(chatId: string) {
+  try {
+    const messages = await prisma.message.findMany({
+      where: { chatId },
+      orderBy: { id: "asc" },
+    });
+
+    const formattedHistory = messages.flatMap((msg: any) => {
+      const content = msg.content as any[];
+      return content.map((c) => ({
+        role: c.role,
+        content: c.content,
+      }));
+    });
+
+    return formattedHistory;
+  } catch (error) {
+    console.error("Error fetching chat history:", error);
+    return [];
+  }
+}
 
 async function getTransactionIntentFromOpenAI(
   prompt: string,
@@ -194,6 +274,7 @@ async function getTransactionIntentFromOpenAI(
     throw error;
   }
 }
+
 // Investment Recommendation Logic
 async function generateInvestmentRecommendations(
   userPreferences: UserPreferences,
@@ -301,6 +382,7 @@ async function handleMessage({
       if (["deposit", "withdraw"].includes(transactionIntent.action)) {
         processedTx.receiver = address;
       }
+
       const transaction = await storeTransaction(
         userId,
         transactionIntent.action,
@@ -382,6 +464,7 @@ async function handleMessage({
         await systemMessage.format({ brianai_answer: "How can I assist you?" }),
         { role: "user", content: prompt },
       ]);
+      
       await storeMessage({
         content: [
           {
