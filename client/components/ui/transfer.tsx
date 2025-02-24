@@ -15,6 +15,8 @@ const Transfer: React.FC<TransferProps> = ({ setSelectedCommand }) => {
   const [fromCoin] = useState<CryptoCoin>(CoinsLogo[0]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [walletAddress, setWalletAddress] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   const openModal = () => {
     setShowModal(true);
@@ -23,6 +25,49 @@ const Transfer: React.FC<TransferProps> = ({ setSelectedCommand }) => {
   const handleCoinSelect = () => {
     setShowModal(false);
   };
+
+  // Handle Tranfer
+  const handleTransfer = async () => {
+    setError("");
+
+    if(!fromAmount || !walletAddress || !fromCoin) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'transfer',
+          prompt: `Transfer ${fromAmount} ${fromCoin.name} to ${walletAddress}`,
+          address: walletAddress,
+          data: {
+            amount: fromAmount,
+            token: fromCoin.name,
+            recipient: walletAddress
+          }
+        })
+      });
+
+      const data = await response.json();
+
+      if(!response.ok) {
+        throw new Error(data.error || 'Transfer failed');
+      }
+
+      setSelectedCommand(null);
+
+      alert('Transfer initiated successfully')
+    } catch(err){
+      setError(err instanceof Error ? err.message : "An error occured");
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex flex-col items-center justify-center animated fadeIn">
@@ -81,9 +126,16 @@ const Transfer: React.FC<TransferProps> = ({ setSelectedCommand }) => {
           </div>
         </div>
 
+        {/* Error Handling */}
+        {error && (
+          <div className="mt-2 text-red-500 text-sm text-center">
+            {error}
+          </div>
+        )}
+
         <div className={`mt-5`}>
-          <button className="bg-[#060606] text-white w-full py-3 rounded-2xl text-lg flex items-center justify-center">
-            Transfer
+          <button className={`bg-[#060606] text-white w-full py-3 rounded-2xl text-lg flex items-center justify-center ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={handleTransfer} disabled={isLoading}>
+            {isLoading ? 'Processing...' : 'Transfer'}
           </button>
         </div>
         {showModal && (
