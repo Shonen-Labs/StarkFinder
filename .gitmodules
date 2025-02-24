@@ -1,0 +1,3 @@
+[submodule "client/eliza"]
+	path = client/eliza
+	url = https://github.com/elizaOS/eliza.git
