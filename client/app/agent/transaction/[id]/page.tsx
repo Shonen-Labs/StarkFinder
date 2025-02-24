@@ -296,14 +296,16 @@ export default function TransactionPage() {
       },
     ]);
   }, []);
+  // Generates a unique chat ID and navigates to the new chat route.
   const createNewChat = async () => {
-    const id = uuidv4();
-    await router.push(`/agent/chat/${id}`);
+    const id = uuidv4(); // Generate a unique ID for the chat session
+    await router.push(`/agent/chat/${id}`); // Navigate to the new chat route
   };
 
+// Generates a unique chat ID and navigates to the new Transaction route.
   const createNewTxn = async () => {
-    const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    const id = uuidv4(); // Generate a unique ID for the transaction session
+    await router.push(`/agent/transaction/${id}`); // Navigate to the new transaction route
   };
 
   const handleTransactionSuccess = (hash: string) => {
@@ -418,6 +420,8 @@ export default function TransactionPage() {
     }
   };
 
+  
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
       {/* Dotted background */}
@@ -437,7 +441,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-            onClick={() => router.push("/agent/chat")}
+            onClick={createNewChat} // onclick command for a new chat route
           >
             <span>Agent Chat</span>
             <Plus className="h-4 w-4" />
@@ -445,7 +449,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={() => router.push("/agent/transaction")}
+            onClick={createNewTxn}  // onclick command for a new transaction route 
           >
             <span>Agent Txn</span>
             <Plus className="h-4 w-4" />
