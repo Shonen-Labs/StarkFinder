@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Send, Home } from "lucide-react";
-import { useAccount } from "@starknet-react/core";
+import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
 import {
   Dialog,
@@ -261,6 +261,7 @@ export default function TransactionPage() {
   const [inputValue, setInputValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const { address } = useAccount();
+
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
   const [showPreferences, setShowPreferences] = useState(false);
