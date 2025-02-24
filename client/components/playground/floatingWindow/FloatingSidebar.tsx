@@ -493,6 +493,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           Contracts
         </Link>
       </div>
+      <Link
+          href="/devx/resources"
+          className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
+        >
+          Resources
+        </Link>
 
       <CustomBlockModal
         isOpen={isCustomModalOpen}
