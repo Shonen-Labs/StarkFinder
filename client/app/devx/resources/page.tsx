@@ -92,7 +92,6 @@ const resources = [
         description: "Quickstart templates",
         icon: "🚀",
       },
-      
     ],
   },
   {
@@ -152,7 +151,6 @@ interface ResourceItem {
   icon: string;
 }
 
-
 const ResourceCard = ({ item }: { item: ResourceItem }) => (
   <motion.a
     href={item.url}
@@ -162,7 +160,7 @@ const ResourceCard = ({ item }: { item: ResourceItem }) => (
     whileTap={{ scale: 0.98 }}
     className="group relative flex flex-col justify-between p-6 bg-white/5 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" ></div>
+    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
     <div>
       <div className="text-3xl mb-4">{item.icon}</div>
       <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
