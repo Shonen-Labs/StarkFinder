@@ -37,12 +37,12 @@ jobs:
             target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
       
+      # Fixed: Removed invalid inputs and using rustup directly
       - name: Install Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          targets: wasm32-unknown-unknown
-          profile: minimal
+        run: |
+          rustup toolchain install stable
+          rustup target add wasm32-unknown-unknown
+          rustup default stable
 
       - name: Cache snforge
         uses: actions/cache@v4
@@ -93,7 +93,7 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:  # Proper indentation here
+        env:
           NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.BRIAN_API_KEY }}
@@ -135,3 +135,4 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
+
