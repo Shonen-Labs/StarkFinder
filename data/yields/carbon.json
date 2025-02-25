@@ -1,0 +1,275 @@
+[
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "USD-SWTH",
+        "tvlUsd": 161069,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 1.86884,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "161f810c-48ea-4a2b-aa50-524713c1e6f8",
+        "apyPct1D": -0.00127,
+        "apyPct7D": -0.03499,
+        "apyPct30D": -2.07487,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 64,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 8.38587,
+        "sigma": 0.19679,
+        "count": 725,
+        "outlier": false,
+        "underlyingTokens": [
+            "cgt/1",
+            "swth"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 2.91029,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "ETH-SWTH",
+        "tvlUsd": 109494,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 2.78483,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "f9cffe95-d052-4af5-83a6-1290a6b9615f",
+        "apyPct1D": 0,
+        "apyPct7D": -0.07259,
+        "apyPct30D": 2.78483,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.01923,
+        "sigma": 0.07162,
+        "count": 36,
+        "outlier": false,
+        "underlyingTokens": [
+            "cgt/2",
+            "swth"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.17414,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "USD-USC",
+        "tvlUsd": 104542,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0.71083,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "eddbfa58-ac76-43af-8348-b420013050db",
+        "apyPct1D": -1e-05,
+        "apyPct7D": -0.01372,
+        "apyPct30D": -0.99982,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 83,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 6.243,
+        "sigma": 0.20751,
+        "count": 563,
+        "outlier": false,
+        "underlyingTokens": [
+            "cgt/1",
+            "usc"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.16546,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "TRB-BUSD",
+        "tvlUsd": 51717,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "53454399-220d-43d0-903d-6e9664790236",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 905,
+        "outlier": false,
+        "underlyingTokens": [
+            "trb.1.2.10a74e",
+            "busd.1.6.754a80"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "RSWTH-SWTH",
+        "tvlUsd": 44480,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0.85043,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "bfb49a90-e8f0-49d9-bb28-318e0473572a",
+        "apyPct1D": 0,
+        "apyPct7D": -0.0979,
+        "apyPct30D": -0.86737,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.87395,
+        "sigma": 0.10107,
+        "count": 651,
+        "outlier": false,
+        "underlyingTokens": [
+            "ibc/F73839B9CAD86AC5E8D589177CCB6528A93499BC36C35790A79EBB794C344080",
+            "swth"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.36364,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "DEC-USD",
+        "tvlUsd": 23876,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "c8b6ea22-ef4c-4231-ae12-45c880ee487b",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 99,
+        "outlier": false,
+        "underlyingTokens": [
+            "ibc/A535E5C1A2E328143AC55CCB04103B92092559E5D7343F07E3D9BDC5056762BD",
+            "cgt/1"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Carbon",
+        "project": "demex-perp",
+        "symbol": "LUNC-SWTH",
+        "tvlUsd": 23619,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0,
+        "rewardTokens": [
+            "swth"
+        ],
+        "pool": "9b6ad91a-45dc-47d6-95c3-607f83cb5db9",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 846,
+        "outlier": false,
+        "underlyingTokens": [
+            "ibc/D70B0FBF97AEB04491E9ABF4467A7F66CD6250F4382CE5192D856114B83738D2",
+            "swth"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

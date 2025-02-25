@@ -1,0 +1,76 @@
+[
+    {
+        "chain": "Rollux",
+        "project": "gamma",
+        "symbol": "USDT-USDC",
+        "tvlUsd": 26450,
+        "apyBase": 0.30398,
+        "apyReward": 0,
+        "apy": 0.30398,
+        "rewardTokens": [],
+        "pool": "baaf056a-171c-4902-8abc-18a548219b83",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 53,
+            "binnedConfidence": 1
+        },
+        "poolMeta": "0.05%",
+        "mu": 3.23316,
+        "sigma": 0.37571,
+        "count": 481,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x28c9c7fb3fe3104d2116af26cc8ef7905547349c",
+            "0x368433cac2a0b8d76e64681a9835502a1f2a8a30"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.30398,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Rollux",
+        "project": "gamma",
+        "symbol": "WSYS-PSYS",
+        "tvlUsd": 16400,
+        "apyBase": 0.16727,
+        "apyReward": 0,
+        "apy": 0.16727,
+        "rewardTokens": [],
+        "pool": "722da4d1-3dc7-42ad-82d4-ae708c27a881",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 65,
+            "binnedConfidence": 2
+        },
+        "poolMeta": "0.3%",
+        "mu": 1.94647,
+        "sigma": 0.19486,
+        "count": 487,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x4200000000000000000000000000000000000006",
+            "0x48023b16c3e81aa7f6effbdeb35bb83f4f31a8fd"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.16727,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

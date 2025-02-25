@@ -1,0 +1,41 @@
+[
+    {
+        "chain": "Libre",
+        "project": "libre-swap",
+        "symbol": "BTC-USD",
+        "tvlUsd": 18043,
+        "apyBase": null,
+        "apyReward": 287.06,
+        "apy": 287.06,
+        "rewardTokens": [
+            "LIBRE"
+        ],
+        "pool": "64921981-0ecb-4724-9899-f7933a203da6",
+        "apyPct1D": 0,
+        "apyPct7D": 0.2,
+        "apyPct30D": 13.69,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 97,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "BTC - USDT farming pool",
+        "mu": 51.89404,
+        "sigma": 1.73022,
+        "count": 742,
+        "outlier": false,
+        "underlyingTokens": [
+            "BTC",
+            "USDT"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 281.5946,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
