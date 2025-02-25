@@ -1,0 +1,36 @@
+[
+    {
+        "chain": "Acala",
+        "project": "taiga-acala",
+        "symbol": "TDOT",
+        "tvlUsd": 1902984,
+        "apyBase": 8.15552,
+        "apyReward": null,
+        "apy": 8.15552,
+        "rewardTokens": null,
+        "pool": "6cd36989-747e-4411-a629-c5ffca4d5a2f",
+        "apyPct1D": -0.08642,
+        "apyPct7D": -0.88497,
+        "apyPct30D": -3.99295,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 68,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 16.33456,
+        "sigma": 0.24121,
+        "count": 946,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 9.94001,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

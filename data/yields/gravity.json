@@ -1,0 +1,74 @@
+[
+    {
+        "chain": "Gravity",
+        "project": "latch",
+        "symbol": "ATUSD",
+        "tvlUsd": 9425787,
+        "apyBase": 13.4649,
+        "apyReward": null,
+        "apy": 13.4649,
+        "rewardTokens": null,
+        "pool": "9998bf68-1ef8-4948-9cbb-d62eeeab91ab",
+        "apyPct1D": -0.04754,
+        "apyPct7D": 0.18492,
+        "apyPct30D": -2.26576,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 56.99999999999999,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 15.61818,
+        "sigma": 0.0789,
+        "count": 47,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xc4af68Dd5b96f0A544c4417407773fEFDc97F58d"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 14.76886,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Gravity",
+        "project": "latch",
+        "symbol": "ATETH",
+        "tvlUsd": 5150022,
+        "apyBase": 5.45793,
+        "apyReward": null,
+        "apy": 5.45793,
+        "rewardTokens": null,
+        "pool": "191d6bfe-d781-4972-a5c1-765f80a7042a",
+        "apyPct1D": -0.01029,
+        "apyPct7D": -0.10363,
+        "apyPct30D": 0.96104,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 5.11205,
+        "sigma": 0.03282,
+        "count": 47,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xc314b8637B05A294Ae9D9C29300d5f667c748baD"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 5.02589,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
