@@ -28,42 +28,40 @@ jobs:
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
 
       # Cache Rust toolchain and dependencies
-- name: Cache Rust
-uses: actions/cache@v4
-with:
-  path: |
-    ~/.cargo/registry
-    ~/.cargo/git
-    target/
-  key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
-  restore-keys: |
-    ${{ runner.os }}-rust-
+      - name: Cache Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-
 
-# Install Rust toolchain
-- name: Install Rust toolchain
-run: |
-  rustup toolchain install stable
-  rustup target add wasm32-unknown-unknown
-  rustup default stable
+      # Fixed: Removed invalid inputs and using rustup directly
+      - name: Install Rust toolchain
+        run: |
+          rustup toolchain install stable
+          rustup target add wasm32-unknown-unknown
+          rustup default stable
 
-# Cache snforge
-- name: Cache snforge
-uses: actions/cache@v4
-with:
-  path: ~/.cargo/bin/snforge
-  key: ${{ runner.os }}-snforge-0.33.0
+      - name: Cache snforge
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/snforge
+          key: ${{ runner.os }}-snforge-0.33.0
 
-# Install snforge
-- name: Install snforge
-run: |
-  if ! command -v snforge &> /dev/null; then
-    cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
-      --tag v0.33.0 \
-      --bin snforge \
-      --features=rust-serde \
-      snforge
-  fi
-  echo "Installed snforge version: $(snforge --version)"
+      - name: Install snforge
+        run: |
+          if ! command -v snforge &> /dev/null; then
+            cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
+              --tag v0.33.0 \
+              --bin snforge \
+              --features=rust-serde \
+              snforge
+          fi
+          echo "Installed snforge version: $(snforge --version)"
 
       - name: Install dependencies
         run: scarb clean && scarb fetch
