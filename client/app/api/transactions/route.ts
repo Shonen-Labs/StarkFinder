@@ -59,11 +59,14 @@ async function getTransactionIntentFromOpenAI(
         chain: intentData.extractedParams.chain || "",
         amount: intentData.extractedParams.amount || "",
         protocol: intentData.extractedParams.protocol || "",
-        address: intentData.extractedParams.address || address,
+        address: address, // should always be connected address
         dest_chain: intentData.extractedParams.dest_chain || "",
         destinationChain: intentData.extractedParams.dest_chain || "",
         destinationAddress:
-          intentData.extractedParams.destinationAddress || address,
+          intentData.extractedParams.destinationAddress ||
+          (intentData.extractedParams.same_network_type === "true"
+            ? address
+            : ""),
       },
       data: {} as BrianTransactionData,
     };
@@ -122,7 +125,7 @@ async function getTransactionIntentFromOpenAI(
             destinationNetwork: intentData.extractedParams.dest_chain || "",
             sourceToken: intentData.extractedParams.token1 || "",
             destinationToken: intentData.extractedParams.token2 || "",
-            amount: parseFloat(intentData.extractedParams.amount || "0"),
+            amount: Number.parseFloat(intentData.extractedParams.amount || "0"),
             sourceAddress: address,
             destinationAddress:
               intentData.extractedParams.destinationAddress || address,
@@ -269,7 +272,7 @@ export async function POST(request: NextRequest) {
         {
           ...processedTx,
           chainId,
-          originalIntent: transactionIntent
+          originalIntent: transactionIntent,
         }
       );
 

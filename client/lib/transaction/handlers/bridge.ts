@@ -104,7 +104,7 @@ export class BridgeHandler extends BaseTransactionHandler {
       const networkToken = token.symbol.toLowerCase();
 
       if (
-        networkToken == normalized ||
+        networkToken === normalized ||
         networkToken.includes(normalized) ||
         normalized.includes(networkToken)
       ) {

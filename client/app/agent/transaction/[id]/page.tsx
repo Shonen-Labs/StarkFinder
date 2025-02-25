@@ -92,9 +92,11 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   onError,
 }) => {
   const { account } = useAccount();
+  // console.log(account)
   const [isProcessing, setIsProcessing] = React.useState(false);
   console.log(transactions);
   const executeTransaction = async () => {
+    console.log('trying');
     if (!account) {
       onError(new Error("Wallet not connected"));
       return;
@@ -260,6 +262,9 @@ export default function TransactionPage() {
   const [inputValue, setInputValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const { address } = useAccount();
+  console.log(address);
+  const { provider } = useProvider();
+  console.log(provider.getChainId())
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
@@ -435,7 +440,7 @@ export default function TransactionPage() {
       <div
         className="absolute inset-0 bg-repeat opacity-5"
         style={{
-          backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+          backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
           backgroundSize: "20px 20px",
         }}
       />
@@ -544,7 +549,7 @@ export default function TransactionPage() {
               {address ? (
                 <div className="flex items-center gap-4">
                   <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
-                    {address.slice(0, 5) + "..." + address.slice(-3)}
+                    {`${address.slice(0, 5)}...${address.slice(-3)}`}
                   </div>
                   <DisconnectButton />
                 </div>
