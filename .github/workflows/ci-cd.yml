@@ -36,7 +36,9 @@ jobs:
             ~/.cargo/git
             target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
-      
+          restore-keys: |
+            ${{ runner.os }}-rust-
+
       # Fixed: Removed invalid inputs and using rustup directly
       - name: Install Rust toolchain
         run: |
@@ -49,17 +51,18 @@ jobs:
         with:
           path: ~/.cargo/bin/snforge
           key: ${{ runner.os }}-snforge-0.33.0
-        
+
       - name: Install snforge
         run: |
           if ! command -v snforge &> /dev/null; then
             cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
               --tag v0.33.0 \
               --bin snforge \
-              --features=rust-serde
+              --features=rust-serde \
+              snforge
           fi
           echo "Installed snforge version: $(snforge --version)"
-          
+
       - name: Install dependencies
         run: scarb clean && scarb fetch
 
@@ -67,7 +70,7 @@ jobs:
         run: scarb build
 
       - name: Run snforge tests
-        run: snforge test --workspace       
+        run: snforge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
@@ -135,4 +138,3 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
-
