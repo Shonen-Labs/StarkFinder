@@ -1,4 +1,4 @@
-import { ModalLanding } from './modal-landing'
+import { ModalLanding } from "./modal-landing";
 
 export function Header() {
   return (
@@ -23,11 +23,11 @@ export function Header() {
         <ModalLanding />
       </div>
     </header>
-  )
+  );
 }
 
 const menuItems = [
-  { name: 'How It Works', href: '#offer' },
-  { name: 'Our Features', href: '#feature' },
-  { name: 'FAQ', href: '#faq' },
-]
+  { name: "How It Works", href: "#offer" },
+  { name: "Our Features", href: "#feature" },
+  { name: "FAQ", href: "#faq" },
+];

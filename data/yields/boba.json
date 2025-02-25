@@ -1,0 +1,118 @@
+[
+    {
+        "chain": "Boba",
+        "project": "symbiosis",
+        "symbol": "USDC",
+        "tvlUsd": 127621,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xd38bb40815d2b0c2d2c866e0c72c5728ffc76dd9"
+        ],
+        "pool": "4bc7b297-b1c3-4c11-9c5f-5b96023ace65",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0.1471,
+        "sigma": 0.02111,
+        "count": 761,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Boba",
+        "project": "teahouse-permissionless",
+        "symbol": "USDC-WETH0.05%",
+        "tvlUsd": 95574,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7"
+        ],
+        "pool": "aeaa52be-979d-4719-aae9-1ce778f4459e",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": "0.05%",
+        "mu": 47.42197,
+        "sigma": 2.06975,
+        "count": 432,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc",
+            "0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Boba",
+        "project": "teahouse-permissionless",
+        "symbol": "USDC-BOBA0.05%",
+        "tvlUsd": 21686,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xa18bF3994C0Cc6E3b63ac420308E5383f53120D7"
+        ],
+        "pool": "4be56e67-7f3b-482e-87ec-be13ca0bd9f2",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": "0.05%",
+        "mu": 114.2131,
+        "sigma": 4.68365,
+        "count": 432,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc",
+            "0xa18bf3994c0cc6e3b63ac420308e5383f53120d7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

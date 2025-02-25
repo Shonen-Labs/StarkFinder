@@ -1,0 +1,38 @@
+[
+    {
+        "chain": "Bitlayer",
+        "project": "enzo-finance",
+        "symbol": "BTC",
+        "tvlUsd": 34808,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0.11618,
+        "rewardTokens": null,
+        "pool": "f30a860a-0e1e-4422-8aff-6d9915f895f1",
+        "apyPct1D": 0.0054,
+        "apyPct7D": 0.00324,
+        "apyPct30D": 0.00457,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 0.22534,
+        "sigma": 0.00595,
+        "count": 282,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xfF204e2681A6fA0e2C3FaDe68a1B28fb90E4Fc5F"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.11319,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

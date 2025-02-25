@@ -1,0 +1,80 @@
+[
+    {
+        "chain": "Conflux",
+        "project": "nucleon",
+        "symbol": "WCFX-XCFX",
+        "tvlUsd": 708257,
+        "apyBase": null,
+        "apyReward": 0.72081,
+        "apy": 0.72081,
+        "rewardTokens": [
+            "0xfe197e7968807b311d476915db585831b43a7e3b"
+        ],
+        "pool": "4ee2f0ba-ca31-4580-9ca4-7dd7a5cac042",
+        "apyPct1D": 0.00152,
+        "apyPct7D": 0.01991,
+        "apyPct30D": 0.01797,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 88,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 6.39779,
+        "sigma": 0.27216,
+        "count": 697,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x14b2D3bC65e74DAE1030EAFd8ac30c533c976A9b",
+            "0x889138644274a7Dc602f25A7e7D53fF40E6d0091"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.6959,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Conflux",
+        "project": "nucleon",
+        "symbol": "XCFX-NUT",
+        "tvlUsd": 42517,
+        "apyBase": null,
+        "apyReward": 8.00494,
+        "apy": 8.00494,
+        "rewardTokens": [
+            "0xfe197e7968807b311d476915db585831b43a7e3b"
+        ],
+        "pool": "52c16fe3-6854-4378-85bf-cfc846bb0403",
+        "apyPct1D": -0.06138,
+        "apyPct7D": 0.03031,
+        "apyPct30D": -0.27753,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 54,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 42.76193,
+        "sigma": 1.40719,
+        "count": 697,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x889138644274a7Dc602f25A7e7D53fF40E6d0091",
+            "0xFE197E7968807B311D476915DB585831B43A7E3b"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 8.02086,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

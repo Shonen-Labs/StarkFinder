@@ -1,0 +1,77 @@
+[
+    {
+        "chain": "Karura",
+        "project": "taiga-karura",
+        "symbol": "TKSM",
+        "tvlUsd": 647363,
+        "apyBase": 7.98591,
+        "apyReward": 0,
+        "apy": 7.98591,
+        "rewardTokens": [
+            "TAI"
+        ],
+        "pool": "d25d5f0c-38a7-4460-9719-c78e9f8538e3",
+        "apyPct1D": -1.06236,
+        "apyPct7D": -0.97384,
+        "apyPct30D": -2.39061,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 67,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 13.45202,
+        "sigma": 0.19005,
+        "count": 946,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 9.02299,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Karura",
+        "project": "taiga-karura",
+        "symbol": "3USD",
+        "tvlUsd": 580828,
+        "apyBase": 0.1385,
+        "apyReward": 32.88265,
+        "apy": 33.02114,
+        "rewardTokens": [
+            "TAI",
+            "sa://0",
+            "LKSM",
+            "KAR"
+        ],
+        "pool": "2ea21b97-d104-4ded-a671-76d46d0f6ea4",
+        "apyPct1D": 0.01617,
+        "apyPct7D": -0.07766,
+        "apyPct30D": -5.4916,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 88,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 25.21536,
+        "sigma": 0.52502,
+        "count": 946,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 33.49534,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

@@ -1,0 +1,38 @@
+[
+    {
+        "chain": "Bifrost",
+        "project": "bifrost-liquid-staking",
+        "symbol": "VBNC",
+        "tvlUsd": 1021896,
+        "apyBase": 6.11,
+        "apyReward": 0,
+        "apy": 6.11,
+        "rewardTokens": [
+            "BNC"
+        ],
+        "pool": "eadcb734-fe5e-4f8b-ac19-096906cc12b5",
+        "apyPct1D": 0.02,
+        "apyPct7D": 0.06,
+        "apyPct30D": -0.69,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 66,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 8.20789,
+        "sigma": 0.15603,
+        "count": 729,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 6.21226,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
