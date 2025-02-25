@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type TransactionAction =
   | "swap"
   | "transfer"
@@ -166,16 +167,16 @@ export interface LayerswapError {
   metadata?: Record<string, unknown>;
 }
 
-export interface LayerswapNetwork{
+export interface LayerswapNetwork {
   tokens?: LayerswapToken[];
   name: string;
   display_name: string;
   chain_id: string;
-  token:  LayerswapToken;
+  token: LayerswapToken;
   transaction_explorer_template: string;
   type: string;
   metadata?: Record<string, string>;
-  deposit_methods?:  Record<string, string>;
+  deposit_methods?: Record<string, string>;
 }
 
 export interface LayerswapLimit {
@@ -185,10 +186,10 @@ export interface LayerswapLimit {
   max_amount: number;
 }
 
-export interface LayerswapQuoteResponse{
+export interface LayerswapQuoteResponse {
   quote: LayerswapQuote;
   refuel: LayerswapRefuel | null;
-  reward: LayerswapReward | null
+  reward: LayerswapReward | null;
 }
 
 export interface LayerswapRefuel {
@@ -219,28 +220,28 @@ export interface LayerswapSwap {
   status: string;
   fail_reason: string;
   use_deposit_address: string;
-  deposit_methods?:  Record<string, string>;
-  transactions: LayerswapTransaction[]
+  deposit_methods?: Record<string, string>;
+  transactions: LayerswapTransaction[];
 }
 
 export interface LayerswapTransaction {
- from: string;
- to: string;
- timestamp: string;
- transaction_hash: string;
- confirmations: number;
- max_confirmations: number;
- amount: number;
- type: string;
- status: string;
- token: LayerswapToken;
- network: LayerswapNetwork
+  from: string;
+  to: string;
+  timestamp: string;
+  transaction_hash: string;
+  confirmations: number;
+  max_confirmations: number;
+  amount: number;
+  type: string;
+  status: string;
+  token: LayerswapToken;
+  network: LayerswapNetwork;
 }
 
 export interface LayerswapExchange {
   name: string;
   display_name: string;
-  deposit_methods?:  Record<string, any>;
+  deposit_methods?: Record<string, any>;
 }
 
 export interface LayerswapAction {
