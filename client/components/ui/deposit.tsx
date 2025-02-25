@@ -12,16 +12,28 @@ interface DepositProps {
 
 const Deposit: React.FC<DepositProps> = ({ setSelectedCommand }) => {
   const [fromAmount, setFromAmount] = useState<string>("");
-  const [fromCoin] = useState<CryptoCoin>(CoinsLogo[0]);
+  const [fromCoin, setFromCoin] = useState<CryptoCoin>(CoinsLogo[0]);
+  const [toCoin, setToCoin] = useState<CryptoCoin>(CoinsLogo[3]);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">(
+        "from"
+      );
+  
+console.log(toCoin);
 
-  const openModal = () => {
-    setShowModal(true);
-  };
-
-  const handleCoinSelect = () => {
-    setShowModal(false);
-  };
+  const openModal = (type: "from" | "to") => {
+      setSelectingCoinFor(type);
+      setShowModal(true);
+    };
+  
+    const handleCoinSelect = (coin: CryptoCoin) => {
+        if (selectingCoinFor === "from") {
+          setFromCoin(coin);
+        } else {
+          setToCoin(coin);
+        }
+        setShowModal(false);
+      }; 
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex flex-col items-center justify-center animated fadeIn">
@@ -55,7 +67,7 @@ const Deposit: React.FC<DepositProps> = ({ setSelectedCommand }) => {
           </div>
           <div
             className="flex items-center space-x-2 cursor-pointer"
-            onClick={() => openModal()}
+            onClick={() => openModal("from")}
           >
             <Image
               src={fromCoin.logo}

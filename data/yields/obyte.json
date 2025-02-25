@@ -1,0 +1,110 @@
+[
+    {
+        "chain": "Obyte",
+        "project": "line-token-rewards",
+        "symbol": "LINE",
+        "tvlUsd": 122704,
+        "apyBase": 0.74226,
+        "apyReward": null,
+        "apy": 0.74226,
+        "rewardTokens": [
+            "GBYTE"
+        ],
+        "pool": "203d32f2-bba2-4450-9be2-e8651b4b97dd",
+        "apyPct1D": -0.06058,
+        "apyPct7D": -0.06759,
+        "apyPct30D": -236.43405,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 57.99999999999999,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 118.98179,
+        "sigma": 2.62949,
+        "count": 197,
+        "outlier": true,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 45.79169,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Obyte",
+        "project": "oswap-amm",
+        "symbol": "GBYTE-ETH",
+        "tvlUsd": 20264,
+        "apyBase": 0,
+        "apyReward": 127.54,
+        "apy": 127.54,
+        "rewardTokens": [
+            "GBYTE"
+        ],
+        "pool": "f5bb9538-c45d-4a4b-873e-913503a847d8",
+        "apyPct1D": 2.86,
+        "apyPct7D": -4.01,
+        "apyPct30D": 2.23,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 76,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 256.88957,
+        "sigma": 5.61363,
+        "count": 696,
+        "outlier": true,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 125.82152,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Obyte",
+        "project": "oswap-amm",
+        "symbol": "GBYTE-USDC",
+        "tvlUsd": 11702,
+        "apyBase": 43.24,
+        "apyReward": 127.54,
+        "apy": 170.78,
+        "rewardTokens": [
+            "GBYTE"
+        ],
+        "pool": "aadeb21e-c762-4965-82fe-1d2e3455a478",
+        "apyPct1D": 27.15,
+        "apyPct7D": -3.63,
+        "apyPct30D": 35.04,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 87,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 245.60961,
+        "sigma": 5.16379,
+        "count": 604,
+        "outlier": true,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 215.22876,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
