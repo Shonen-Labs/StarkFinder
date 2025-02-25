@@ -1,0 +1,110 @@
+[
+    {
+        "chain": "Bsquared",
+        "project": "kiloex",
+        "symbol": "USDT",
+        "tvlUsd": 184194,
+        "apyBase": 0.21,
+        "apyReward": null,
+        "apy": 0.21,
+        "rewardTokens": null,
+        "pool": "4948fcbe-f608-4c3c-9b27-4ecf1bb383a6",
+        "apyPct1D": 0,
+        "apyPct7D": -9.21,
+        "apyPct30D": -12.12,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 87,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 14.33174,
+        "sigma": 0.56568,
+        "count": 168,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x681202351a488040fa4fdcc24188afb582c9dd62"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 12.31634,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Bsquared",
+        "project": "kiloex",
+        "symbol": "UBTC",
+        "tvlUsd": 24466,
+        "apyBase": 0.13,
+        "apyReward": null,
+        "apy": 0.13,
+        "rewardTokens": null,
+        "pool": "ddc6888e-a4b2-4353-9452-518709a43db8",
+        "apyPct1D": 0,
+        "apyPct7D": -5.52,
+        "apyPct30D": -7.27,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 65,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 8.74461,
+        "sigma": 0.35999,
+        "count": 168,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x796e4d53067ff374b89b2ac101ce0c1f72ccaac2"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 7.38927,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Bsquared",
+        "project": "kiloex",
+        "symbol": "BSTONE",
+        "tvlUsd": 11410,
+        "apyBase": 0.14,
+        "apyReward": null,
+        "apy": 0.14,
+        "rewardTokens": null,
+        "pool": "164d2a90-0e3e-4126-a9ff-0de6db888bdf",
+        "apyPct1D": 0,
+        "apyPct7D": -5.98,
+        "apyPct30D": -7.87,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 70,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 9.45314,
+        "sigma": 0.387,
+        "count": 168,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x7537c1f80c9e157ed7afd93a494be3e1f04f1462"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 8.00626,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

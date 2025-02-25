@@ -1,0 +1,40 @@
+[
+    {
+        "chain": "Boba_Bnb",
+        "project": "symbiosis",
+        "symbol": "USDC",
+        "tvlUsd": 228494,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xd38bb40815d2b0c2d2c866e0c72c5728ffc76dd9"
+        ],
+        "pool": "ca8c0908-e156-4d90-8a32-6c47de938c6b",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0.14701,
+        "sigma": 0.03572,
+        "count": 761,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x9F98f9F312D23d078061962837042b8918e6aff2"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

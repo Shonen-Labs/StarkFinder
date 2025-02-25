@@ -1,0 +1,228 @@
+[
+    {
+        "chain": "Tezos",
+        "project": "kordfi",
+        "symbol": "TZBTC",
+        "tvlUsd": 7801096,
+        "apyBase": 0.01,
+        "apyReward": null,
+        "apy": 0.01,
+        "rewardTokens": null,
+        "pool": "07a52f5f-7ccb-46d5-87f2-fd7a9e2a8c86",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 1.75361,
+        "sigma": 0.05637,
+        "count": 593,
+        "outlier": false,
+        "underlyingTokens": [
+            "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.03327,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tezos",
+        "project": "quipuswap-stableswap",
+        "symbol": "TZBTC-UBTC",
+        "tvlUsd": 135023,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 0.78685,
+        "rewardTokens": [
+            "KT193D4vozYnhGJQVtw7CoxxqphqUEEwK6Vb"
+        ],
+        "pool": "ff48958a-15ef-4471-afb3-e3942bbdd264",
+        "apyPct1D": -0.03843,
+        "apyPct7D": -0.05067,
+        "apyPct30D": -0.39524,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 85,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 3.18372,
+        "sigma": 0.13728,
+        "count": 670,
+        "outlier": false,
+        "underlyingTokens": [
+            "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn",
+            "KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.87192,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tezos",
+        "project": "quipuswap-stableswap",
+        "symbol": "TZBTC-USDT",
+        "tvlUsd": 42662,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 13.20266,
+        "rewardTokens": [
+            "KT193D4vozYnhGJQVtw7CoxxqphqUEEwK6Vb"
+        ],
+        "pool": "1b2cf614-8678-484f-ad50-8f7d8e609bfc",
+        "apyPct1D": -0.95237,
+        "apyPct7D": -1.17474,
+        "apyPct30D": -10.17564,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 60,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 26.63549,
+        "sigma": 0.4595,
+        "count": 740,
+        "outlier": false,
+        "underlyingTokens": [
+            "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn",
+            "KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 15.56512,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tezos",
+        "project": "kordfi",
+        "symbol": "XTZ",
+        "tvlUsd": 18149,
+        "apyBase": 6.7,
+        "apyReward": null,
+        "apy": 6.7,
+        "rewardTokens": null,
+        "pool": "0955fb4f-ee95-46af-a8e3-a78b6b68d5a8",
+        "apyPct1D": 0,
+        "apyPct7D": -0.12,
+        "apyPct30D": 1.28,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 5.79197,
+        "sigma": 0.05029,
+        "count": 574,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 6.52829,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tezos",
+        "project": "quipuswap-stableswap",
+        "symbol": "QUIPU-TEZ",
+        "tvlUsd": 14829,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 23.86605,
+        "rewardTokens": [
+            "KT193D4vozYnhGJQVtw7CoxxqphqUEEwK6Vb"
+        ],
+        "pool": "5f5ed8e1-8f34-452a-baae-fce99157417d",
+        "apyPct1D": 0.05228,
+        "apyPct7D": 0.09905,
+        "apyPct30D": -2.15416,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 29.88891,
+        "sigma": 0.39619,
+        "count": 740,
+        "outlier": false,
+        "underlyingTokens": [
+            "KT193D4vozYnhGJQVtw7CoxxqphqUEEwK6Vb",
+            "tez"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 24.04188,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tezos",
+        "project": "quipuswap-stableswap",
+        "symbol": "USDT-TEZ",
+        "tvlUsd": 10007,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 12.08429,
+        "rewardTokens": [
+            "KT193D4vozYnhGJQVtw7CoxxqphqUEEwK6Vb"
+        ],
+        "pool": "658e7f4a-eb46-4299-8097-1b5b84061c20",
+        "apyPct1D": null,
+        "apyPct7D": -0.01837,
+        "apyPct30D": -3.50259,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 54,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 22.0649,
+        "sigma": 0.59549,
+        "count": 739,
+        "outlier": false,
+        "underlyingTokens": [
+            "KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o",
+            "tez"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 12.3137,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

@@ -1,0 +1,820 @@
+[
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-BNEO",
+        "tvlUsd": 3933552,
+        "apyBase": 0,
+        "apyReward": 21.98421,
+        "apy": 21.98421,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "1cbf99d6-acbd-4dd1-a4e0-140259a09ee9",
+        "apyPct1D": -0.58492,
+        "apyPct7D": 0.25803,
+        "apyPct30D": -0.86013,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 24.76677,
+        "sigma": 0.25413,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 21.85694,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLUND",
+        "tvlUsd": 3155916,
+        "apyBase": 0,
+        "apyReward": 29.61451,
+        "apy": 29.61451,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "c4de8f84-608c-4325-a0a1-ba6a007d1fba",
+        "apyPct1D": 0.03567,
+        "apyPct7D": 0.00299,
+        "apyPct30D": 1.00777,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 85,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Single Stake Pool",
+        "mu": 30.3187,
+        "sigma": 0.27664,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 29.34876,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-GAS",
+        "tvlUsd": 906044,
+        "apyBase": 0,
+        "apyReward": 17.75587,
+        "apy": 17.75587,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "9c0eb3a6-38cd-4906-a71c-ce030dd74e13",
+        "apyPct1D": -1.08492,
+        "apyPct7D": 0.24553,
+        "apyPct30D": -0.9108,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 66,
+            "binnedConfidence": 2
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 25.17111,
+        "sigma": 0.20655,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0xd2a4cff31913016155e38e474a2c06d08be276cf"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 17.79884,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-FUSD",
+        "tvlUsd": 581221,
+        "apyBase": 0,
+        "apyReward": 79.86128,
+        "apy": 79.86128,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "ed47f5d5-ab8c-4f84-8ad0-999b650a786a",
+        "apyPct1D": -6.89054,
+        "apyPct7D": -1.35978,
+        "apyPct30D": 7.08623,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 89,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 80.10752,
+        "sigma": 0.53101,
+        "count": 598,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x1005d400bcc2a56b7352f09e273be3f9933a5fb1",
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 78.61376,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-FWBTC",
+        "tvlUsd": 414126,
+        "apyBase": 0,
+        "apyReward": 44.20339,
+        "apy": 44.20339,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "90a74198-57e9-4105-a604-d739334b69b8",
+        "apyPct1D": -3.41894,
+        "apyPct7D": -0.44594,
+        "apyPct30D": -7.89407,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 95,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 24.95039,
+        "sigma": 0.73806,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0xd6abe115ecb75e1fa0b42f5e85934ce8c1ae2893"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 45.98298,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-GAS",
+        "tvlUsd": 410874,
+        "apyBase": 0,
+        "apyReward": 44.70712,
+        "apy": 44.70712,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "aa70b7f8-8a5a-433b-b983-4c4176e99b3d",
+        "apyPct1D": -1.5106,
+        "apyPct7D": 1.03551,
+        "apyPct30D": -2.71693,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 83,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 32.33972,
+        "sigma": 0.33717,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xd2a4cff31913016155e38e474a2c06d08be276cf",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 44.96639,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-FUSD",
+        "tvlUsd": 297457,
+        "apyBase": 0,
+        "apyReward": 79.70441,
+        "apy": 79.70441,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "7b8bbcfe-ab4b-45ef-8179-f14e90f3dda5",
+        "apyPct1D": -1.2435,
+        "apyPct7D": -1.78111,
+        "apyPct30D": -11.10526,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 87,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 78.3043,
+        "sigma": 0.5906,
+        "count": 598,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x1005d400bcc2a56b7352f09e273be3f9933a5fb1",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 84.66803,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-FUSDT",
+        "tvlUsd": 236317,
+        "apyBase": 0,
+        "apyReward": 48.41771,
+        "apy": 48.41771,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "08972627-65d8-4fb3-956d-52078f8d5c39",
+        "apyPct1D": -4.19725,
+        "apyPct7D": -0.76638,
+        "apyPct30D": -12.17166,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 93,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 28.55391,
+        "sigma": 0.68984,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0xcd48b160c1bbc9d74997b803b9a7ad50a4bef020"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 51.60596,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-FWBTC",
+        "tvlUsd": 230865,
+        "apyBase": 0,
+        "apyReward": 79.37835,
+        "apy": 79.37835,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "4a00e2bc-9c2a-4556-a33e-205391bcde4e",
+        "apyPct1D": -3.92403,
+        "apyPct7D": -1.59566,
+        "apyPct30D": -12.17137,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 34.65469,
+        "sigma": 0.85771,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xd6abe115ecb75e1fa0b42f5e85934ce8c1ae2893",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 83.17496,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FWBTC-FUSDT",
+        "tvlUsd": 228606,
+        "apyBase": 0,
+        "apyReward": 50.16596,
+        "apy": 50.16596,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "a947e1a6-815f-4c78-a9b6-bd7c9b00d64e",
+        "apyPct1D": -5.3945,
+        "apyPct7D": -2.36649,
+        "apyPct30D": -20.23668,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 98,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 26.28809,
+        "sigma": 1.01386,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xcd48b160c1bbc9d74997b803b9a7ad50a4bef020",
+            "0xd6abe115ecb75e1fa0b42f5e85934ce8c1ae2893"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 56.59464,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-FWETH",
+        "tvlUsd": 226284,
+        "apyBase": 0,
+        "apyReward": 80.93976,
+        "apy": 80.93976,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "b577b6a3-7c08-45e8-b85a-a36421c48260",
+        "apyPct1D": -4.43961,
+        "apyPct7D": 0.15379,
+        "apyPct30D": -8.41471,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 99,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 31.31793,
+        "sigma": 1.10516,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0xc14b601252aa5dfa6166cf35fe5ccd2e35f3fdf5"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 82.70259,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-FWETH",
+        "tvlUsd": 180954,
+        "apyBase": 0,
+        "apyReward": 101.2896,
+        "apy": 101.2896,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "82981f33-6760-4d53-8f79-7ee602baa4b6",
+        "apyPct1D": -2.86414,
+        "apyPct7D": -1.22273,
+        "apyPct30D": -7.74987,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 98,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 42.7952,
+        "sigma": 0.90729,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xc14b601252aa5dfa6166cf35fe5ccd2e35f3fdf5",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 104.52876,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-FUSDT",
+        "tvlUsd": 159280,
+        "apyBase": 0,
+        "apyReward": 72.16472,
+        "apy": 72.16472,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "9d7a945d-5b39-4afa-8136-90503259eb5e",
+        "apyPct1D": -4.20266,
+        "apyPct7D": -1.90163,
+        "apyPct30D": -15.58188,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 94,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 33.22907,
+        "sigma": 0.90658,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xcd48b160c1bbc9d74997b803b9a7ad50a4bef020",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 77.34462,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FWBTC-FUSD",
+        "tvlUsd": 50485,
+        "apyBase": 0,
+        "apyReward": 454.29462,
+        "apy": 454.29462,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "b4d2cf53-8daa-4ad7-99d2-09dc1951089c",
+        "apyPct1D": -48.84012,
+        "apyPct7D": -21.44738,
+        "apyPct30D": -195.21344,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 97,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 139.20293,
+        "sigma": 4.38352,
+        "count": 598,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x1005d400bcc2a56b7352f09e273be3f9933a5fb1",
+            "0xd6abe115ecb75e1fa0b42f5e85934ce8c1ae2893"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 516.6688,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-PONT",
+        "tvlUsd": 36248,
+        "apyBase": 0,
+        "apyReward": 50.50308,
+        "apy": 50.50308,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "ef67ee82-2584-46b4-a031-125d3f265321",
+        "apyPct1D": -0.71771,
+        "apyPct7D": 1.60409,
+        "apyPct30D": -4.76928,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 85,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 23.84107,
+        "sigma": 0.66062,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x8122bc2212ec971690a044b37a6f52a9349b702b",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 50.50211,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-FCAKE",
+        "tvlUsd": 32454,
+        "apyBase": 0,
+        "apyReward": 74.4027,
+        "apy": 74.4027,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "39a95f36-1ab6-44b9-b5f8-00d9c5eafbb3",
+        "apyPct1D": -2.40091,
+        "apyPct7D": 3.41663,
+        "apyPct30D": -25.12224,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 89,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 44.98989,
+        "sigma": 0.88134,
+        "count": 709,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xe65b462b90516012826f8a9c4c285d8c750e3a77",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 88.12909,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FUSDT-FUSD",
+        "tvlUsd": 18339,
+        "apyBase": 0,
+        "apyReward": 1005.79848,
+        "apy": 1005.79848,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "65446288-b952-4947-8228-fdee797c6d09",
+        "apyPct1D": -117.60847,
+        "apyPct7D": -53.94822,
+        "apyPct30D": -511.99617,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 97,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 132.36617,
+        "sigma": 5.24669,
+        "count": 598,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x1005d400bcc2a56b7352f09e273be3f9933a5fb1",
+            "0xcd48b160c1bbc9d74997b803b9a7ad50a4bef020"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1171.05086,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-TIPS",
+        "tvlUsd": 13027,
+        "apyBase": 0,
+        "apyReward": 69.7717,
+        "apy": 69.7717,
+        "rewardTokens": [
+            "0x340720c7107ef5721e44ed2ea8e314cce5c130fa"
+        ],
+        "pool": "dde2a539-240d-46b9-9fca-8681dbbb68ec",
+        "apyPct1D": 2.35024,
+        "apyPct7D": 3.62858,
+        "apyPct30D": 1.97101,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 88,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Reverse Pool",
+        "mu": 37.37261,
+        "sigma": 0.71551,
+        "count": 664,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x340720c7107ef5721e44ed2ea8e314cce5c130fa",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 66.78196,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-FDE",
+        "tvlUsd": 11941,
+        "apyBase": 0,
+        "apyReward": 18.38712,
+        "apy": 18.38712,
+        "rewardTokens": [
+            "0x9770f4d78a19d1a6fa94b472bcedffcc06b56c49"
+        ],
+        "pool": "4f128e2b-95ca-4671-b278-1f7f16250fe5",
+        "apyPct1D": -0.48886,
+        "apyPct7D": 0.19879,
+        "apyPct30D": -0.47835,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 61,
+            "binnedConfidence": 1
+        },
+        "poolMeta": "Flamingo Reverse Pool",
+        "mu": 26.13723,
+        "sigma": 0.55366,
+        "count": 627,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0x9770f4d78a19d1a6fa94b472bcedffcc06b56c49"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 18.46493,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "FLM-FBNB",
+        "tvlUsd": 10696,
+        "apyBase": 0,
+        "apyReward": 447.48188,
+        "apy": 447.48188,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "0f6b1373-eb74-4354-8618-683a78529767",
+        "apyPct1D": -24.09044,
+        "apyPct7D": -3.24155,
+        "apyPct30D": -92.82793,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 95,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 72.77114,
+        "sigma": 3.17533,
+        "count": 651,
+        "outlier": true,
+        "underlyingTokens": [
+            "0xb56f0fba45cc57a948b342186274dfd863996bb3",
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 482.01736,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Neo",
+        "project": "flamingo-finance",
+        "symbol": "BNEO-FCAKE",
+        "tvlUsd": 10031,
+        "apyBase": 0,
+        "apyReward": 252.56366,
+        "apy": 252.56366,
+        "rewardTokens": [
+            "0xf0151f528127558851b39c2cd8aa47da7418ab28"
+        ],
+        "pool": "b58ee358-03f2-42df-aac9-122a8967a91b",
+        "apyPct1D": -0.96511,
+        "apyPct7D": 26.02871,
+        "apyPct30D": -77.21023,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 95,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "Flamingo Pool",
+        "mu": 67.9621,
+        "sigma": 2.20197,
+        "count": 630,
+        "outlier": true,
+        "underlyingTokens": [
+            "0x48c40d4666f93408be1bef038b6722404d9a4c2a",
+            "0xe65b462b90516012826f8a9c4c285d8c750e3a77"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 281.13014,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

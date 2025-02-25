@@ -1,0 +1,36 @@
+[
+    {
+        "chain": "Chiliz",
+        "project": "azuro",
+        "symbol": "WCHZ",
+        "tvlUsd": 2092002,
+        "apyBase": 7.47752,
+        "apyReward": null,
+        "apy": 7.47752,
+        "rewardTokens": null,
+        "pool": "972ab821-797d-49c3-81bf-866f31938f07",
+        "apyPct1D": -0.02404,
+        "apyPct7D": -0.17162,
+        "apyPct30D": -0.80003,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 66,
+            "binnedConfidence": 2
+        },
+        "poolMeta": "7 day lockup",
+        "mu": 5.35971,
+        "sigma": 0.23306,
+        "count": 259,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 7.87526,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

@@ -1,0 +1,38 @@
+[
+    {
+        "chain": "Polkadot",
+        "project": "bifrost-liquid-staking",
+        "symbol": "VDOT",
+        "tvlUsd": 39571909,
+        "apyBase": 12.05,
+        "apyReward": 0.18,
+        "apy": 12.23,
+        "rewardTokens": [
+            "DOT"
+        ],
+        "pool": "ff05ab26-971e-4e68-b1c6-c61a4c12c364",
+        "apyPct1D": 0.01,
+        "apyPct7D": 0.14,
+        "apyPct30D": -1.21,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 52,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 19.59116,
+        "sigma": 0.18207,
+        "count": 729,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 12.61241,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
