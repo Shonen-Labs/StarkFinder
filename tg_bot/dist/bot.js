@@ -605,17 +605,23 @@ Received a message from chat:
 bot.catch((err) => {
     console.error("Bot error:", err);
 });
+let isBotRunning = false; // Prevents multiple instances
 function startBot() {
     return __awaiter(this, void 0, void 0, function* () {
+        if (isBotRunning)
+            return; // Ensure only one instance runs
+        isBotRunning = true;
         try {
-            bot.start({
+            yield bot.start({
                 onStart: () => __awaiter(this, void 0, void 0, function* () {
                     var _a;
                     console.log(`✅ Bot started as ${(_a = bot.botInfo) === null || _a === void 0 ? void 0 : _a.username}!`);
                 }),
+                drop_pending_updates: true,
             });
         }
         catch (err) {
+            isBotRunning = false; // Reset flag on failure
             if (err instanceof grammy_1.GrammyError) {
                 console.error("❌ Grammy Error:", err.description);
                 if (err.error_code === 409) {
@@ -632,4 +638,4 @@ function startBot() {
         }
     });
 }
-// startBot();
+startBot();

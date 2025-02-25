@@ -1,6 +1,6 @@
 // lib/transaction/processor.ts
 import { Provider } from 'starknet';
-import { BrianResponse, ProcessedTransaction, BrianTransactionData, TransactionAction } from './types';
+import type { BrianResponse, ProcessedTransaction, BrianTransactionData, TransactionAction } from './types';
 import { STARKNET_RPC_URL } from './config';
 import {
   SwapHandler,
@@ -8,7 +8,7 @@ import {
   NostraDepositHandler,
   NostraWithdrawHandler,
   BridgeHandler,
-  BaseTransactionHandler
+  type BaseTransactionHandler
 } from './handlers';
 
 export class TransactionProcessor {
@@ -142,12 +142,9 @@ export class TransactionProcessor {
         throw new Error(`Unsupported action type: ${response.action}`);
       }
 
-
       const transactionData = this.createTransactionData(response);
 
-
       const transactions = await handler.processSteps(transactionData, response.extractedParams);
-
 
       const description = this.generateDescription(response);
 
