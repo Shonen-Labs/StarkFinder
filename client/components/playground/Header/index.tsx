@@ -75,6 +75,11 @@ export default function Header({
       <div className="flex-1 flex justify-center">
         <ul className="flex gap-6">
           <li>
+            <Link href="/" className="hover:text-blue-500 transition-colors">
+              Home
+            </Link>
+          </li>
+          <li>
             <Link href="/deploy" className="hover:text-blue-500 transition-colors">
               Deploy
             </Link>
