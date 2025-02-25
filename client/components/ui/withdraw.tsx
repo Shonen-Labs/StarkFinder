@@ -18,7 +18,7 @@ const Withdraw: React.FC<WithdrawProps> = ({ setSelectedCommand }) => {
   const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">(
         "from"
       );
-
+  console.log(toCoin);
   const openModal = (type: "from" | "to") => {
       setSelectingCoinFor(type);
       setShowModal(true);

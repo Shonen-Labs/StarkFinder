@@ -19,6 +19,7 @@ const Deposit: React.FC<DepositProps> = ({ setSelectedCommand }) => {
         "from"
       );
   
+console.log(toCoin);
 
   const openModal = (type: "from" | "to") => {
       setSelectingCoinFor(type);
