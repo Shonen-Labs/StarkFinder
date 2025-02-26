@@ -1,0 +1,50 @@
+{
+    "name": "@elizaos/plugin-abstract",
+    "version": "0.25.6-alpha.1",
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "import": {
+                "@elizaos/source": "./src/index.ts",
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "@abstract-foundation/agw-client": "1.0.1",
+        "@elizaos/core": "workspace:*",
+        "tsup": "^8.3.5",
+        "viem": "2.22.2"
+    },
+    "scripts": {
+        "lint": "biome lint .",
+        "lint:fix": "biome check --apply .",
+        "format": "biome format .",
+        "format:fix": "biome format --write .",
+        "build": "tsup --format esm --no-dts",
+        "dev": "tsup --format esm --no-dts --watch",
+        "test": "vitest run",
+        "test:watch": "vitest watch",
+        "test:coverage": "vitest run --coverage"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4",
+        "tsup": "8.3.5",
+        "typescript": "4.9",
+        "vitest": "^3.0.0"
+    },
+    "peerDependencies": {
+        "whatwg-url": "7.1.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}

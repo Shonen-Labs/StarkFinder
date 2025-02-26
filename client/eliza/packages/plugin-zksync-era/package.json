@@ -1,0 +1,42 @@
+{
+    "name": "@elizaos/plugin-zksync-era",
+    "version": "0.25.6-alpha.1",
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "./package.json": "./package.json",
+        ".": {
+            "import": {
+                "@elizaos/source": "./src/index.ts",
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            }
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "dependencies": {
+        "@elizaos/core": "workspace:*",
+        "tsup": "^8.3.5",
+        "viem": "2.22.2"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.5.3"
+    },
+    "scripts": {
+        "build": "tsup --format esm --dts",
+        "lint": "biome check src/",
+        "lint:fix": "biome check --apply src/",
+        "format": "biome format src/",
+        "format:fix": "biome format --write src/"
+    },
+    "peerDependencies": {
+        "whatwg-url": "7.1.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
+}
