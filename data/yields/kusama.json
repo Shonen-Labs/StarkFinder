@@ -1,0 +1,38 @@
+[
+    {
+        "chain": "Kusama",
+        "project": "bifrost-liquid-staking",
+        "symbol": "VKSM",
+        "tvlUsd": 4337339,
+        "apyBase": 14.58,
+        "apyReward": 0.63,
+        "apy": 15.21,
+        "rewardTokens": [
+            "KSM"
+        ],
+        "pool": "402b81ac-fa55-4beb-9364-dd927376cbd0",
+        "apyPct1D": -0.09,
+        "apyPct7D": -0.07,
+        "apyPct30D": 0.01,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 55.00000000000001,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 19.14662,
+        "sigma": 0.20205,
+        "count": 729,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 15.3252,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

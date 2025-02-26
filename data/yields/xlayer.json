@@ -1,0 +1,38 @@
+[
+    {
+        "chain": "Xlayer",
+        "project": "zerolend",
+        "symbol": "WOKB",
+        "tvlUsd": 12096,
+        "apyBase": 0.11537,
+        "apyReward": null,
+        "apy": 0.11537,
+        "rewardTokens": null,
+        "pool": "9290c84a-bab8-4275-bb76-778550b76c38",
+        "apyPct1D": -0.00065,
+        "apyPct7D": -0.00134,
+        "apyPct30D": 0.02599,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 67,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 0.17077,
+        "sigma": 0.04482,
+        "count": 162,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xe538905cf8410324e03a5a23c1c177a474d59b2b"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.11326,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

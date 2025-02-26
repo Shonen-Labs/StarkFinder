@@ -1,5 +1,5 @@
-import { ReactFlowProvider } from 'reactflow'
-import Playground from './Playground'
+import { ReactFlowProvider } from "reactflow";
+import Playground from "./Playground";
 
 // Wrap the main component with ReactFlowProvider
 export default function BlocksPlayground() {
@@ -7,5 +7,5 @@ export default function BlocksPlayground() {
     <ReactFlowProvider>
       <Playground />
     </ReactFlowProvider>
-  )
+  );
 }

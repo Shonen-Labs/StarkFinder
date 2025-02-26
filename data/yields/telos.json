@@ -1,0 +1,153 @@
+[
+    {
+        "chain": "Telos",
+        "project": "stlos-liquid-staking",
+        "symbol": "STLOS",
+        "tvlUsd": 2344492,
+        "apyBase": 4.24,
+        "apyReward": null,
+        "apy": 4.24,
+        "rewardTokens": null,
+        "pool": "28bba7c2-72f2-4f1d-afd3-abfe2e4b51af",
+        "apyPct1D": 0,
+        "apyPct7D": -0.01,
+        "apyPct30D": 0.05,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 74,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 8.06135,
+        "sigma": 0.1152,
+        "count": 778,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.2206,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Telos",
+        "project": "apeswap-amm",
+        "symbol": "TLOS-STLOS",
+        "tvlUsd": 72324,
+        "apyBase": null,
+        "apyReward": 1977.26187,
+        "apy": 1977.26187,
+        "rewardTokens": [
+            "0xd102ce6a4db07d247fcc28f366a623df0938ca9e"
+        ],
+        "pool": "0603f735-e234-4a66-8ce3-d992db68b32e",
+        "apyPct1D": 2.18713,
+        "apyPct7D": -6.82644,
+        "apyPct30D": -1.85782,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 98,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 659.25104,
+        "sigma": 5.20829,
+        "count": 758,
+        "outlier": true,
+        "underlyingTokens": [
+            "0xd102ce6a4db07d247fcc28f366a623df0938ca9e",
+            "0xB4B01216a5Bc8F1C8A33CD990A1239030E60C905"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1996.65837,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Telos",
+        "project": "apeswap-amm",
+        "symbol": "STLOS-USDC",
+        "tvlUsd": 37195,
+        "apyBase": null,
+        "apyReward": 5767.25301,
+        "apy": 5767.25301,
+        "rewardTokens": [
+            "0xd102ce6a4db07d247fcc28f366a623df0938ca9e"
+        ],
+        "pool": "06334241-378b-43ae-8aee-0520cc7afb5c",
+        "apyPct1D": 6.44003,
+        "apyPct7D": -19.9424,
+        "apyPct30D": 1082.24101,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 99,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 1972.87166,
+        "sigma": 7.09161,
+        "count": 726,
+        "outlier": true,
+        "underlyingTokens": [
+            "0xB4B01216a5Bc8F1C8A33CD990A1239030E60C905",
+            "0x818ec0A7Fe18Ff94269904fCED6AE3DaE6d6dC0b"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 5362.42182,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Telos",
+        "project": "apeswap-amm",
+        "symbol": "TLOS-ETH",
+        "tvlUsd": 11336,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xd102ce6a4db07d247fcc28f366a623df0938ca9e"
+        ],
+        "pool": "7f5fb4a9-d3f3-47cb-b06e-319efbaa8201",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": null,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 8.21416,
+        "sigma": 0.51304,
+        "count": 213,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xd102ce6a4db07d247fcc28f366a623df0938ca9e",
+            "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
