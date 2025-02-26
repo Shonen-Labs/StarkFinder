@@ -10,7 +10,8 @@ starknet = "2.9.1"
 openzeppelin = "0.20.0"
 
 [dev-dependencies]
-snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.33.0" }
+snforge_std = "0.34.0"
+openzeppelin_testing = "0.20.0"
 # cairo_test = "2.9.1"
 assert_macros = "2.9.1"
 

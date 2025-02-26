@@ -5,9 +5,7 @@ mod DefiVault {
     use starknet::{get_caller_address, get_contract_address, get_block_timestamp};
     use core::integer::u256;
     use core::num::traits::Zero;
-    use contracts::interfaces::IDefiVault::{
-        IDefiVaultDispatcher, IDefiVaultDispatcherTrait, IDefiVault,
-    };
+    use contracts::interfaces::IDefiVault::IDefiVault;
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use core::starknet::storage::Map;
     use starknet::storage::StorageMapReadAccess;

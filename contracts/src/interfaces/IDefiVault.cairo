@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use starknet::storage::{Map, Vec};
 
 #[starknet::interface]
 pub trait IDefiVault<TContractState> {
