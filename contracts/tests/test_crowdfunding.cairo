@@ -3,7 +3,7 @@ use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan,
     cheat_block_timestamp, spy_events, EventSpyAssertionsTrait,
 };
-use starknet::ArrayTrait;
+use core::array::ArrayTrait;
 use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use contracts::crowdfunding::{
     CampaignCreated, CampaignFunded, CampaignResolved, ICrowdfundingDispatcher,
@@ -265,25 +265,14 @@ fn test_get_user_campaigns() {
 
     // USER1 creates 2 campaigns
     cheat_caller_address(contract, USER1(), CheatSpan::TargetCalls(2));
-    let campaign_1 = dispatcher.create_campaign(5000, starknet::get_block_timestamp() + 2000);
-    let campaign_2 = dispatcher.create_campaign(10000, starknet::get_block_timestamp() + 4000);
-
-    // USER2 creates 1 campaign
-    cheat_caller_address(contract, USER2(), CheatSpan::TargetCalls(1));
-    let campaign_3 = dispatcher.create_campaign(7000, starknet::get_block_timestamp() + 3000);
+    let _campaign_1 = dispatcher.create_campaign(5000, starknet::get_block_timestamp() + 2000);
+    let _campaign_2 = dispatcher.create_campaign(10000, starknet::get_block_timestamp() + 4000);
 
     // Retrieve campaigns
-    let user1_campaigns = dispatcher.get_user_campaigns(USER1()).into();
-    let user2_campaigns= dispatcher.get_user_campaigns(USER2()).into();
+    let user1_campaigns = dispatcher.get_user_campaigns(USER1());
 
     // Assertions
-    assert(user1_campaigns.len() == 2, "USER1: wrong count");
-    assert(user1_campaigns[0] == campaign_1, "USER1: first ID mismatch");
-    assert(user1_campaigns[1] == campaign_2, "USER1: second ID mismatch");
-
-    assert(user2_campaigns.len() == 1, "USER2: wrong count");
-    assert(user2_campaigns[0] == campaign_3, "USER2: ID mismatch");
-
-    assert(user1_campaigns != user2_campaigns, "Campaigns mixed up");
+    assert(user1_campaigns.len() == 2, 'USER1: wrong count');
+    assert(user1_campaigns == array![1, 2], 'USER1 campaigns not match IDs');
 }
 

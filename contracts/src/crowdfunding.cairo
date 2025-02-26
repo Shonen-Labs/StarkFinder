@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use starknet::storage::{Map, Vec};
-use alexandria_storage::{ListTrait , List};
+use alexandria_storage::{ListTrait, List};
 
 #[starknet::interface]
 pub trait ICrowdfunding<TContractState> {
@@ -70,10 +70,10 @@ pub mod Crowdfunding {
     use core::starknet::{
         ContractAddress, get_block_timestamp, get_caller_address, get_contract_address,
     };
-    use alexandria_storage::{ListTrait , List};
+    use alexandria_storage::{ListTrait, List};
     use core::option::OptionTrait;
     use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map,Vec,
+        StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map, Vec,
         StorageMapWriteAccess, MutableVecTrait,
     };
     use starknet::storage::StorageMapReadAccess;
@@ -126,10 +126,10 @@ pub mod Crowdfunding {
             self.nonce.write(id);
 
             let mut user_campaigns = self.user_campaigns.entry(creator).read();
-            let result = user_campaigns.append(id);            
-            assert(result.is_ok(), 'Failed to append campaign ID');            
-            self.user_campaigns.entry(creator).write(user_campaigns);          
-            
+            let result = user_campaigns.append(id);
+            assert(result.is_ok(), 'Failed to append campaign ID');
+            self.user_campaigns.entry(creator).write(user_campaigns);
+
             self.emit(CampaignCreated { id, creator, funding_goal });
 
             id
@@ -217,23 +217,24 @@ pub mod Crowdfunding {
 
         fn get_user_campaigns(self: @ContractState, user: ContractAddress) -> Array<u256> {
             let mut user_campaigns = self.user_campaigns.read(user);
-        
-            let mut campaign_ids: Array<u256> = array![];
+
+            let mut campaign_ids = ArrayTrait::new();
+
             let mut i: u32 = 0;
-        
+
             loop {
                 if i >= user_campaigns.len() {
                     break;
                 }
-        
+
                 let campaign_id = user_campaigns[i];
                 campaign_ids.append(campaign_id);
-        
+
                 i += 1;
             };
-        
+
             campaign_ids
-        }        
+        }
     }
 
     #[generate_trait]
