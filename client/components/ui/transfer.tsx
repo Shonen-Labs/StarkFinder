@@ -12,17 +12,27 @@ interface TransferProps {
 
 const Transfer: React.FC<TransferProps> = ({ setSelectedCommand }) => {
   const [fromAmount, setFromAmount] = useState<string>("");
-  const [fromCoin] = useState<CryptoCoin>(CoinsLogo[0]);
+  const [fromCoin, setFromCoin] = useState<CryptoCoin>(CoinsLogo[0]);
+  const [toCoin, setToCoin] = useState<CryptoCoin>(CoinsLogo[3]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [walletAddress, setWalletAddress] = useState<string>("");
-
-  const openModal = () => {
+  const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">(
+      "from"
+    );
+  console.log(toCoin);
+  const openModal = (type: "from" | "to") => {
+    setSelectingCoinFor(type);
     setShowModal(true);
   };
 
-  const handleCoinSelect = () => {
-    setShowModal(false);
-  };
+  const handleCoinSelect = (coin: CryptoCoin) => {
+      if (selectingCoinFor === "from") {
+        setFromCoin(coin);
+      } else {
+        setToCoin(coin);
+      }
+      setShowModal(false);
+    }; 
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-80 flex flex-col items-center justify-center animated fadeIn">
@@ -54,7 +64,7 @@ const Transfer: React.FC<TransferProps> = ({ setSelectedCommand }) => {
           />
           <div
             className="flex items-center space-x-2 cursor-pointer bg-[#333333] px-3 py-2 rounded-lg"
-            onClick={() => openModal()}
+            onClick={() => openModal("from")}
           >
             <Image
               src={fromCoin.logo}
