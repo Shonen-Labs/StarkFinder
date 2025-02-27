@@ -58,26 +58,26 @@ interface FloatingSidebarProps {
 //   blockName: z.string().min(1, "Block name is required"),
 //   solidityCode: z.string().min(1, "Solidity code is required"),
 // })
-const greg=groupedBlocks["Trigger Actions"]
-const token=groupedBlocks["Token Actions"]
-const li=groupedBlocks["Liquidity"]
-const po=groupedBlocks["Portfolio Management"]
-const inst=groupedBlocks["Analytics"]
-const go=groupedBlocks["Governance"]
-const ev=groupedBlocks["Events"]
-const triggerActions = [{icon: <FlagIcon/>, text:"Initialise", toggle:false,groupedBlock:groupedBlocks["Trigger Actions"]}, {icon: <ConnectionIcon/>, text: "Connection", toggle:true,groupedBlock:groupedBlocks["Trigger Actions"]}];
+const greg = groupedBlocks["Trigger Actions"]
+const token = groupedBlocks["Token Actions"]
+const li = groupedBlocks["Liquidity"]
+const po = groupedBlocks["Portfolio Management"]
+const inst = groupedBlocks["Analytics"]
+const go = groupedBlocks["Governance"]
+const ev = groupedBlocks["Events"]
+const triggerActions = [{ icon: <FlagIcon />, text: "Initialise", toggle: false, groupedBlock: groupedBlocks["Trigger Actions"] }, { icon: <ConnectionIcon />, text: "Connection", toggle: true, groupedBlock: groupedBlocks["Trigger Actions"] }];
 
-const tokenActions  = [{icon: <SwapTokenIcon/>, text: "Swap Token", toggle:false}, {icon: <StakeTokenIcon/>, text: "StakeToken",  toggle:false}, {icon:<AllocateTokenIcon/>, text: "Allocate Token", toggle:false}, {icon: <YieldFarmingIcon/>, text: "Yield Farming", toggle:true}, {icon: <LendTokenIcon/>, text: "Lend Tokens", toggle:false}, {icon: <BorrowTokenIcon/>, text:"Borrow Token", toggle:false}, {icon:<RepayLoanIcon/>, text:"Repay Loan", toggle:false}];
+const tokenActions = [{ icon: <SwapTokenIcon />, text: "Swap Token", toggle: false }, { icon: <StakeTokenIcon />, text: "StakeToken", toggle: false }, { icon: <AllocateTokenIcon />, text: "Allocate Token", toggle: false }, { icon: <YieldFarmingIcon />, text: "Yield Farming", toggle: true }, { icon: <LendTokenIcon />, text: "Lend Tokens", toggle: false }, { icon: <BorrowTokenIcon />, text: "Borrow Token", toggle: false }, { icon: <RepayLoanIcon />, text: "Repay Loan", toggle: false }];
 
-const liquidityManagement  = [{icon: <AddIcon/>, text: "Add Liquidity"}, {icon: <PeopleIcon/>, text:"Create Stack Pooling"}]
+const liquidityManagement = [{ icon: <AddIcon />, text: "Add Liquidity" }, { icon: <PeopleIcon />, text: "Create Stack Pooling" }]
 
-const portfolioManagement = [{icon: <ClockIcon/>, text: "rebalance Portfolio"}, {icon: <ScaleofJusticeIcon/>, text:"Set Rebalance"},{icon: <CubeIcon/>, text: "Create Custom Index"},{icon: <LossIcon/>, text: "Set Stop Loss"},{icon: <ProfitIcon/>, text: "Set Take Profit"},{icon: <SetStrategyIcon/>, text: "Set Strategy"}]
+const portfolioManagement = [{ icon: <ClockIcon />, text: "rebalance Portfolio" }, { icon: <ScaleofJusticeIcon />, text: "Set Rebalance" }, { icon: <CubeIcon />, text: "Create Custom Index" }, { icon: <LossIcon />, text: "Set Stop Loss" }, { icon: <ProfitIcon />, text: "Set Take Profit" }, { icon: <SetStrategyIcon />, text: "Set Strategy" }]
 
-const insighAndAnalytics =[{icon: <PieChartIcon/>, text: "Check Transaction"}, {icon: <PortfolioIcon/>, text:"Portfolio Analytics"}]
+const insighAndAnalytics = [{ icon: <PieChartIcon />, text: "Check Transaction" }, { icon: <PortfolioIcon />, text: "Portfolio Analytics" }]
 
-const governance = [{icon: <VoteIcon/>, text: "Vote on Proposal"}, {icon: <PadlockIcon/>, text:"Create Vesting"}]
+const governance = [{ icon: <VoteIcon />, text: "Vote on Proposal" }, { icon: <PadlockIcon />, text: "Create Vesting" }]
 
-const eventsAndAutomation = [{icon: <MarkedCalenderIcon/>, text: "On Event Outcome"}, {icon: <EnergyIcon/>, text:"Execute Flash Loan"},{icon: <AirdropIcon/>, text: "Initiate Airdrop"}]
+const eventsAndAutomation = [{ icon: <MarkedCalenderIcon />, text: "On Event Outcome" }, { icon: <EnergyIcon />, text: "Execute Flash Loan" }, { icon: <AirdropIcon />, text: "Initiate Airdrop" }]
 
 interface FloatingSidebarProps {
   addBlock: (block: any) => void;
@@ -117,20 +117,20 @@ const combined = triggerActions.map((action, index) => ({
 }));
 
 
-function toggleReducer(state: ToggleState, action:ToggleAction ): ToggleState {
+function toggleReducer(state: ToggleState, action: ToggleAction): ToggleState {
   switch (action.type) {
     case "toggle_triggerAction":
       return { ...initialState, triggerActionToggle: !state.triggerActionToggle };
     case "toggle_tokenActions":
-      return { ...initialState, tokenActionsToggle: !state.tokenActionsToggle};
+      return { ...initialState, tokenActionsToggle: !state.tokenActionsToggle };
     case "toggle_liquidityManagement":
-      return { ...initialState, liquidityManagementToggle: !state.liquidityManagementToggle};
-    case "toggle_portfolioManagement": 
+      return { ...initialState, liquidityManagementToggle: !state.liquidityManagementToggle };
+    case "toggle_portfolioManagement":
       return { ...initialState, portfolioManagementToggle: !state.portfolioManagementToggle }
     case "toggle_insightAndAnalytics":
       return { ...initialState, insightAndAnalyticsToggle: !state.insightAndAnalyticsToggle };
     case "toggle_governance":
-      return { ...initialState, governanceToggle: !state.governanceToggle};
+      return { ...initialState, governanceToggle: !state.governanceToggle };
     case "toggle_eventsAndAutomation":
       return { ...initialState, eventsAndAutomationToggle: !state.eventsAndAutomationToggle };
     default:
@@ -208,20 +208,20 @@ function CustomBlockModal({ isOpen, onClose, onSubmit }: CustomBlockModalProps) 
 }
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
-  const [{triggerActionToggle,
+  const [{ triggerActionToggle,
     tokenActionsToggle,
     liquidityManagementToggle,
     portfolioManagementToggle,
     insightAndAnalyticsToggle,
     governanceToggle,
-    eventsAndAutomationToggle}, dispatch] = useReducer(toggleReducer, initialState);
+    eventsAndAutomationToggle }, dispatch] = useReducer(toggleReducer, initialState);
 
   const [onToggleButton, setOnToggleButton] = useState(false);
 
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
 
-  function switchToggleBtn(){
-    setOnToggleButton((prev)=> !prev)
+  function switchToggleBtn() {
+    setOnToggleButton((prev) => !prev)
     console.log("print")
   }
 
@@ -242,246 +242,321 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       {/* Defi Section */}
       <div>
         <h4 className="text-gray-400">Defi</h4>
-      
+
         <div className="mt-4 flex flex-col gap-2 text-gray-400">
           <div className={clsx("hover:bg-gray-200 rounded-lg", triggerActionToggle && 'bg-gray-200')}>
-            <div className="px-3 py-2 flex justify-between items-center">
-                <div className="flex gap-3">
-                  <span>
-                    <StartIcon/>
-                  </span>
-                  <div className="text-black">Trigger Actions</div>
-                </div>
-                <div onClick={() => dispatch({ type: "toggle_triggerAction" })}>
-                  {triggerActionToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
-                </div>
-            </div>
-            {triggerActionToggle && <div className="ml-10 my-2 mr-2 flex flex-col gap-2">
-              {combined.map((item) => (
-      <div 
-        key={item.text}  // ensure key is unique; consider using a unique id if available
-        className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2"
-      >
-        <div 
-          className="flex justify-between items-center"
-          onClick={() => item.block && addBlock(item.block)}  // only call addBlock if block exists
-        >
-          <div className="flex gap-3">
-            <span>{item.icon}</span>
-            <div className="text-black hover:font-medium">{item.text}</div>
-          </div>
-          <span>
-            {item.toggle && (
-              onToggleButton ? (
-                <ToggleBtn mode="on" onClick={switchToggleBtn} />
-              ) : (
-                <ToggleBtn mode="off" onClick={switchToggleBtn} />
-              )
-            )}
-          </span>
-        </div>
-        {/* If you need to render extra details from the block */}
-        {/*item.block && ()*/}
-      </div>
-    ))}
 
-              </div>}
-          </div>
-          <div className={clsx("hover:bg-gray-200 rounded-lg", tokenActionsToggle && 'bg-gray-200')}>
-            <div className="px-3 py-2 flex justify-between items-center">
+            <div onClick={(e) => {
+              e.stopPropagation();
+              dispatch({ type: "toggle_triggerAction" });
+            }} className="px-3 py-2 flex justify-between items-center">
               <div className="flex gap-3">
                 <span>
-                  <CoinIcon/>
+                  <StartIcon />
+                </span>
+                <div className="text-black">Trigger Actions</div>
+              </div>
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_triggerAction" });
+              }}>
+                {triggerActionToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+              </div>
+            </div>
+
+            {triggerActionToggle && <div className="ml-10 my-2 mr-2 flex flex-col gap-2">
+              {combined.map((item) => (
+                <div
+                  key={item.text}  // ensure key is unique; consider using a unique id if available
+                  className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2"
+                >
+                  <div
+                    className="flex justify-between items-center"
+                    onClick={() => item.block && addBlock(item.block)}  // only call addBlock if block exists
+                  >
+                    <div className="flex gap-3">
+                      <span>{item.icon}</span>
+                      <div className="text-black hover:font-medium">{item.text}</div>
+                    </div>
+                    <span>
+                      {item.toggle && (
+                        onToggleButton ? (
+                          <ToggleBtn mode="on" onClick={switchToggleBtn} />
+                        ) : (
+                          <ToggleBtn mode="off" onClick={switchToggleBtn} />
+                        )
+                      )}
+                    </span>
+                  </div>
+                  {/* If you need to render extra details from the block */}
+                  {/*item.block && ()*/}
+                </div>
+              ))}
+
+            </div>}
+
+          </div>
+
+          <div className={clsx("hover:bg-gray-200 rounded-lg", tokenActionsToggle && 'bg-gray-200')}>
+
+            <div onClick={(e) => {
+              e.stopPropagation();
+              dispatch({ type: "toggle_tokenActions" });
+            }} className="px-3 py-2 flex justify-between items-center">
+              <div className="flex gap-3">
+                <span>
+                  <CoinIcon />
                 </span>
                 <div className="text-black ">Token Actions</div>
               </div>
-              <div onClick={() => dispatch({ type: "toggle_tokenActions" })}>
-               {tokenActionsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
-              </div> 
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_tokenActions" });
+              }} >
+                {tokenActionsToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+              </div>
             </div>
-            {tokenActionsToggle && (
-  <div className="ml-10 my-2 flex flex-col gap-2 cursor-pointer">
-    {tokenActions.map((child, index) => {
-      // Get the corresponding token item by index.
-      const block = token[index];
-      
-      return (
-        <div
-          key={child.text} // Consider using a unique identifier if available
-          className="px-3 py-2 hover:bg-gray-100 rounded-md mr-2"
-        >
-          <div className="flex justify-between items-center" onClick={() => block && addBlock(block)}>
-            <div className="flex gap-3">
-              <span>{child.icon}</span>
-              <div className="text-black hover:font-medium">{child.text}</div>
-            </div>
-            <span>
-              {child.toggle &&
-                (onToggleButton ? (
-                  <ToggleBtn mode="on" onClick={switchToggleBtn} />
-                ) : (
-                  <ToggleBtn mode="off" onClick={switchToggleBtn} />
-                ))}
-            </span>
-          </div>
 
-          {/* Render details from the corresponding token item if needed */}
-          {/*block && (
+            {tokenActionsToggle && (
+              <div className="ml-10 my-2 flex flex-col gap-2 cursor-pointer">
+                {tokenActions.map((child, index) => {
+                  // Get the corresponding token item by index.
+                  const block = token[index];
+
+                  return (
+                    <div
+                      key={child.text} // Consider using a unique identifier if available
+                      className="px-3 py-2 hover:bg-gray-100 rounded-md mr-2"
+                    >
+                      <div className="flex justify-between items-center" onClick={() => block && addBlock(block)}>
+                        <div className="flex gap-3">
+                          <span>{child.icon}</span>
+                          <div className="text-black hover:font-medium">{child.text}</div>
+                        </div>
+                        <span>
+                          {child.toggle &&
+                            (onToggleButton ? (
+                              <ToggleBtn mode="on" onClick={switchToggleBtn} />
+                            ) : (
+                              <ToggleBtn mode="off" onClick={switchToggleBtn} />
+                            ))}
+                        </span>
+                      </div>
+
+                      {/* Render details from the corresponding token item if needed */}
+                      {/*block && (
           
           )*/}
-        </div>
-      );
-    })}
-  </div>
-)}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
           </div>
         </div>
 
         {/* Assesment Management Section */}
         <div className="mt-8 text-gray-400">
-          <h4>Assesment Management</h4>
-          <div className="mt-4 flex flex-col gap-2">
-          <div className={clsx("hover:bg-gray-200 rounded-lg", liquidityManagementToggle && 'bg-gray-200')}>
-              <div className="px-3 py-2 flex justify-between items-center">
-                  <div className="flex gap-3">
-                    <span><LiquidDropIcon/></span>
-                    <div className="text-black">Liquidity Management</div>
-                  </div>
-                  <div onClick={() => dispatch({ type: "toggle_liquidityManagement" })}>
-                      {liquidityManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>} 
-                  </div> 
-                </div>
-                {liquidityManagementToggle && 
-                  <div className="ml-10 my-2 flex flex-col gap-2">
-                    {liquidityManagement.map((child,index) => {
-                      const block = li[index];
-                      return(
-                    <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2" key={child.text}>
-                      
-                      <div className="flex gap-3" onClick={() => block && addBlock(block)}>
-                        <span>{child.icon}</span>
-                        <div className="text-black">{child.text}</div>
-                      </div>
-                    </div>)})}   
-                  </div>}
-            </div>
-          
-            <div className={clsx("hover:bg-gray-200 rounded-lg", portfolioManagementToggle && 'bg-gray-200')}>
-              <div className="px-3 py-2 flex justify-between items-center text-gray-400">
-                <div className="flex gap-3">
-                  <span><BagIcon/></span>
-                  <div className="text-black">Portfolio Management</div>
-                </div>
-                <div onClick={() => dispatch({ type: "toggle_portfolioManagement" })}>
-                  {portfolioManagementToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-                </div> 
-              </div>
-              {portfolioManagementToggle && 
-                <div className="ml-10 my-2 flex flex-col gap-2">
-                  {portfolioManagement.map((child,index)=>{
-                    const block = po[index];
-                     return(
-                     <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                    <div className="flex gap-3" onClick={() => block && addBlock(block)}>
-                      <span>{child.icon}</span>
-                      <div className="text-black">{child.text}</div>
-                    </div>
-                  </div>)})}
-                </div>}
-            </div>
 
-            <div className={clsx("hover:bg-gray-200 rounded-lg", insightAndAnalyticsToggle && 'bg-gray-200')}>
-              <div className="px-3 py-2 flex justify-between items-center">
-                  <div className="flex gap-3">
-                    <span><AnalyticsIcon/></span>
-                    <div className="text-black">Insight & Analytics</div>
-                  </div>
-                    <div onClick={() => dispatch({ type: "toggle_insightAndAnalytics"})}>
-                    {insightAndAnalyticsToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-                  </div> 
+          <h4>Assesment Management</h4>
+
+          <div className="mt-4 flex flex-col gap-2">
+
+            <div className={clsx("hover:bg-gray-200 rounded-lg", liquidityManagementToggle && 'bg-gray-200')}>
+
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_liquidityManagement" });
+              }} className="px-3 py-2 flex justify-between items-center">
+                <div className="flex gap-3">
+                  <span><LiquidDropIcon /></span>
+                  <div className="text-black">Liquidity Management</div>
                 </div>
-                {insightAndAnalyticsToggle && 
-                    <div className="ml-10 my-2 flex flex-col gap-2">
-                      {insighAndAnalytics.map((child,index) =>{ 
-                        const block = inst[index];
-                        return(
-                         <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                        <div className="flex gap-3"onClick={() => block && addBlock(block)}>
+                <div onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: "toggle_liquidityManagement" });
+                }}>
+                  {liquidityManagementToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+                </div>
+              </div>
+
+              {liquidityManagementToggle &&
+                <div className="ml-10 my-2 flex flex-col gap-2">
+                  {liquidityManagement.map((child, index) => {
+                    const block = li[index];
+                    return (
+                      <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2" key={child.text}>
+
+                        <div className="flex gap-3" onClick={() => block && addBlock(block)}>
                           <span>{child.icon}</span>
                           <div className="text-black">{child.text}</div>
                         </div>
-                      </div>)})}    
-                  </div>}
-              </div>
+                      </div>)
+                  })}
+                </div>}
+
             </div>
+
+            <div className={clsx("hover:bg-gray-200 rounded-lg", portfolioManagementToggle && 'bg-gray-200')}>
+
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_portfolioManagement" });
+              }} className="px-3 py-2 flex justify-between items-center text-gray-400">
+                <div className="flex gap-3">
+                  <span><BagIcon /></span>
+                  <div className="text-black">Portfolio Management</div>
+                </div>
+                <div onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: "toggle_portfolioManagement" });
+                }}>
+                  {portfolioManagementToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+                </div>
+              </div>
+
+              {portfolioManagementToggle &&
+                <div className="ml-10 my-2 flex flex-col gap-2">
+                  {portfolioManagement.map((child, index) => {
+                    const block = po[index];
+                    return (
+                      <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                        <div className="flex gap-3" onClick={() => block && addBlock(block)}>
+                          <span>{child.icon}</span>
+                          <div className="text-black">{child.text}</div>
+                        </div>
+                      </div>)
+                  })}
+                </div>}
+
+            </div>
+
+            <div className={clsx("hover:bg-gray-200 rounded-lg", insightAndAnalyticsToggle && 'bg-gray-200')}>
+
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_insightAndAnalytics" });
+              }} className="px-3 py-2 flex justify-between items-center">
+                <div className="flex gap-3">
+                  <span><AnalyticsIcon /></span>
+                  <div className="text-black">Insight & Analytics</div>
+                </div>
+                <div onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: "toggle_insightAndAnalytics" });
+                }}>
+                  {insightAndAnalyticsToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+                </div>
+              </div>
+
+              {insightAndAnalyticsToggle &&
+                <div className="ml-10 my-2 flex flex-col gap-2">
+                  {insighAndAnalytics.map((child, index) => {
+                    const block = inst[index];
+                    return (
+                      <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                        <div className="flex gap-3" onClick={() => block && addBlock(block)}>
+                          <span>{child.icon}</span>
+                          <div className="text-black">{child.text}</div>
+                        </div>
+                      </div>)
+                  })}
+                </div>}
+
+            </div>
+          </div>
         </div>
-        
+
         {/* Token Action Section  */}
         <div className="mt-8 text-gray-400">
+
           <h4>Token Action</h4>
+
           <div className="mt-4 flex flex-col gap-2">
+
             <div className={clsx("hover:bg-gray-200 rounded-lg", governanceToggle && 'bg-gray-200')}>
-              <div className="px-3 py-2 flex justify-between items-center">
+
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_governance" });
+              }} className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
-                  <span><GovernanceIcon/></span>
+                  <span><GovernanceIcon /></span>
                   <div className="text-black">Governance</div>
                 </div>
-                <div onClick={() => dispatch({ type: "toggle_governance"})}>
-                  {governanceToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-                </div> 
+                <div onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: "toggle_governance" });
+                }}>
+                  {governanceToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+                </div>
               </div>
+
               {governanceToggle &&
-              <div className="ml-10 my-2 flex flex-col gap-2">
-                {governance.map((child,index)=>{
-                   const block = go[index];
-                  return(
-                <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                    <div className="flex gap-3" onClick={() => block && addBlock(block)}>
-                      <span>{child.icon}</span>
-                      <div className="text-black">{child.text}</div>
-                    </div>
-                  </div>)})}  
-              </div>}
+                <div className="ml-10 my-2 flex flex-col gap-2">
+                  {governance.map((child, index) => {
+                    const block = go[index];
+                    return (
+                      <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                        <div className="flex gap-3" onClick={() => block && addBlock(block)}>
+                          <span>{child.icon}</span>
+                          <div className="text-black">{child.text}</div>
+                        </div>
+                      </div>)
+                  })}
+                </div>}
+
             </div>
 
             <div className={clsx("hover:bg-gray-200 rounded-lg", eventsAndAutomationToggle && 'bg-gray-200')}>
-              <div className="px-3 py-2 flex justify-between items-center">
+
+              <div onClick={(e) => {
+                e.stopPropagation();
+                dispatch({ type: "toggle_eventsAndAutomation" });
+              }} className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
-                  <span><CalenderIcon/></span>
+                  <span><CalenderIcon /></span>
                   <div className="text-black">Events & Automations</div>
                 </div>
-                <div onClick={() => dispatch({ type: "toggle_eventsAndAutomation"})}>
-                {eventsAndAutomationToggle? <DropdownArrowIcon status="open"/>: <DropdownArrowIcon status="closed"/>}
-                </div> 
+                <div onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch({ type: "toggle_eventsAndAutomation" });
+                }}>
+                  {eventsAndAutomationToggle ? <DropdownArrowIcon status="open" /> : <DropdownArrowIcon status="closed" />}
+                </div>
               </div>
+
               {eventsAndAutomationToggle &&
-              <div className="ml-10 my-2 flex flex-col gap-2">
-                {eventsAndAutomation.map((child,index)=>{
-                  const block = ev[index];
-                  return(
-                  <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
-                    <div className="flex gap-3" onClick={() => block && addBlock(block)}>
-                      <span>{child.icon}</span>
-                      <div className="text-black">{child.text}</div>
-                    </div>
-                  </div>)})}
-              </div>}
+                <div className="ml-10 my-2 flex flex-col gap-2">
+                  {eventsAndAutomation.map((child, index) => {
+                    const block = ev[index];
+                    return (
+                      <div className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2">
+                        <div className="flex gap-3" onClick={() => block && addBlock(block)}>
+                          <span>{child.icon}</span>
+                          <div className="text-black">{child.text}</div>
+                        </div>
+                      </div>)
+                  })}
+                </div>}
+
             </div>
-            
+
             <div className="px-3 py-2 cursor-pointer" onClick={() => setIsCustomModalOpen(true)}>
-            <div className="flex gap-3">
-              <span><MenuIcon /></span>
-              <div className="text-black">Custom</div>
+              <div className="flex gap-3">
+                <span><MenuIcon /></span>
+                <div className="text-black">Custom</div>
+              </div>
             </div>
-          </div>
+
           </div>
         </div>
 
         <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">
           <div>Take full control of your rewards! 🚀</div>
           <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71] shadow-sm transition transform hover:hover:bg-opacity-80 hover:shadow-md active:shadow-lg active:scale-95 ease-out">
-            <span><RewardIcon/></span>
+            <span><RewardIcon /></span>
             <div>Claim Token</div>
           </button>
         </div>
@@ -489,16 +564,16 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
       {/* Link to Example contracts page */}
       <div className="mt-4">
-        <Link href="/devx/contracts"  className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium">
+        <Link href="/devx/contracts" className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium">
           Contracts
         </Link>
       </div>
       <Link
-          href="/devx/resources"
-          className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
-        >
-          Resources
-        </Link>
+        href="/devx/resources"
+        className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
+      >
+        Resources
+      </Link>
 
       <CustomBlockModal
         isOpen={isCustomModalOpen}
@@ -518,9 +593,10 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       icon: Code,
       code: values.cairoCode,
     }
-  
+
     addBlock(newCustomBlock)
     setIsCustomModalOpen(false)
     form.reset()
-    toast.success('Custom block added successfully')}
+    toast.success('Custom block added successfully')
   }
+}
