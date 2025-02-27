@@ -4,9 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { connect, disconnect } from "starknetkit";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import Argent from "@/public/img/Argent Wallet.png";
-import Bravoos from "@/public/img/bravoos wallet.jpeg";
+
 
 interface HeaderProps {
   showClearButton: boolean;
