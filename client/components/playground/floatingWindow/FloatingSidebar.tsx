@@ -254,7 +254,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span>
                   <StartIcon />
                 </span>
-                <div className="text-black">Trigger Actions</div>
+                <div className="text-black cursor-default">Trigger Actions</div>
               </div>
               <div onClick={(e) => {
                 e.stopPropagation();
@@ -307,7 +307,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 <span>
                   <CoinIcon />
                 </span>
-                <div className="text-black ">Token Actions</div>
+                <div className="text-black cursor-default">Token Actions</div>
               </div>
               <div onClick={(e) => {
                 e.stopPropagation();
@@ -371,7 +371,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               }} className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
                   <span><LiquidDropIcon /></span>
-                  <div className="text-black">Liquidity Management</div>
+                  <div className="text-black cursor-default">Liquidity Management</div>
                 </div>
                 <div onClick={(e) => {
                   e.stopPropagation();
@@ -406,7 +406,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               }} className="px-3 py-2 flex justify-between items-center text-gray-400">
                 <div className="flex gap-3">
                   <span><BagIcon /></span>
-                  <div className="text-black">Portfolio Management</div>
+                  <div className="text-black cursor-default">Portfolio Management</div>
                 </div>
                 <div onClick={(e) => {
                   e.stopPropagation();
@@ -440,7 +440,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               }} className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
                   <span><AnalyticsIcon /></span>
-                  <div className="text-black">Insight & Analytics</div>
+                  <div className="text-black cursor-default">Insight & Analytics</div>
                 </div>
                 <div onClick={(e) => {
                   e.stopPropagation();
@@ -483,7 +483,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               }} className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
                   <span><GovernanceIcon /></span>
-                  <div className="text-black">Governance</div>
+                  <div className="text-black cursor-default">Governance</div>
                 </div>
                 <div onClick={(e) => {
                   e.stopPropagation();
@@ -517,7 +517,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               }} className="px-3 py-2 flex justify-between items-center">
                 <div className="flex gap-3">
                   <span><CalenderIcon /></span>
-                  <div className="text-black">Events & Automations</div>
+                  <div className="text-black cursor-default">Events & Automations</div>
                 </div>
                 <div onClick={(e) => {
                   e.stopPropagation();
