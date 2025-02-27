@@ -1,14 +1,15 @@
 use starknet::ContractAddress;
 use snforge_std::{
-    declare, ContractClassTrait, DeclareResultTrait,
-    cheat_block_timestamp, CheatSpan,
-    cheat_caller_address
+    declare, ContractClassTrait, DeclareResultTrait, cheat_block_timestamp, CheatSpan,
+    cheat_caller_address,
 };
 
 use core::traits::TryInto;
 use core::option::OptionTrait;
 
-use contracts::interfaces::INFTDutchAuction::{INFTDutchAuctionDispatcher, INFTDutchAuctionDispatcherTrait};
+use contracts::interfaces::INFTDutchAuction::{
+    INFTDutchAuctionDispatcher, INFTDutchAuctionDispatcherTrait,
+};
 use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use contracts::interfaces::IERC721::{IERC721Dispatcher, IERC721DispatcherTrait};
 fn deploy_contract(name: ByteArray) -> ContractAddress {
@@ -44,7 +45,7 @@ fn deploy_dutch_auction(
     seller: ContractAddress,
     duration: u64,
     discount_rate: u64,
-    total_supply: u128
+    total_supply: u128,
 ) -> ContractAddress {
     let contract = declare("NFTDutchAuction").unwrap().contract_class();
     let mut calldata = array![];
@@ -67,13 +68,13 @@ fn test_dutch_auction_constructor() {
     let erc721_token = deploy_erc721();
 
     let auction = deploy_dutch_auction(
-        erc20_token, 
-        erc721_token, 
+        erc20_token,
+        erc721_token,
         1000, // starting price 
-        owner, 
-        100,  // duration 
-        10,   // discount rate
-        5     // total supply
+        owner,
+        100, // duration 
+        10, // discount rate
+        5 // total supply
     );
 
     let dutch_auction_dispatcher = INFTDutchAuctionDispatcher { contract_address: auction };
@@ -84,19 +85,18 @@ fn test_dutch_auction_constructor() {
 
 #[test]
 fn test_price_decreases_after_some_time() {
-
     let owner = starknet::contract_address_const::<0x123>();
     let erc20_token = deploy_erc20();
     let erc721_token = deploy_erc721();
 
     let nft_auction_address = deploy_dutch_auction(
-        erc20_token, 
-        erc721_token, 
+        erc20_token,
+        erc721_token,
         1000, // starting price 
-        owner, 
-        100,  // duration 
-        10,   // discount rate
-        5     // total supply
+        owner,
+        100, // duration 
+        10, // discount rate
+        5 // total supply
     );
 
     let nft_auction_dispatcher = INFTDutchAuctionDispatcher {
@@ -117,19 +117,18 @@ fn test_price_decreases_after_some_time() {
 
 #[test]
 fn test_buy_asset() {
-
     let seller = starknet::contract_address_const::<0x123>();
     let erc20_address = deploy_erc20();
     let erc721_address = deploy_erc721();
 
     let nft_auction_address = deploy_dutch_auction(
-        erc20_address, 
-        erc721_address, 
+        erc20_address,
+        erc721_address,
         500, // starting price 
-        seller, 
-        60,  // duration 
-        5,   // discount rate
-        2     // total supply
+        seller,
+        60, // duration 
+        5, // discount rate
+        2 // total supply
     );
 
     let erc721_dispatcher = IERC721Dispatcher { contract_address: erc721_address };
@@ -185,7 +184,6 @@ fn test_buy_asset() {
 }
 
 
-
 #[test]
 #[should_panic(expected: 'auction has ended')]
 fn test_buy_should_panic_when_total_supply_reached() {
@@ -194,13 +192,13 @@ fn test_buy_should_panic_when_total_supply_reached() {
     let erc721_address = deploy_erc721();
 
     let nft_auction_address = deploy_dutch_auction(
-        erc20_address, 
-        erc721_address, 
+        erc20_address,
+        erc721_address,
         500, // starting price 
-        owner, 
-        60,  // duration 
-        5,   // discount rate
-        2     // total supply
+        owner,
+        60, // duration 
+        5, // discount rate
+        2 // total supply
     );
     let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_address };
     let nft_auction_dispatcher = INFTDutchAuctionDispatcher {
@@ -236,11 +234,9 @@ fn test_buy_should_panic_when_total_supply_reached() {
     cheat_block_timestamp(nft_auction_address, forward_blocktime_by, CheatSpan::TargetCalls(1));
     let nft_price = nft_auction_dispatcher.get_price().into();
 
-
     // buyer approves nft auction contract to spend own erc20 token
     cheat_caller_address(erc20_address, buyer, CheatSpan::TargetCalls(1));
     erc20_dispatcher.approve(nft_auction_address, nft_price);
-
 
     cheat_caller_address(nft_auction_address, buyer, CheatSpan::TargetCalls(1));
     cheat_block_timestamp(nft_auction_address, forward_blocktime_by, CheatSpan::TargetCalls(1));
@@ -257,7 +253,6 @@ fn test_buy_should_panic_when_total_supply_reached() {
     // Buy token
     cheat_caller_address(nft_auction_address, buyer, CheatSpan::TargetCalls(4));
     nft_auction_dispatcher.buy(nft_id_3);
-
 }
 
 #[test]
@@ -268,13 +263,13 @@ fn test_buy_should_panic_when_duration_ended() {
     let erc721_address = deploy_erc721();
 
     let nft_auction_address = deploy_dutch_auction(
-        erc20_address, 
-        erc721_address, 
+        erc20_address,
+        erc721_address,
         500, // starting price 
-        owner, 
-        60,  // duration 
-        5,   // discount rate
-        2     // total supply
+        owner,
+        60, // duration 
+        5, // discount rate
+        2 // total supply
     );
     let erc20_dispatcher = IERC20Dispatcher { contract_address: erc20_address };
     let nft_auction_dispatcher = INFTDutchAuctionDispatcher {

@@ -21,7 +21,6 @@ pub trait IERC721<TContractState> {
 
 #[starknet::contract]
 mod MockERC721 {
-
     use starknet::{ContractAddress, get_caller_address};
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
@@ -143,7 +142,6 @@ mod MockERC721 {
 
     #[generate_trait]
     impl ERC721HelperImpl of ERC721HelperTrait {
-
         fn _exists(self: @ContractState, token_id: u256) -> bool {
             // check that owner of token is not zero
             self.owner_of(token_id).is_non_zero()
@@ -219,3 +217,4 @@ mod MockERC721 {
         }
     }
 }
+

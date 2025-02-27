@@ -72,7 +72,6 @@ pub mod NFTDutchAuction {
             };
 
             let caller = get_caller_address();
-            println!("Caller inside the buy: {:?}", caller);
             // Get NFT price
             let price: u256 = self.get_price().into();
             let buyer_balance: u256 = erc20_dispatcher.balance_of(caller).into();
