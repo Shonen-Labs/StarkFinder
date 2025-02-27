@@ -4,9 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { connect, disconnect } from "starknetkit";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import Argent from "@/public/img/Argent Wallet.png";
-import Bravoos from "@/public/img/bravoos wallet.jpeg";
+
 
 interface HeaderProps {
   showClearButton: boolean;
@@ -37,7 +35,6 @@ export default function Header({
   const [isEditing, setIsEditing] = useState(false);
   const [projectName, setProjectName] = useState("DevXStark");
   const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
 
   // Wallet connection state
   const [connection, setConnection] = useState<StarknetConnection | null>(null);
@@ -104,7 +101,6 @@ export default function Header({
         const address = await getWalletAddress(result.wallet);
         setWalletAddress(address);
         localStorage.setItem("starknetConnection", "true");
-        setIsWalletModalOpen(false);
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -198,7 +194,7 @@ export default function Header({
               </Button>
             </div>
           ) : (
-            <Button variant="primary" onClick={() => setIsWalletModalOpen(true)}>
+            <Button variant="primary" onClick={() => handleConnectWallet()}>
               Connect wallet
             </Button>
           )}
@@ -231,37 +227,6 @@ export default function Header({
         </div>
       </div>
 
-      {/* Wallet Connection Modal */}
-      <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <h2>Connect your Starknet wallet</h2>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <Button
-              onClick={handleConnectWallet}
-              className="flex items-center justify-center gap-2"
-            >
-              <img src={Argent.src} alt="Argent" className="w-10 h-10" />
-              Connect with Argent
-            </Button>
-            <Button
-              onClick={handleConnectWallet}
-              className="flex items-center justify-center gap-2"
-            >
-              <img src={Bravoos.src} alt="Braavos" className="w-9 h-9 rounded-md" />
-              Connect with Braavos
-            </Button>
-            <Button
-              onClick={handleConnectWallet}
-              variant="outline"
-              className="flex items-center justify-center gap-2"
-            >
-              Other Starknet Wallet
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

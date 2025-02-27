@@ -1,78 +1,79 @@
 use starknet::{ContractAddress};
 
+#[derive(Drop, Copy, starknet::Store, Serde)]
+pub struct ActivityRecord {
+    pub activity_type: felt252, // 'Transaction', 'Stake', 'Swap'
+    pub protocol: felt252,
+    pub value: u256,
+    pub timestamp: u64,
+}
+
+#[derive(Drop, Copy, starknet::Store, Serde)]
+pub struct Identity {
+    // Basic Identity
+    pub address: ContractAddress,
+    pub username: felt252,
+    // Web3 Identity Components
+    pub ens_name: felt252,
+    pub stark_name: felt252,
+    pub social_connections: u32,
+    pub recovery_address: ContractAddress,
+    // DeFi Identity
+    pub transaction_volume: u256,
+    pub protocols_used: u32,
+    // Activity Metrics
+    pub last_active: u64,
+    pub created_at: u64,
+    pub transaction_count: u32,
+    pub reputation_score: u32,
+}
+
+#[derive(Drop, Copy, starknet::Store, Serde)]
+pub struct ProtocolUsage {
+    pub protocol: felt252,
+    pub first_used: u64,
+    pub last_used: u64,
+    pub interaction_count: u32,
+}
+
+#[derive(Drop, Copy, starknet::Store, Serde)]
+pub struct SocialProof {
+    pub platform: felt252,
+    pub signature: felt252,
+    pub verified_by: ContractAddress,
+    pub timestamp: u64,
+}
+
+#[derive(Drop, Copy, starknet::Store, Serde)]
+pub struct VerificationRequest {
+    pub requester: ContractAddress,
+    pub verification_type: felt252,
+    pub status: u8,
+    pub timestamp: u64,
+}
+
 #[starknet::contract]
 pub mod StarkIdentity {
-    // use super::{ActivityRecord, Identity, ProtocolUsage, SocialProof, VerificationRequest};
+    use super::{ActivityRecord, Identity, ProtocolUsage, SocialProof, VerificationRequest};
     use contracts::interfaces::IStarkIdentity::IStarkIdentity;
     use core::array::ArrayTrait;
+    use core::hash::{HashStateTrait};
     use core::poseidon::PoseidonTrait;
-    use core::hash::{HashStateTrait, HashStateExTrait};
     use starknet::{
         ContractAddress, get_block_timestamp, get_caller_address,
         storage::{
-            Map, StorageMapWriteAccess, StorageMapReadAccess, StoragePointerReadAccess,
+            Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
             StoragePointerWriteAccess,
         },
     };
-
-    #[derive(Drop, Copy, starknet::Store, Serde)]
-    pub struct ActivityRecord {
-        pub activity_type: felt252, // 'transaction', 'stake', 'swap'
-        pub protocol: felt252,
-        pub value: u256,
-        pub timestamp: u64,
-    }
-
-    #[derive(Drop, Copy, starknet::Store, Serde)]
-    pub struct Identity {
-        // Basic Identity
-        pub address: ContractAddress,
-        pub username: felt252,
-        // Web3 Identity Components
-        pub ens_name: felt252,
-        pub stark_name: felt252,
-        pub social_connections: u32,
-        pub recovery_address: ContractAddress,
-        // DeFi Identity
-        pub transaction_volume: u256,
-        pub protocols_used: u32,
-        // Activity Metrics
-        pub last_active: u64,
-        pub created_at: u64,
-        pub transaction_count: u32,
-        pub reputation_score: u32,
-    }
-
-    #[derive(Drop, Copy, starknet::Store, Serde)]
-    pub struct ProtocolUsage {
-        pub protocol: felt252,
-        pub first_used: u64,
-        pub last_used: u64,
-        pub interaction_count: u32,
-    }
-
-    #[derive(Drop, Copy, starknet::Store, Serde)]
-    pub struct SocialProof {
-        pub platform: felt252,
-        pub timestamp: u64,
-        pub signature: felt252,
-        pub verified_by: ContractAddress,
-    }
-
-    #[derive(Drop, Copy, starknet::Store, Serde)]
-    pub struct VerificationRequest {
-        pub requester: ContractAddress,
-        pub verification_type: felt252,
-        pub status: u8, // 0: Pending, 1: Approved, 2: Rejected
-        pub timestamp: u64,
-    }
 
     #[storage]
     struct Storage {
         admin: ContractAddress,
         identities: Map<ContractAddress, Identity>,
-        connected_addresses: Map<ContractAddress, ContractAddress>,
+        connected_addresses: Map<(ContractAddress, ContractAddress), bool>,
         address_signatures: Map<ContractAddress, felt252>,
+        social_verifications: Map<(ContractAddress, felt252), bool>,
         verification_requests: Map<(ContractAddress, felt252), VerificationRequest>,
         verifiers: Map<ContractAddress, bool>,
         social_proofs: Map<(ContractAddress, felt252), SocialProof>,
@@ -83,8 +84,9 @@ pub mod StarkIdentity {
 
     #[event]
     #[derive(Drop, starknet::Event)]
-    enum Event {
+    pub enum Event {
         ActivityRecorded: ActivityRecorded,
+        AddressLinked: AddressLinked,
         IdentityCreated: IdentityCreated,
         IdentityUpdated: IdentityUpdated,
         ReputationUpdated: ReputationUpdated,
@@ -94,59 +96,72 @@ pub mod StarkIdentity {
     }
 
     #[derive(Drop, starknet::Event)]
-    struct ActivityRecorded {
-        address: ContractAddress,
-        activity_type: felt252,
-        protocol: felt252,
-        value: u256,
-        timestamp: u64,
+    pub struct ActivityRecorded {
+        pub address: ContractAddress,
+        pub activity_type: felt252,
+        pub protocol: felt252,
+        pub value: u256,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct IdentityCreated {
-        address: ContractAddress,
-        username: felt252,
-        ens_name: felt252,
-        stark_name: felt252,
-        timestamp: u64,
+    pub struct AddressLinked {
+        pub primary_address: ContractAddress,
+        pub linked_address: ContractAddress,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct IdentityUpdated {
-        address: ContractAddress,
-        field: felt252,
-        timestamp: u64,
+    pub struct IdentityCreated {
+        pub address: ContractAddress,
+        pub username: felt252,
+        pub ens_name: felt252,
+        pub stark_name: felt252,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct ReputationUpdated {
-        address: ContractAddress,
-        old_score: u32,
-        new_score: u32,
-        timestamp: u64,
+    pub struct IdentityUpdated {
+        pub address: ContractAddress,
+        pub field: felt252,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct SocialVerificationAdded {
-        address: ContractAddress,
-        platform: felt252,
-        timestamp: u64,
+    pub struct ReputationUpdated {
+        pub address: ContractAddress,
+        pub old_score: u32,
+        pub new_score: u32,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct VerificationRequested {
-        requester: ContractAddress,
-        verification_type: felt252,
-        timestamp: u64,
+    pub struct SocialVerificationAdded {
+        pub address: ContractAddress,
+        pub platform: felt252,
+        pub timestamp: u64,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct VerificationStatusChanged {
-        address: ContractAddress,
-        verification_type: felt252,
-        status: u8,
-        timestamp: u64,
+    pub struct VerificationRequested {
+        pub requester: ContractAddress,
+        pub verification_type: felt252,
+        pub timestamp: u64,
     }
+
+    #[derive(Drop, starknet::Event)]
+    pub struct VerificationStatusChanged {
+        pub address: ContractAddress,
+        pub verification_type: felt252,
+        pub status: u8,
+        pub timestamp: u64,
+    }
+
+    const PROOF_EXPIRY_IN_SECONDS: u64 = 60 * 60 * 24 * 90; // THREE MONTHS IN SECONDS
+
+    const VERIFICATION_PENDING: u8 = 0;
+    const VERIFICATION_APPROVED: u8 = 1;
+    const VERIFICATION_REJECTED: u8 = 2;
 
     #[constructor]
     fn constructor(ref self: ContractState, admin: ContractAddress) {
@@ -155,7 +170,6 @@ pub mod StarkIdentity {
 
     #[abi(embed_v0)]
     impl IStarkIdentityImpl of IStarkIdentity<ContractState> {
-        // impl IStarkIdentityImpl of super::IStarkIdentity<ContractState> {
         // Create a user identity
         fn create_identity(
             ref self: ContractState,
@@ -200,14 +214,19 @@ pub mod StarkIdentity {
             let caller = get_caller_address();
             assert(self.identity_exists(caller), 'Identity does not exist');
 
-            let identity = self.identities.read(caller);
-            match field {
-                'username' => identity.username = value,
-                'ens_name' => identity.ens_name = value,
-                'stark_name' => identity.stark_name = value,
-                'recovery_address' => identity.recovery_address = value.try_into().unwrap(),
-                _ => panic!('Invalid field'),
-            };
+            let mut identity = self.identities.read(caller);
+            if field == 'username' {
+                identity.username = value;
+            } else if field == 'ens_name' {
+                identity.ens_name = value;
+            } else if field == 'stark_name' {
+                identity.stark_name = value;
+            } else if field == 'recovery_address' {
+                identity.recovery_address = value.try_into().unwrap();
+            } else {
+                // Handle unknown field or error
+                assert(false, 'Unknown field');
+            }
 
             self.identities.write(caller, identity);
             self.emit(IdentityUpdated { address: caller, field, timestamp: get_block_timestamp() });
@@ -220,7 +239,6 @@ pub mod StarkIdentity {
 
         fn identity_exists(self: @ContractState, address: ContractAddress) -> bool {
             let identity = self.identities.read(address);
-            assert(identity.address == address, 'Identity does not exist');
             identity.created_at != 0
         }
 
@@ -243,11 +261,17 @@ pub mod StarkIdentity {
                 );
         }
 
-        fn add_verifier(ref self: TContractState, verifier: ContractAddress) {
-            let caller = get_caller_address();
-            assert(caller == self.admin, 'Only caller can add add verifier');
+        fn verify_linked_addresses(
+            self: @ContractState, address1: ContractAddress, address2: ContractAddress,
+        ) -> bool {
+            self.connected_addresses.read((address1, address2))
+        }
 
-            self.verifiers.write(verifier);
+        fn add_verifier(ref self: ContractState, verifier: ContractAddress) {
+            let caller = get_caller_address();
+            let stored_admin = self.admin.read();
+            assert(caller == stored_admin, 'Only caller can add verifier');
+            self.verifiers.write(verifier, true);
         }
 
         fn add_social_verification(
@@ -278,10 +302,10 @@ pub mod StarkIdentity {
             signature: felt252,
         ) {
             let caller = get_caller_address();
-            assert(self.verifiers.read(caller), 'Only verifiers can submit proofs');
+            assert(self.verifiers.read(caller), 'Only verifiers submit proofs');
 
             let proof = SocialProof {
-                platform, timestamp: get_block_timestamp(), signature, verified_by: caller,
+                platform, signature, verified_by: caller, timestamp: get_block_timestamp(),
             };
 
             self.social_proofs.write((user_address, platform), proof);
@@ -290,19 +314,22 @@ pub mod StarkIdentity {
         fn verify_social_proof(self: @ContractState, platform: felt252, proof: felt252) -> bool {
             let caller = get_caller_address();
             let stored_proof = self.social_proofs.read((caller, platform));
+
+            // Check that a proof exists.
             if stored_proof.timestamp == 0 {
                 return false;
             }
 
+            // Verify that the proof was submitted by a valid verifier.
             let is_verifier = self.verifiers.read(stored_proof.verified_by);
             if !is_verifier {
                 return false;
             }
 
+            // Ensure the proof is within the allowed time window.
             let current_time = get_block_timestamp();
             let proof_age = current_time - stored_proof.timestamp;
-
-            if proof_age > 2592000 {
+            if proof_age >= PROOF_EXPIRY_IN_SECONDS {
                 return false;
             }
 
@@ -347,13 +374,19 @@ pub mod StarkIdentity {
         }
 
         fn get_activities(
-            self: @ContractState, address: ContractAddress, start_index: u32, limit: u32,
+            self: @ContractState, address: ContractAddress, start_index: u256, limit: u256,
         ) -> Array<ActivityRecord> {
-            let mut activities = ArrayTrait::new();
+            let mut activities: Array<ActivityRecord> = ArrayTrait::new();
             let total_activities = self.activity_count.read(address);
 
             let mut i = start_index;
-            while i < total_activities.min(start_index + limit) {
+            let end_index = if start_index + limit < total_activities {
+                start_index + limit
+            } else {
+                total_activities
+            };
+
+            while i < end_index {
                 activities.append(self.activity_records.read((address, i)));
                 i += 1;
             };
@@ -366,7 +399,10 @@ pub mod StarkIdentity {
             assert(self.identity_exists(caller), 'Identity does not exist');
 
             let request = VerificationRequest {
-                requester: caller, verification_type, status: 0, timestamp: get_block_timestamp(),
+                requester: caller,
+                verification_type,
+                status: VERIFICATION_PENDING,
+                timestamp: get_block_timestamp(),
             };
 
             self.verification_requests.write((caller, verification_type), request);
@@ -383,17 +419,20 @@ pub mod StarkIdentity {
             assert(self.verifiers.read(caller), 'Not authorized');
 
             let mut identity = self.identities.read(address);
-            assert(self.identity_exists(caller), 'Identity does not exist');
+            assert(self.identity_exists(address), 'Identity does not exist');
             let old_score = identity.reputation_score;
 
             // Update score (handle overflow/underflow)
             if points >= 0 {
                 identity.reputation_score += points.try_into().unwrap();
             } else {
-                identity
-                    .reputation_score = identity
-                    .reputation_score
-                    .saturating_sub((-points).try_into().unwrap());
+                // Safe subtraction to prevent underflow
+                let absolute_points: u32 = (-points).try_into().unwrap();
+                if identity.reputation_score >= absolute_points {
+                    identity.reputation_score -= absolute_points;
+                } else {
+                    identity.reputation_score = 0; // Don't go below zero
+                }
             }
 
             self.identities.write(address, identity);
@@ -443,7 +482,7 @@ pub mod StarkIdentity {
                 return true;
             }
 
-            let stored_signature = self.address_signatures.read(address);
+            let stored_signature = self.address_signatures.read(caller);
             if stored_signature == 0 {
                 return false;
             }
@@ -452,16 +491,18 @@ pub mod StarkIdentity {
             stored_signature == expected_signature
         }
 
-        fn generate_ownership_signature(self: @ContractState, owner: ContractAddress, address: ContractAddress) -> felt252 {
+        fn generate_ownership_signature(
+            self: @ContractState, owner: ContractAddress, address: ContractAddress,
+        ) -> felt252 {
             // Convert ContractAddress to felt252 for hashing
             let owner_felt: felt252 = owner.into();
             let address_felt: felt252 = address.into();
 
-            // Create an array with the encoded owner address to hash
-            let mut input = array![owner_felt, address_felt];
-
-            // Use Poseidon hash with the address as input
-            PoseidonTrait::new().update_with(input).finalize();
+            // Simple hash implementation without using update_with
+            let hash_state = PoseidonTrait::new();
+            let hash_state = hash_state.update(owner_felt);
+            let hash_state = hash_state.update(address_felt);
+            hash_state.finalize()
         }
 
         fn submit_address_signature(
@@ -470,6 +511,33 @@ pub mod StarkIdentity {
             let caller = get_caller_address();
             assert(caller == address, 'Only address owner can submit');
             self.address_signatures.write(address, signature);
+        }
+
+        fn update_verification_request(
+            ref self: ContractState,
+            user: ContractAddress,
+            verification_type: felt252,
+            new_status: u8,
+        ) {
+            let caller = get_caller_address();
+            assert(self.verifiers.read(caller), 'Not authorized');
+
+            // Retrieve the existing request.
+            let mut request = self.verification_requests.read((user, verification_type));
+            assert(request.timestamp != 0, 'Verification request not found');
+
+            request.status = new_status;
+            self.verification_requests.write((user, verification_type), request);
+
+            self
+                .emit(
+                    VerificationStatusChanged {
+                        address: user,
+                        verification_type: verification_type,
+                        status: new_status,
+                        timestamp: get_block_timestamp(),
+                    },
+                );
         }
     }
 }
