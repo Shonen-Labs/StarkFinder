@@ -136,7 +136,7 @@ export default function ChatPage() {
         stream: true
       };
   
-      const response = await fetch("/api/ask", {
+      const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

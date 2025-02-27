@@ -49,7 +49,7 @@ function Navbar({ className }: { className?: string }) {
 
   const createNewChat = async () => {
     const id = uuidv4();
-    await router.push(`/agent/chat/${id}`);
+    await router.push(`/agent/transaction/${id}`);
   };
 
   const createNewTxn = async () => {

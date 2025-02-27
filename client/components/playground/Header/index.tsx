@@ -197,7 +197,7 @@ export default function Header({
               </li>
               <li>
                 <Link
-                  href="/agent/chat/someId"
+                  href="/agent/transaction/someId"
                   className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
                 >
                   <MessageSquare size={18} /> Agent

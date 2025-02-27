@@ -57,7 +57,7 @@ const itemsButton = [
   {
     icon: <ChatIcon />,
     text: 'New Chat',
-    link: '/agent/chat/2fc5da97-6f45-4bf2-84f0-bbc1cbb57cdd',
+    link: '/agent/transaction/2fc5da97-6f45-4bf2-84f0-bbc1cbb57cdd',
   },
   {
     icon: <ContractIcon />,
