@@ -2,9 +2,15 @@
 version = 1
 
 [[package]]
+name = "alexandria_storage"
+version = "0.2.0"
+source = "git+https://github.com/keep-starknet-strange/alexandria?tag=v0.2.0#bcc4fa417abbc8b067ae6f2d382b127006b5077c"
+
+[[package]]
 name = "contracts"
 version = "0.1.0"
 dependencies = [
+ "alexandria_storage",
  "openzeppelin",
  "openzeppelin_testing",
  "snforge_std",
