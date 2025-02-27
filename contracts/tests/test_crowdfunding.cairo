@@ -3,6 +3,7 @@ use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan,
     cheat_block_timestamp, spy_events, EventSpyAssertionsTrait,
 };
+use core::array::ArrayTrait;
 use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use contracts::crowdfunding::{
     CampaignCreated, CampaignFunded, CampaignResolved, ICrowdfundingDispatcher,
@@ -254,3 +255,24 @@ fn test_crowdfunding_should_panic_funding_on_exceeded_deadline() {
     );
     dispatcher.fund(campaign_id, 300);
 }
+
+#[test]
+fn test_get_user_campaigns() {
+    let token_contract = deploy_token();
+    let contract = deploy_crowdfunding(token_contract);
+
+    let dispatcher = ICrowdfundingDispatcher { contract_address: contract };
+
+    // USER1 creates 2 campaigns
+    cheat_caller_address(contract, USER1(), CheatSpan::TargetCalls(2));
+    let _campaign_1 = dispatcher.create_campaign(5000, starknet::get_block_timestamp() + 2000);
+    let _campaign_2 = dispatcher.create_campaign(10000, starknet::get_block_timestamp() + 4000);
+
+    // Retrieve campaigns
+    let user1_campaigns = dispatcher.get_user_campaigns(USER1());
+
+    // Assertions
+    assert(user1_campaigns.len() == 2, 'USER1: wrong count');
+    assert(user1_campaigns == array![1, 2], 'USER1 campaigns not match IDs');
+}
+

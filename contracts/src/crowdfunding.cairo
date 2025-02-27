@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use starknet::storage::{Map, Vec};
+use alexandria_storage::{ListTrait, List};
 
 #[starknet::interface]
 pub trait ICrowdfunding<TContractState> {
@@ -10,6 +11,7 @@ pub trait ICrowdfunding<TContractState> {
     fn get_contribution(
         self: @TContractState, campaign_id: u256, contributor: ContractAddress,
     ) -> u256;
+    fn get_user_campaigns(self: @TContractState, user: ContractAddress) -> Array<u256>;
 }
 
 #[derive(Drop, Copy, Serde, starknet::Store)]
@@ -68,11 +70,13 @@ pub mod Crowdfunding {
     use core::starknet::{
         ContractAddress, get_block_timestamp, get_caller_address, get_contract_address,
     };
+    use alexandria_storage::{ListTrait, List};
     use core::option::OptionTrait;
     use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map,
+        StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map, Vec,
         StorageMapWriteAccess, MutableVecTrait,
     };
+    use starknet::storage::StorageMapReadAccess;
     use super::{
         CampaignStatus, CampaignState, Campaign, CampaignCreated, CampaignResolved, CampaignFunded,
     };
@@ -82,6 +86,7 @@ pub mod Crowdfunding {
     struct Storage {
         campaigns: Map<u256, Option<Campaign>>,
         campaign_state: Map<u256, CampaignState>,
+        user_campaigns: Map<ContractAddress, List<u256>>,
         nonce: u256,
         token_address: ContractAddress,
     }
@@ -119,6 +124,11 @@ pub mod Crowdfunding {
             };
             self.campaigns.entry(id).write(Option::Some(new_campaign));
             self.nonce.write(id);
+
+            let mut user_campaigns = self.user_campaigns.entry(creator).read();
+            let result = user_campaigns.append(id);
+            assert(result.is_ok(), 'Failed to append campaign ID');
+            self.user_campaigns.entry(creator).write(user_campaigns);
 
             self.emit(CampaignCreated { id, creator, funding_goal });
 
@@ -203,6 +213,27 @@ pub mod Crowdfunding {
         ) -> u256 {
             let campaign_state = self.campaign_state.entry(campaign_id);
             campaign_state.contributions.entry(contributor).read()
+        }
+
+        fn get_user_campaigns(self: @ContractState, user: ContractAddress) -> Array<u256> {
+            let mut user_campaigns = self.user_campaigns.read(user);
+
+            let mut campaign_ids = ArrayTrait::new();
+
+            let mut i: u32 = 0;
+
+            loop {
+                if i >= user_campaigns.len() {
+                    break;
+                }
+
+                let campaign_id = user_campaigns[i];
+                campaign_ids.append(campaign_id);
+
+                i += 1;
+            };
+
+            campaign_ids
         }
     }
 

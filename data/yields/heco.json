@@ -1,0 +1,1241 @@
+[
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 5536231,
+        "apyBase": null,
+        "apyReward": 0.05476,
+        "apy": 0.05476,
+        "rewardTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "pool": "279e4cc3-d69b-4567-94e5-74eddd7a10ed",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.19251,
+        "sigma": 0.01887,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.05476,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "WHT-USDT",
+        "tvlUsd": 253898,
+        "apyBase": 0.00509,
+        "apyReward": 0.97214,
+        "apy": 0.97723,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "a8549b82-881c-4d8c-99ca-b410919feb8d",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 79,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 2.9994,
+        "sigma": 0.17703,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.97723,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "DOGE-USDT",
+        "tvlUsd": 143654,
+        "apyBase": 0.00228,
+        "apyReward": 0.07117,
+        "apy": 0.07345,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "372ce454-1efb-49d7-975a-ddf0862ceb24",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 66,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.0503,
+        "sigma": 0.12229,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x40280e26a572745b1152a54d1d44f365daa51618",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.07345,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 143507,
+        "apyBase": null,
+        "apyReward": 0.50869,
+        "apy": 0.50869,
+        "rewardTokens": [
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f"
+        ],
+        "pool": "3218a6d2-6692-4c25-8382-8ba2fb5cde59",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 60,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 0.34377,
+        "sigma": 0.01611,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.50869,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-USDT",
+        "tvlUsd": 135532,
+        "apyBase": 0.00205,
+        "apyReward": 1.4871,
+        "apy": 1.48915,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "359957b0-5365-4713-a400-fbfa74313cb9",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 51,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 2.1789,
+        "sigma": 0.15018,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.48915,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "HUSD-WHT",
+        "tvlUsd": 131523,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "de20d560-0667-4c19-9334-0b8281e8b2b0",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x0298c2b32eae4da002a15f36fdf7615bea3da047",
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "USDT-CON",
+        "tvlUsd": 108282,
+        "apyBase": 0.00107,
+        "apyReward": 0.00899,
+        "apy": 0.01006,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "31e91e4b-b9f4-4047-bc6d-02487aabefa3",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 76,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.02124,
+        "sigma": 0.00101,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xa71edc38d189767582c38a3145b5873052c3e47a",
+            "0xeef1324343ca7bf6e743e21dd9e92dfa4efc3a56"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.01006,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "HBTC-USDT",
+        "tvlUsd": 71396,
+        "apyBase": 0.00555,
+        "apyReward": 27.86841,
+        "apy": 27.87396,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "94ee509c-161d-49dc-8c48-8baac2da17af",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 15.05311,
+        "sigma": 0.56342,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x66a79d23e58475d2738179ca52cd0b41d73f0bea",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 27.87396,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-XMDX",
+        "tvlUsd": 70297,
+        "apyBase": 0.00564,
+        "apyReward": 0.4086,
+        "apy": 0.41424,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "4995e832-b68d-47c9-b387-a8e9cb9d416b",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 52,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 0.51684,
+        "sigma": 0.0212,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c",
+            "0xf5cf092c93cddfe9087b86bdca5cb3f4f72b7242"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.41424,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 69987,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x4668e0e7cc545de886abf038067f81cd4dc0924b"
+        ],
+        "pool": "d0256426-5d23-44ce-8013-5e9fe3ce3d41",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "HUSD-FILDA",
+        "tvlUsd": 67021,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "6d837142-e37d-4097-8b23-ffaf61800c40",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0.0725,
+        "sigma": 0.02278,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x0298c2b32eae4da002a15f36fdf7615bea3da047",
+            "0xe36ffd17b2661eb57144ceaef942d95295e637f0"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "ETH-USDT",
+        "tvlUsd": 64268,
+        "apyBase": 0.01045,
+        "apyReward": 30.20176,
+        "apy": 30.2122,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "21c644c1-895d-4793-8c9d-63efd3fee9a7",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 95,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 12.82782,
+        "sigma": 0.55124,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x64ff637fb478863b7468bc97d30a5bf3a428a1fd",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 30.2122,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-USDT",
+        "tvlUsd": 63134,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f"
+        ],
+        "pool": "68130b1c-d9f0-4030-a1ee-be2936223b4f",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x615e6285c5944540fd8bd921c9c8c56739fd1e13"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "HUSD-USDT",
+        "tvlUsd": 57118,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "fb1ab192-a72d-4761-852d-d4cc6d295969",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0.39761,
+        "sigma": 0.35338,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x0298c2b32eae4da002a15f36fdf7615bea3da047",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "ONE-USDT",
+        "tvlUsd": 49947,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "e8fc3856-aa77-441e-adc7-7ea6d7b52fba",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x04baf95fd4c52fd09a56d840baee0ab8d7357bf0",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 40623,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "pool": "4d33811d-e65d-49de-b9c2-f61dafed5259",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "ETH-HBTC",
+        "tvlUsd": 33496,
+        "apyBase": 0.00869,
+        "apyReward": 1.93304,
+        "apy": 1.94173,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "04c10fe2-61ef-464c-ae82-902e284541bf",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.63336,
+        "sigma": 0.07642,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x64ff637fb478863b7468bc97d30a5bf3a428a1fd",
+            "0x66a79d23e58475d2738179ca52cd0b41d73f0bea"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.94173,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "USDC-USDT",
+        "tvlUsd": 31859,
+        "apyBase": 0.00044,
+        "apyReward": 0.3973,
+        "apy": 0.39774,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "369c023c-0f31-4379-9d6f-1f7da3bed250",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 59,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 0.83263,
+        "sigma": 0.06588,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x9362bbef4b8313a8aa9f0c9808b80577aa26b73b",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.39774,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "HDOT-USDT",
+        "tvlUsd": 28483,
+        "apyBase": 0.00476,
+        "apyReward": 1.02552,
+        "apy": 1.03028,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "1677fd5e-7f80-4ee0-8f21-6826661b0b65",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 53,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 1.51732,
+        "sigma": 0.07732,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xa2c49cee16a5e5bdefde931107dc1fae9f7773e3",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.03028,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-HT",
+        "tvlUsd": 24480,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f"
+        ],
+        "pool": "89b55c20-e558-4b36-958f-185c54d73607",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 128,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x6dd2993b50b365c707718b0807fc4e344c072ec2"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 24259,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xcd1faff6e578fa5cac469d2418c95671ba1a62fe"
+        ],
+        "pool": "044e7384-9e5c-49b5-9127-ecab56378633",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-ETH",
+        "tvlUsd": 23892,
+        "apyBase": 0.01924,
+        "apyReward": 0.40752,
+        "apy": 0.42677,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "a702f85d-ba47-4d8f-a03f-4624499f2ba2",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 70,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.41949,
+        "sigma": 0.12925,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c",
+            "0x64ff637fb478863b7468bc97d30a5bf3a428a1fd"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.42677,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 20826,
+        "apyBase": null,
+        "apyReward": 1.74913,
+        "apy": 1.74913,
+        "rewardTokens": [
+            "0x80861a817106665bca173db6ac2ab628a738c737"
+        ],
+        "pool": "a26b6fdf-9475-4067-a45c-ec2ab1ebcea8",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 57.99999999999999,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 1.15824,
+        "sigma": 0.03369,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.74913,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-BOO",
+        "tvlUsd": 15391,
+        "apyBase": 0.00393,
+        "apyReward": 0.15816,
+        "apy": 0.16209,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "bdbe03b7-1b12-4fde-8154-0b887e8113da",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 72,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 0.61246,
+        "sigma": 0.03218,
+        "count": 483,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c",
+            "0xff96dccf2763d512b6038dc60b7e96d1a9142507"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.16209,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "HUSD-ETH",
+        "tvlUsd": 15295,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "7e692787-30bc-4fdc-81cc-6ef58f41378b",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 704,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x0298c2b32eae4da002a15f36fdf7615bea3da047",
+            "0x64ff637fb478863b7468bc97d30a5bf3a428a1fd"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MX-USDT",
+        "tvlUsd": 14322,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "a5ea3556-8a07-4757-8aa3-284cec1e76ad",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x8d854e603dc777337134286f5b3408261736a88f",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "USDT-HFIL",
+        "tvlUsd": 13642,
+        "apyBase": 0.12334,
+        "apyReward": 3.46148,
+        "apy": 3.58481,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "c51f9556-e821-44b3-a06e-90279d219f9a",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 67,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.92531,
+        "sigma": 0.11486,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xa71edc38d189767582c38a3145b5873052c3e47a",
+            "0xae3a768f9ab104c69a7cd6041fe16ffa235d1810"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 3.58481,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX-WHT",
+        "tvlUsd": 11784,
+        "apyBase": 0.04057,
+        "apyReward": 1.61117,
+        "apy": 1.65174,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "f4d06856-5c78-4569-8741-252e8d28af7c",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 67,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 2.15563,
+        "sigma": 0.15222,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c",
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.65174,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "MDX",
+        "tvlUsd": 11446,
+        "apyBase": null,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "0xd3b8999ea66d5ddac8af7be52165b913dd46c3b7"
+        ],
+        "pool": "d27c9f37-c221-4c6a-9181-681bdbc34f41",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 906,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x25d2e80cb6b86881fd7e07dd263fb79f4abe033c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "USDT-COMP",
+        "tvlUsd": 11006,
+        "apyBase": 0.63978,
+        "apyReward": 0.57505,
+        "apy": 1.21483,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "78167d9b-51ab-44ef-90a6-d877408d6d69",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 56.99999999999999,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 1.32581,
+        "sigma": 0.0585,
+        "count": 554,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xa71edc38d189767582c38a3145b5873052c3e47a",
+            "0xce0a5ca134fb59402b723412994b30e02f083842"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.21483,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "DAI-USDT",
+        "tvlUsd": 10227,
+        "apyBase": 0.00953,
+        "apyReward": 0.47601,
+        "apy": 0.48554,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "7d3b0b55-3d8d-4b2a-b6d9-21767be04986",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 62,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 1.85744,
+        "sigma": 0.10497,
+        "count": 264,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x3d760a45d0887dfd89a2f5385a236b29cb46ed2a",
+            "0xa71edc38d189767582c38a3145b5873052c3e47a"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.48554,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Heco",
+        "project": "mdex",
+        "symbol": "WHT-ETH",
+        "tvlUsd": 10172,
+        "apyBase": 0.03902,
+        "apyReward": 0.3829,
+        "apy": 0.42192,
+        "rewardTokens": [
+            "0x9c65ab58d8d978db963e63f2bfb7121627e3a739"
+        ],
+        "pool": "6f43f529-2a29-49fa-8621-adb5d86c5e91",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 2.6869,
+        "sigma": 0.18412,
+        "count": 269,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x5545153ccfca01fbd7dd11c0b23ba694d9509a6f",
+            "0x64ff637fb478863b7468bc97d30a5bf3a428a1fd"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.42192,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

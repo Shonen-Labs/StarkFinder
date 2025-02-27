@@ -1,0 +1,790 @@
+[
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "TRX",
+        "tvlUsd": 1802693015,
+        "apyBase": 0.02323,
+        "apyReward": 0,
+        "apy": 0.02323,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "90d3f42a-8700-4b9f-baa8-090a3c4322c9",
+        "apyPct1D": 0.0002,
+        "apyPct7D": 0.00267,
+        "apyPct30D": 0.01106,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 71,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 2.4416,
+        "sigma": 0.09966,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.01573,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "STRX",
+        "tvlUsd": 1723180462,
+        "apyBase": 0.0006,
+        "apyReward": 0,
+        "apy": 0.0006,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "31e2bebc-85e6-4974-b2e3-7f24675095cf",
+        "apyPct1D": 0.00055,
+        "apyPct7D": 0.00055,
+        "apyPct30D": 0.00059,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.28776,
+        "sigma": 0.03171,
+        "count": 608,
+        "outlier": false,
+        "underlyingTokens": [
+            "TU3kjFuhtEo42tsCBtfYUAZxoqQ4yuSLQ5"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 6e-05,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "BTC",
+        "tvlUsd": 654517977,
+        "apyBase": 0.00596,
+        "apyReward": 0,
+        "apy": 0.00596,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "71418c17-d2aa-4eff-b68a-806fff9ec951",
+        "apyPct1D": -0.00169,
+        "apyPct7D": 0.00016,
+        "apyPct30D": 0.00465,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 79,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.01643,
+        "sigma": 0.00095,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TN3W4H6rK2ce4vX9YnFQHwKENnHjoxb3m9"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.00359,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "USDD",
+        "tvlUsd": 169258606,
+        "apyBase": 0.24856,
+        "apyReward": 17.94543,
+        "apy": 18.19399,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "f179ea6c-3345-432f-b727-9e68e7881105",
+        "apyPct1D": 0.95516,
+        "apyPct7D": 0.75355,
+        "apyPct30D": null,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 73,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 17.73376,
+        "sigma": 0.20728,
+        "count": 25,
+        "outlier": false,
+        "underlyingTokens": [
+            "TXDk8mbtRbXeYuMNS83CfKPaYYT8XWv9Hz"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 17.08783,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "stusdt",
+        "symbol": "STUSDT",
+        "tvlUsd": 56387592,
+        "apyBase": null,
+        "apyReward": null,
+        "apy": 4.99009,
+        "rewardTokens": null,
+        "pool": "11e29b13-2042-403a-ab27-d27f23b37c33",
+        "apyPct1D": -0.05762,
+        "apyPct7D": 0.0506,
+        "apyPct30D": -1.27576,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 52,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 4.46516,
+        "sigma": 0.0311,
+        "count": 409,
+        "outlier": false,
+        "underlyingTokens": [
+            "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 5.7413,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "ETH",
+        "tvlUsd": 27058131,
+        "apyBase": 0.0061,
+        "apyReward": 0,
+        "apy": 0.0061,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "ae255d3e-5f02-4edd-aab3-ba43eead3a06",
+        "apyPct1D": -0.06623,
+        "apyPct7D": -0.05534,
+        "apyPct30D": 0.00148,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.21297,
+        "sigma": 0.03623,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "THb4CqiFdwNHsWsQCs4JhzwjMWys4aqCbF"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.03971,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "USDT",
+        "tvlUsd": 19033408,
+        "apyBase": 8.65015,
+        "apyReward": 0,
+        "apy": 8.65015,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "dac406f6-5600-437e-849d-f03daa383864",
+        "apyPct1D": 5.40029,
+        "apyPct7D": 5.27593,
+        "apyPct30D": 5.32665,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 93,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 1.73603,
+        "sigma": 0.09127,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.95191,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "ETHB",
+        "tvlUsd": 11885748,
+        "apyBase": 0.08656,
+        "apyReward": 0,
+        "apy": 0.08656,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "f6522715-a036-47cc-b53f-8a7bd39c8f63",
+        "apyPct1D": 0.08656,
+        "apyPct7D": 0.08653,
+        "apyPct30D": 0.08603,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 62,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 0.05355,
+        "sigma": 0.01048,
+        "count": 560,
+        "outlier": false,
+        "underlyingTokens": [
+            "TRFe3hT5oYhjSZ6f3ji5FJ7YCfrkWnHRvh"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.00128,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "SUN",
+        "tvlUsd": 9227711,
+        "apyBase": 0.14967,
+        "apyReward": 0,
+        "apy": 0.14967,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "873e1048-9094-4b63-a6f4-bd62325ecc81",
+        "apyPct1D": 4e-05,
+        "apyPct7D": -0.01155,
+        "apyPct30D": -0.02782,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 97,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 8.75044,
+        "sigma": 0.21455,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TSSMHYeV2uE9qYH95DqyoCuNCzEL1NvU3S"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.17843,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "USDDOLD",
+        "tvlUsd": 8101838,
+        "apyBase": 3.04499,
+        "apyReward": 0,
+        "apy": 3.04499,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "53b3663f-9096-49df-8787-f6ea3b6d0612",
+        "apyPct1D": 1.14374,
+        "apyPct7D": 0.79685,
+        "apyPct30D": -3.31197,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 90,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 5.85845,
+        "sigma": 0.10538,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.56186,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "allbridge-classic",
+        "symbol": "USDT",
+        "tvlUsd": 5644188,
+        "apyBase": 0.09119,
+        "apyReward": null,
+        "apy": 0.09119,
+        "rewardTokens": null,
+        "pool": "70f0fc28-6860-43b8-b032-c11bc2bc5414",
+        "apyPct1D": -0.10097,
+        "apyPct7D": -0.09413,
+        "apyPct30D": -0.02173,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 75,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 0.15672,
+        "sigma": 0.00728,
+        "count": 631,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.12073,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "BTT",
+        "tvlUsd": 5519718,
+        "apyBase": 0.22855,
+        "apyReward": 0,
+        "apy": 0.22855,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "1a009024-2ff0-4e82-8b14-e77685db7e0a",
+        "apyPct1D": 0.05699,
+        "apyPct7D": -0.00805,
+        "apyPct30D": -0.02963,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 88,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 12.14836,
+        "sigma": 0.33113,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TAFjULxiVgT4qWk6UZwjqwZXTSaGaqnVp4"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.2425,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "JST",
+        "tvlUsd": 3530975,
+        "apyBase": 0.05232,
+        "apyReward": 0,
+        "apy": 0.05232,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "aa3b8470-cd15-4e02-a83d-b83fae993855",
+        "apyPct1D": 0.00066,
+        "apyPct7D": -0.00027,
+        "apyPct30D": -0.02622,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 79,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 10.46826,
+        "sigma": 0.26693,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TCFLL5dx5ZJdKnWuesXxi1VPwjLVmWZZy9"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.18228,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "WIN",
+        "tvlUsd": 1454805,
+        "apyBase": 0.09697,
+        "apyReward": 0,
+        "apy": 0.09697,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "0864f70d-085b-4a19-a2bc-fc107ab3750a",
+        "apyPct1D": -0.00023,
+        "apyPct7D": -0.0005,
+        "apyPct30D": 0.03473,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 91,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 11.19553,
+        "sigma": 0.27386,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.08844,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "NFT",
+        "tvlUsd": 1350509,
+        "apyBase": 0.00539,
+        "apyReward": 0,
+        "apy": 0.00539,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "ef2717a7-e370-47cf-b744-2551f9515ae3",
+        "apyPct1D": 1e-05,
+        "apyPct7D": 0.00014,
+        "apyPct30D": -0.00434,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 82,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 11.66727,
+        "sigma": 0.28348,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TFczxzPhnThNSqr5by8tvxsdCFRRz6cPNq"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.00836,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "USDJ",
+        "tvlUsd": 709569,
+        "apyBase": 5.83054,
+        "apyReward": 0,
+        "apy": 5.83054,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "22b4985a-d97b-40a4-ae97-37f9351a9d91",
+        "apyPct1D": 0.80693,
+        "apyPct7D": 0.6521,
+        "apyPct30D": 2.64315,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 76,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 1.03774,
+        "sigma": 0.05908,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TMwFHYXLJaRUPeW6421aqXL4ZEzPRFGkGT"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.98406,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "WBTT",
+        "tvlUsd": 585961,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "dce475db-88bc-4174-a436-a942cc174892",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 1.31845,
+        "sigma": 0.0962,
+        "count": 962,
+        "outlier": false,
+        "underlyingTokens": [
+            "TKfjV9RNKJJCqPvBtK8L7Knykh7DNWvnYt"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "WSTUSDT",
+        "tvlUsd": 520609,
+        "apyBase": 2.12271,
+        "apyReward": 0,
+        "apy": 2.12271,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "00bce708-f7e2-4af6-9488-be0089a660a6",
+        "apyPct1D": -0.0033,
+        "apyPct7D": -0.04082,
+        "apyPct30D": -1.35371,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 66,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 0.37918,
+        "sigma": 0.04008,
+        "count": 554,
+        "outlier": false,
+        "underlyingTokens": [
+            "TGkxzkDKyMeq2T7edKnyjZoFypyzjkkssq"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 2.35104,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "TUSD",
+        "tvlUsd": 374800,
+        "apyBase": 8.19782,
+        "apyReward": 0,
+        "apy": 8.19782,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "535daca1-b457-48be-b93f-82b7a7fa1e0a",
+        "apyPct1D": 3.20792,
+        "apyPct7D": 2.34606,
+        "apyPct30D": 5.20537,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 91,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 2.24973,
+        "sigma": 0.15587,
+        "count": 955,
+        "outlier": false,
+        "underlyingTokens": [
+            "TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 4.14138,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "justlend",
+        "symbol": "SUNOLD",
+        "tvlUsd": 282109,
+        "apyBase": 0,
+        "apyReward": 0,
+        "apy": 0,
+        "rewardTokens": [
+            "TPYmHEhy5n8TCEfYGqW2rPxsghSfzghPDn"
+        ],
+        "pool": "4bf535e7-6092-476e-ac99-9286d1ade534",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 0,
+        "sigma": 0,
+        "count": 855,
+        "outlier": false,
+        "underlyingTokens": [
+            "TKkeiboTkxXKJpbmVFbv4a8ov5rAfRDMf9"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Tron",
+        "project": "strx-finance",
+        "symbol": "TRX",
+        "tvlUsd": 16374,
+        "apyBase": 0,
+        "apyReward": null,
+        "apy": 0,
+        "rewardTokens": null,
+        "pool": "d6527d23-05bb-4de9-9a11-505bad9d5677",
+        "apyPct1D": 0,
+        "apyPct7D": 0,
+        "apyPct30D": 0,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": null,
+        "mu": 22.01292,
+        "sigma": 1.48407,
+        "count": 778,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 10.80105,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
