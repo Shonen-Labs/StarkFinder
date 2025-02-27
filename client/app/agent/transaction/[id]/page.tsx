@@ -348,76 +348,84 @@ export default function TransactionPage() {
     setInputValue("");
     setIsLoading(true);
 
-    try {
-      const response = await fetch("/api/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: inputValue,
-          address: address,
-          messages: messages,
-          userPreferences,
-          stream: true,
-        }),
-      });
+  try {
+  const response = await fetch("/api/transactions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt: inputValue,
+      address: address,
+      messages: messages,
+      userPreferences,
+      stream: true,
+    }),
+  });
 
-      const data = await response.json();
+  const data = await response.json();
+  let agentMessage: Message;
 
-      let agentMessage: Message;
+  // Check if it's an error message that's actually a prompt for more information
+  if (
+    data.error &&
+    typeof data.error === "string" &&
+    !data.error.includes("not recognized")
+  ) {
+    // This is a conversational prompt from Brian, not an error
+    agentMessage = {
+      id: uuidv4(),
+      role: "agent",
+      content: data.error, // This contains Brian's question for more details
+      timestamp: new Date().toLocaleTimeString(),
+      user: "Agent",
+    };
+  } else if (response.ok && data.result?.[0]?.data) {
+    // We have transaction data
+    const { description, transaction } = data.result[0].data;
+    agentMessage = {
+      id: uuidv4(),
+      role: "agent",
+      content: description,
+      timestamp: new Date().toLocaleTimeString(),
+      user: "Agent",
+      transaction: transaction,
+    };
+  } else if (response.ok && data.answer) {
+    // We have a regular answer (from the old /ask endpoint)
+    agentMessage = {
+      id: uuidv4(),
+      role: "agent",
+      content: data.answer,
+      timestamp: new Date().toLocaleTimeString(),
+      user: "Agent",
+    };
+  } else {
+    // This is an actual error
+    agentMessage = {
+      id: uuidv4(),
+      role: "agent",
+      content:
+        "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
+      timestamp: new Date().toLocaleTimeString(),
+      user: "Agent",
+    };
+  }
 
-      // Check if it's an error message that's actually a prompt for more information
-      if (
-        data.error &&
-        typeof data.error === "string" &&
-        !data.error.includes("not recognized")
-      ) {
-        // This is a conversational prompt from Brian, not an error
-        agentMessage = {
-          id: uuidv4(),
-          role: "agent",
-          content: data.error, // This contains Brian's question for more details
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-        };
-      } else if (response.ok && data.result?.[0]?.data) {
-        // We have transaction data
-        const { description, transaction } = data.result[0].data;
-        agentMessage = {
-          id: uuidv4(),
-          role: "agent",
-          content: description,
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-          transaction: transaction,
-        };
-      } else {
-        // This is an actual error
-        agentMessage = {
-          id: uuidv4(),
-          role: "agent",
-          content:
-            "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-        };
-      }
-
-      setMessages((prev) => [...prev, agentMessage]);
-    } catch (error) {
-      console.error("Error:", error);
-      const errorMessage: Message = {
-        id: uuidv4(),
-        role: "agent",
-        content: "Sorry, something went wrong. Please try again.",
-        timestamp: new Date().toLocaleTimeString(),
-        user: "Agent",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
+  setMessages((prev) => [...prev, agentMessage]);
+} catch (error) {
+  console.error("Error:", error);
+  const errorMessage: Message = {
+    id: uuidv4(),
+    role: "agent",
+    content: "Sorry, something went wrong. Please try again.",
+    timestamp: new Date().toLocaleTimeString(),
+    user: "Agent",
+  };
+  setMessages((prev) => [...prev, errorMessage]);
+} finally {
+  setIsLoading(false);
+}
   };
 
   
