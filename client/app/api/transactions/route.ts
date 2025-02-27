@@ -191,29 +191,6 @@ function determineImpermanentLossRisk(poolName: string): string {
   return "Variable";
 }
 
-// User and chat management functions
-// async function getOrCreateUser(userId: string) {
-//   try {
-//     let user = await prisma.user.findUnique({
-//       where: { id: userId },
-//     });
-
-//     if (!user) {
-//       user = await prisma.user.create({
-//         data: {
-//           id: userId,
-//           email: null,
-//           name: null,
-//         },
-//       });
-//     }
-
-//     return user;
-//   } catch (error) {
-//     console.error("Error in getOrCreateUser:", error);
-//     throw error;
-//   }
-// }
 
 // User and chat management functions
 async function getOrCreateUser(userId: string) {
