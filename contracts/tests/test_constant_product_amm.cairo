@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 use starknet::{ContractAddress, contract_address_const};
 use snforge_std::{declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan};
 use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
@@ -5,6 +6,20 @@ use contracts::interfaces::IConstantProductAmm::{
     IConstantProductAmmDispatcher, IConstantProductAmmDispatcherTrait,
 };
 use contracts::ConstantProductAmm::{ConstantProductAmm};
+=======
+
+use starknet::{ContractAddress, contract_address_const};
+use snforge_std::{
+    declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan
+};
+use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
+use contracts::interfaces::IConstantProductAmm::{
+    IConstantProductAmmDispatcher, IConstantProductAmmDispatcherTrait
+};
+use contracts::ConstantProductAmm::{
+    ConstantProductAmm
+};
+>>>>>>> 4c7455c (fix conflict)
 
 const BANK: felt252 = 0x123;
 const INITIAL_SUPPLY: u256 = 10_000;
@@ -13,7 +28,11 @@ const INITIAL_SUPPLY: u256 = 10_000;
 struct Deployment {
     contract: IConstantProductAmmDispatcher,
     token0: IERC20Dispatcher,
+<<<<<<< HEAD
     token1: IERC20Dispatcher,
+=======
+    token1: IERC20Dispatcher
+>>>>>>> 4c7455c (fix conflict)
 }
 
 fn deploy_token(name: ByteArray) -> ContractAddress {
@@ -27,7 +46,11 @@ fn deploy_token(name: ByteArray) -> ContractAddress {
     contract_address
 }
 
+<<<<<<< HEAD
 fn deploy_erc20(name: ByteArray, symbol: ByteArray) -> (ContractAddress, IERC20Dispatcher) {
+=======
+fn deploy_erc20(name: ByteArray, symbol: ByteArray) ->  (ContractAddress, IERC20Dispatcher) {
+>>>>>>> 4c7455c (fix conflict)
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
@@ -51,11 +74,20 @@ fn setup() -> Deployment {
     calldata.append(token1_address.into());
     calldata.append(fee.into());
     let (contract_address, _) = starknet::syscalls::deploy_syscall(
+<<<<<<< HEAD
         ConstantProductAmm::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), false,
     )
         .unwrap();
 
     Deployment { contract: IConstantProductAmmDispatcher { contract_address }, token0, token1 }
+=======
+        ConstantProductAmm::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), false
+    )
+        .unwrap();
+
+    Deployment { contract: IConstantProductAmmDispatcher { contract_address }, token0, token1
+    }
+>>>>>>> 4c7455c (fix conflict)
 }
 
 fn add_liquidity(deploy: Deployment, amount: u256) -> u256 {

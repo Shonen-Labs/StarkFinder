@@ -2,11 +2,21 @@ mod tests {
     use starknet::class_hash::ClassHash;
 
     use starknet::ContractAddress;
+<<<<<<< HEAD
     use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
 
     use contracts::upgradable::{
         UpgradeableContract_V0, IUpgradeableContractDispatcher, IUpgradeableContractDispatcherTrait,
         UpgradeableContract_V1,
+=======
+    use snforge_std::{
+        declare, ContractClassTrait, DeclareResultTrait
+    };
+
+    use contracts::upgradable::{
+        UpgradeableContract_V0, IUpgradeableContractDispatcher,
+        IUpgradeableContractDispatcherTrait, UpgradeableContract_V1,
+>>>>>>> 4c7455c (fix conflict)
     };
 
     use core::num::traits::Zero;
@@ -36,7 +46,11 @@ mod tests {
         (
             IUpgradeableContractDispatcher { contract_address },
             contract_address,
+<<<<<<< HEAD
             UpgradeableContract_V1::TEST_CLASS_HASH.try_into().unwrap(),
+=======
+            UpgradeableContract_V1::TEST_CLASS_HASH.try_into().unwrap()
+>>>>>>> 4c7455c (fix conflict)
         )
     }
 

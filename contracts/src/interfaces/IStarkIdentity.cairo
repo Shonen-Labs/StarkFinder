@@ -1,9 +1,17 @@
 use starknet::ContractAddress;
+<<<<<<< HEAD
 use contracts::starkidentity::{ActivityRecord, Identity};
 
 #[starknet::interface]
 pub trait IStarkIdentity<TContractState> {
     /// Creates new identity caller with username, ENS name, Stark name, and recovery address.
+=======
+use contracts::starkidentity::StarkIdentity::{ActivityRecord, Identity};
+
+#[starknet::interface]
+pub trait IStarkIdentity<TContractState> {
+    /// Creates a new identity for the caller with username, ENS name, Stark name, and recovery address.
+>>>>>>> 4c7455c (fix conflict)
     fn create_identity(
         ref self: TContractState,
         username: felt252,
@@ -19,10 +27,13 @@ pub trait IStarkIdentity<TContractState> {
     fn identity_exists(self: @TContractState, address: ContractAddress) -> bool;
     /// Links an additional address to the caller's identity.
     fn link_address(ref self: TContractState, address_to_link: ContractAddress);
+<<<<<<< HEAD
     /// Checks if two addresses are linked
     fn verify_linked_addresses(
         self: @TContractState, address1: ContractAddress, address2: ContractAddress,
     ) -> bool;
+=======
+>>>>>>> 4c7455c (fix conflict)
     /// Adds a new verifier (admin only).
     fn add_verifier(ref self: TContractState, verifier: ContractAddress);
     /// Adds social verification for the caller's identity.
@@ -30,12 +41,16 @@ pub trait IStarkIdentity<TContractState> {
         ref self: TContractState, platform: felt252, verification_proof: felt252,
     );
     /// Submits social proof for a user's identity (verifiers only).
+<<<<<<< HEAD
     fn submit_social_proof(
         ref self: TContractState,
         platform: felt252,
         user_address: ContractAddress,
         signature: felt252,
     );
+=======
+    fn submit_social_proof(ref self: TContractState, platform: felt252, uaer_address: ContractAddress, signature: felt252);
+>>>>>>> 4c7455c (fix conflict)
     /// Verifies the provided social proof.
     fn verify_social_proof(self: @TContractState, platform: felt252, proof: felt252) -> bool;
     /// Records a new activity for the caller's identity.
@@ -44,6 +59,7 @@ pub trait IStarkIdentity<TContractState> {
     );
     /// Retrieves recorded activities for the specified address.
     fn get_activities(
+<<<<<<< HEAD
         self: @TContractState, address: ContractAddress, start_index: u256, limit: u256,
     ) -> Array<ActivityRecord>;
     /// Sends a verification request for the caller's identity.
@@ -52,6 +68,12 @@ pub trait IStarkIdentity<TContractState> {
     fn update_verification_request(
         ref self: TContractState, user: ContractAddress, verification_type: felt252, new_status: u8,
     );
+=======
+        self: @TContractState, address: ContractAddress, start_index: u32, limit: u32,
+    ) -> Array<ActivityRecord>;
+    /// Sends a verification request for the caller's identity.
+    fn request_verification(ref self: TContractState, verification_type: felt252);
+>>>>>>> 4c7455c (fix conflict)
     /// Updates the reputation score of a user's identity.
     fn update_reputation(ref self: TContractState, address: ContractAddress, points: i32);
     /// Records protocol usage for the specified address.

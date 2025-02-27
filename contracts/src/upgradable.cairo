@@ -16,7 +16,13 @@ pub mod UpgradeableContract_V0 {
     use starknet::class_hash::ClassHash;
     use core::num::traits::Zero;
     use starknet::{ContractAddress, get_caller_address};
+<<<<<<< HEAD
     use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+=======
+    use core::starknet::storage::{
+        StoragePointerReadAccess, StoragePointerWriteAccess,
+    };
+>>>>>>> 4c7455c (fix conflict)
 
     #[storage]
     struct Storage {
@@ -75,7 +81,13 @@ pub mod UpgradeableContract_V1 {
     use starknet::class_hash::ClassHash;
     use core::num::traits::Zero;
     use starknet::{ContractAddress, get_caller_address};
+<<<<<<< HEAD
     use core::starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+=======
+    use core::starknet::storage::{
+        StoragePointerReadAccess, StoragePointerWriteAccess,
+    };
+>>>>>>> 4c7455c (fix conflict)
 
     #[storage]
     struct Storage {
