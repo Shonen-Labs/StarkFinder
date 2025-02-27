@@ -92,7 +92,7 @@ jobs:
         run: npm run lint
 
       - name: Eliza install
-        run: cd client/eliza && pnpm i
+        run: cd eliza && pnpm i
 
       - name: Build
         run: npm run build
