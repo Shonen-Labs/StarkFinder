@@ -1,15 +1,10 @@
-
 use starknet::{ContractAddress, contract_address_const};
-use snforge_std::{
-    declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan
-};
+use snforge_std::{declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan};
 use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
 use contracts::interfaces::IConstantProductAmm::{
-    IConstantProductAmmDispatcher, IConstantProductAmmDispatcherTrait
+    IConstantProductAmmDispatcher, IConstantProductAmmDispatcherTrait,
 };
-use contracts::ConstantProductAmm::{
-    ConstantProductAmm
-};
+use contracts::ConstantProductAmm::{ConstantProductAmm};
 
 const BANK: felt252 = 0x123;
 const INITIAL_SUPPLY: u256 = 10_000;
@@ -18,7 +13,7 @@ const INITIAL_SUPPLY: u256 = 10_000;
 struct Deployment {
     contract: IConstantProductAmmDispatcher,
     token0: IERC20Dispatcher,
-    token1: IERC20Dispatcher
+    token1: IERC20Dispatcher,
 }
 
 fn deploy_token(name: ByteArray) -> ContractAddress {
@@ -32,7 +27,7 @@ fn deploy_token(name: ByteArray) -> ContractAddress {
     contract_address
 }
 
-fn deploy_erc20(name: ByteArray, symbol: ByteArray) ->  (ContractAddress, IERC20Dispatcher) {
+fn deploy_erc20(name: ByteArray, symbol: ByteArray) -> (ContractAddress, IERC20Dispatcher) {
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
@@ -56,12 +51,11 @@ fn setup() -> Deployment {
     calldata.append(token1_address.into());
     calldata.append(fee.into());
     let (contract_address, _) = starknet::syscalls::deploy_syscall(
-        ConstantProductAmm::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), false
+        ConstantProductAmm::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), false,
     )
         .unwrap();
 
-    Deployment { contract: IConstantProductAmmDispatcher { contract_address }, token0, token1
-    }
+    Deployment { contract: IConstantProductAmmDispatcher { contract_address }, token0, token1 }
 }
 
 fn add_liquidity(deploy: Deployment, amount: u256) -> u256 {
