@@ -95,7 +95,7 @@ jobs:
         run: npm install -g pnpm
 
       - name: Eliza install
-        run: cd eliza && pnpm install
+        run: cd eliza && pnpm install --no-frozen-lockfile
 
       - name: Build
         run: npm run build
