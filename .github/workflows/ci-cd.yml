@@ -91,6 +91,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Eliza install
         run: cd eliza && pnpm i
 
