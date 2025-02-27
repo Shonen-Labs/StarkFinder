@@ -215,7 +215,8 @@ function determineImpermanentLossRisk(poolName: string): string {
 //   }
 // }
 
-async function getOrCreateUser(userId: string, retries = 3) {
+// User and chat management functions
+async function getOrCreateUser(userId: string) {
   try {
     let user = await prisma.user.findUnique({
       where: { id: userId },
@@ -233,13 +234,7 @@ async function getOrCreateUser(userId: string, retries = 3) {
 
     return user;
   } catch (error) {
-    console.error(`Error in getOrCreateUser (attempts left: ${retries}):`, error);
-    // if (retries > 0 && error.message.includes("Can't reach database server")) {
-    //   // Wait 1 second before retrying
-    //   await new Promise(resolve => setTimeout(resolve, 1000));
-    //   return getOrCreateUser(userId, retries - 1);
-    // }
-    console.log({error})
+    console.error("Error in getOrCreateUser:", error);
     throw error;
   }
 }
