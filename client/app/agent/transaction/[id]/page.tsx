@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Send, Home } from "lucide-react";
-import { useAccount } from "@starknet-react/core";
+import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
 import {
   Dialog,
@@ -92,9 +92,11 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   onError,
 }) => {
   const { account } = useAccount();
+  // console.log(account)
   const [isProcessing, setIsProcessing] = React.useState(false);
-
+  console.log(transactions);
   const executeTransaction = async () => {
+    console.log('trying');
     if (!account) {
       onError(new Error("Wallet not connected"));
       return;
@@ -127,11 +129,10 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
       <button
         onClick={executeTransaction}
         disabled={isProcessing}
-        className={`w-full py-2 px-4 rounded-lg ${
-          isProcessing
-            ? "bg-white/20 cursor-not-allowed"
-            : "bg-white/10 hover:bg-white/20"
-        } transition-colors duration-200`}
+        className={`w-full py-2 px-4 rounded-lg ${isProcessing
+          ? "bg-white/20 cursor-not-allowed"
+          : "bg-white/10 hover:bg-white/20"
+          } transition-colors duration-200`}
       >
         {isProcessing ? "Processing Transaction..." : "Execute Transaction"}
       </button>
@@ -261,6 +262,10 @@ export default function TransactionPage() {
   const [inputValue, setInputValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const { address } = useAccount();
+  console.log(address);
+  const { provider } = useProvider();
+  console.log(provider.getChainId())
+
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -335,7 +340,7 @@ export default function TransactionPage() {
       setMessages((prev) => [...prev, errorMessage]);
       return;
     }
-
+  
     const userMessage: Message = {
       id: uuidv4(),
       role: "user",
@@ -343,91 +348,93 @@ export default function TransactionPage() {
       timestamp: new Date().toLocaleTimeString(),
       user: "User",
     };
-
+  
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
 
-  try {
-  const response = await fetch("/api/transactions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      prompt: inputValue,
-      address: address,
-      messages: messages,
-      userPreferences,
-      stream: true,
-    }),
-  });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
 
-  const data = await response.json();
-  let agentMessage: Message;
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: inputValue,
+          address: address,
+          messages: messages,
+          userPreferences,
+          stream: true,
+        }),
+        signal: controller.signal,
+      });
 
-  // Check if it's an error message that's actually a prompt for more information
-  if (
-    data.error &&
-    typeof data.error === "string" &&
-    !data.error.includes("not recognized")
-  ) {
-    // This is a conversational prompt from Brian, not an error
-    agentMessage = {
-      id: uuidv4(),
-      role: "agent",
-      content: data.error, // This contains Brian's question for more details
-      timestamp: new Date().toLocaleTimeString(),
-      user: "Agent",
-    };
-  } else if (response.ok && data.result?.[0]?.data) {
-    // We have transaction data
-    const { description, transaction } = data.result[0].data;
-    agentMessage = {
-      id: uuidv4(),
-      role: "agent",
-      content: description,
-      timestamp: new Date().toLocaleTimeString(),
-      user: "Agent",
-      transaction: transaction,
-    };
-  } else if (response.ok && data.answer) {
-    // We have a regular answer (from the old /ask endpoint)
-    agentMessage = {
-      id: uuidv4(),
-      role: "agent",
-      content: data.answer,
-      timestamp: new Date().toLocaleTimeString(),
-      user: "Agent",
-    };
-  } else {
-    // This is an actual error
-    agentMessage = {
-      id: uuidv4(),
-      role: "agent",
-      content:
-        "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
-      timestamp: new Date().toLocaleTimeString(),
-      user: "Agent",
-    };
-  }
+      const data = await response.json();
+      console.log(data);
 
-  setMessages((prev) => [...prev, agentMessage]);
-} catch (error) {
-  console.error("Error:", error);
-  const errorMessage: Message = {
-    id: uuidv4(),
-    role: "agent",
-    content: "Sorry, something went wrong. Please try again.",
-    timestamp: new Date().toLocaleTimeString(),
-    user: "Agent",
+      clearTimeout(timeoutId); // Clear timeout if fetch succeeds
+
+      let agentMessage: Message;
+
+      // Check if it's an error message that's actually a prompt for more information
+      if (
+        data.error &&
+        typeof data.error === "string" &&
+        !data.error.includes("not recognized")
+      ) {
+        // This is a conversational prompt from Brian, not an error
+        agentMessage = {
+          id: uuidv4(),
+          role: "agent",
+          content: data.error, // This contains Brian's question for more details
+          timestamp: new Date().toLocaleTimeString(),
+          user: "Agent",
+        };
+      } else if (response.ok && data.result?.[0]?.data) {
+        // We have transaction data
+        const { description, transaction } = data.result[0].data;
+        agentMessage = {
+          id: uuidv4(),
+          role: "agent",
+          content: description,
+          timestamp: new Date().toLocaleTimeString(),
+          user: "Agent",
+          transaction: transaction,
+        };
+      } else {
+        // This is an actual error
+        agentMessage = {
+          id: uuidv4(),
+          role: "agent",
+          content:
+            "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
+          timestamp: new Date().toLocaleTimeString(),
+          user: "Agent",
+        };
+      }
+
+      setMessages((prev) => [...prev, agentMessage]);
+    } catch (error) {
+      if ((error instanceof Error) && error.name === "AbortError") {
+        console.error("Frontend fetch request timed out");
+      } else {
+        console.error("Error:", error);
+      }
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content: "Sorry, something went wrong. Please try again.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
   };
-  setMessages((prev) => [...prev, errorMessage]);
-} finally {
-  setIsLoading(false);
-}
-  };
-
   
 
   return (
@@ -436,7 +443,7 @@ export default function TransactionPage() {
       <div
         className="absolute inset-0 bg-repeat opacity-5"
         style={{
-          backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+          backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
           backgroundSize: "20px 20px",
         }}
       />
@@ -545,7 +552,7 @@ export default function TransactionPage() {
               {address ? (
                 <div className="flex items-center gap-4">
                   <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
-                    {address.slice(0, 5) + "..." + address.slice(-3)}
+                    {`${address.slice(0, 5)}...${address.slice(-3)}`}
                   </div>
                   <DisconnectButton />
                 </div>
