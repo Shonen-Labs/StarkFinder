@@ -24,10 +24,12 @@ fn USER3() -> ContractAddress {
 
 fn deploy_token() -> ContractAddress {
     let name: ByteArray = "MockToken";
+    let symbol: ByteArray = "MTK";
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
     name.serialize(ref constructor_calldata);
+    symbol.serialize(ref constructor_calldata);
 
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
     contract_address

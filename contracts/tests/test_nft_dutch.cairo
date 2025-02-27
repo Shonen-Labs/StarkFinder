@@ -20,10 +20,12 @@ fn deploy_contract(name: ByteArray) -> ContractAddress {
 
 fn deploy_erc20() -> ContractAddress {
     let name: ByteArray = "MockToken";
+    let symbol: ByteArray = "MTK";
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
     name.serialize(ref constructor_calldata);
+    symbol.serialize(ref constructor_calldata);
 
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
     contract_address
@@ -314,3 +316,4 @@ fn test_buy_should_panic_when_duration_ended() {
     cheat_caller_address(nft_auction_address, buyer, CheatSpan::TargetCalls(1));
     nft_auction_dispatcher.buy(nft_id_2);
 }
+

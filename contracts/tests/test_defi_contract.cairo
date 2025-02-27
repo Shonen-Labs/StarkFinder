@@ -24,10 +24,12 @@ fn deploy_contract(interest_rate: u256) -> ContractAddress {
 
 fn deploy_erc20() -> ContractAddress {
     let name: ByteArray = "MockToken";
+    let symbol: ByteArray = "MTK";
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
     name.serialize(ref constructor_calldata);
+    symbol.serialize(ref constructor_calldata);
 
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
     contract_address
@@ -142,4 +144,5 @@ fn test_withdraw_with_yield_farming() {
 
     assert(user_balance_after == expected_final_balance, 'Wrong final balance');
 }
+
 
