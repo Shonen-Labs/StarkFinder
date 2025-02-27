@@ -170,7 +170,7 @@ export default function Header({
               </Link>
             </li>
             <li>
-              <Link href="/agent/chat/someId" className="hover:text-blue-500 transition-colors">
+              <Link href="/agent/transaction/someId" className="hover:text-blue-500 transition-colors">
                 Agent
               </Link>
             </li>

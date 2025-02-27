@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Send, Home } from "lucide-react";
+import { Plus, Send, Home, Mic, Ban } from "lucide-react";
 import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
 import {
@@ -23,7 +23,9 @@ import {
 import Link from "next/link";
 import { TransactionSuccess } from "@/components/TransactionSuccess";
 import CommandList from "@/components/ui/command";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface UserPreferences {
   riskTolerance: "low" | "medium" | "high";
@@ -92,11 +94,9 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   onError,
 }) => {
   const { account } = useAccount();
-  // console.log(account)
   const [isProcessing, setIsProcessing] = React.useState(false);
-  console.log(transactions);
+  
   const executeTransaction = async () => {
-    console.log('trying');
     if (!account) {
       onError(new Error("Wallet not connected"));
       return;
@@ -226,7 +226,11 @@ const MessageContent: React.FC<MessageContentProps> = ({
   if (message.transaction?.data?.transactions) {
     return (
       <div className="space-y-4">
-        <p className="text-white/80">{message.content}</p>
+        <p className="text-white/80">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {message.content}
+          </ReactMarkdown>
+        </p>
         {txHash ? (
           <TransactionSuccess
             type={message.transaction.type}
@@ -252,8 +256,13 @@ const MessageContent: React.FC<MessageContentProps> = ({
       </div>
     );
   }
-  return <p className="text-white/80">{message.content}</p>;
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      {message.content}
+    </ReactMarkdown>
+  );
 };
+
 export default function TransactionPage() {
   const router = useRouter();
   const params = useParams();
@@ -261,11 +270,10 @@ export default function TransactionPage() {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [inputValue, setInputValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const [streamedResponse, setStreamedResponse] = useState("");
   const { address } = useAccount();
-  console.log(address);
   const { provider } = useProvider();
-  console.log(provider.getChainId())
-
+  
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -275,12 +283,13 @@ export default function TransactionPage() {
     preferredChains: [],
     investmentHorizon: "medium",
   });
+  const [error, setError] = useState("");
 
   React.useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, streamedResponse]);
 
   React.useEffect(() => {
     // Initial welcome message
@@ -301,16 +310,17 @@ export default function TransactionPage() {
       },
     ]);
   }, []);
+
   // Generates a unique chat ID and navigates to the new chat route.
   const createNewChat = async () => {
-    const id = uuidv4(); // Generate a unique ID for the chat session
-    await router.push(`/agent/chat/${id}`); // Navigate to the new chat route
+    const id = uuidv4();
+    await router.push(`/agent/transaction/${id}`);
   };
 
-// Generates a unique chat ID and navigates to the new Transaction route.
+  // Generates a unique chat ID and navigates to the new Transaction route.
   const createNewTxn = async () => {
-    const id = uuidv4(); // Generate a unique ID for the transaction session
-    await router.push(`/agent/transaction/${id}`); // Navigate to the new transaction route
+    const id = uuidv4();
+    await router.push(`/agent/transaction/${id}`);
   };
 
   const handleTransactionSuccess = (hash: string) => {
@@ -352,90 +362,174 @@ export default function TransactionPage() {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
+    setStreamedResponse("");
+    setError("");
 
     try {
+      // Format messages for the API - include unique user messages
+      const formattedMessages = Array.from(
+        new Set(
+          messages
+            .filter(msg => msg.role === "user")
+            .map(msg => msg.content)
+        )
+      ).map(content => ({
+        sender: "user",
+        content
+      }));
+  
+      // Add the current message if it's not already included
+      if (!formattedMessages.some(msg => msg.content === inputValue)) {
+        formattedMessages.push({
+          sender: "user",
+          content: inputValue
+        });
+      }
+  
+      const requestBody = {
+        prompt: inputValue,
+        address: address,
+        messages: messages,
+        userPreferences,
+        stream: true
+      };
+  
       const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          prompt: inputValue,
-          address: address,
-          messages: messages,
-          userPreferences,
-          stream: true,
-        }),
-        signal: controller.signal,
+        body: JSON.stringify(requestBody),
       });
-
-      const data = await response.json();
-      console.log(data);
-
-      clearTimeout(timeoutId); // Clear timeout if fetch succeeds
-
-      let agentMessage: Message;
-
-      // Check if it's an error message that's actually a prompt for more information
-      if (
-        data.error &&
-        typeof data.error === "string" &&
-        !data.error.includes("not recognized")
-      ) {
-        // This is a conversational prompt from Brian, not an error
-        agentMessage = {
-          id: uuidv4(),
-          role: "agent",
-          content: data.error, // This contains Brian's question for more details
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-        };
-      } else if (response.ok && data.result?.[0]?.data) {
-        // We have transaction data
-        const { description, transaction } = data.result[0].data;
-        agentMessage = {
-          id: uuidv4(),
-          role: "agent",
-          content: description,
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-          transaction: transaction,
-        };
-      } else {
-        // This is an actual error
-        agentMessage = {
-          id: uuidv4(),
-          role: "agent",
-          content:
-            "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
-          timestamp: new Date().toLocaleTimeString(),
-          user: "Agent",
-        };
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details?.message || 'Failed to get response');
       }
 
-      setMessages((prev) => [...prev, agentMessage]);
-    } catch (error) {
-      if ((error instanceof Error) && error.name === "AbortError") {
-        console.error("Frontend fetch request timed out");
+      const contentType = response.headers.get("Content-Type") || "";
+
+      if(!response.body || contentType.includes('application/json')){
+        // Handle non-streamed response
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        if (data.result?.[0]?.data) {
+          // We have transaction data
+          const { description, transaction } = data.result[0].data;
+          const agentMessage: Message = {
+            id: uuidv4(),
+            role: "agent",
+            content: description,
+            timestamp: new Date().toLocaleTimeString(),
+            user: "Agent",
+            transaction: transaction,
+          };
+          
+          setMessages((prevMessages) => [...prevMessages, agentMessage]);
+        } else {
+          // Normal response
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              id: uuidv4(),
+              role: "agent",
+              content: data.answer || data.content,
+              timestamp: new Date().toLocaleTimeString(),
+              user: "Agent",
+            },
+          ]);
+        }
       } else {
-        console.error("Error:", error);
+        // Handle streaming response
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = '';
+  
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+  
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n').filter(Boolean);
+  
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(5));
+                  if (data.content) {
+                    accumulatedResponse += data.content;
+                    setStreamedResponse(accumulatedResponse);
+                  } else if (data.error) {
+                    throw new Error(data.error);
+                  }
+                } catch (e) {
+                  console.error('Error parsing JSON:', e);
+                }
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock();
+        }
+  
+        // Add final message to chat
+        if (accumulatedResponse) {
+          // Check if the response contains transaction data
+          try {
+            const jsonResponse = JSON.parse(accumulatedResponse);
+            if (jsonResponse.result?.[0]?.data) {
+              const { description, transaction } = jsonResponse.result[0].data;
+              setMessages(prev => [...prev, {
+                id: uuidv4(),
+                role: "agent",
+                content: description,
+                timestamp: new Date().toLocaleTimeString(),
+                user: "Agent",
+                transaction: transaction,
+              }]);
+            } else {
+              setMessages(prev => [...prev, {
+                id: uuidv4(),
+                role: "agent",
+                content: accumulatedResponse,
+                timestamp: new Date().toLocaleTimeString(),
+                user: "Agent",
+              }]);
+            }
+          } catch {
+            // If it's not valid JSON, add it as a regular message
+            setMessages(prev => [...prev, {
+              id: uuidv4(),
+              role: "agent",
+              content: accumulatedResponse,
+              timestamp: new Date().toLocaleTimeString(),
+              user: "Agent",
+            }]);
+          }
+        }
       }
-      const errorMessage: Message = {
+    } catch (err: any) {
+      console.error('Transaction error:', err);
+      setError(err.message || "Unable to get response");
+      
+      // Add error message to chat
+      setMessages(prev => [...prev, {
         id: uuidv4(),
         role: "agent",
-        content: "Sorry, something went wrong. Please try again.",
+        content: err.message || "Sorry, something went wrong. Please try again.",
         timestamp: new Date().toLocaleTimeString(),
         user: "Agent",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      }]);
     } finally {
       setIsLoading(false);
+      setStreamedResponse("");
     }
   };
-  
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
@@ -456,7 +550,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-            onClick={createNewChat} // onclick command for a new chat route
+            onClick={createNewChat}
           >
             <span>Agent Chat</span>
             <Plus className="h-4 w-4" />
@@ -464,43 +558,12 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={createNewTxn}  // onclick command for a new transaction route 
+            onClick={createNewTxn}
           >
             <span>Agent Txn</span>
             <Plus className="h-4 w-4" />
           </Button>
           <Separator className="my-2 bg-white/20" />
-          {/* <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                className="justify-start gap-2 border border-white/20 hover:bg-white/10 transition-colors"
-              >
-                <Plus className="h-4 w-4" /> New
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-gray-900 border border-white/20 text-white">
-              <DialogHeader>
-                <DialogTitle>Create New</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewChat}
-                >
-                  Chat
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewTxn}
-                >
-                  Txn
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog> */}
 
           <div className="flex flex-col gap-4">
             <h4 className="text-sm">Transaction History</h4>
@@ -587,10 +650,50 @@ export default function TransactionPage() {
                 </div>
               </div>
             ))}
+            
+            {isLoading && (
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.4s" }}
+                ></div>
+              </div>
+            )}
+            
+            {streamedResponse && (
+              <div className="flex gap-2 mb-4 animate-fadeIn">
+                <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">
+                  A
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold">Transaction Agent</span>
+                    <span className="text-xs text-white/60">
+                      ({new Date().toLocaleTimeString()})
+                    </span>
+                  </div>
+                  <div className="text-white/80 bg-white/5 p-2 rounded-lg">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {streamedResponse}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={scrollRef} />
           </ScrollArea>
 
           {isInputClicked && <CommandList />}
+          
           {/* Input Area */}
           <div className="p-4 border-t border-white/20 bg-[#010101]">
             <div className="relative">
@@ -613,13 +716,14 @@ export default function TransactionPage() {
                 onClick={handleSendMessage}
                 disabled={isLoading}
               >
-                <Send className="h-5 w-5" />
+                {isLoading ? <Ban className="h-5 w-5" /> : <Send className="h-5 w-5" />}
                 <span className="sr-only">Send message</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
+      
       <Button
         onClick={() => setShowPreferences(true)}
         className="absolute right-20 top-4"
