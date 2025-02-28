@@ -63,8 +63,12 @@ jobs:
 
       - name: Install Universal Sierra Compiler 
         run: |
-          curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
-          echo "$HOME/.cairo/target/release" >> $GITHUB_PATH
+         # Download the Universal Sierra Compiler binary
+          curl -L https://github.com/software-mansion/universal-sierra-compiler/releases/download/v0.1.0/universal-sierra-compiler-v0.1.0-x86_64-unknown-linux-gnu.tar.gz -o usc.tar.gz
+          mkdir -p $HOME/.local/bin
+          tar -xzf usc.tar.gz -C $HOME/.local/bin --strip-components=1
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          rm usc.tar.gz
           usc --version
 
       - name: Install dependencies
