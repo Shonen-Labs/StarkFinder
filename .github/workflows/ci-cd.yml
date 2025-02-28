@@ -61,10 +61,10 @@ jobs:
           fi
           echo "Installed forge version: $(forge --version)"
 
-      - name: Install Universal Sierra Compiler (via Scarb package)
+      - name: Install Universal Sierra Compiler 
         run: |
-          scarb install --global universal-sierra-compiler
-          echo "$HOME/.local/share/scarb/bin" >> $GITHUB_PATH
+          curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
+          echo "$HOME/.cairo/target/release" >> $GITHUB_PATH
           usc --version
 
       - name: Install dependencies
