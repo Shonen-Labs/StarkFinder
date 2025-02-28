@@ -59,8 +59,11 @@ jobs:
             # Build the project
             cargo build --release
 
-            # Install the binary
-            sudo cp target/release/forge /usr/local/bin/forge
+            # Check the build output
+            ls -l target/release
+
+            # Install the binary (replace 'forge' with the correct binary name if needed)
+            sudo cp target/release/snforge /usr/local/bin/forge
 
             # Clean up
             cd ..
