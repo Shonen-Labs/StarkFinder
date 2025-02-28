@@ -3,6 +3,7 @@
 // app/agent/transaction/[id]/page.tsx
 "use client";
 
+
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
@@ -25,12 +26,14 @@ import { TransactionSuccess } from "@/components/TransactionSuccess";
 import CommandList from "@/components/ui/command";
 import { useState } from "react";
 
+
 interface UserPreferences {
   riskTolerance: "low" | "medium" | "high";
   preferredAssets: string[];
   preferredChains: string[];
   investmentHorizon: "short" | "medium" | "long";
 }
+
 
 interface Message {
   role: string;
@@ -69,6 +72,7 @@ interface Message {
   };
 }
 
+
 interface TransactionHandlerProps {
   transactions: Array<{
     contractAddress: string;
@@ -80,10 +84,12 @@ interface TransactionHandlerProps {
   onError: (error: any) => void;
 }
 
+
 interface MessageContentProps {
   message: Message;
   onTransactionSuccess: (hash: string) => void;
 }
+
 
 const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   transactions,
@@ -101,6 +107,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
       onError(new Error("Wallet not connected"));
       return;
     }
+
 
     setIsProcessing(true);
     try {
@@ -123,6 +130,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
     }
   };
 
+
   return (
     <div className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10">
       <p className="text-sm text-white/80 mb-4">{description}</p>
@@ -140,6 +148,7 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   );
 };
 
+
 const PreferencesDialog: React.FC<{
   open: boolean;
   onClose: () => void;
@@ -151,6 +160,7 @@ const PreferencesDialog: React.FC<{
     preferredChains: [],
     investmentHorizon: "medium",
   });
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -190,11 +200,13 @@ const PreferencesDialog: React.FC<{
   );
 };
 
+
 const MessageContent: React.FC<MessageContentProps> = ({
   message,
   onTransactionSuccess,
 }) => {
   const [txHash, setTxHash] = React.useState<string | null>(null);
+
 
   if (message.recommendations) {
     return (
@@ -266,6 +278,7 @@ export default function TransactionPage() {
   const { provider } = useProvider();
   console.log(provider.getChainId())
 
+
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -276,11 +289,13 @@ export default function TransactionPage() {
     investmentHorizon: "medium",
   });
 
+
   React.useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
 
   React.useEffect(() => {
     // Initial welcome message
@@ -307,11 +322,13 @@ export default function TransactionPage() {
     await router.push(`/agent/chat/${id}`); // Navigate to the new chat route
   };
 
-// Generates a unique chat ID and navigates to the new Transaction route.
+
+  // Generates a unique chat ID and navigates to the new Transaction route.
   const createNewTxn = async () => {
     const id = uuidv4(); // Generate a unique ID for the transaction session
     await router.push(`/agent/transaction/${id}`); // Navigate to the new transaction route
   };
+
 
   const handleTransactionSuccess = (hash: string) => {
     const successMessage: Message = {
@@ -324,6 +341,7 @@ export default function TransactionPage() {
     };
     setMessages((prev) => [...prev, successMessage]);
   };
+
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -341,6 +359,7 @@ export default function TransactionPage() {
       return;
     }
 
+
     const userMessage: Message = {
       id: uuidv4(),
       role: "user",
@@ -349,12 +368,15 @@ export default function TransactionPage() {
       user: "User",
     };
 
+
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
 
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
+
 
     try {
       const response = await fetch("/api/transactions", {
@@ -372,12 +394,16 @@ export default function TransactionPage() {
         signal: controller.signal,
       });
 
+
       const data = await response.json();
       console.log(data);
 
+
       clearTimeout(timeoutId); // Clear timeout if fetch succeeds
 
+
       let agentMessage: Message;
+
 
       // Check if it's an error message that's actually a prompt for more information
       if (
@@ -416,6 +442,7 @@ export default function TransactionPage() {
         };
       }
 
+
       setMessages((prev) => [...prev, agentMessage]);
     } catch (error) {
       if ((error instanceof Error) && error.name === "AbortError") {
@@ -436,7 +463,10 @@ export default function TransactionPage() {
     }
   };
 
-  
+
+
+
+
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
@@ -448,6 +478,7 @@ export default function TransactionPage() {
           backgroundSize: "20px 20px",
         }}
       />
+
 
       {/* Content wrapper */}
       <div className="flex w-full h-full relative z-10">
@@ -465,7 +496,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={createNewTxn}  // onclick command for a new transaction route 
+            onClick={createNewTxn}  // onclick command for a new transaction route
           >
             <span>Agent Txn</span>
             <Plus className="h-4 w-4" />
@@ -503,6 +534,7 @@ export default function TransactionPage() {
             </DialogContent>
           </Dialog> */}
 
+
           <div className="flex flex-col gap-4">
             <h4 className="text-sm">Transaction History</h4>
             <Input
@@ -532,11 +564,13 @@ export default function TransactionPage() {
             </div>
           </div>
 
+
           <div className="mt-auto flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-sm text-green-500">Online</span>
           </div>
         </div>
+
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
@@ -553,7 +587,7 @@ export default function TransactionPage() {
               {address ? (
                 <div className="flex items-center gap-4">
                   <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
-                    {`${address.slice(0, 5)}...${address.slice(-3)}`}
+                    {`${address?.slice(0, 5)}...${address?.slice(-3)}`}
                   </div>
                   <DisconnectButton />
                 </div>
@@ -562,6 +596,7 @@ export default function TransactionPage() {
               )}
             </div>
           </div>
+
 
           {/* Chat Area */}
           <ScrollArea className="flex-1 p-4">
@@ -591,7 +626,8 @@ export default function TransactionPage() {
             <div ref={scrollRef} />
           </ScrollArea>
 
-          {isInputClicked && <CommandList />}
+
+          {isInputClicked && <CommandList setMessages={setMessages} inputValue={inputValue} userPreferences={userPreferences} messages={messages} setIsLoading={setIsLoading} setInputValue={setInputValue} isLoading={isLoading} />}
           {/* Input Area */}
           <div className="p-4 border-t border-white/20 bg-[#010101]">
             <div className="relative">
@@ -628,6 +664,7 @@ export default function TransactionPage() {
         Investment Preferences
       </Button>
 
+
       <PreferencesDialog
         open={showPreferences}
         onClose={() => setShowPreferences(false)}
@@ -639,3 +676,6 @@ export default function TransactionPage() {
     </div>
   );
 }
+
+
+

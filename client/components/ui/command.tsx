@@ -6,18 +6,48 @@ import Deposit from "./deposit";
 import Withdraw from "./withdraw";
 import Bridge from "./bridge";
 
+// Import Message type or define it here if needed
+import { Message } from "@/app/tg/types"; // Adjust the import path as needed
+
+// Define UserPreferences interface
+interface UserPreferences {
+  riskTolerance: "low" | "medium" | "high";
+  preferredAssets: string[];
+  preferredChains: string[];
+  investmentHorizon: "short" | "medium" | "long";
+}
+
+// Define CommandList props interface
+interface CommandListProps {
+  inputValue: string;
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  userPreferences: UserPreferences;
+  messages: Message[];
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setInputValue: React.Dispatch<React.SetStateAction<string>>;
+  isLoading: boolean;
+}
+
 const commands = ["Transfer", "Swap", "Deposit", "Withdraw", "Bridge"];
 
-const CommandList = () => {
+const CommandList: React.FC<CommandListProps> = ({ 
+  inputValue, 
+  setMessages, 
+  userPreferences, 
+  messages, 
+  setIsLoading, 
+  setInputValue,
+  isLoading 
+}) => {
   const [selectedCommand, setSelectedCommand] = useState<string | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
-
+  
   useEffect(() => {
     if (selectedCommand) {
       setShowModal(true);
     }
   }, [selectedCommand]);
-
+  
   return (
     <div>
       {showModal && (
@@ -25,7 +55,17 @@ const CommandList = () => {
           {selectedCommand === "Swap" ? (
             <Swap setSelectedCommand={setSelectedCommand} />
           ) : selectedCommand === "Transfer" ? (
-            <Transfer setSelectedCommand={setSelectedCommand} />
+            <Transfer 
+              setSelectedCommand={setSelectedCommand} 
+              setMessages={setMessages} 
+              inputValue={inputValue} 
+              setIsLoading={setIsLoading} 
+              messages={messages} 
+              userPreferences={userPreferences} 
+              setInputValue={setInputValue} 
+              isLoading={isLoading} 
+              setShowTransferModal={setShowModal} 
+            />
           ) : selectedCommand === "Deposit" ? (
             <Deposit setSelectedCommand={setSelectedCommand} />
           ) : selectedCommand === "Withdraw" ? (
@@ -40,11 +80,11 @@ const CommandList = () => {
           <h2 className="text-lg font-bold mb-4">Commands</h2>
           <div
             className="max-h-40 overflow-y-auto [&::-webkit-scrollbar]:w-2
-              [&::-webkit-scrollbar-track]:bg-[#060606]
-              [&::-webkit-scrollbar-thumb]:bg-white/10
-              [&::-webkit-scrollbar-thumb]:rounded-full
-              dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-              dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+            [&::-webkit-scrollbar-track]:bg-[#060606]
+            [&::-webkit-scrollbar-thumb]:bg-white/10
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+            dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
           >
             {commands.map((command, index) => (
               <div
