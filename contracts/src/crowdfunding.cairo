@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use starknet::storage::{Map, Vec};
-use alexandria_storage::{ListTrait, List};
+// use alexandria_storage::{ListTrait, List};
 
 #[starknet::interface]
 pub trait ICrowdfunding<TContractState> {
@@ -73,7 +73,7 @@ pub mod Crowdfunding {
     use alexandria_storage::{ListTrait, List};
     use core::option::OptionTrait;
     use starknet::storage::{
-        StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map, Vec,
+        StoragePointerReadAccess, StoragePointerWriteAccess, StoragePathEntry, Map,
         StorageMapWriteAccess, MutableVecTrait,
     };
     use starknet::storage::StorageMapReadAccess;
