@@ -20,12 +20,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev pkg-config
-          
-      - name: Install Scarb
-        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
-      - name: Add Scarb to PATH
-        run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
+      - name: Install Scarb (Stable)
+        run: |
+          curl -L https://github.com/software-mansion/scarb/releases/download/v2.7.0-rc.4/scarb-v2.7.0-rc.4-x86_64-unknown-linux-gnu.tar.gz -o scarb.tar.gz
+          mkdir -p ~/.local/share/scarb/bin
+          tar -xzf scarb.tar.gz -C ~/.local/share/scarb/bin --strip-components=1
+          echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
+          scarb --version
 
       - name: Cache Rust
         uses: actions/cache@v4
@@ -49,7 +51,7 @@ jobs:
           path: ~/.cargo/bin
           key: ${{ runner.os }}-forge-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install forge
+      - name: Install Starknet Foundry (snforge)
         run: |
           if ! command -v forge &> /dev/null; then
             git clone https://github.com/foundry-rs/starknet-foundry.git
@@ -59,28 +61,12 @@ jobs:
             cd ..
             rm -rf starknet-foundry
           fi
-          echo "Installed forge version: $(forge --version)"
-
-      - name: Install Cairo Toolchain
-        run: |
-          # Install Cairo (includes Universal Sierra Compiler)
-          curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
-          echo "$HOME/.cairo/target/release" >> $GITHUB_PATH
-
-          # Verify the installation
-          cairo-compile --version
-          universal-sierra-compiler --version
-
-      - name: Verify Universal Sierra Compiler
-        run: |
-          if ! command -v universal-sierra-compiler &> /dev/null; then
-            echo "Universal Sierra Compiler is not installed or not in PATH"
-            exit 1
-          fi
-          echo "Universal Sierra Compiler is installed: $(universal-sierra-compiler --version)"
+          forge --version
 
       - name: Install dependencies
-        run: scarb clean && scarb fetch
+        run: |
+          scarb clean
+          scarb fetch
 
       - name: Build Starknet contracts
         run: scarb build
@@ -169,7 +155,4 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
 
-      - name: Deploy
-        run: |
-          # Add deployment steps here (e.g., deploy to Vercel, Netlify, etc.)
-          echo "Deployment steps go here"
+  
