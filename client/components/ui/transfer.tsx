@@ -99,6 +99,7 @@ const Transfer: React.FC<TransferProps> = ({
     const timeoutId = setTimeout(() => controller.abort(), 135000);
 
     try {
+      // this is where the endpoint is meant to be called I am not sure if the endpoint is correct
       const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
