@@ -20,24 +20,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev pkg-config
+          
+      - name: Install Scarb
+        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
-      - name: Install Scarb (v2.7.0-rc.4)
-        run: |
-          curl -L https://github.com/software-mansion/scarb/releases/download/v2.7.0-rc.4/scarb-v2.7.0-rc.4-x86_64-unknown-linux-gnu.tar.gz -o scarb.tar.gz
-          mkdir -p $HOME/.local/share/scarb/bin
-          tar -xzf scarb.tar.gz -C $HOME/.local/share/scarb/bin --strip-components=1
-          echo "$HOME/.local/share/scarb/bin" >> $GITHUB_PATH
-          rm scarb.tar.gz
-
-      - name: Debug PATH
-        run: |
-          echo "PATH: $PATH"
-          ls -l $HOME/.local/share/scarb/bin
-
-      - name: Verify Scarb Installation
-        run: |
-          echo "PATH: $PATH"
-          scarb --version
+      - name: Add Scarb to PATH
+        run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
 
       - name: Cache Rust
         uses: actions/cache@v4
