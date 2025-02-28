@@ -57,7 +57,7 @@ jobs:
           if ! command -v snforge &> /dev/null; then
             cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
               --tag v0.38.0 \
-              --bin snforge \
+              --bin forge \
               --features=rust-serde=1.0.130 \
               snforge@0.38.0
           fi
