@@ -21,11 +21,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev pkg-config
 
-      - name: Install Scarb
-        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
+      - name: Install Scarb (v2.7.0-rc.4)
+        run: |
+          curl -L https://github.com/software-mansion/scarb/releases/download/v2.7.0-rc.4/scarb-v2.7.0-rc.4-x86_64-unknown-linux-gnu.tar.gz -o scarb.tar.gz
+          mkdir -p $HOME/.local/share/scarb/bin
+          tar -xzf scarb.tar.gz -C $HOME/.local/share/scarb/bin --strip-components=1
+          echo "$HOME/.local/share/scarb/bin" >> $GITHUB_PATH
+          rm scarb.tar.gz
 
-      - name: Add Scarb to PATH
-        run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
+      - name: Verify Scarb Installation
+        run: scarb --version
 
       - name: Cache Rust
         uses: actions/cache@v4
@@ -34,7 +39,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ./contracts/target/
-          key: ${{ runner.os }}-rust-${{ hashFiles('contracts/Cargo.lock') }}
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -47,7 +52,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin
-          key: ${{ runner.os }}-forge-${{ hashFiles('contracts/Cargo.lock') }}
+          key: ${{ runner.os }}-forge-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install forge
         run: |
@@ -61,8 +66,11 @@ jobs:
           fi
           echo "Installed forge version: $(forge --version)"
 
-      - name: Install Universal Sierra Compiler (USC)
-        run: scarb install --global universal-sierra-compiler
+      - name: Install Universal Sierra Compiler (via Scarb package)
+        run: |
+          scarb install --global universal-sierra-compiler
+          echo "$HOME/.local/share/scarb/bin" >> $GITHUB_PATH
+          usc --version
 
       - name: Install dependencies
         run: scarb clean && scarb fetch
