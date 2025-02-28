@@ -52,8 +52,7 @@ jobs:
       - name: Install forge
         run: |
           if ! command -v forge &> /dev/null; then
-            cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
-              --package forge \
+            cargo install --locked --git https://github.com/foundry-rs/starknet-foundry forge \
               --bin forge \
               --features=rust-serde
           fi
