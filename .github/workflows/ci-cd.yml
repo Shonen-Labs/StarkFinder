@@ -36,13 +36,14 @@ jobs:
             ~/.cargo/git
             target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-
       
       - name: Install Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          targets: wasm32-unknown-unknown
-          profile: minimal
+        run: |
+          rustup toolchain install stable
+          rustup target add wasm32-unknown-unknown
+          rustup default stable
 
       - name: Cache snforge
         uses: actions/cache@v4
@@ -56,7 +57,8 @@ jobs:
             cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
               --tag v0.33.0 \
               --bin snforge \
-              --features=rust-serde
+              --features=rust-serde=1.0.130 \
+              snforge@0.33.0
           fi
           echo "Installed snforge version: $(snforge --version)"
           
