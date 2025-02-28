@@ -63,13 +63,19 @@ jobs:
             ls -l target/release
 
             # Install the binary (replace 'forge' with the correct binary name if needed)
-            sudo cp target/release/snforge /usr/local/bin/forge
+            sudo cp target/release/forge /usr/local/bin/forge
 
             # Clean up
             cd ..
             rm -rf starknet-foundry
           fi
           echo "Installed forge version: $(forge --version)"
+
+      - name: Install Universal Sierra Compiler
+        run: |
+          # Install Cairo (includes the Universal Sierra Compiler)
+          curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
+          echo "$HOME/.cairo/target/release" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: scarb clean && scarb fetch
@@ -115,34 +121,4 @@ jobs:
           path: |
             ./client/.next/cache
             ./client/.next/static
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-${{ hashFiles('client/**.[jt]sx?') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-
-
-  deploy:
-    needs: [check-contracts, nextjs-build-and-test]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    defaults:
-      run:
-        working-directory: ./client
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './client/package-lock.json'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-        env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('
