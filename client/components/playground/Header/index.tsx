@@ -295,7 +295,7 @@ export default function Header({
               onClick={handleConnectWallet}
               className="flex items-center justify-center gap-2"
             >
-              <Image src={Argent.src} alt="Argent" className="w-10 h-10" />
+              <Image src={Argent.src} alt="Argent" width={40} height={40} />
               Connect with Argent
             </Button>
             <Button
@@ -305,7 +305,9 @@ export default function Header({
               <Image
                 src={Bravoos.src}
                 alt="Braavos"
-                className="w-9 h-9 rounded-md"
+                width={36} // Set the width in pixels
+                height={36} // Set the height in pixels
+                className="rounded-md"
               />
               Connect with Braavos
             </Button>
