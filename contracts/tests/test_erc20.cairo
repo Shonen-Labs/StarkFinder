@@ -1,6 +1,9 @@
 use starknet::ContractAddress;
 
-use snforge_std::{declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address, stop_cheat_caller_address};
+use snforge_std::{
+    declare, ContractClassTrait, DeclareResultTrait, start_cheat_caller_address,
+    stop_cheat_caller_address,
+};
 
 #[starknet::interface]
 pub trait IERC20Combined<TContractState> {
@@ -10,7 +13,7 @@ pub trait IERC20Combined<TContractState> {
     fn allowance(self: @TContractState, owner: ContractAddress, spender: ContractAddress) -> u256;
     fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256) -> bool;
     fn transfer_from(
-        ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256
+        ref self: TContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256,
     ) -> bool;
     fn approve(ref self: TContractState, spender: ContractAddress, amount: u256) -> bool;
 
@@ -34,8 +37,8 @@ fn test_constructor() {
 
     let nat_token_contract = IERC20CombinedDispatcher { contract_address };
 
-    let token_name  = nat_token_contract.name();
-    let token_symbol  = nat_token_contract.symbol();
+    let token_name = nat_token_contract.name();
+    let token_symbol = nat_token_contract.symbol();
 
     assert(token_name == "Nat Token", 'wrong name');
     assert(token_symbol == "NAT", 'wrong symbol');
@@ -86,7 +89,10 @@ fn test_approve() {
     nat_token_contract.approve(token_recipient, approve_amount);
     stop_cheat_caller_address(contract_address);
 
-    assert(nat_token_contract.allowance(token_owner, token_recipient) == approve_amount, 'wrong allowance');
+    assert(
+        nat_token_contract.allowance(token_owner, token_recipient) == approve_amount,
+        'wrong allowance',
+    );
 }
 
 #[test]
@@ -106,6 +112,12 @@ fn test_transfer() {
     nat_token_contract.transfer(token_recipient, transfer_amount);
     stop_cheat_caller_address(contract_address);
 
-    assert(nat_token_contract.balance_of(token_recipient) == transfer_amount, 'balance increment failed');
-    assert(nat_token_contract.balance_of(token_owner) == mint_amount - transfer_amount, 'incorrect balance');
+    assert(
+        nat_token_contract.balance_of(token_recipient) == transfer_amount,
+        'balance increment failed',
+    );
+    assert(
+        nat_token_contract.balance_of(token_owner) == mint_amount - transfer_amount,
+        'incorrect balance',
+    );
 }

@@ -41,7 +41,8 @@ Respond ONLY in JSON format with the following structure:
      "contractAddress": string,
      "entrypoint": string,
      "calldata": string[]
-   }
+   },
+   "same_network_type": "true" | "false"
  },
   "data": {
     "description": string,
@@ -97,6 +98,20 @@ Examples:
        calldata: ["USDC", "50", "Ethereum", "Arbitrum"]
      }
 
+If only one token is mentioned in a bridge request, assume the destination token (token2) is the same as the source token (token1). 
+For example, if a user says bridge 0.01 ETH from Ethereum to Arbitrum, interpret it as token1 = ETH and token2 = ETH.
+
+If the user provides a destination wallet address, set it as destination_address.
+
+3. "Bridge 0.01 ETH from Starknet to Ethereum address 0x8e2C9eB372b134B87C1A3e3a2a10Cfe33e4c1D3B.
+   - destination_address: 0x8e2C9eB372b134B87C1A3e3a2a10Cfe33e4c1D3B
+
+4. Bridge 0.01 ETH from Starknet to Ethereum. Send to: 0x8e2C9eB372b134B87C1A3e3a2a10Cfe33e4c1D3B.
+   - destination_address: 0x8e2C9eB372b134B87C1A3e3a2a10Cfe33e4c1D3B
+
+If the user does not provide a destination wallet, check whether both chains belong to the same network type (e.g., Tron, EVM, Solana, Starknet, Cosmos, StarkEx, Ton, zkSync Lite, Paradex).
+If they are of the same network type, set same_network_type to "true". Otherwise, set it to "false".
+
 remember to take contract address based on type of token as there are different address for STRK and ETH that i have provided
 
 Current Context:
@@ -117,7 +132,7 @@ export const transactionIntentPromptTemplate = new PromptTemplate({
   template: `
   {TRANSACTION_INTENT_PROMPT}
 
-  dditional Context:
+  additional Context:
   Current Chain ID: {chainId}
 
   Conversation History:

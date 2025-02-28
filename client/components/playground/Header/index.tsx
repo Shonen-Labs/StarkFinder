@@ -1,24 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { connect, disconnect } from "starknetkit";
+
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import Argent from "@/public/img/Argent Wallet.png";
 import Bravoos from "@/public/img/bravoos wallet.jpeg";
+import { Home, Upload, MessageSquare, Book, Wallet } from "lucide-react"; 
+import { motion } from "framer-motion";
+import Image from 'next/image';
+
+
+
 
 interface HeaderProps {
   showClearButton: boolean;
   showFinishButton: boolean;
   handleClear: () => void;
-  nodes: any; // Replace 'NodeType' with the appropriate type if known
-  edges: any; // Replace 'any' with the appropriate type if known
-  flowSummary: any; // Replace 'any' with the appropriate type if known
-  selectedNode: any; // Replace 'any' with the appropriate type if known
-  handleDelete: (node: any) => void; // Replace 'any' with the appropriate type if known
+  nodes: any;
+  edges: any;
+  flowSummary: any;
+  selectedNode: any;
+  handleDelete: (node: any) => void;
 }
 
-// Define proper types for starknetkit results
 interface StarknetConnection {
   wallet?: any;
   provider?: any;
@@ -35,48 +42,35 @@ export default function Header({
   handleDelete,
 }: HeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [text, setText] = useState("DevXStark");
+  const [projectName, setProjectName] = useState("DevXStark");
   const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const showDeleteButton = !!selectedNode;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Wallet connection state
   const [connection, setConnection] = useState<StarknetConnection | null>(null);
-  const [walletAddress, setWalletAddress] = useState<string | undefined>(
-    undefined
-  );
+  const [walletAddress, setWalletAddress] = useState<string | undefined>(undefined);
   const isConnected = !!connection?.wallet;
 
-  // Helper function to extract address from wallet
+  // Helper to extract the wallet address
   const getWalletAddress = async (wallet: any): Promise<string | undefined> => {
     try {
-      // Use wallet.getAccount() method if available
       if (wallet.getAccount) {
         return await wallet.getAccount();
       }
-
-      // Try to access selectedAddress
       if (wallet.selectedAddress) {
         return wallet.selectedAddress;
       }
-
-      // Try to get account and then address
       if (wallet.account) {
         return wallet.account;
       }
-
-      // For Argent specific format
       if (wallet.enable) {
         const accounts = await wallet.enable();
         return accounts?.[0];
       }
-
-      // For newer starknet.js
       if (wallet.signer?.getAddress) {
         return await wallet.signer.getAddress();
       }
-
-      // Final fallback
       console.error("Could not determine wallet address format");
       return undefined;
     } catch (error) {
@@ -85,18 +79,15 @@ export default function Header({
     }
   };
 
-  // Check for existing connection on mount
+  // On mount, check for existing wallet connection
   useEffect(() => {
     const checkConnection = async () => {
       const savedConnection = localStorage.getItem("starknetConnection");
       if (savedConnection) {
         try {
-          // Attempt to reconnect
           const result = await connect({ modalMode: "neverAsk" });
           if (result?.wallet) {
             setConnection(result);
-
-            // Try to get the address
             const address = await getWalletAddress(result.wallet);
             setWalletAddress(address);
           }
@@ -106,7 +97,6 @@ export default function Header({
         }
       }
     };
-
     checkConnection();
   }, []);
 
@@ -117,17 +107,11 @@ export default function Header({
         webWalletUrl: "https://web.argent.xyz",
         dappName: "DevXStark",
       });
-
       if (result?.wallet) {
         setConnection(result);
-
-        // Try to get the address
         const address = await getWalletAddress(result.wallet);
         setWalletAddress(address);
-
-        // Save connection state
         localStorage.setItem("starknetConnection", "true");
-        setIsWalletModalOpen(false);
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -146,82 +130,158 @@ export default function Header({
     }
   };
 
-  // Format address for display
+  // Format wallet address for display
   const formatAddress = (address?: string) => {
     if (!address) return "";
-    return `${address.substring(0, 6)}...${address.substring(
-      address.length - 4
-    )}`;
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   };
 
-  return (
-    <div className="flex justify-between items-center m-4">
-      <div className="w-full flex items-center justify-between gap-4 mx-8">
-        {isEditing ? (
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onBlur={() => setIsEditing(false)}
-            onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
-            className="text-2xl text-black font-semibold bg-transparent outline-none border-b border-white"
-            autoFocus
-          />
-        ) : (
-          <h2
-            className="text-2xl font-semibold text-black cursor-pointer"
-            onClick={() => setIsEditing(true)}
-          >
-            {text.length > 0 ? text : "Project Name"}
-          </h2>
-        )}
+  const isDeleteVisible = !!selectedNode;
 
-        {isConnected ? (
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-              {formatAddress(walletAddress)}
-            </span>
+  return (
+    <>
+      <div className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke shadow-md rounded-full w-[80%] mx-auto mb-6">
+        <div className="flex items-center m-4">
+          {/* Left: Editable Project Title */}
+
+          <motion.div
+            className="flex-1 flex items-center "
+            initial={{ x: -200, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 1.5 }}
+          >
+            {isEditing ? (
+              <input
+                type="text"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                onBlur={() => setIsEditing(false)}
+                onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
+                className="text-2xl text-black font-semibold bg-transparent outline-none border-b border-white"
+                autoFocus
+              />
+            ) : (
+              <h2
+                className="text-2xl font-semibold text-black cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
+                {projectName || "Project Name"}
+              </h2>
+            )}
+          </motion.div>
+
+          {/* Center: Navigation Links */}
+
+          <motion.div
+            className="flex-1 hidden md:flex  justify-center"
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 1.5, delay: 0.5 }}
+          >
+            <ul className="flex gap-6">
+              <li>
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
+                >
+                  <Home size={18} /> Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/deploy"
+                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110 duration-300 "
+                >
+                  <Upload size={18} /> Deploy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/agent/chat/someId"
+                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
+                >
+                  <MessageSquare size={18} /> Agent
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/devx/resources"
+                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
+                >
+                  <Book size={18} /> Resources
+                </Link>
+              </li>
+            </ul>
+          </motion.div>
+
+          {/* CHANGE 4: Add Mobile Menu Button */}
+          <div className="md:hidden flex items-center mx-2">
             <Button
-              variant="outline"
-              onClick={handleDisconnectWallet}
-              className="text-red-500 border-red-200 hover:bg-red-50"
+              variant="ghost"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2"
             >
-              Disconnect
+              {mobileMenuOpen}
             </Button>
           </div>
-        ) : (
-          <Button variant="primary" onClick={() => setIsWalletModalOpen(true)}>
-            Connect wallet
-          </Button>
-        )}
-      </div>
 
-      <div className="flex gap-2">
-        {showDeleteButton && (
-          <Button
-            onClick={() => handleDelete(selectedNode)}
-            className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+          {/* Right: Wallet Connection & Action Buttons */}
+          <motion.div
+            className="flex-1 flex items-center justify-end gap-1 "
+            initial={{ x: 200, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 1.5, delay: 1 }}
           >
-            Delete node
-          </Button>
-        )}
-        {showClearButton && (
-          <Button
-            onClick={handleClear}
-            className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
-          >
-            Clear
-          </Button>
-        )}
-        {showFinishButton && (
-          <Compile
-            nodes={nodes}
-            edges={edges}
-            isOpen={isCompileModalOpen}
-            onOpenChange={setIsCompileModalOpen}
-            flowSummary={flowSummary}
-          />
-        )}
+            {isConnected ? (
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                  {formatAddress(walletAddress)}
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={handleDisconnectWallet}
+                  className=" flex items-center gap-2 text-red-500 border-red-200 hover:bg-red-50"
+                >
+                  <Wallet size={18} /> Disconnect
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={() => setIsWalletModalOpen(true)}
+                className="flex items-center gap-2 hover:scale-110  duration-300 "
+              >
+                <Wallet size={18} /> Connect Wallet
+              </Button>
+            )}
+
+            {isDeleteVisible && (
+              <Button
+                onClick={() => handleDelete(selectedNode)}
+                className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+              >
+                Delete node
+              </Button>
+            )}
+            {showClearButton && (
+              <Button
+                onClick={handleClear}
+                className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+              >
+                Clear
+              </Button>
+            )}
+            {showFinishButton && (
+              <Compile
+                nodes={nodes}
+                edges={edges}
+                isOpen={isCompileModalOpen}
+                onOpenChange={setIsCompileModalOpen}
+                flowSummary={flowSummary}
+              />
+            )}
+          </motion.div>
+        </div>
       </div>
 
       {/* Wallet Connection Modal */}
@@ -235,14 +295,20 @@ export default function Header({
               onClick={handleConnectWallet}
               className="flex items-center justify-center gap-2"
             >
-              <img src={Argent.src} alt="Argent" className="w-10 h-10" />
+              <Image src={Argent.src} alt="Argent" width={40} height={40} />
               Connect with Argent
             </Button>
             <Button
               onClick={handleConnectWallet}
               className="flex items-center justify-center gap-2"
             >
-              <img src={Bravoos.src} alt="Braavos" className="w-9 h-9 rounded-md" />
+              <Image
+                src={Bravoos.src}
+                alt="Braavos"
+                width={36} // Set the width in pixels
+                height={36} // Set the height in pixels
+                className="rounded-md"
+              />
               Connect with Braavos
             </Button>
             <Button
@@ -255,6 +321,6 @@ export default function Header({
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

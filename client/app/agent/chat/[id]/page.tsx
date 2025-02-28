@@ -148,9 +148,31 @@ export default function ChatPage() {
         const errorData = await response.json();
         throw new Error(errorData.details?.message || 'Failed to get response');
       }
+
+      const contentType = response.headers.get("Content-Type") || "";
+
+      if(!response.body || contentType.includes('application/json')){
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
   
-      // Check if the response is a stream (has body readable)
-      if (response.body) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: uuidv4(),
+            role: "agent",
+            content: data.answer,
+            timestamp: new Date().toLocaleTimeString(),
+            user: "Agent",
+          },
+        ]);
+
+        setAnswer(data.answer);
+        
+      } else {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let accumulatedResponse = '';
@@ -194,27 +216,8 @@ export default function ChatPage() {
           }]);
           setAnswer(accumulatedResponse);
         }
-      } else {
-        // Fallback to non-streaming response
-        const data = await response.json();
-        
-        if (data.error) {
-          throw new Error(data.error);
-        }
-  
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            id: uuidv4(),
-            role: "agent",
-            content: data.answer,
-            timestamp: new Date().toLocaleTimeString(),
-            user: "Agent",
-          },
-        ]);
-        setAnswer(data.answer);
+
       }
-      
     } catch (err: any) {
       console.error('Chat error:', err);
       setError(err.message || "Unable to get response");

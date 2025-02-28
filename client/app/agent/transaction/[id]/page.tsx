@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Send, Home } from "lucide-react";
-import { useAccount } from "@starknet-react/core";
+import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
 import {
   Dialog,
@@ -92,9 +92,11 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   onError,
 }) => {
   const { account } = useAccount();
+  // console.log(account)
   const [isProcessing, setIsProcessing] = React.useState(false);
-
+  console.log(transactions);
   const executeTransaction = async () => {
+    console.log('trying');
     if (!account) {
       onError(new Error("Wallet not connected"));
       return;
@@ -127,11 +129,10 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
       <button
         onClick={executeTransaction}
         disabled={isProcessing}
-        className={`w-full py-2 px-4 rounded-lg ${
-          isProcessing
-            ? "bg-white/20 cursor-not-allowed"
-            : "bg-white/10 hover:bg-white/20"
-        } transition-colors duration-200`}
+        className={`w-full py-2 px-4 rounded-lg ${isProcessing
+          ? "bg-white/20 cursor-not-allowed"
+          : "bg-white/10 hover:bg-white/20"
+          } transition-colors duration-200`}
       >
         {isProcessing ? "Processing Transaction..." : "Execute Transaction"}
       </button>
@@ -261,6 +262,10 @@ export default function TransactionPage() {
   const [inputValue, setInputValue] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const { address } = useAccount();
+  console.log(address);
+  const { provider } = useProvider();
+  console.log(provider.getChainId())
+
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
   const [showPreferences, setShowPreferences] = useState(false);
@@ -296,14 +301,16 @@ export default function TransactionPage() {
       },
     ]);
   }, []);
+  // Generates a unique chat ID and navigates to the new chat route.
   const createNewChat = async () => {
-    const id = uuidv4();
-    await router.push(`/agent/chat/${id}`);
+    const id = uuidv4(); // Generate a unique ID for the chat session
+    await router.push(`/agent/chat/${id}`); // Navigate to the new chat route
   };
 
+// Generates a unique chat ID and navigates to the new Transaction route.
   const createNewTxn = async () => {
-    const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    const id = uuidv4(); // Generate a unique ID for the transaction session
+    await router.push(`/agent/transaction/${id}`); // Navigate to the new transaction route
   };
 
   const handleTransactionSuccess = (hash: string) => {
@@ -346,8 +353,11 @@ export default function TransactionPage() {
     setInputValue("");
     setIsLoading(true);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
+
     try {
-      const response = await fetch("/api/ask", {
+      const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -359,9 +369,13 @@ export default function TransactionPage() {
           userPreferences,
           stream: true,
         }),
+        signal: controller.signal,
       });
 
       const data = await response.json();
+      console.log(data);
+
+      clearTimeout(timeoutId); // Clear timeout if fetch succeeds
 
       let agentMessage: Message;
 
@@ -404,7 +418,11 @@ export default function TransactionPage() {
 
       setMessages((prev) => [...prev, agentMessage]);
     } catch (error) {
-      console.error("Error:", error);
+      if ((error instanceof Error) && error.name === "AbortError") {
+        console.error("Frontend fetch request timed out");
+      } else {
+        console.error("Error:", error);
+      }
       const errorMessage: Message = {
         id: uuidv4(),
         role: "agent",
@@ -418,13 +436,15 @@ export default function TransactionPage() {
     }
   };
 
+  
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
       {/* Dotted background */}
       <div
         className="absolute inset-0 bg-repeat opacity-5"
         style={{
-          backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+          backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
           backgroundSize: "20px 20px",
         }}
       />
@@ -437,7 +457,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-            onClick={() => router.push("/agent/chat")}
+            onClick={createNewChat} // onclick command for a new chat route
           >
             <span>Agent Chat</span>
             <Plus className="h-4 w-4" />
@@ -445,7 +465,7 @@ export default function TransactionPage() {
           <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={() => router.push("/agent/transaction")}
+            onClick={createNewTxn}  // onclick command for a new transaction route 
           >
             <span>Agent Txn</span>
             <Plus className="h-4 w-4" />
@@ -513,9 +533,18 @@ export default function TransactionPage() {
           </div>
 
           <div className="mt-auto flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm text-green-500">Online</span>
-          </div>
+            {address ? (
+              <>
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm text-green-500">Online</span>
+              </>
+            ) : (
+              <>
+                <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-sm text-red-500 animate-pulse">Offline</span>
+              </>
+            )}
+          </div> 
         </div>
 
         {/* Main Content */}
@@ -533,7 +562,7 @@ export default function TransactionPage() {
               {address ? (
                 <div className="flex items-center gap-4">
                   <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
-                    {address.slice(0, 5) + "..." + address.slice(-3)}
+                    {`${address.slice(0, 5)}...${address.slice(-3)}`}
                   </div>
                   <DisconnectButton />
                 </div>

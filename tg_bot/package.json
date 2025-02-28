@@ -5,7 +5,7 @@
     "typescript": "^5.7.3"
   },
   "scripts": {
-    "start": "npx tsc && node bot.js",
+    "start": "npx tsc && node ./dist/bot.js",
     "build": "tsc"
   },
   "dependencies": {

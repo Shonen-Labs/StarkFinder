@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { ChatOpenAI } from "@langchain/openai";
 import { transactionProcessor } from "@/lib/transaction";
 
@@ -15,7 +15,7 @@ import {
 } from "@/prompts/prompts";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
-import { TxType } from "@prisma/client";
+import type { TxType } from "@prisma/client";
 
 const llm = new ChatOpenAI({
   model: "gpt-4",
@@ -59,11 +59,14 @@ async function getTransactionIntentFromOpenAI(
         chain: intentData.extractedParams.chain || "",
         amount: intentData.extractedParams.amount || "",
         protocol: intentData.extractedParams.protocol || "",
-        address: intentData.extractedParams.address || address,
+        address: address, // should always be connected address
         dest_chain: intentData.extractedParams.dest_chain || "",
         destinationChain: intentData.extractedParams.dest_chain || "",
         destinationAddress:
-          intentData.extractedParams.destinationAddress || address,
+          intentData.extractedParams.destinationAddress ||
+          (intentData.extractedParams.same_network_type === "true"
+            ? address
+            : ""),
       },
       data: {} as BrianTransactionData,
     };
@@ -122,7 +125,7 @@ async function getTransactionIntentFromOpenAI(
             destinationNetwork: intentData.extractedParams.dest_chain || "",
             sourceToken: intentData.extractedParams.token1 || "",
             destinationToken: intentData.extractedParams.token2 || "",
-            amount: parseFloat(intentData.extractedParams.amount || "0"),
+            amount: Number.parseFloat(intentData.extractedParams.amount || "0"),
             sourceAddress: address,
             destinationAddress:
               intentData.extractedParams.destinationAddress || address,
@@ -265,7 +268,7 @@ export async function POST(request: NextRequest) {
 
       const transaction = await storeTransaction(
         user.id,
-        transactionIntent.action,
+        transactionIntent.action.toUpperCase(),
         {
           ...processedTx,
           chainId,
