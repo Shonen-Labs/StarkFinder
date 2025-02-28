@@ -38,7 +38,8 @@ jobs:
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-
-      
+
+      # Fixed: Removed invalid inputs and using rustup directly
       - name: Install Rust toolchain
         run: |
           rustup toolchain install stable
@@ -50,7 +51,7 @@ jobs:
         with:
           path: ~/.cargo/bin/snforge
           key: ${{ runner.os }}-snforge-0.33.0
-        
+
       - name: Install snforge
         run: |
           if ! command -v snforge &> /dev/null; then
@@ -61,7 +62,7 @@ jobs:
               snforge@0.33.0
           fi
           echo "Installed snforge version: $(snforge --version)"
-          
+
       - name: Install dependencies
         run: scarb clean && scarb fetch
 
@@ -69,7 +70,7 @@ jobs:
         run: scarb build
 
       - name: Run snforge tests
-        run: snforge test --workspace       
+        run: snforge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
@@ -95,7 +96,7 @@ jobs:
 
       - name: Build
         run: npm run build
-        env:  # Proper indentation here
+        env:
           NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.BRIAN_API_KEY }}
