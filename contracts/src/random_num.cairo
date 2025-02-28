@@ -21,9 +21,13 @@ pub trait IPragmaVRF<TContractState> {
 pub mod CoinFlip {
     use core::num::traits::zero::Zero;
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_timestamp};
-    use starknet::storage::{Map, StoragePointerReadAccess, StoragePathEntry, StoragePointerWriteAccess};
-    use pragma_lib::abi::{IRandomnessDispatcher, IRandomnessDispatcherTrait};
+    use starknet::storage::{
+        Map, StoragePointerReadAccess, StoragePathEntry, StoragePointerWriteAccess,
+    };
+    use contracts::interfaces::IRandomness::{IRandomnessDispatcher, IRandomnessDispatcherTrait};
+
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+
 
     #[storage]
     struct Storage {
@@ -92,7 +96,7 @@ pub mod CoinFlip {
     ) {
         assert(randomness_contract_address.is_non_zero(), Errors::INVALID_ADDRESS);
         assert(eth_address.is_non_zero(), Errors::INVALID_ADDRESS);
-        
+
         self.randomness_contract_address.write(randomness_contract_address);
         self.eth_dispatcher.write(IERC20Dispatcher { contract_address: eth_address });
         self.callback_fee_limit.write(100_000_000_000_000); // 0.0001 ETH
@@ -112,12 +116,12 @@ pub mod CoinFlip {
         fn cancel_stale_flip(ref self: ContractState, flip_id: u64) {
             let flipper = self.flips.entry(flip_id).read();
             assert(flipper == get_caller_address(), Errors::UNAUTHORIZED_CANCELLATION);
-            
+
             let timestamp = self.flip_timestamps.entry(flip_id).read();
             assert(get_block_timestamp() - timestamp > FLIP_TIMEOUT, Errors::FLIP_NOT_EXPIRED);
-            
-            self.flips.entry(flip_id).remove();
-            self.flip_timestamps.entry(flip_id).remove();
+
+            self.flips.entry(flip_id).write('0'.try_into().unwrap());
+            self.flip_timestamps.entry(flip_id).write(0);
             self.emit(Event::FlipCancelled(FlipCancelled { flip_id, flipper }));
         }
     }
@@ -132,7 +136,9 @@ pub mod CoinFlip {
             calldata: Array<felt252>,
         ) {
             let caller = get_caller_address();
-            assert(caller == self.randomness_contract_address.read(), Errors::CALLER_NOT_RANDOMNESS);
+            assert(
+                caller == self.randomness_contract_address.read(), Errors::CALLER_NOT_RANDOMNESS,
+            );
             assert(requestor_address == get_contract_address(), Errors::REQUESTOR_NOT_SELF);
 
             self._process_coin_flip(request_id, random_words.at(0));
@@ -144,28 +150,31 @@ pub mod CoinFlip {
         fn _request_my_randomness(ref self: ContractState) -> u64 {
             let randomness_contract_address = self.randomness_contract_address.read();
             let eth_dispatcher = self.eth_dispatcher.read();
-            
+
             // Dynamic fee adjustment check
             let current_fee_limit = self.callback_fee_limit.read();
             let max_deposit = self.max_callback_fee_deposit.read();
-            
+
             // Verify contract has sufficient balance
             let balance = eth_dispatcher.balance_of(get_contract_address());
             assert(balance >= max_deposit.into(), Errors::TRANSFER_FAILED);
 
             eth_dispatcher.approve(randomness_contract_address, max_deposit);
-            
-            let nonce = self.nonce.read();
-            let randomness_dispatcher = IRandomnessDispatcher { contract_address: randomness_contract_address };
 
-            let request_id = randomness_dispatcher.request_random(
-                nonce,
-                get_contract_address(),
-                current_fee_limit,
-                PUBLISH_DELAY,
-                NUM_OF_WORDS,
-                array![]
-            );
+            let nonce = self.nonce.read();
+            let randomness_dispatcher = IRandomnessDispatcher {
+                contract_address: randomness_contract_address,
+            };
+
+            let request_id = randomness_dispatcher
+                .request_random(
+                    nonce,
+                    get_contract_address(),
+                    current_fee_limit,
+                    PUBLISH_DELAY,
+                    NUM_OF_WORDS,
+                    array![],
+                );
 
             self.nonce.write(nonce + 1);
             request_id
@@ -174,9 +183,9 @@ pub mod CoinFlip {
         fn _process_coin_flip(ref self: ContractState, flip_id: u64, random_value: @felt252) {
             let flipper = self.flips.entry(flip_id).read();
             assert(flipper.is_non_zero(), Errors::INVALID_FLIP_ID);
-            
-            self.flips.entry(flip_id).remove();
-            self.flip_timestamps.entry(flip_id).remove();
+
+            self.flips.entry(flip_id).write('0'.try_into().unwrap());
+            self.flip_timestamps.entry(flip_id).write(0);
 
             let random_num: u256 = (*random_value).into();
             let side = if random_num % 2 == 0 {
@@ -185,12 +194,10 @@ pub mod CoinFlip {
                 Side::Tails
             };
 
-            self.emit(Event::Landed(Landed {
-                flip_id,
-                flipper,
-                side,
-                random_value: *random_value
-            }));
+            self
+                .emit(
+                    Event::Landed(Landed { flip_id, flipper, side, random_value: *random_value }),
+                );
         }
     }
 

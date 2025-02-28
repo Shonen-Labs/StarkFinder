@@ -20,11 +20,14 @@ fn USER2() -> ContractAddress {
 
 const ONE_E18: u128 = 1000000000000000000;
 
-fn deploy_token(name: ByteArray) -> ContractAddress {
+fn deploy_token() -> ContractAddress {
+    let names: ByteArray = "MockToken";
+    let symbol: ByteArray = "MTK";
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
-    name.serialize(ref constructor_calldata);
+    names.serialize(ref constructor_calldata);
+    symbol.serialize(ref constructor_calldata);
 
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
     contract_address
@@ -45,7 +48,7 @@ fn deploy_starkfinder(
 
 #[test]
 fn test_setup() {
-    let token_address = deploy_token("MockToken");
+    let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
 
     let token = IERC20Dispatcher { contract_address: token_address };
@@ -62,7 +65,7 @@ fn test_setup() {
 
 #[test]
 fn test_register() {
-    let token_address = deploy_token("MockToken");
+    let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
 
     let starkfinder = IStarkfinderDispatcher { contract_address: starkfinder_address };
@@ -92,7 +95,7 @@ fn test_register() {
 #[should_panic(expected: 'Caller is not a registered user')]
 #[test]
 fn test_send_transaction_should_panic_with_unregistered_user() {
-    let token_address = deploy_token("MockToken");
+    let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
 
     let token = IERC20Dispatcher { contract_address: token_address };
@@ -113,7 +116,7 @@ fn test_send_transaction_should_panic_with_unregistered_user() {
 #[should_panic(expected: 'Insufficient balance')]
 #[test]
 fn test_send_transaction_should_panic_with_insufficient_balance() {
-    let token_address = deploy_token("MockToken");
+    let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
 
     let starkfinder = IStarkfinderDispatcher { contract_address: starkfinder_address };
@@ -136,7 +139,7 @@ fn test_send_transaction_should_panic_with_insufficient_balance() {
 #[should_panic(expected: 'Insufficient allowance')]
 #[test]
 fn test_send_transaction_should_panic_with_insufficient_allowance() {
-    let token_address = deploy_token("MockToken");
+    let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
 
     let token = IERC20Dispatcher { contract_address: token_address };
@@ -162,7 +165,7 @@ fn test_send_transaction_should_panic_with_insufficient_allowance() {
 
 #[test]
 fn test_send_transaction() {
-    let token_address = deploy_token("MockToken");
+    let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
 
     let token = IERC20Dispatcher { contract_address: token_address };

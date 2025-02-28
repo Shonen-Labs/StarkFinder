@@ -1,17 +1,18 @@
 #[starknet::interface]
-trait ISimpleStorage<T> {
-    fn set(ref self: T, x: u128);
-    fn get(self: @T) -> u128;
-    fn increment(ref self: T, amount: u128);
-    fn decrement(ref self: T, amount: u128);
+pub trait ISimpleStorage<TContractState> {
+    fn set(ref self: TContractState, x: u128);
+    fn get(self: @TContractState) -> u128;
+    fn increment(ref self: TContractState, amount: u128);
+    fn decrement(ref self: TContractState, amount: u128);
 }
 
 #[starknet::contract]
 mod SimpleStorage {
+    use starknet::event::EventEmitter;
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet::ContractAddress;
     use starknet::get_caller_address;
-    use starknet::info::emit_event;
+
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -19,11 +20,12 @@ mod SimpleStorage {
         StoredDataChanged: StoredDataChanged,
     }
 
+
     #[derive(Drop, starknet::Event)]
     struct StoredDataChanged {
         old_value: u128,
         new_value: u128,
-        caller: ContractAddress
+        caller: ContractAddress,
     }
 
     #[storage]
@@ -38,18 +40,11 @@ mod SimpleStorage {
             let caller = get_caller_address();
             let owner = self.owner.read();
             assert(caller == owner, 'Unauthorized: Only owner');
-            
+
             let old_value = self.stored_data.read();
             self.stored_data.write(x);
-            
-            emit_event(
-                self, 
-                Event::StoredDataChanged(StoredDataChanged { 
-                    old_value: old_value, 
-                    new_value: x,
-                    caller: caller
-                })
-            );
+
+            self.emit(StoredDataChanged { old_value, new_value: x, caller });
         }
 
         fn get(self: @ContractState) -> u128 {
@@ -60,45 +55,34 @@ mod SimpleStorage {
             let caller = get_caller_address();
             let owner = self.owner.read();
             assert(caller == owner, 'Unauthorized: Only owner');
-            
+
             let current = self.stored_data.read();
-            let new_value = current.saturating_add(amount);
+            let new_value = current + amount;
             self.stored_data.write(new_value);
-            
-            emit_event(
-                self,
-                Event::StoredDataChanged(StoredDataChanged { 
-                    old_value: current, 
-                    new_value: new_value,
-                    caller: caller
-                })
-            );
+
+            self.emit(StoredDataChanged { old_value: current, new_value, caller });
         }
 
         fn decrement(ref self: ContractState, amount: u128) {
             let caller = get_caller_address();
             let owner = self.owner.read();
             assert(caller == owner, 'Unauthorized: Only owner');
-            
+
             let current = self.stored_data.read();
-            let new_value = current.saturating_sub(amount);
+            let new_value = if amount > current {
+                0
+            } else {
+                current - amount
+            };
             self.stored_data.write(new_value);
-            
-            emit_event(
-                self,
-                Event::StoredDataChanged(StoredDataChanged { 
-                    old_value: current, 
-                    new_value: new_value,
-                    caller: caller
-                })
-            );
+
+            self.emit(StoredDataChanged { old_value: current, new_value, caller });
         }
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState) {
-        let deployer = get_caller_address();
-        self.owner.write(deployer);
+    fn constructor(ref self: ContractState, admin: ContractAddress) {
+        self.owner.write(admin);
         self.stored_data.write(0);
     }
 }

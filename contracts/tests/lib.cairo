@@ -7,6 +7,7 @@ mod test_starkidentity;
 mod test_nft_dutch;
 mod test_constant_product_amm;
 mod test_upgradable_contract;
+mod test_storage;
 #[feature("safe_dispatcher")]
 mod test_timelock;
 
