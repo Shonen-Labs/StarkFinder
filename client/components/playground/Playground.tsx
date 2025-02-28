@@ -187,11 +187,7 @@ export default function Playground() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#f9f7f3] text-black pt-8 selectable-none relative">
-      <div className="absolute z-10 left-10 my-20 h-[850px] w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent">
-        <FloatingSidebar addBlock={addBlock} />
-      </div>
-
+    <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-8 selectable-none ">
       <motion.div
         className="flex-1 w-full flex flex-col ml-8"
         animate={{ marginLeft: isOpen ? "1rem" : "2rem" }}
@@ -208,7 +204,14 @@ export default function Playground() {
           handleDelete={handleDeleteNode}
         />
 
-        <div className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-hidden bg-transparent">
+        
+      </motion.div>
+        <div className="flex ">
+
+      <div className=" max-h-[525px] w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent">
+        <FloatingSidebar addBlock={addBlock} />
+      </div>
+      <div className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-hidden bg-transparent">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -243,7 +246,8 @@ export default function Playground() {
             ))}
           </ReactFlow>
         </div>
-      </motion.div>
+        </div>
+
     </div>
   );
 
