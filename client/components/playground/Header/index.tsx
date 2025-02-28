@@ -4,10 +4,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { connect, disconnect } from "starknetkit";
+
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import Argent from "@/public/img/Argent Wallet.png";
 import Bravoos from "@/public/img/bravoos wallet.jpeg";
-import { Home, Upload, MessageSquare, Book, Wallet, } from "lucide-react"; 
+import { Home, Upload, MessageSquare, Book, Wallet } from "lucide-react"; 
 import { motion } from "framer-motion";
 
 
@@ -110,7 +111,6 @@ export default function Header({
         const address = await getWalletAddress(result.wallet);
         setWalletAddress(address);
         localStorage.setItem("starknetConnection", "true");
-        setIsWalletModalOpen(false);
       }
     } catch (error) {
       console.error("Error connecting wallet:", error);
@@ -224,6 +224,26 @@ export default function Header({
             </Button>
           </div>
 
+        {/* Right: Wallet Connection & Action Buttons */}
+        <div className="flex-1 flex items-center justify-end gap-2 mr-8">
+          {isConnected ? (
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                {formatAddress(walletAddress)}
+              </span>
+              <Button
+                variant="outline"
+                onClick={handleDisconnectWallet}
+                className="text-red-500 border-red-200 hover:bg-red-50"
+              >
+                Disconnect
+              </Button>
+            </div>
+          ) : (
+            <Button variant="primary" onClick={() => handleConnectWallet()}>
+              Connect wallet
+            </Button>
+          )}
           {/* Right: Wallet Connection & Action Buttons */}
           <motion.div
             className="flex-1 flex items-center justify-end gap-1 "
@@ -321,3 +341,4 @@ export default function Header({
     </>
   );
 }
+
