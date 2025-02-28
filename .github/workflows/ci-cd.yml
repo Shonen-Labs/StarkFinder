@@ -62,7 +62,7 @@ jobs:
             # Check the build output
             ls -l target/release
 
-            # Install the binary 
+            # Install the binary (replace 'forge' with the correct binary name if needed)
             sudo cp target/release/snforge /usr/local/bin/forge
 
             # Clean up
@@ -76,6 +76,15 @@ jobs:
           # Install Cairo (includes the Universal Sierra Compiler)
           curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
           echo "$HOME/.cairo/target/release" >> $GITHUB_PATH
+
+      - name: Verify Universal Sierra Compiler
+        run: |
+          # Check if the Universal Sierra Compiler is installed
+          if ! command -v universal-sierra-compiler &> /dev/null; then
+            echo "Universal Sierra Compiler is not installed or not in PATH"
+            exit 1
+          fi
+          echo "Universal Sierra Compiler is installed: $(universal-sierra-compiler --version)"
 
       - name: Install dependencies
         run: scarb clean && scarb fetch
