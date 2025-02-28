@@ -43,20 +43,21 @@ jobs:
           targets: wasm32-unknown-unknown
           profile: minimal
 
-      - name: Cache snforge
+      - name: Cache forge
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin
-          key: ${{ runner.os }}-snforge-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-forge-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install snforge
+      - name: Install forge
         run: |
-          if ! command -v snforge &> /dev/null; then
+          if ! command -v forge &> /dev/null; then
             cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
-              --bin snforge \
+              --package forge \
+              --bin forge \
               --features=rust-serde
           fi
-          echo "Installed snforge version: $(snforge --version)"
+          echo "Installed forge version: $(forge --version)"
 
       - name: Install dependencies
         run: scarb clean && scarb fetch
@@ -64,8 +65,8 @@ jobs:
       - name: Build Starknet contracts
         run: scarb build
 
-      - name: Run snforge tests
-        run: snforge test --workspace
+      - name: Run forge tests
+        run: forge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
