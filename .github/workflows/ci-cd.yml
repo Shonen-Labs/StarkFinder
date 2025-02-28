@@ -29,8 +29,15 @@ jobs:
           echo "$HOME/.local/share/scarb/bin" >> $GITHUB_PATH
           rm scarb.tar.gz
 
+      - name: Debug PATH
+        run: |
+          echo "PATH: $PATH"
+          ls -l $HOME/.local/share/scarb/bin
+
       - name: Verify Scarb Installation
-        run: scarb --version
+        run: |
+          echo "PATH: $PATH"
+          scarb --version
 
       - name: Cache Rust
         uses: actions/cache@v4
@@ -106,6 +113,14 @@ jobs:
       - name: Setup pnpm
         run: npm install -g pnpm
 
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Eliza install
         run: cd eliza && pnpm install --no-frozen-lockfile
 
@@ -153,3 +168,8 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
+
+      - name: Deploy
+        run: |
+          # Add deployment steps here (e.g., deploy to Vercel, Netlify, etc.)
+          echo "Deployment steps go here"
