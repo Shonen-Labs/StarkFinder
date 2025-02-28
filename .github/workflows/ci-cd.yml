@@ -52,8 +52,19 @@ jobs:
       - name: Install forge
         run: |
           if ! command -v forge &> /dev/null; then
-            cargo install --locked --git https://github.com/foundry-rs/starknet-foundry forge \
-              --bin forge
+            # Clone the repository
+            git clone https://github.com/foundry-rs/starknet-foundry.git
+            cd starknet-foundry
+
+            # Build the project
+            cargo build --release
+
+            # Install the binary
+            sudo cp target/release/forge /usr/local/bin/forge
+
+            # Clean up
+            cd ..
+            rm -rf starknet-foundry
           fi
           echo "Installed forge version: $(forge --version)"
 
