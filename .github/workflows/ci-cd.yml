@@ -27,39 +27,34 @@ jobs:
       - name: Add Scarb to PATH
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
 
-      # Cache Rust toolchain and dependencies
       - name: Cache Rust
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target/
+            ./contracts/target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-
 
-      # Fixed: Removed invalid inputs and using rustup directly
       - name: Install Rust toolchain
-        run: |
-          rustup toolchain install stable
-          rustup target add wasm32-unknown-unknown
-          rustup default stable
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+          profile: minimal
 
       - name: Cache snforge
         uses: actions/cache@v4
         with:
-          path: ~/.cargo/bin/snforge
-          key: ${{ runner.os }}-snforge-0.33.0
+          path: ~/.cargo/bin
+          key: ${{ runner.os }}-snforge-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install snforge
         run: |
           if ! command -v snforge &> /dev/null; then
             cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
-              --tag v0.38.0 \
-              --bin forge \
-              --features=rust-serde=1.0.130 \
-              snforge@0.38.0
+              --bin snforge \
+              --features=rust-serde
           fi
           echo "Installed snforge version: $(snforge --version)"
 
@@ -105,8 +100,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            client/.next/cache
-            ${{ github.workspace }}/client/.next/static
+            ./client/.next/cache
+            ./client/.next/static
           key: ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-${{ hashFiles('client/**.[jt]sx?') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-
