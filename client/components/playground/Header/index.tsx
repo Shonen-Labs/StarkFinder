@@ -10,6 +10,7 @@ import Argent from "@/public/img/Argent Wallet.png";
 import Bravoos from "@/public/img/bravoos wallet.jpeg";
 import { Home, Upload, MessageSquare, Book, Wallet } from "lucide-react"; 
 import { motion } from "framer-motion";
+import Image from 'next/image';
 
 
 
@@ -224,26 +225,6 @@ export default function Header({
             </Button>
           </div>
 
-        {/* Right: Wallet Connection & Action Buttons */}
-        <div className="flex-1 flex items-center justify-end gap-2 mr-8">
-          {isConnected ? (
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                {formatAddress(walletAddress)}
-              </span>
-              <Button
-                variant="outline"
-                onClick={handleDisconnectWallet}
-                className="text-red-500 border-red-200 hover:bg-red-50"
-              >
-                Disconnect
-              </Button>
-            </div>
-          ) : (
-            <Button variant="primary" onClick={() => handleConnectWallet()}>
-              Connect wallet
-            </Button>
-          )}
           {/* Right: Wallet Connection & Action Buttons */}
           <motion.div
             className="flex-1 flex items-center justify-end gap-1 "
@@ -314,14 +295,14 @@ export default function Header({
               onClick={handleConnectWallet}
               className="flex items-center justify-center gap-2"
             >
-              <img src={Argent.src} alt="Argent" className="w-10 h-10" />
+              <Image src={Argent.src} alt="Argent" className="w-10 h-10" />
               Connect with Argent
             </Button>
             <Button
               onClick={handleConnectWallet}
               className="flex items-center justify-center gap-2"
             >
-              <img
+              <Image
                 src={Bravoos.src}
                 alt="Braavos"
                 className="w-9 h-9 rounded-md"
@@ -341,4 +322,3 @@ export default function Header({
     </>
   );
 }
-
