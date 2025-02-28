@@ -61,15 +61,23 @@ jobs:
           fi
           echo "Installed forge version: $(forge --version)"
 
-      - name: Install Universal Sierra Compiler 
+      - name: Install Cairo Toolchain
         run: |
-         # Download the Universal Sierra Compiler binary
-          curl -L https://github.com/software-mansion/universal-sierra-compiler/releases/download/v0.1.0/universal-sierra-compiler-v0.1.0-x86_64-unknown-linux-gnu.tar.gz -o usc.tar.gz
-          mkdir -p $HOME/.local/bin
-          tar -xzf usc.tar.gz -C $HOME/.local/bin --strip-components=1
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          rm usc.tar.gz
-          usc --version
+          # Install Cairo (includes Universal Sierra Compiler)
+          curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
+          echo "$HOME/.cairo/target/release" >> $GITHUB_PATH
+
+          # Verify the installation
+          cairo-compile --version
+          universal-sierra-compiler --version
+
+      - name: Verify Universal Sierra Compiler
+        run: |
+          if ! command -v universal-sierra-compiler &> /dev/null; then
+            echo "Universal Sierra Compiler is not installed or not in PATH"
+            exit 1
+          fi
+          echo "Universal Sierra Compiler is installed: $(universal-sierra-compiler --version)"
 
       - name: Install dependencies
         run: scarb clean && scarb fetch
