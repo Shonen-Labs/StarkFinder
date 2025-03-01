@@ -7,12 +7,12 @@ use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTr
 use contracts::erc20::{INatTokenDispatcher, INatTokenDispatcherTrait};
 use contracts::interfaces::timelock::{
     ITimelockDispatcher, ITimelockDispatcherTrait, ITimelockSafeDispatcher,
-    ITimelockSafeDispatcherTrait,
+    ITimelockSafeDispatcherTrait
 };
 use contracts::timelock::Timelock;
 use snforge_std::{
     start_cheat_caller_address, cheat_caller_address, start_cheat_block_timestamp_global, CheatSpan,
-    spy_events, EventSpyAssertionsTrait,
+    spy_events, EventSpyAssertionsTrait
 };
 
 const LOCK_DELAY: u64 = 3600;
@@ -20,11 +20,7 @@ const MINTED_AMOUNT: u256 = 1000;
 const DEPOSIT_AMOUNT: u256 = 100;
 
 fn setup() -> (
-    ContractAddress,
-    IERC20Dispatcher,
-    ContractAddress,
-    ITimelockDispatcher,
-    ITimelockSafeDispatcher,
+    ContractAddress, IERC20Dispatcher, ContractAddress, ITimelockDispatcher, ITimelockSafeDispatcher
 ) {
     let erc20_address = declare_and_deploy("NatToken", array![]);
     let erc20 = IERC20Dispatcher { contract_address: erc20_address };
@@ -53,7 +49,7 @@ fn test_set_lock_delay_not_owner() {
     match timelock_safe.set_lock_delay(LOCK_DELAY * 2) {
         Result::Ok(_) => panic!("Expected OwnableComponent::Errors::NOT_OWNER"),
         Result::Err(panic_data) => assert_eq!(
-            *panic_data.at(0), OwnableComponent::Errors::NOT_OWNER,
+            *panic_data.at(0), OwnableComponent::Errors::NOT_OWNER
         ),
     };
 }
@@ -72,7 +68,7 @@ fn test_deposit_zero_amount() {
     match timelock_safe.deposit(erc20_address, 0) {
         Result::Ok(_) => panic!("Expected Timelock::Errors::DEPOSIT_AMOUNT_ZERO"),
         Result::Err(panic_data) => assert_eq!(
-            *panic_data.at(0), Timelock::Errors::DEPOSIT_AMOUNT_ZERO,
+            *panic_data.at(0), Timelock::Errors::DEPOSIT_AMOUNT_ZERO
         ),
     };
 }
@@ -83,7 +79,7 @@ fn test_deposit_invalid_token_address() {
     match timelock_safe.deposit(ZERO(), DEPOSIT_AMOUNT) {
         Result::Ok(_) => panic!("Expected Timelock::Errors::INVALID_TOKEN_ADDRESS"),
         Result::Err(panic_data) => assert_eq!(
-            *panic_data.at(0), Timelock::Errors::INVALID_TOKEN_ADDRESS,
+            *panic_data.at(0), Timelock::Errors::INVALID_TOKEN_ADDRESS
         ),
     }
 }
@@ -104,11 +100,11 @@ fn test_single_deposit() {
                             depositor: ALICE(),
                             token: erc20_address,
                             timestamp: get_block_timestamp(),
-                            amount: DEPOSIT_AMOUNT,
-                        },
-                    ),
-                ),
-            ],
+                            amount: DEPOSIT_AMOUNT
+                        }
+                    )
+                )
+            ]
         );
     assert_eq!(timelock.balance_of(ALICE(), erc20_address), DEPOSIT_AMOUNT);
     assert_eq!(timelock.withdrawable_balance_of(ALICE(), erc20_address), 0);
@@ -134,7 +130,7 @@ fn test_withdraw_zero_amount() {
     match timelock_safe.withdraw(erc20_address, 0) {
         Result::Ok(_) => panic!("Expected Timelock::Errors::DEPOSIT_AMOUNT_ZERO"),
         Result::Err(panic_data) => assert_eq!(
-            *panic_data.at(0), Timelock::Errors::DEPOSIT_AMOUNT_ZERO,
+            *panic_data.at(0), Timelock::Errors::DEPOSIT_AMOUNT_ZERO
         ),
     };
 }
@@ -145,7 +141,7 @@ fn test_withdraw_invalid_token_address() {
     match timelock_safe.withdraw(ZERO(), DEPOSIT_AMOUNT) {
         Result::Ok(_) => panic!("Expected Timelock::Errors::INVALID_TOKEN_ADDRESS"),
         Result::Err(panic_data) => assert_eq!(
-            *panic_data.at(0), Timelock::Errors::INVALID_TOKEN_ADDRESS,
+            *panic_data.at(0), Timelock::Errors::INVALID_TOKEN_ADDRESS
         ),
     }
 }
@@ -158,7 +154,7 @@ fn test_withdraw_insufficient_withdrawable_balance() {
     match timelock_safe.withdraw(erc20_address, DEPOSIT_AMOUNT) {
         Result::Ok(_) => panic!("Expected Timelock::Errors::INSUFFICIENT_WITHDRAWABLE_BALANCE"),
         Result::Err(panic_data) => assert_eq!(
-            *panic_data.at(0), Timelock::Errors::INSUFFICIENT_WITHDRAWABLE_BALANCE,
+            *panic_data.at(0), Timelock::Errors::INSUFFICIENT_WITHDRAWABLE_BALANCE
         ),
     }
 }
@@ -183,11 +179,11 @@ fn test_withdraw_after_lock_delay() {
                             withdrawer: ALICE(),
                             token: erc20_address,
                             timestamp: get_block_timestamp(),
-                            amount: DEPOSIT_AMOUNT,
-                        },
-                    ),
-                ),
-            ],
+                            amount: DEPOSIT_AMOUNT
+                        }
+                    )
+                )
+            ]
         );
     assert_eq!(timelock.balance_of(ALICE(), erc20_address), 0);
     assert_eq!(timelock.withdrawable_balance_of(ALICE(), erc20_address), 0);

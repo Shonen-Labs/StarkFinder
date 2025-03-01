@@ -67,7 +67,7 @@ pub mod MockToken {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, name: ByteArray, symbol: ByteArray) {
+    fn constructor(ref self: ContractState, name: ByteArray) {
         self.token_name.write(name);
         self.symbol.write("MKT");
         self.decimal.write(18);
@@ -176,4 +176,3 @@ pub mod MockToken {
         }
     }
 }
-

@@ -1,7 +1,7 @@
 use starknet::{ContractAddress, contract_address_const};
 use snforge_std::{
     declare, ContractClassTrait, DeclareResultTrait, cheat_caller_address, CheatSpan,
-    cheat_block_timestamp,
+    cheat_block_timestamp
 };
 use contracts::interfaces::IDefiVault::{IDefiVaultDispatcher, IDefiVaultDispatcherTrait};
 use contracts::mock_erc20::{IERC20Dispatcher, IERC20DispatcherTrait};
@@ -24,12 +24,10 @@ fn deploy_contract(interest_rate: u256) -> ContractAddress {
 
 fn deploy_erc20() -> ContractAddress {
     let name: ByteArray = "MockToken";
-    let symbol: ByteArray = "MTK";
     let contract = declare("MockToken").unwrap().contract_class();
 
     let mut constructor_calldata = ArrayTrait::new();
     name.serialize(ref constructor_calldata);
-    symbol.serialize(ref constructor_calldata);
 
     let (contract_address, _) = contract.deploy(@constructor_calldata).unwrap();
     contract_address

@@ -4,7 +4,7 @@ pub mod Timelock {
     use starknet::{ContractAddress, get_caller_address, get_contract_address, get_block_timestamp};
     use starknet::storage::{
         Map, StoragePathEntry, StoragePointerReadAccess, StoragePointerWriteAccess, Vec, VecTrait,
-        MutableVecTrait,
+        MutableVecTrait
     };
     use openzeppelin::access::ownable::OwnableComponent;
     use contracts::interfaces::timelock::ITimelock;
@@ -99,8 +99,8 @@ pub mod Timelock {
             self
                 .emit(
                     Deposit {
-                        depositor: caller, token: token_address, timestamp: block_timestamp, amount,
-                    },
+                        depositor: caller, token: token_address, timestamp: block_timestamp, amount
+                    }
                 );
         }
         /// Allows a user to withdraw ERC-20 tokens from the Timelock.
@@ -120,18 +120,20 @@ pub mod Timelock {
             let lock_delay = self.lock_delay.read();
             let mut remaining_amount = amount;
             // Update balance
-            for i in 0..deposits.len() {
-                let (deposit_timestamp, deposit_amount) = deposits.at(i).read();
-                if deposit_amount > 0 && block_timestamp >= deposit_timestamp + lock_delay {
-                    let remaining_deposit_amount = if remaining_amount > deposit_amount {
-                        0
-                    } else {
-                        deposit_amount - remaining_amount
+            for i in 0
+                ..deposits
+                    .len() {
+                        let (deposit_timestamp, deposit_amount) = deposits.at(i).read();
+                        if deposit_amount > 0 && block_timestamp >= deposit_timestamp + lock_delay {
+                            let remaining_deposit_amount = if remaining_amount > deposit_amount {
+                                0
+                            } else {
+                                deposit_amount - remaining_amount
+                            };
+                            deposits.at(i).write((deposit_timestamp, remaining_deposit_amount));
+                            remaining_amount -= deposit_amount - remaining_deposit_amount;
+                        }
                     };
-                    deposits.at(i).write((deposit_timestamp, remaining_deposit_amount));
-                    remaining_amount -= deposit_amount - remaining_deposit_amount;
-                }
-            };
 
             let erc20 = IERC20Dispatcher { contract_address: token_address };
 
@@ -142,11 +144,8 @@ pub mod Timelock {
             self
                 .emit(
                     Withdraw {
-                        withdrawer: caller,
-                        token: token_address,
-                        timestamp: block_timestamp,
-                        amount,
-                    },
+                        withdrawer: caller, token: token_address, timestamp: block_timestamp, amount
+                    }
                 );
         }
         /// Retrieves the withdrawable balance of a depositor for a specific ERC-20 token.
@@ -173,7 +172,7 @@ pub mod Timelock {
             self: @ContractState,
             depositor_address: ContractAddress,
             token_address: ContractAddress,
-            withdrawable: bool,
+            withdrawable: bool
         ) -> u256 {
             let block_timestamp = get_block_timestamp();
             let lock_delay = self.lock_delay.read();
@@ -184,17 +183,19 @@ pub mod Timelock {
 
             let deposits = self.deposits.entry((depositor_address, token_address));
             let mut balance = 0;
-            for i in 0..deposits.len() {
-                let (deposit_timestamp, deposit_amount) = deposits.at(i).read();
-                let condition = if withdrawable {
-                    block_timestamp >= deposit_timestamp + lock_delay
-                } else {
-                    true
-                };
-                if condition {
-                    balance += deposit_amount;
-                }
-            };
+            for i in 0
+                ..deposits
+                    .len() {
+                        let (deposit_timestamp, deposit_amount) = deposits.at(i).read();
+                        let condition = if withdrawable {
+                            block_timestamp >= deposit_timestamp + lock_delay
+                        } else {
+                            true
+                        };
+                        if condition {
+                            balance += deposit_amount;
+                        }
+                    };
             balance
         }
     }
