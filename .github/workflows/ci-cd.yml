@@ -55,11 +55,20 @@ jobs:
           if ! command -v snforge &> /dev/null; then
             cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
               --tag v0.33.0 \
+              --package snforge \
               --bin snforge \
               --features=rust-serde
           fi
           echo "Installed snforge version: $(snforge --version)"
-
+        env:
+          CARGO_INCREMENTAL: 0
+          CARGO_PROFILE_DEV_DEBUG: 0
+          CARGO_TERM_COLOR: always
+          RUST_BACKTRACE: short
+          RUSTFLAGS: -D warnings
+          CARGO_UNSTABLE_SPARSE_REGISTRY: true
+          CARGO_REGISTRIES_CRATES_IO_PROTOCOL: sparse
+          
       - name: Install Universal Sierra Compiler
         run: curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
 
