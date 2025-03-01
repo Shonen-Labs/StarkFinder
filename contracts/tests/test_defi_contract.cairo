@@ -145,4 +145,3 @@ fn test_withdraw_with_yield_farming() {
     assert(user_balance_after == expected_final_balance, 'Wrong final balance');
 }
 
-

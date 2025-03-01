@@ -1,5 +1,3 @@
-use starknet::ContractAddress;
-
 #[starknet::contract]
 pub mod ConstantProductAmm {
     use contracts::interfaces::IConstantProductAmm::IConstantProductAmm;

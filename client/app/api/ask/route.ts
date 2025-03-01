@@ -295,7 +295,7 @@ async function generateInvestmentRecommendations(
   }
 }
 
-export const maxDuration = 500
+export const maxDuration = 300
 
 export async function POST(request: Request) {
   try {
