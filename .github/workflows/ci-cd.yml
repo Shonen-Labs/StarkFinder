@@ -60,6 +60,9 @@ jobs:
           fi
           echo "Installed snforge version: $(snforge --version)"
 
+      - name: Install Universal Sierra Compiler
+        run: curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
+
       - name: Install dependencies
         run: scarb clean && scarb fetch
 
