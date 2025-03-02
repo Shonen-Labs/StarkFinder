@@ -103,30 +103,6 @@ async function getChatHistory(
 }
 
 
-async function storeMessage({
-  content,
-  chatId,
-  userId,
-  transactionId = null,
-}: {
-  content: any[];
-  chatId: string;
-  userId: string;
-  transactionId?: string | null;
-}) {
-  try {
-    return await prisma.message.create({
-      data: {
-        content,
-        chatId,
-        userId,
-      },
-    });
-  } catch (error) {
-    console.error("Error storing message:", error);
-    throw error;
-  }
-}
 
 async function storeTransaction(userId: string, type: string, metadata: any) {
   try {
