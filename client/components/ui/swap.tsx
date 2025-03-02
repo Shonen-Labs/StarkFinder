@@ -13,7 +13,7 @@ interface SwapProps {
 }
 
 const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
-	const { address, account, status } = useAccount();
+	const { address, account } = useAccount();
 
 	const [fromAmount, setFromAmount] = useState<string>("");
 	const [toAmount, setToAmount] = useState<string>("");
@@ -22,7 +22,7 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">("from");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	// const [result, setResult] = useState<[]>([]);
+	/* eslint-disable */
 	const [transactionDetails, setTransactionDetails] = useState<any>(null);
 	const [txHash, setTxHash] = useState<string | null>(null);
 
@@ -76,13 +76,12 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				// "x-brian-api-key": "brian_9iWP8ONOgF8WvXktK",
 			},
 			body: JSON.stringify(requestBody),
 		});
 
 		const data = await response.json();
-		// console.log("swap data: from /api/transactions", data);
+
 		if (data?.result) {
 			setIsLoading(false);
 			const resTx = data?.result;
@@ -92,7 +91,6 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 		} else {
 			setIsLoading(false);
 		}
-		// console.log(data);
 	};
 
 	const handleExecuteTransaction = async () => {
