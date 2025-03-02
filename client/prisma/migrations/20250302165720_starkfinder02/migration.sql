@@ -1,9 +1,6 @@
-/*
-  Warnings:
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'ASSISTANT');
 
-  - A unique constraint covering the columns `[address]` on the table `User` will be added. If there are existing duplicate values, this will fail.
-
-*/
 -- CreateEnum
 CREATE TYPE "ChatType" AS ENUM ('GENERAL', 'TRANSACTION', 'ASK');
 
@@ -13,14 +10,39 @@ CREATE TYPE "TxType" AS ENUM ('SWAP', 'TRANSFER', 'BRIDGE', 'DEPOSIT', 'WITHDRAW
 -- CreateEnum
 CREATE TYPE "TxStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED');
 
--- AlterTable
-ALTER TABLE "Chat" ADD COLUMN     "type" "ChatType" NOT NULL DEFAULT 'GENERAL';
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "email" TEXT,
+    "name" TEXT,
+    "address" TEXT,
 
--- AlterTable
-ALTER TABLE "Message" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "address" TEXT;
+-- CreateTable
+CREATE TABLE "Chat" (
+    "id" TEXT NOT NULL,
+    "title" TEXT,
+    "metadata" JSONB,
+    "userId" TEXT,
+    "type" "ChatType" NOT NULL DEFAULT 'GENERAL',
+
+    CONSTRAINT "Chat_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL,
+    "content" JSONB[],
+    "metadata" JSONB,
+    "replyTo" TEXT,
+    "chatId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Transaction" (
@@ -62,7 +84,19 @@ CREATE TABLE "DeployedContract" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_address_key" ON "User"("address");
+
+-- AddForeignKey
+ALTER TABLE "Chat" ADD CONSTRAINT "Chat_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "Chat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Message" ADD CONSTRAINT "Message_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
