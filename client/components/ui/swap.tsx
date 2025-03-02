@@ -1,190 +1,40 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { ArrowDownUp, ChevronDown } from "lucide-react";
 import TokensModal from "./tokens-modal";
 import { CryptoCoin, CoinsLogo } from "../../types/crypto-coin";
 import { useAccount } from "@starknet-react/core";
-import { v4 as uuidv4 } from "uuid";
-import { TransactionSuccess } from "@/components/TransactionSuccess";
-
+import useDebounce from "../useDebounce";
 
 interface SwapProps {
 	setSelectedCommand: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-interface TransactionHandlerProps {
-	transactions: Array<{
-		contractAddress: string;
-		entrypoint: string;
-		calldata: string[];
-	}>;
-	description: string;
-	onSuccess: (hash: string) => void;
-	onError: (error: any) => void;
-}
-
-const TransactionHandler: React.FC<TransactionHandlerProps> = ({ transactions, description, onSuccess, onError }) => {
-	const { account } = useAccount();
-	const [isProcessing, setIsProcessing] = React.useState(false);
-
-	const executeTransaction = async () => {
-		if (!account) {
-			onError(new Error("Wallet not connected"));
-			return;
-		}
-
-		setIsProcessing(true);
-		try {
-			for (const tx of transactions) {
-				const response = await account.execute({
-					contractAddress: tx.contractAddress,
-					entrypoint: tx.entrypoint,
-					calldata: tx.calldata,
-				});
-				await account.waitForTransaction(response.transaction_hash);
-				if (tx === transactions[transactions.length - 1]) {
-					onSuccess(response.transaction_hash);
-				}
-			}
-		} catch (error) {
-			console.error("Transaction failed:", error);
-			onError(error);
-		} finally {
-			setIsProcessing(false);
-		}
-	};
-
-	return (
-		<div className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10">
-			<p className="text-sm text-white/80 mb-4">{description}</p>
-			<button
-				onClick={executeTransaction}
-				disabled={isProcessing}
-				className={`w-full py-2 px-4 rounded-lg ${isProcessing ? "bg-white/20 cursor-not-allowed" : "bg-white/10 hover:bg-white/20"} transition-colors duration-200`}>
-				{isProcessing ? "Processing Transaction..." : "Execute Transaction"}
-			</button>
-		</div>
-	);
-};
-
 const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
+	const { address, account, status } = useAccount();
+
 	const [fromAmount, setFromAmount] = useState<string>("");
 	const [toAmount, setToAmount] = useState<string>("");
 	const [fromCoin, setFromCoin] = useState<CryptoCoin>(CoinsLogo[0]);
 	const [toCoin, setToCoin] = useState<CryptoCoin>(CoinsLogo[3]);
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">("from");
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+	// const [result, setResult] = useState<[]>([]);
+	const [transactionDetails, setTransactionDetails] = useState<any>(null);
 	const [txHash, setTxHash] = useState<string | null>(null);
-	const [transactionData, setTransactionData] = useState<Message["transaction"] | null>(null);
 
-	const [messages, setMessages] = React.useState<Message[]>([]);
+	// Debounce the fromAmount with a 1 second delay
+	const debouncedFromAmount = useDebounce(fromAmount, 1000);
 
-	interface Message {
-		role: string;
-		id: string;
-		content: string;
-		timestamp: string;
-		user: string;
-		transaction?: {
-			data: {
-				transactions: Array<{
-					contractAddress: string;
-					entrypoint: string;
-					calldata: string[];
-				}>;
-				fromToken?: CryptoCoin;
-				toToken?: CryptoCoin;
-				fromAmount?: string;
-				toAmount?: string;
-				receiver?: string;
-				gasCostUSD?: string;
-				solver?: string;
-			};
-			type: string;
-		};
-		recommendations?: {
-			pools: Array<{
-				name: string;
-				apy: number;
-				tvl: number;
-				riskLevel: string;
-				impermanentLoss: string;
-				chain: string;
-				protocol: string;
-			}>;
-			strategy: string;
-		};
-	}
-
-	const { address, account } = useAccount();
-
-	const handleTransactionSuccess = (hash: string) => {
-		setTxHash(hash);
-		const successMessage: Message = {
-			id: uuidv4(),
-			role: "agent",
-			content: "Swap completed successfully! Would you like to perform another swap?",
-			timestamp: new Date().toLocaleTimeString(),
-			user: "Agent",
-		};
-		setMessages((prev) => [...prev, successMessage]);
-	};
-	
-  const handleSwap = async () => {
-		if (!fromAmount || !fromCoin || !toCoin) return;
-
-		if (!account) {
-			const errorMessage: Message = {
-				id: uuidv4(),
-				role: "agent",
-				content: "Please connect your wallet first to proceed with the transaction.",
-				timestamp: new Date().toLocaleTimeString(),
-				user: "Agent",
-			};
-			setMessages((prev) => [...prev, errorMessage]);
-			return;
+	// Effect to trigger handleSwap when the debounced value changes
+	useEffect(() => {
+		if (debouncedFromAmount) {
+			handleSwap(debouncedFromAmount);
 		}
-
-		setIsLoading(true);
-
-		try {
-			const response = await fetch("/api/transactions", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					prompt: `swap ${fromAmount} ${fromCoin.name} to ${toCoin.name}`,
-					address: address || 0x0,
-					messages: messages,
-				}),
-			});
-
-			const data = await response.json();
-
-			if (response.ok && data.result?.[0]?.data) {
-				const { transaction } = data.result[0].data;
-				setTransactionData(transaction);
-			} else {
-				throw new Error("Failed to get transaction data");
-			}
-		} catch (error) {
-			console.error("Swap failed:", error);
-			const errorMessage: Message = {
-				id: uuidv4(),
-				role: "agent",
-				content: "Sorry, the swap transaction failed. Please try again.",
-				timestamp: new Date().toLocaleTimeString(),
-				user: "Agent",
-			};
-			setMessages((prev) => [...prev, errorMessage]);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	}, [debouncedFromAmount]);
 
 	const openModal = (type: "from" | "to") => {
 		setSelectingCoinFor(type);
@@ -206,6 +56,59 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 		setFromCoin(toCoin);
 		setToCoin(fromCoin);
 	};
+
+	const handleSwap = async (value?: string) => {
+		const prompt = `swap ${value} ${fromCoin.name} to ${toCoin.name}`;
+		const messages = [
+			{
+				role: "user",
+				content: prompt,
+			},
+		];
+		const requestBody = {
+			prompt,
+			address: address || "0x0",
+			messages,
+			chainId: "4012",
+		};
+		setIsLoading(true);
+		const response = await fetch("/api/transactions", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				// "x-brian-api-key": "brian_9iWP8ONOgF8WvXktK",
+			},
+			body: JSON.stringify(requestBody),
+		});
+
+		const data = await response.json();
+		// console.log("swap data: from /api/transactions", data);
+		if (data?.result) {
+			setIsLoading(false);
+			const resTx = data?.result;
+			const amt = resTx?.[0]?.data?.transaction?.data?.toAmount;
+			setTransactionDetails(resTx?.[0].data.transaction.data.transactions);
+			setToAmount(amt);
+		} else {
+			setIsLoading(false);
+		}
+		// console.log(data);
+	};
+
+	const handleExecuteTransaction = async () => {
+		try {
+			const txDetails = transactionDetails;
+			const result = await account?.execute(txDetails);
+
+			if (result?.transaction_hash) {
+				setTxHash(result.transaction_hash);
+				console.log("Transaction submitted:", txHash);
+			}
+		} catch (error) {
+			console.error("Transaction failed:", error);
+		}
+	};
+
 	return (
 		<div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex flex-col items-center justify-center animated fadeIn">
 			<div className="bg-white p-6 max-w-lg w-full shadow-lg rounded-xl animated fadeIn">
@@ -283,41 +186,23 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 				</div>
 
 				<div className={`mt-5`}>
-					{txHash ? (
-						<TransactionSuccess
-							type="swap"
-							hash={txHash}
-							onNewTransaction={() => {
-								setTxHash(null);
-								setTransactionData(null);
-							}}
-						/>
-					) : transactionData?.data?.transactions ? (
-						<TransactionHandler
-							transactions={transactionData.data.transactions}
-							description={`Ready to execute swap transaction`}
-							onSuccess={handleTransactionSuccess}
-							onError={(error) => {
-								console.error("Transaction failed:", error);
-								const errorMessage: Message = {
-									id: uuidv4(),
-									role: "agent",
-									content: "Transaction failed. Please try again.",
-									timestamp: new Date().toLocaleTimeString(),
-									user: "Agent",
-								};
-								setMessages((prev) => [...prev, errorMessage]);
-							}}
-						/>
+					{transactionDetails ? (
+						<button
+							onClick={() => handleExecuteTransaction()}
+							className="bg-[#060606] text-white w-full py-3 rounded-2xl text-lg flex items-center justify-center">
+							Execute Swap
+						</button>
 					) : (
 						<button
+							disabled={isLoading}
 							className="bg-[#060606] text-white w-full py-3 rounded-2xl text-lg flex items-center justify-center"
-							onClick={handleSwap}
-							disabled={isLoading}>
-							{isLoading ? "Processing..." : "Swap"}
+							onClick={() => handleSwap()}>
+							{isLoading ? "Getting Quote..." : "Swap"}
 						</button>
 					)}
 				</div>
+
+				{txHash && <div>Transaction submitted: {txHash}</div>}
 				{showModal && (
 					<TokensModal
 						blockchain_logo={CoinsLogo}

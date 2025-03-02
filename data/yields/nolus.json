@@ -1,0 +1,113 @@
+[
+    {
+        "chain": "Nolus",
+        "project": "nolus-protocol",
+        "symbol": "USDC",
+        "tvlUsd": 609482,
+        "apyBase": 9.34367,
+        "apyReward": null,
+        "apy": 9.34367,
+        "rewardTokens": null,
+        "pool": "7fc4cebd-634e-49ac-a64a-f52a1c841fde",
+        "apyPct1D": -0.0105,
+        "apyPct7D": null,
+        "apyPct30D": null,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 84,
+            "binnedConfidence": 3
+        },
+        "poolMeta": "",
+        "mu": 7.71007,
+        "sigma": 0.26427,
+        "count": 232,
+        "outlier": false,
+        "underlyingTokens": [
+            "ibc/F5FABF52B54E65064B57BF6DBD8E5FAD22CEE9F4B8A57ADBB20CCD0173AA72A4",
+            "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 14.12497,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Nolus",
+        "project": "nolus-protocol",
+        "symbol": "USDC",
+        "tvlUsd": 14844,
+        "apyBase": 0,
+        "apyReward": null,
+        "apy": 0,
+        "rewardTokens": null,
+        "pool": "a38b7a27-4b0c-4333-8e5d-a6188d2996dd",
+        "apyPct1D": -10.72136,
+        "apyPct7D": null,
+        "apyPct30D": null,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": "",
+        "mu": 12.83829,
+        "sigma": 0.17829,
+        "count": 50,
+        "outlier": false,
+        "underlyingTokens": [
+            "ibc/18161D8EFBD00FF5B7683EF8E923B8913453567FBE3FB6672D75712B0DEB6682",
+            "ibc/B559A80D62249C8AA07A380E2A2BEA6E5CA9A6F079C912C3A9E9B494105E4F81"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 13.32392,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Nolus",
+        "project": "nolus-protocol",
+        "symbol": "BTC",
+        "tvlUsd": 11242,
+        "apyBase": 0.06987,
+        "apyReward": null,
+        "apy": 0.06987,
+        "rewardTokens": null,
+        "pool": "0bf81621-d0f8-4917-b391-aab66ea545f1",
+        "apyPct1D": 0,
+        "apyPct7D": null,
+        "apyPct30D": -2.71104,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 55.00000000000001,
+            "binnedConfidence": 1
+        },
+        "poolMeta": "",
+        "mu": 1.12201,
+        "sigma": 0.05213,
+        "count": 23,
+        "outlier": false,
+        "underlyingTokens": [
+            "ibc/E45CFCB959F4F6D1065B7033EE49A88E606E6AD82E75725219B3D68B0FA89987",
+            "factory/osmo1z6r6qdknhgsc0zeracktgpcxf43j6sekq07nw8sxduc9lg0qjjlqfu25e3/alloyed/allBTC"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.51355,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

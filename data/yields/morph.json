@@ -1,0 +1,110 @@
+[
+    {
+        "chain": "Morph",
+        "project": "morfi",
+        "symbol": "WETH-USDT",
+        "tvlUsd": 71090,
+        "apyBase": 0,
+        "apyReward": 41.21856,
+        "apy": 41.21856,
+        "rewardTokens": [
+            "0x0f204582f30c5f896cd3260a0181cf5838c93c0b"
+        ],
+        "pool": "3420e70c-5861-4739-821a-ff4bc8f56c18",
+        "apyPct1D": null,
+        "apyPct7D": 4.2616,
+        "apyPct30D": 9.33849,
+        "stablecoin": false,
+        "ilRisk": "yes",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 65,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 80.70901,
+        "sigma": 3.05394,
+        "count": 88,
+        "outlier": true,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 27.86582,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Morph",
+        "project": "morfi",
+        "symbol": "USDT-USDC",
+        "tvlUsd": 25860,
+        "apyBase": 2.91637,
+        "apyReward": 7.64135,
+        "apy": 10.55772,
+        "rewardTokens": [
+            "0x0f204582f30c5f896cd3260a0181cf5838c93c0b"
+        ],
+        "pool": "ec95b314-76c6-426f-b87c-49092db1e92b",
+        "apyPct1D": null,
+        "apyPct7D": -5.94541,
+        "apyPct30D": -2.78933,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 63,
+            "binnedConfidence": 2
+        },
+        "poolMeta": null,
+        "mu": 25.95689,
+        "sigma": 0.57406,
+        "count": 88,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 15.67532,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Morph",
+        "project": "morfi",
+        "symbol": "WETH-WEETH",
+        "tvlUsd": 15276,
+        "apyBase": 9.91052,
+        "apyReward": 20.27859,
+        "apy": 30.1891,
+        "rewardTokens": [
+            "0x0f204582f30c5f896cd3260a0181cf5838c93c0b"
+        ],
+        "pool": "1d871a0e-b019-4886-b50e-806635694869",
+        "apyPct1D": null,
+        "apyPct7D": 6.38354,
+        "apyPct30D": -62.25038,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "multi",
+        "predictions": {
+            "predictedClass": "Down",
+            "predictedProbability": 50,
+            "binnedConfidence": 1
+        },
+        "poolMeta": null,
+        "mu": 52.44344,
+        "sigma": 1.09329,
+        "count": 29,
+        "outlier": false,
+        "underlyingTokens": null,
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 54.54941,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
