@@ -10,14 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Send, Home } from "lucide-react";
+import { Plus, Send, Home, Mic, Ban } from "lucide-react";
 import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
 import { TransactionSuccess } from "@/components/TransactionSuccess";
 import CommandList from "@/components/ui/command";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface UserPreferences {
 	riskTolerance: "low" | "medium" | "high";
@@ -79,17 +81,22 @@ interface MessageContentProps {
 	onTransactionSuccess: (hash: string) => void;
 }
 
-const TransactionHandler: React.FC<TransactionHandlerProps> = ({ transactions, description, onSuccess, onError }) => {
-	const { account } = useAccount();
-	// console.log(account)
-	const [isProcessing, setIsProcessing] = React.useState(false);
-	console.log(transactions);
-	const executeTransaction = async () => {
-		console.log("trying");
-		if (!account) {
-			onError(new Error("Wallet not connected"));
-			return;
-		}
+
+const TransactionHandler: React.FC<TransactionHandlerProps> = ({
+  transactions,
+  description,
+  onSuccess,
+  onError,
+}) => {
+  const { account } = useAccount();
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  
+  const executeTransaction = async () => {
+    if (!account) {
+      onError(new Error("Wallet not connected"));
+      return;
+    }
+
 
 		setIsProcessing(true);
 		try {
@@ -177,115 +184,135 @@ const PreferencesDialog: React.FC<{
 const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionSuccess }) => {
 	const [txHash, setTxHash] = React.useState<string | null>(null);
 
-	if (message.recommendations) {
-		return (
-			<div className="space-y-4">
-				<p className="text-white/80">{message.content}</p>
-				<div className="grid gap-4">
-					<h3 className="font-bold">Recommended Strategy:</h3>
-					<p>{message.recommendations.strategy}</p>
-					<h3 className="font-bold">Recommended Pools:</h3>
-					{message.recommendations.pools.map((pool, index) => (
-						<div
-							key={index}
-							className="bg-white/5 p-4 rounded-lg">
-							<div className="flex justify-between">
-								<span>Pool: {pool.name}</span>
-								<span>APY: {pool.apy}%</span>
-							</div>
-							<div className="flex justify-between">
-								<span>TVL: ${pool.tvl.toLocaleString()}</span>
-								<span>Risk: {pool.riskLevel}</span>
-							</div>
-							<div className="text-sm text-white/60">IL Risk: {pool.impermanentLoss}</div>
-						</div>
-					))}
-				</div>
-			</div>
-		);
-	}
-	if (message.transaction?.data?.transactions) {
-		return (
-			<div className="space-y-4">
-				<p className="text-white/80">{message.content}</p>
-				{txHash ? (
-					<TransactionSuccess
-						type={message.transaction.type}
-						hash={txHash}
-						onNewTransaction={() => {
-							// This keeps the success message visible but allows new transactions
-							setTxHash(null);
-						}}
-					/>
-				) : (
-					<TransactionHandler
-						transactions={message.transaction.data.transactions}
-						description={`Ready to execute ${message.transaction.type} transaction`}
-						onSuccess={(hash) => {
-							setTxHash(hash);
-							onTransactionSuccess(hash);
-						}}
-						onError={(error) => {
-							console.error("Transaction failed:", error);
-						}}
-					/>
-				)}
-			</div>
-		);
-	}
-	return <p className="text-white/80">{message.content}</p>;
+  if (message.recommendations) {
+    return (
+      <div className="space-y-4">
+        <p className="text-white/80">{message.content}</p>
+        <div className="grid gap-4">
+          <h3 className="font-bold">Recommended Strategy:</h3>
+          <p>{message.recommendations.strategy}</p>
+          <h3 className="font-bold">Recommended Pools:</h3>
+          {message.recommendations.pools.map((pool, index) => (
+            <div key={index} className="bg-white/5 p-4 rounded-lg">
+              <div className="flex justify-between">
+                <span>Pool: {pool.name}</span>
+                <span>APY: {pool.apy}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>TVL: ${pool.tvl.toLocaleString()}</span>
+                <span>Risk: {pool.riskLevel}</span>
+              </div>
+              <div className="text-sm text-white/60">
+                IL Risk: {pool.impermanentLoss}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (message.transaction?.data?.transactions) {
+    return (
+      <div className="space-y-4">
+        <p className="text-white/80">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {message.content}
+          </ReactMarkdown>
+        </p>
+        {txHash ? (
+          <TransactionSuccess
+            type={message.transaction.type}
+            hash={txHash}
+            onNewTransaction={() => {
+              // This keeps the success message visible but allows new transactions
+              setTxHash(null);
+            }}
+          />
+        ) : (
+          <TransactionHandler
+            transactions={message.transaction.data.transactions}
+            description={`Ready to execute ${message.transaction.type} transaction`}
+            onSuccess={(hash) => {
+              setTxHash(hash);
+              onTransactionSuccess(hash);
+            }}
+            onError={(error) => {
+              console.error("Transaction failed:", error);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      {message.content}
+    </ReactMarkdown>
+  );
 };
+
 export default function TransactionPage() {
-	const router = useRouter();
-	const params = useParams();
-	const txId = params.id as string;
-	const [messages, setMessages] = React.useState<Message[]>([]);
-	const [inputValue, setInputValue] = React.useState("");
-	const [isLoading, setIsLoading] = React.useState(false);
-	const { address } = useAccount();
-	console.log(address);
-	const { provider } = useProvider();
-	console.log(provider.getChainId());
+  const router = useRouter();
+  const params = useParams();
+  const txId = params.id as string;
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [inputValue, setInputValue] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [streamedResponse, setStreamedResponse] = useState("");
+  const { address } = useAccount();
+  const { provider } = useProvider();
+  console.log(provider.getChainId())
 
-	const scrollRef = React.useRef<HTMLDivElement>(null);
-	const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
-	const [showPreferences, setShowPreferences] = useState(false);
-	const [userPreferences, setUserPreferences] = useState<UserPreferences>({
-		riskTolerance: "medium",
-		preferredAssets: [],
-		preferredChains: [],
-		investmentHorizon: "medium",
-	});
 
-	React.useEffect(() => {
-		if (scrollRef.current) {
-			scrollRef.current.scrollIntoView({ behavior: "smooth" });
-		}
-	}, [messages]);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({
+    riskTolerance: "medium",
+    preferredAssets: [],
+    preferredChains: [],
+    investmentHorizon: "medium",
+  });
+  const [error, setError] = useState("");
 
-	React.useEffect(() => {
-		// Initial welcome message
-		setMessages([
-			{
-				id: uuidv4(),
-				role: "agent",
-				content: "Hello! I can help you with the following actions:\n\n" + "• Swap tokens\n" + "• Transfer tokens\n" + "• Deposit to protocols\n" + "• Withdraw from protocols\n" + "• Bridge tokens\n\n" + "What would you like to do?",
-				timestamp: new Date().toLocaleTimeString(),
-				user: "Agent",
-			},
-		]);
-	}, []);
-	// Generates a unique chat ID and navigates to the new chat route.
-	const createNewChat = async () => {
-		const id = uuidv4(); // Generate a unique ID for the chat session
-		await router.push(`/agent/chat/${id}`); // Navigate to the new chat route
-	};
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, streamedResponse]);
 
-	// Generates a unique chat ID and navigates to the new Transaction route.
-	const createNewTxn = async () => {
-		const id = uuidv4(); // Generate a unique ID for the transaction session
-		await router.push(`/agent/transaction/${id}`); // Navigate to the new transaction route
-	};
+  React.useEffect(() => {
+    // Initial welcome message
+    setMessages([
+      {
+        id: uuidv4(),
+        role: "agent",
+        content:
+          "Hello! I can help you with the following actions:\n\n" +
+          "• Swap tokens\n" +
+          "• Transfer tokens\n" +
+          "• Deposit to protocols\n" +
+          "• Withdraw from protocols\n" +
+          "• Bridge tokens\n\n" +
+          "What would you like to do?",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      },
+    ]);
+  }, []);
+
+  // Generates a unique chat ID and navigates to the new chat route.
+  const createNewChat = async () => {
+    const id = uuidv4();
+    await router.push(`/agent/transaction/${id}`);
+  };
+
+  // Generates a unique chat ID and navigates to the new Transaction route.
+  const createNewTxn = async () => {
+    const id = uuidv4();
+    await router.push(`/agent/transaction/${id}`);
+  };
+
 
 	const handleTransactionSuccess = (hash: string) => {
 		const successMessage: Message = {
@@ -298,110 +325,201 @@ export default function TransactionPage() {
 		setMessages((prev) => [...prev, successMessage]);
 	};
 
-	const handleSendMessage = async () => {
-		if (!inputValue.trim()) return;
-		if (!address) {
-			// Add a message to connect wallet if not connected
-			const errorMessage: Message = {
-				id: uuidv4(),
-				role: "agent",
-				content: "Please connect your wallet first to proceed with the transaction.",
-				timestamp: new Date().toLocaleTimeString(),
-				user: "Agent",
-			};
-			setMessages((prev) => [...prev, errorMessage]);
-			return;
-		}
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+    if (!address) {
+      // Add a message to connect wallet if not connected
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content:
+          "Please connect your wallet first to proceed with the transaction.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+      return;
+    }
+  
+    const userMessage: Message = {
+      id: uuidv4(),
+      role: "user",
+      content: inputValue,
+      timestamp: new Date().toLocaleTimeString(),
+      user: "User",
+    };
+  
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
+    setIsLoading(true);
+    setStreamedResponse("");
+    setError("");
 
-		const userMessage: Message = {
-			id: uuidv4(),
-			role: "user",
-			content: inputValue,
-			timestamp: new Date().toLocaleTimeString(),
-			user: "User",
-		};
+    try {
+      // Format messages for the API - include unique user messages
+      const formattedMessages = Array.from(
+        new Set(
+          messages
+            .filter(msg => msg.role === "user")
+            .map(msg => msg.content)
+        )
+      ).map(content => ({
+        sender: "user",
+        content
+      }));
+  
+      // Add the current message if it's not already included
+      if (!formattedMessages.some(msg => msg.content === inputValue)) {
+        formattedMessages.push({
+          sender: "user",
+          content: inputValue
+        });
+      }
+  
+      const requestBody = {
+        prompt: inputValue,
+        address: address,
+        messages: messages,
+        userPreferences,
+        stream: true
+      };
+  
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details?.message || 'Failed to get response');
+      }
 
-		setMessages((prev) => [...prev, userMessage]);
-		setInputValue("");
-		setIsLoading(true);
+      const contentType = response.headers.get("Content-Type") || "";
 
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
-
-		try {
-			const response = await fetch("/api/transactions", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					prompt: inputValue,
-					address: address,
-					messages: messages,
-					userPreferences,
-					stream: true,
-				}),
-				signal: controller.signal,
-			});
-
-			const data = await response.json();
-			console.log(data);
-
-			clearTimeout(timeoutId); // Clear timeout if fetch succeeds
-
-			let agentMessage: Message;
-
-			// Check if it's an error message that's actually a prompt for more information
-			if (data.error && typeof data.error === "string" && !data.error.includes("not recognized")) {
-				// This is a conversational prompt from Brian, not an error
-				agentMessage = {
-					id: uuidv4(),
-					role: "agent",
-					content: data.error, // This contains Brian's question for more details
-					timestamp: new Date().toLocaleTimeString(),
-					user: "Agent",
-				};
-			} else if (response.ok && data.result?.[0]?.data) {
-				// We have transaction data
-				const { description, transaction } = data.result[0].data;
-				agentMessage = {
-					id: uuidv4(),
-					role: "agent",
-					content: description,
-					timestamp: new Date().toLocaleTimeString(),
-					user: "Agent",
-					transaction: transaction,
-				};
-			} else {
-				// This is an actual error
-				agentMessage = {
-					id: uuidv4(),
-					role: "agent",
-					content: "I'm sorry, I couldn't understand that. Could you try rephrasing your request? For example, you can say 'swap', 'transfer', 'deposit', or 'bridge'.",
-					timestamp: new Date().toLocaleTimeString(),
-					user: "Agent",
-				};
-			}
-
-			setMessages((prev) => [...prev, agentMessage]);
-		} catch (error) {
-			if (error instanceof Error && error.name === "AbortError") {
-				console.error("Frontend fetch request timed out");
-			} else {
-				console.error("Error:", error);
-			}
-			const errorMessage: Message = {
-				id: uuidv4(),
-				role: "agent",
-				content: "Sorry, something went wrong. Please try again.",
-				timestamp: new Date().toLocaleTimeString(),
-				user: "Agent",
-			};
-			setMessages((prev) => [...prev, errorMessage]);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+      if(!response.body || contentType.includes('application/json')){
+        // Handle non-streamed response
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        if (data.result?.[0]?.data) {
+          // We have transaction data
+          const { description, transaction } = data.result[0].data;
+          const agentMessage: Message = {
+            id: uuidv4(),
+            role: "agent",
+            content: description,
+            timestamp: new Date().toLocaleTimeString(),
+            user: "Agent",
+            transaction: transaction,
+          };
+          
+          setMessages((prevMessages) => [...prevMessages, agentMessage]);
+        } else {
+          // Normal response
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              id: uuidv4(),
+              role: "agent",
+              content: data.answer || data.content,
+              timestamp: new Date().toLocaleTimeString(),
+              user: "Agent",
+            },
+          ]);
+        }
+      } else {
+        // Handle streaming response
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedResponse = '';
+  
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+  
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n').filter(Boolean);
+  
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const data = JSON.parse(line.slice(5));
+                  if (data.content) {
+                    accumulatedResponse += data.content;
+                    setStreamedResponse(accumulatedResponse);
+                  } else if (data.error) {
+                    throw new Error(data.error);
+                  }
+                } catch (e) {
+                  console.error('Error parsing JSON:', e);
+                }
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock();
+        }
+  
+        // Add final message to chat
+        if (accumulatedResponse) {
+          // Check if the response contains transaction data
+          try {
+            const jsonResponse = JSON.parse(accumulatedResponse);
+            if (jsonResponse.result?.[0]?.data) {
+              const { description, transaction } = jsonResponse.result[0].data;
+              setMessages(prev => [...prev, {
+                id: uuidv4(),
+                role: "agent",
+                content: description,
+                timestamp: new Date().toLocaleTimeString(),
+                user: "Agent",
+                transaction: transaction,
+              }]);
+            } else {
+              setMessages(prev => [...prev, {
+                id: uuidv4(),
+                role: "agent",
+                content: accumulatedResponse,
+                timestamp: new Date().toLocaleTimeString(),
+                user: "Agent",
+              }]);
+            }
+          } catch {
+            // If it's not valid JSON, add it as a regular message
+            setMessages(prev => [...prev, {
+              id: uuidv4(),
+              role: "agent",
+              content: accumulatedResponse,
+              timestamp: new Date().toLocaleTimeString(),
+              user: "Agent",
+            }]);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('Transaction error:', err);
+      setError(err.message || "Unable to get response");
+      
+      // Add error message to chat
+      setMessages(prev => [...prev, {
+        id: uuidv4(),
+        role: "agent",
+        content: err.message || "Sorry, something went wrong. Please try again.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      }]);
+    } finally {
+      setIsLoading(false);
+      setStreamedResponse("");
+    }
+  };
 
 	return (
 		<div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
@@ -414,29 +532,29 @@ export default function TransactionPage() {
 				}}
 			/>
 
-			{/* Content wrapper */}
-			<div className="flex w-full h-full relative z-10">
-				{/* Sidebar */}
-				<div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
-					<h2 className="text-2xl text-white mb-4">StarkFinder</h2>
-					<Button
-						variant="ghost"
-						className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-						onClick={createNewChat} // onclick command for a new chat route
-					>
-						<span>Agent Chat</span>
-						<Plus className="h-4 w-4" />
-					</Button>
-					<Button
-						variant="ghost"
-						className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-						onClick={createNewTxn} // onclick command for a new transaction route
-					>
-						<span>Agent Txn</span>
-						<Plus className="h-4 w-4" />
-					</Button>
-					<Separator className="my-2 bg-white/20" />
-					{/* <Dialog>
+      {/* Content wrapper */}
+      <div className="flex w-full h-full relative z-10">
+        {/* Sidebar */}
+        <div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
+          <h2 className="text-2xl text-white mb-4">StarkFinder</h2>
+          <Button
+            variant="ghost"
+            className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
+            onClick={createNewChat}
+          >
+            <span>Agent Chat</span>
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
+            onClick={createNewTxn}
+          >
+            <span>Agent Txn</span>
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Separator className="my-2 bg-white/20" />
+          {/* <Dialog>
             <DialogTrigger asChild>
               <Button
                 variant="ghost"
@@ -493,20 +611,12 @@ export default function TransactionPage() {
 						</div>
 					</div>
 
-					<div className="mt-auto flex items-center gap-2">
-						{address ? (
-							<>
-								<div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-								<span className="text-sm text-green-500">Online</span>
-							</>
-						) : (
-							<>
-								<div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-								<span className="text-sm text-red-500 animate-pulse">Offline</span>
-							</>
-						)}
-					</div>
-				</div>
+          <div className="mt-auto flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-sm text-green-500">Online</span>
+          </div>
+        </div>
+
 
 				{/* Main Content */}
 				<div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
@@ -533,74 +643,112 @@ export default function TransactionPage() {
 						</div>
 					</div>
 
-					{/* Chat Area */}
-					<ScrollArea className="flex-1 p-4">
-						{messages.map((message) => (
-							<div
-								key={message.id}
-								className="flex gap-2 mb-4 animate-fadeIn">
-								<div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">{message.role === "agent" ? "A" : "U"}</div>
-								<div className="flex-1">
-									<div className="flex items-center gap-2 mb-1">
-										<span className="font-bold">{message.role === "agent" ? "Transaction Agent" : "You"}</span>
-										<span className="text-xs text-white/60">({message.timestamp})</span>
-									</div>
-									<div className="text-white/80 bg-white/5 p-2 rounded-lg">
-										<MessageContent
-											message={message}
-											onTransactionSuccess={handleTransactionSuccess}
-										/>
-									</div>
-								</div>
-							</div>
-						))}
-						<div ref={scrollRef} />
-					</ScrollArea>
+          {/* Chat Area */}
+          <ScrollArea className="flex-1 p-4">
+            {messages.map((message) => (
+              <div key={message.id} className="flex gap-2 mb-4 animate-fadeIn">
+                <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">
+                  {message.role === "agent" ? "A" : "U"}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold">
+                      {message.role === "agent" ? "Transaction Agent" : "You"}
+                    </span>
+                    <span className="text-xs text-white/60">
+                      ({message.timestamp})
+                    </span>
+                  </div>
+                  <div className="text-white/80 bg-white/5 p-2 rounded-lg">
+                    <MessageContent
+                      message={message}
+                      onTransactionSuccess={handleTransactionSuccess}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {isLoading && (
+              <div className="flex items-center justify-center space-x-2 mb-4">
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.4s" }}
+                ></div>
+              </div>
+            )}
+            
+            {streamedResponse && (
+              <div className="flex gap-2 mb-4 animate-fadeIn">
+                <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">
+                  A
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold">Transaction Agent</span>
+                    <span className="text-xs text-white/60">
+                      ({new Date().toLocaleTimeString()})
+                    </span>
+                  </div>
+                  <div className="text-white/80 bg-white/5 p-2 rounded-lg">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {streamedResponse}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={scrollRef} />
+          </ScrollArea>
 
-					{isInputClicked && (
-						<CommandList
-							setMessages={setMessages}
-							inputValue={inputValue}
-							userPreferences={userPreferences}
-							messages={messages}
-							setIsLoading={setIsLoading}
-							setInputValue={setInputValue}
-							isLoading={isLoading}
-						/>
-					)}
-					{/* Input Area */}
-					<div className="p-4 border-t border-white/20 bg-[#010101]">
-						<div className="relative">
-							<Input
-								placeholder="Type your message..."
-								className="bg-white/5 border border-white/20 text-white pl-4 pr-24 py-6 rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-								value={inputValue}
-								onChange={(e) => {
-									setInputValue(e.target.value);
-									setIsInputClicked(false);
-								}}
-								onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-								disabled={isLoading}
-								onClick={() => setIsInputClicked(!isInputClicked)}
-							/>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
-								onClick={handleSendMessage}
-								disabled={isLoading}>
-								<Send className="h-5 w-5" />
-								<span className="sr-only">Send message</span>
-							</Button>
-						</div>
-					</div>
-				</div>
-			</div>
-			<Button
-				onClick={() => setShowPreferences(true)}
-				className="absolute right-20 top-4">
-				Investment Preferences
-			</Button>
+
+          {isInputClicked && <CommandList setMessages={setMessages} inputValue={inputValue} userPreferences={userPreferences} messages={messages} setIsLoading={setIsLoading} setInputValue={setInputValue} isLoading={isLoading} />}
+          {/* Input Area */}
+          <div className="p-4 border-t border-white/20 bg-[#010101]">
+            <div className="relative">
+              <Input
+                placeholder="Type your message..."
+                className="bg-white/5 border border-white/20 text-white pl-4 pr-24 py-6 rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
+                value={inputValue}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  setIsInputClicked(false);
+                }}
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                disabled={isLoading}
+                onClick={() => setIsInputClicked(!isInputClicked)}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
+                onClick={handleSendMessage}
+                disabled={isLoading}
+              >
+                {isLoading ? <Ban className="h-5 w-5" /> : <Send className="h-5 w-5" />}
+                <span className="sr-only">Send message</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <Button
+        onClick={() => setShowPreferences(true)}
+        className="absolute right-20 top-4"
+      >
+        Investment Preferences
+      </Button>
+
 
 			<PreferencesDialog
 				open={showPreferences}

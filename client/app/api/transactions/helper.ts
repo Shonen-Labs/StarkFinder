@@ -81,8 +81,9 @@ export async function getOrCreateUser(address: string) {
 	}
 }
 
-export async function storeMessage({ content, chatId, userId }: { content: any[]; chatId: string; userId: string }) {
+export async function storeMessage({ content, chatId, userId, transactionId = null }: { content: any[]; chatId: string; userId: string; transactionId?: string | null }) {
 	try {
+		console.log(transactionId);
 		return await prisma.message.create({
 			data: {
 				content,
@@ -107,6 +108,8 @@ export async function createOrGetChat(userId: string) {
 		throw error;
 	}
 }
+
+
 
 function determineRiskLevel(apy: number, tvl: number): string {
 	if (!apy || !tvl) return "unknown";
