@@ -33,11 +33,6 @@ import { TxType } from "@prisma/client";
 import { UserPreferences, InvestmentRecommendation, Pool } from "./types";
 import { BRIAN_API_KEY, BRIAN_API_URL, BRIAN_DEFAULT_RESPONSE, createOrGetChat, fetchTokenData, fetchYieldData, getOrCreateUser, OPENAI_API_KEY, storeMessage } from "./helper";
 import axios from "axios";
-import { ChatType } from "@prisma/client";
-
-
-export const YIELD_API_URL = "https://yields.llama.fi/pools";
-export const TOKEN_API_URL = "https://starknet.api.avnu.fi/v1/starknet/tokens";
 
 // Initialize OpenAI models
 const agent = new ChatOpenAI({
