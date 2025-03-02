@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   check-contracts:
@@ -27,16 +27,15 @@ jobs:
       - name: Add Scarb to PATH
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
 
-      # Cache Rust toolchain and dependencies
       - name: Cache Rust
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target/
+            ./contracts/target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
-      
+
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -44,30 +43,37 @@ jobs:
           targets: wasm32-unknown-unknown
           profile: minimal
 
-      - name: Cache snforge
+      - name: Cache forge
         uses: actions/cache@v4
         with:
-          path: ~/.cargo/bin/snforge
-          key: ${{ runner.os }}-snforge-0.33.0
-        
-      - name: Install snforge
+          path: ~/.cargo/bin
+          key: ${{ runner.os }}-forge-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Starknet Foundry (snforge)
         run: |
-          if ! command -v snforge &> /dev/null; then
-            cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
-              --tag v0.33.0 \
-              --bin snforge \
-              --features=rust-serde
+          if ! command -v forge &> /dev/null; then
+            git clone https://github.com/foundry-rs/starknet-foundry.git
+            cd starknet-foundry
+            cargo build --release
+            sudo cp target/release/snforge /usr/local/bin/forge
+            cd ..
+            rm -rf starknet-foundry
           fi
-          echo "Installed snforge version: $(snforge --version)"
-          
+          forge --version
+
+      - name: Install Universal Sierra Compiler
+        run: curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
+
       - name: Install dependencies
-        run: scarb clean && scarb fetch
+        run: |
+          scarb clean
+          scarb fetch
 
       - name: Build Starknet contracts
         run: scarb build
 
-      - name: Run snforge tests
-        run: snforge test --workspace       
+      - name: Run forge tests
+        run: forge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
@@ -81,9 +87,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './client/package-lock.json'
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "./client/package-lock.json"
 
       - name: Install dependencies
         run: npm ci
@@ -91,9 +97,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Setup pnpm
+        run: npm install -g pnpm
+
       - name: Build
         run: npm run build
-        env:  # Proper indentation here
+        env:
           NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.BRIAN_API_KEY }}
@@ -102,8 +111,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            client/.next/cache
-            ${{ github.workspace }}/client/.next/static
+            ./client/.next/cache
+            ./client/.next/static
           key: ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-${{ hashFiles('client/**.[jt]sx?') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('client/package-lock.json') }}-
@@ -122,9 +131,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: './client/package-lock.json'
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: "./client/package-lock.json"
 
       - name: Install dependencies
         run: npm ci
@@ -135,3 +144,5 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
+
+  
