@@ -37,6 +37,8 @@ async function callBrianAI(prompt: string, address: string, chainId: string, mes
 			throw new Error(`Brian AI API error: ${errorData.error || response.statusText}`);
 		}
 
+		console.log("response from BRIAN", response);
+
 		const brianData = await response.json();
 
 		if (!brianData.result || !brianData.result.length) {

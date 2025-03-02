@@ -6,7 +6,7 @@ import { Pool } from "./types";
 export const BRIAN_API_KEY = process.env.BRIAN_API_KEY || "";
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 export const BRIAN_API_URL = "https://api.brianknows.org/api/v0/agent/knowledge";
-export const BRIAN_TRANSACTION_API_URL = "https://api.brianknows.org/api/v0/agent/knowledge";
+export const BRIAN_TRANSACTION_API_URL = "https://api.brianknows.org/api/v0/agent/transaction";
 export const BRIAN_DEFAULT_RESPONSE = "🤖 Sorry, I don't know how to answer. The AskBrian feature allows you to ask for information on a custom-built knowledge base of resources. Contact the Brian team if you want to add new resources!";
 export const YIELD_API_URL = "https://yields.llama.fi/pools";
 export const TOKEN_API_URL = "https://starknet.api.avnu.fi/v1/starknet/tokens";
