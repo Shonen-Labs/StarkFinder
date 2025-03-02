@@ -92,8 +92,9 @@ export async function storeMessage({
     chatId: string;
     userId: string;
     transactionId?: string | null;
-  }) {
+}) {
     try {
+        console.log(transactionId);
       return await prisma.message.create({
         data: {
           content,
