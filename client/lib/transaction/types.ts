@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type TransactionAction =
   | "swap"
   | "transfer"
@@ -38,99 +39,6 @@ export interface BridgeConfig {
       sourceToken: string;
       destinationToken: string;
     };
-  };
-}
-
-export interface LayerswapAction {
-  call_data: string; // JSON string of TransactionStep[]
-  chain_id: string;
-  created_date: string;
-  network: string;
-  status: string;
-  type: string;
-}
-
-export interface LayerswapResponse {
-  data: {
-    id: string;
-    status: string;
-    created_date: string;
-    deposit_actions: LayerswapAction[];
-    source_network: string;
-    destination_network: string;
-    source_token: string;
-    destination_token: string;
-    source_amount: number;
-    destination_amount: number;
-    source_address: string;
-    destination_address: string;
-  };
-}
-
-// lib/layerswap/types.ts
-export interface LayerswapRequest {
-  sourceAddress: string;
-  destinationAddress: string;
-  sourceNetwork: string;
-  destinationNetwork: string;
-  sourceToken: string;
-  destinationToken: string;
-  amount: number;
-}
-
-export interface LayerswapErrorResponse {
-  errors?: Array<{
-    code: string;
-    message: string;
-  }>;
-  error?: string;
-}
-
-export interface LayerswapCreateSwapRequest {
-  source: string;
-  destination: string;
-  amount: number;
-  source_asset: string;
-  destination_asset: string;
-  destination_address: string;
-  refuel: boolean;
-  reference_id?: string;
-  source_address?: string;
-  use_deposit_address?: boolean;
-}
-
-export interface LayerswapCreateSwapResponse {
-  data: {
-    swap_id: string;
-  };
-  error: null | {
-    message: string;
-  };
-}
-
-export interface LayerswapAction {
-  call_data: string;
-  chain_id: string;
-  created_date: string;
-  network: string;
-  status: string;
-  type: string;
-}
-
-export interface LayerswapSuccessResponse {
-  data: {
-    id: string;
-    status: string;
-    created_date: string;
-    deposit_actions: LayerswapAction[];
-    source_network: string;
-    destination_network: string;
-    source_token: string;
-    destination_token: string;
-    source_amount: number;
-    destination_amount: number;
-    source_address: string;
-    destination_address: string;
   };
 }
 
@@ -202,11 +110,54 @@ export interface NostraTokenAddresses {
   };
 }
 
-export interface LayerswapRoutes {
-  source_networks: string[];
-  destination_networks: string[];
-  tokens: {
-    [network: string]: string[];
+// lib/layerswap/types.ts
+export interface LayerswapRequest {
+  sourceAddress: string;
+  destinationAddress: string;
+  sourceNetwork: string;
+  destinationNetwork: string;
+  sourceToken: string;
+  destinationToken: string;
+  amount: number;
+}
+
+export interface LayerswapErrorResponse {
+  errors?: Array<{
+    code: string;
+    message: string;
+  }>;
+  error?: string;
+}
+
+export interface LayerswapCreateSwapRequest {
+  source: string;
+  destination: string;
+  amount: number;
+  source_asset: string;
+  destination_asset: string;
+  destination_address: string;
+  refuel: boolean;
+  reference_id?: string;
+  source_address?: string;
+  use_deposit_address?: boolean;
+}
+
+export interface LayerswapCreateSwapResponse {
+  data: {
+    swap_id: string;
+  };
+  error: null | {
+    message: string;
+  };
+}
+
+export interface LayerswapResponse {
+  data: {
+    quote: LayerswapQuote;
+    refuel: LayerswapRefuel | null;
+    reward: LayerswapReward | null;
+    deposit_actions: LayerswapAction[];
+    swap: LayerswapSwap;
   };
 }
 
@@ -214,4 +165,117 @@ export interface LayerswapError {
   code: string;
   message: string;
   metadata?: Record<string, unknown>;
+}
+
+export interface LayerswapNetwork {
+  tokens?: LayerswapToken[];
+  name: string;
+  display_name: string;
+  chain_id: string;
+  token: LayerswapToken;
+  transaction_explorer_template: string;
+  type: string;
+  metadata?: Record<string, string>;
+  deposit_methods?: Record<string, string>;
+}
+
+export interface LayerswapLimit {
+  min_amount_in_usd: number;
+  min_amount: number;
+  max_amount_in_usd: number;
+  max_amount: number;
+}
+
+export interface LayerswapQuoteResponse {
+  quote: LayerswapQuote;
+  refuel: LayerswapRefuel | null;
+  reward: LayerswapReward | null;
+}
+
+export interface LayerswapRefuel {
+  token: LayerswapToken;
+  network: LayerswapNetwork;
+  amount: number;
+  amount_in_usd: number;
+}
+
+export interface LayerswapReward {
+  token: LayerswapToken;
+  network: LayerswapNetwork;
+  amount: number;
+  amount_in_usd: number;
+}
+
+export interface LayerswapSwap {
+  id: string;
+  created_date: string;
+  source_network: LayerswapNetwork;
+  source_token: LayerswapToken;
+  source_exchange: LayerswapExchange;
+  destination_network: LayerswapNetwork;
+  destination_token: LayerswapToken;
+  destination_exchange: LayerswapExchange;
+  requested_amount: number;
+  destination_address: string;
+  status: string;
+  fail_reason: string;
+  use_deposit_address: string;
+  deposit_methods?: Record<string, string>;
+  transactions: LayerswapTransaction[];
+}
+
+export interface LayerswapTransaction {
+  from: string;
+  to: string;
+  timestamp: string;
+  transaction_hash: string;
+  confirmations: number;
+  max_confirmations: number;
+  amount: number;
+  type: string;
+  status: string;
+  token: LayerswapToken;
+  network: LayerswapNetwork;
+}
+
+export interface LayerswapExchange {
+  name: string;
+  display_name: string;
+  deposit_methods?: Record<string, any>;
+}
+
+export interface LayerswapAction {
+  call_data?: string;
+  chain_id: string;
+  created_date: string;
+  network: LayerswapNetwork;
+  status: string;
+  type: string;
+  to_address: string;
+  amount: number;
+  order: number;
+  token: LayerswapToken;
+  fee_token: LayerswapToken;
+}
+
+export interface LayerswapQuote {
+  source_network: LayerswapNetwork;
+  source_token: LayerswapToken;
+  destination_network: LayerswapNetwork;
+  destination_token: LayerswapToken;
+  receive_amount: number;
+  min_receive_amount: number;
+  blockchain_fee: number;
+  service_fee: number;
+  avg_completion_time: string;
+  slippage: number;
+  total_fee?: number;
+  total_fee_in_usd?: number;
+}
+
+export interface LayerswapToken {
+  symbol: string;
+  decimals: number;
+  contract: string;
+  price_in_usd: string;
 }
