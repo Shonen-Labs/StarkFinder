@@ -12,7 +12,7 @@ import {
 
 // Third-party libraries
 import { motion } from "framer-motion";
-import {} from "lucide-react";
+import { } from "lucide-react";
 import ReactFlow, {
   Background,
   Edge,
@@ -189,7 +189,7 @@ export default function Playground() {
   return (
     <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-8 selectable-none ">
       <motion.div
-        className="flex-1 w-full flex flex-col ml-8"
+        className=" w-full flex flex-col ml-8"
         animate={{ marginLeft: isOpen ? "1rem" : "2rem" }}
         transition={{ duration: 0.3 }}
       >
@@ -204,14 +204,14 @@ export default function Playground() {
           handleDelete={handleDeleteNode}
         />
 
-        
-      </motion.div>
-        <div className="flex ">
 
-      <div className=" max-h-[525px] w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent">
-        <FloatingSidebar addBlock={addBlock} />
-      </div>
-      <div className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] overflow-hidden bg-transparent">
+      </motion.div>
+      <div className="flex flex-row">
+
+        <div className="h-screen w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent hide-scrollbar">
+          <FloatingSidebar addBlock={addBlock} />
+        </div>
+        <div className="flex-1 rounded-lg shadow-inner p-4 min-h-[200px] h-screen overflow-hidden bg-transparent">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -236,7 +236,7 @@ export default function Playground() {
                 key={edge.id}
                 style={
                   selectedNode &&
-                  (edge.source === selectedNode || edge.target === selectedNode)
+                    (edge.source === selectedNode || edge.target === selectedNode)
                     ? edgeStyles.selected
                     : edgeStyles.default
                 }
@@ -246,7 +246,7 @@ export default function Playground() {
             ))}
           </ReactFlow>
         </div>
-        </div>
+      </div>
 
     </div>
   );
@@ -315,12 +315,12 @@ export default function Playground() {
         block.id === "stake"
           ? "stakeNode"
           : block.id === "swap"
-          ? "swapNode"
-          : block.id === "liquidity"
-          ? "liquidityNode"
-          : block.id === "event"
-          ? "eventNode"
-          : "blockNode",
+            ? "swapNode"
+            : block.id === "liquidity"
+              ? "liquidityNode"
+              : block.id === "event"
+                ? "eventNode"
+                : "blockNode",
       position: { x: 500, y: 100 + nodes.length * 100 },
       data: {
         ...block,
@@ -493,11 +493,10 @@ export default function Playground() {
               {lintErrors.map((error, index) => (
                 <div
                   key={index}
-                  className={`flex items-start space-x-2 ${
-                    error.severity === "error"
+                  className={`flex items-start space-x-2 ${error.severity === "error"
                       ? "text-red-400"
                       : "text-yellow-400"
-                  }`}
+                    }`}
                 >
                   <span className="font-mono">Line {error.line}:</span>
                   <span className="flex-1">{error.message}</span>

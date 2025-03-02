@@ -93,3 +93,17 @@ body {
     opacity: 1;
   }
 }
+
+
+.hide-scrollbar {
+  overflow: auto;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  
+  scrollbar-width: none; 
+}
