@@ -1,0 +1,74 @@
+[
+    {
+        "chain": "Taiko",
+        "project": "kiloex",
+        "symbol": "USDC",
+        "tvlUsd": 94053,
+        "apyBase": 0.71,
+        "apyReward": null,
+        "apy": 0.71,
+        "rewardTokens": null,
+        "pool": "e520a0a5-4bdd-4be1-a804-cdfd25a71711",
+        "apyPct1D": 0.01,
+        "apyPct7D": 0.13,
+        "apyPct30D": -2.09,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 76,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 7.0344,
+        "sigma": 0.31953,
+        "count": 187,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x07d83526730c7438048d55a4fc0b850e2aab6f0b"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 1.14359,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Taiko",
+        "project": "kiloex",
+        "symbol": "USDC.E",
+        "tvlUsd": 16155,
+        "apyBase": 0.53,
+        "apyReward": null,
+        "apy": 0.53,
+        "rewardTokens": null,
+        "pool": "3953f70f-fdb4-4b8d-a3cb-b72d369a691b",
+        "apyPct1D": 0,
+        "apyPct7D": 0.1,
+        "apyPct30D": -1.57,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": "Stable/Up",
+            "predictedProbability": 85,
+            "binnedConfidence": 3
+        },
+        "poolMeta": null,
+        "mu": 4.13881,
+        "sigma": 0.14642,
+        "count": 172,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x19e26b0638bf63aa9fa4d14c6baf8d52ebe86c5c"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.85695,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]

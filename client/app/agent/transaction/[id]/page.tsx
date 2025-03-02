@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Send, Home } from "lucide-react";
-import { useAccount } from "@starknet-react/core";
+import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
@@ -275,10 +275,11 @@ export default function TransactionPage() {
 		await router.push(`/agent/chat/${id}`);
 	};
 
-	const createNewTxn = async () => {
-		const id = uuidv4();
-		await router.push(`/agent/transaction/${id}`);
-	};
+// Generates a unique chat ID and navigates to the new Transaction route.
+  const createNewTxn = async () => {
+    const id = uuidv4(); // Generate a unique ID for the transaction session
+    await router.push(`/agent/transaction/${id}`); // Navigate to the new transaction route
+  };
 
 	const handleTransactionSuccess = (hash: string) => {
 		const successMessage: Message = {
@@ -314,26 +315,33 @@ export default function TransactionPage() {
 			user: "User",
 		};
 
-		setMessages((prev) => [...prev, userMessage]);
-		setInputValue("");
-		setIsLoading(true);
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
+    setIsLoading(true);
 
-		try {
-			const response = await fetch("/api/ask", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					prompt: inputValue,
-					address: address,
-					messages: messages,
-					userPreferences,
-					stream: true,
-				}),
-			});
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 135000); // 35 seconds
 
-			const data = await response.json();
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: inputValue,
+          address: address,
+          messages: messages,
+          userPreferences,
+          stream: true,
+        }),
+        signal: controller.signal,
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      clearTimeout(timeoutId); // Clear timeout if fetch succeeds
 
 			let agentMessage: Message;
 
@@ -369,54 +377,62 @@ export default function TransactionPage() {
 				};
 			}
 
-			setMessages((prev) => [...prev, agentMessage]);
-		} catch (error) {
-			console.error("Error:", error);
-			const errorMessage: Message = {
-				id: uuidv4(),
-				role: "agent",
-				content: "Sorry, something went wrong. Please try again.",
-				timestamp: new Date().toLocaleTimeString(),
-				user: "Agent",
-			};
-			setMessages((prev) => [...prev, errorMessage]);
-		} finally {
-			setIsLoading(false);
-		}
-	};
+      setMessages((prev) => [...prev, agentMessage]);
+    } catch (error) {
+      if ((error instanceof Error) && error.name === "AbortError") {
+        console.error("Frontend fetch request timed out");
+      } else {
+        console.error("Error:", error);
+      }
+      const errorMessage: Message = {
+        id: uuidv4(),
+        role: "agent",
+        content: "Sorry, something went wrong. Please try again.",
+        timestamp: new Date().toLocaleTimeString(),
+        user: "Agent",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-	return (
-		<div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
-			{/* Dotted background */}
-			<div
-				className="absolute inset-0 bg-repeat opacity-5"
-				style={{
-					backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-					backgroundSize: "20px 20px",
-				}}
-			/>
+  
 
-			{/* Content wrapper */}
-			<div className="flex w-full h-full relative z-10">
-				{/* Sidebar */}
-				<div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
-					<h2 className="text-2xl text-white mb-4">StarkFinder</h2>
-					<Button
-						variant="ghost"
-						className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-						onClick={() => router.push("/agent/chat")}>
-						<span>Agent Chat</span>
-						<Plus className="h-4 w-4" />
-					</Button>
-					<Button
-						variant="ghost"
-						className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-						onClick={() => router.push("/agent/transaction")}>
-						<span>Agent Txn</span>
-						<Plus className="h-4 w-4" />
-					</Button>
-					<Separator className="my-2 bg-white/20" />
-					{/* <Dialog>
+  return (
+    <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
+      {/* Dotted background */}
+      <div
+        className="absolute inset-0 bg-repeat opacity-5"
+        style={{
+          backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+      />
+
+      {/* Content wrapper */}
+      <div className="flex w-full h-full relative z-10">
+        {/* Sidebar */}
+        <div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
+          <h2 className="text-2xl text-white mb-4">StarkFinder</h2>
+          <Button
+            variant="ghost"
+            className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
+            onClick={createNewChat} // onclick command for a new chat route
+          >
+            <span>Agent Chat</span>
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
+            onClick={createNewTxn}  // onclick command for a new transaction route 
+          >
+            <span>Agent Txn</span>
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Separator className="my-2 bg-white/20" />
+          {/* <Dialog>
             <DialogTrigger asChild>
               <Button
                 variant="ghost"
@@ -473,36 +489,45 @@ export default function TransactionPage() {
 						</div>
 					</div>
 
-					<div className="mt-auto flex items-center gap-2">
-						<div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-						<span className="text-sm text-green-500">Online</span>
-					</div>
-				</div>
+          <div className="mt-auto flex items-center gap-2">
+            {address ? (
+              <>
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm text-green-500">Online</span>
+              </>
+            ) : (
+              <>
+                <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="text-sm text-red-500 animate-pulse">Offline</span>
+              </>
+            )}
+          </div> 
+        </div>
 
-				{/* Main Content */}
-				<div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
-					{/* Header */}
-					<div className="flex justify-between items-center p-4 border-b border-white/20 bg-[#010101]">
-						<div className="flex flex-col">
-							<Link
-								href="/"
-								className="flex items-center gap-2">
-								<Home className="h-4 w-4" />
-								Home
-							</Link>
-							<h4 className="text-xl">StarkFinder - Transactions</h4>
-						</div>
-						<div className="flex items-center gap-4">
-							{address ? (
-								<div className="flex items-center gap-4">
-									<div className="px-3 py-1 bg-muted rounded-md bg-slate-900">{address.slice(0, 5) + "..." + address.slice(-3)}</div>
-									<DisconnectButton />
-								</div>
-							) : (
-								<ConnectButton />
-							)}
-						</div>
-					</div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 border-b border-white/20 bg-[#010101]">
+            <div className="flex flex-col">
+              <Link href="/" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+              <h4 className="text-xl">StarkFinder - Transactions</h4>
+            </div>
+            <div className="flex items-center gap-4">
+              {address ? (
+                <div className="flex items-center gap-4">
+                  <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">
+                    {`${address.slice(0, 5)}...${address.slice(-3)}`}
+                  </div>
+                  <DisconnectButton />
+                </div>
+              ) : (
+                <ConnectButton />
+              )}
+            </div>
+          </div>
 
 					{/* Chat Area */}
 					<ScrollArea className="flex-1 p-4">

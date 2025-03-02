@@ -1,4 +1,4 @@
-"use client"
+"use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //  import { AgentsTable } from "../components/agents/AgentsTable";
 //  import { Header } from "../components/dashboard/Header";
@@ -10,8 +10,8 @@ export default function Home() {
   {
     return (
       <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 w-full ">
-
         <main className="flex-1 w-full">
+
           {/* <Header />
           <Stats />
 
@@ -100,7 +100,7 @@ export default function Home() {
 //         {/* Contract Generation Form */}
 //         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 mb-8">
 //           <div className="mb-6">
-//             <label 
+//             <label
 //               htmlFor="contractName"
 //               className="block text-gray-700 font-medium mb-2"
 //             >
@@ -119,7 +119,7 @@ export default function Home() {
 //           </div>
 
 //           <div className="mb-6">
-//             <label 
+//             <label
 //               htmlFor="requirements"
 //               className="block text-gray-700 font-medium mb-2"
 //             >
@@ -140,8 +140,8 @@ export default function Home() {
 //             type="submit"
 //             disabled={isLoading}
 //             className={`w-full py-3 px-4 rounded-md text-white font-medium
-//               ${isLoading 
-//                 ? 'bg-blue-400 cursor-not-allowed' 
+//               ${isLoading
+//                 ? 'bg-blue-400 cursor-not-allowed'
 //                 : 'bg-blue-600 hover:bg-blue-700'
 //               }`}
 //           >
@@ -155,7 +155,7 @@ export default function Home() {
 //             <h2 className="text-xl font-semibold mb-4">
 //               {result.success ? 'Generated Contract' : 'Error'}
 //             </h2>
-           
+
 //             {result.error ? (
 //               <div className="p-4 bg-red-50 text-red-700 rounded-md">
 //                 {result.error}

@@ -176,6 +176,6 @@ pub mod starkfinder {
 
         fn get_token_address(self: @ContractState) -> ContractAddress {
             self.token_address.read()
-        } 
+        }
     }
 }

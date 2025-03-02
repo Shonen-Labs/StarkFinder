@@ -16,17 +16,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev pkg-config
+
       - name: Install Scarb
         run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
 
       - name: Add Scarb to PATH
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
 
+      # Cache Rust toolchain and dependencies
+      - name: Cache Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/
+          key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+          profile: minimal
+
+      - name: Cache snforge
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/snforge
+          key: ${{ runner.os }}-snforge-0.33.0
+        
+      - name: Install snforge
+        run: |
+          if ! command -v snforge &> /dev/null; then
+            cargo install --locked --git https://github.com/foundry-rs/starknet-foundry \
+              --tag v0.33.0 \
+              --bin snforge \
+              --features=rust-serde
+          fi
+          echo "Installed snforge version: $(snforge --version)"
+          
+      - name: Install dependencies
+        run: scarb clean && scarb fetch
+
       - name: Build Starknet contracts
         run: scarb build
 
-      - name: Run Scarb tests (if any)
-        run: scarb test
+      - name: Run snforge tests
+        run: snforge test --workspace       
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest

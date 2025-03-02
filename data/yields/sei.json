@@ -1,0 +1,110 @@
+[
+    {
+        "chain": "Sei",
+        "project": "takara-lend",
+        "symbol": "USDC",
+        "tvlUsd": 514870,
+        "apyBase": 1.90924,
+        "apyReward": null,
+        "apy": 1.90924,
+        "rewardTokens": null,
+        "pool": "0611324f-a30c-4795-a16a-fa4c5bb758fa",
+        "apyPct1D": 0.83971,
+        "apyPct7D": null,
+        "apyPct30D": null,
+        "stablecoin": true,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": "Takara Lend USDC Market",
+        "mu": 0.722,
+        "sigma": 0.04363,
+        "count": 5,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x3894085Ef7Ff0f0aeDf52E2A2704928d1Ec074F1"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.26757,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Sei",
+        "project": "takara-lend",
+        "symbol": "WSEI",
+        "tvlUsd": 98544,
+        "apyBase": 0.17682,
+        "apyReward": null,
+        "apy": 0.17682,
+        "rewardTokens": null,
+        "pool": "450812cf-e0cb-4609-9645-2df1e9cf01a5",
+        "apyPct1D": 0.02286,
+        "apyPct7D": null,
+        "apyPct30D": null,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": "Takara Lend WSEI Market",
+        "mu": 0.14496,
+        "sigma": 0.00235,
+        "count": 2,
+        "outlier": false,
+        "underlyingTokens": [
+            "0xE30feDd158A2e3b13e9badaeABaFc5516e95e8C7"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.11874,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    },
+    {
+        "chain": "Sei",
+        "project": "takara-lend",
+        "symbol": "ISEI",
+        "tvlUsd": 52722,
+        "apyBase": 0.2803,
+        "apyReward": null,
+        "apy": 0.2803,
+        "rewardTokens": null,
+        "pool": "610f080e-bac0-4c63-86c7-dcfbdb3d0373",
+        "apyPct1D": -0.00187,
+        "apyPct7D": null,
+        "apyPct30D": null,
+        "stablecoin": false,
+        "ilRisk": "no",
+        "exposure": "single",
+        "predictions": {
+            "predictedClass": null,
+            "predictedProbability": null,
+            "binnedConfidence": null
+        },
+        "poolMeta": "Takara Lend iSEI Market",
+        "mu": 0.22908,
+        "sigma": 0.00378,
+        "count": 2,
+        "outlier": false,
+        "underlyingTokens": [
+            "0x5Cf6826140C1C56Ff49C808A1A75407Cd1DF9423"
+        ],
+        "il7d": null,
+        "apyBase7d": null,
+        "apyMean30d": 0.161,
+        "volumeUsd1d": null,
+        "volumeUsd7d": null,
+        "apyBaseInception": null
+    }
+]
