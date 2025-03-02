@@ -31,15 +31,11 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
 import { TxType } from "@prisma/client";
 import { UserPreferences, InvestmentRecommendation, Pool } from "./types";
+import { BRIAN_API_KEY, BRIAN_API_URL, BRIAN_DEFAULT_RESPONSE, createOrGetChat, fetchTokenData, fetchYieldData, getOrCreateUser, OPENAI_API_KEY, storeMessage } from "./helper";
 import axios from "axios";
 import { ChatType } from "@prisma/client";
 
-// Constants and configurations from both routes
-export const BRIAN_API_KEY = process.env.BRIAN_API_KEY || "";
-export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
-export const BRIAN_API_URL = "https://api.brianknows.org/api/v0/agent/knowledge";
-export const BRIAN_DEFAULT_RESPONSE =
-  "🤖 Sorry, I don't know how to answer. The AskBrian feature allows you to ask for information on a custom-built knowledge base of resources. Contact the Brian team if you want to add new resources!";
+
 export const YIELD_API_URL = "https://yields.llama.fi/pools";
 export const TOKEN_API_URL = "https://starknet.api.avnu.fi/v1/starknet/tokens";
 
@@ -56,7 +52,7 @@ const transactionLLM = new ChatOpenAI({
   apiKey: OPENAI_API_KEY,
 });
 
-// Setup prompt templates
+
 const systemPrompt = 
   ASK_OPENAI_AGENT_PROMPT + 
   "\nThe provided chat history includes a summary of the earlier conversation.";
@@ -67,9 +63,7 @@ const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([
   userMessage,
 ]);
 
-// Helper Functions
 
-// Get chat history function
 async function getChatHistory(
   chatId: string | { configurable?: { additional_args?: { chatId?: string } } }
 ) {
@@ -108,128 +102,6 @@ async function getChatHistory(
   }
 }
 
-// Token and yield data fetching functions
-async function fetchTokenData() {
-  try {
-    const response = await axios.get(TOKEN_API_URL, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!response.data?.content) {
-      throw new Error("Invalid token data response");
-    }
-
-    return response.data.content;
-  } catch (error) {
-    console.error("Error fetching token data:", error);
-    return [];
-  }
-}
-
-async function fetchYieldData(): Promise<Pool[]> {
-  try {
-    const response = await axios.get(YIELD_API_URL, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!response.data?.data) {
-      throw new Error("Invalid yield data response");
-    }
-
-    const allPools = response.data.data;
-    const starknetPools = allPools
-      .filter((pool: any) => pool.chain?.toLowerCase() === "starknet")
-      .map((pool: any) => ({
-        name: pool.pool,
-        apy: parseFloat(pool.apy) || 0,
-        tvl: parseFloat(pool.tvlUsd) || 0,
-        riskLevel: determineRiskLevel(pool.apy, pool.tvlUsd),
-        impermanentLoss: determineImpermanentLossRisk(pool.pool),
-        chain: "starknet",
-        protocol: pool.project,
-      }));
-
-    return starknetPools.sort((a: Pool, b: Pool) => b.tvl - a.tvl);
-  } catch (error) {
-    console.error("Error fetching yield data:", error);
-    return [];
-  }
-}
-
-function determineRiskLevel(apy: number, tvl: number): string {
-  if (!apy || !tvl) return "unknown";
-  const tvlMillions = tvl / 1000000;
-
-  if (apy > 100) {
-    return tvlMillions > 10 ? "medium-high" : "high";
-  } else if (apy > 50) {
-    return tvlMillions > 20 ? "medium" : "medium-high";
-  } else if (apy > 20) {
-    return tvlMillions > 50 ? "low-medium" : "medium";
-  } else {
-    return tvlMillions > 100 ? "low" : "low-medium";
-  }
-}
-
-function determineImpermanentLossRisk(poolName: string): string {
-  const poolNameLower = poolName.toLowerCase();
-  // Check if it's a stablecoin pool
-  if (
-    poolNameLower.includes("usdc") ||
-    poolNameLower.includes("usdt") ||
-    poolNameLower.includes("dai")
-  ) {
-    return "Very Low";
-  }
-
-  // Check if it's a volatile pair
-  if (poolNameLower.includes("eth") || poolNameLower.includes("btc")) {
-    return "Medium";
-  }
-
-  // Default for unknown compositions
-  return "Variable";
-}
-
-
-// User and chat management functions
-async function getOrCreateUser(userId: string) {
-  try {
-    let user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          email: null,
-          name: null,
-        },
-      });
-    }
-
-    return user;
-  } catch (error) {
-    console.error("Error in getOrCreateUser:", error);
-    throw error;
-  }
-}
-
-async function createOrGetChat(userId: string, type: ChatType = "GENERAL") {
-  try {
-    await getOrCreateUser(userId);
-    return await prisma.chat.create({
-      data: { 
-        userId,
-        type: type
-      },
-    });
-  } catch (error) {
-    console.error("Error creating chat:", error);
-    throw error;
-  }
-}
 
 async function storeMessage({
   content,
