@@ -1,4 +1,4 @@
-import { BrianTransactionData, TransactionStep } from '../types';
+import type { BrianTransactionData, TransactionStep } from '../types';
 import { BaseTransactionHandler } from './base';
 
 export class TransferHandler extends BaseTransactionHandler {
@@ -18,4 +18,3 @@ export class TransferHandler extends BaseTransactionHandler {
     return transactions;
   }
 }
-
