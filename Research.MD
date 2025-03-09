@@ -1,99 +1,79 @@
-# Research on the Best LLM for Cairo Programming
+# Research: Best LLM for Cairo Programming on StarkNet
 
-## Introduction
+![StarkNet](https://img.shields.io/badge/StarkNet-EC7211?style=flat&logo=starknet&logoColor=white)
+![Cairo](https://img.shields.io/badge/Cairo-1.0-2B817D?style=flat)
 
-Cairo is a specialized programming language designed for writing provable programs, primarily used in blockchain ecosystems like **StarkNet**. Due to its niche nature, mainstream **Large Language Models (LLMs)** often struggle to generate accurate Cairo code. This document explores the current state of LLMs for Cairo programming, identifies the best models, and evaluates the feasibility of fine-tuning LLMs with custom Cairo datasets.
-
----
-
-## Current Challenges with Mainstream LLMs
-
-### Claude Sonnet 3.5
-- **Performance**: Claude Sonnet 3.5 often generates incorrect or error-prone Cairo code.
-- **Reason**: Lack of sufficient Cairo-specific training data in its dataset.
-- **Example Issues**: Syntax errors, incorrect logic, and failure to adhere to Cairo's unique constraints.
-
-### Other Mainstream LLMs
-- **GPT-4, GPT-3.5**: Struggles with Cairo due to limited exposure to the language during training.
-- **Code Llama**: While better at structured code generation, it lacks Cairo-specific fine-tuning.
-- **StarCoder, WizardCoder, Mistral**: These models are general-purpose and not optimized for Cairo.
+This document evaluates LLMs for **Cairo programming** (StarkNet's language for provable smart contracts) and provides actionable recommendations for fine-tuning.
 
 ---
 
-## Specialized LLMs for Cairo Programming
+## Key Challenges with Mainstream LLMs
 
-### 1. **StarkNet Agent**
-   - **Description**: A specialized LLM designed for Cairo programming, tailored to StarkNet's ecosystem.
-   - **Performance**: Generates more accurate Cairo code compared to mainstream models.
-   - **Availability**: Limited access; primarily used within the StarkNet community.
-   - **Reference**: [StarkNet Agent Documentation](https://starknet.io)
-
-### 2. **DevDock - Web3 Developer Copilot**
-   - **Description**: A developer tool that supports Cairo programming and provides code suggestions.
-   - **Performance**: Better than general-purpose LLMs but still has room for improvement.
-   - **Reference**: [DevDock Website](https://devdock.ai)
-
-### 3. **StarkWizard**
-   - **Description**: A community-driven LLM fine-tuned for Cairo programming.
-   - **Performance**: Promising results but not widely tested.
-   - **Reference**: [StarkWizard GitHub](https://github.com/starkwizard)
+| Model              | Strengths                          | Weaknesses (Cairo-Specific)          |
+|--------------------|------------------------------------|---------------------------------------|
+| **Claude Sonnet 3.5** | General code logic                | Syntax errors, ignores Cairo constraints |
+| **GPT-4**            | Strong problem decomposition      | Outdated Cairo 1.0 patterns           |
+| **Code Llama**       | Structured code generation        | No Cairo-specific tuning              |
+| **Mistral/StarCoder**| General-purpose                  | Fails on low-level memory management  |
 
 ---
 
-## Feasibility of Fine-Tuning LLMs with Custom Cairo Code
+## Specialized LLMs for Cairo
 
-### Why Fine-Tuning?
-Fine-tuning allows LLMs to specialize in niche domains like Cairo programming. By training on Cairo-specific datasets, models can learn the language's syntax, constraints, and best practices.
+### 1. StarkNet Agent
+- **Pros**: Generates syntactically correct Cairo code.
+- **Cons**: 90% failure rate on non-keyword queries.
+- **Use Case**: Scaffolding only.  
+- **Reference**: [StarkNet Docs](https://starknet.io)
 
-### Steps for Fine-Tuning
-1. **Dataset Collection**:
-   - Gather Cairo code from open-source repositories (e.g., GitHub, StarkNet repos).
-   - Include examples of smart contracts, libraries, and common patterns.
-2. **Model Selection**:
-   - **Code Llama**: Best base model due to its proficiency in code generation and structured languages.
-   - **GPT-4**: Alternatively, GPT-4 can be fine-tuned if computational resources are available.
-3. **Training**:
-   - Use frameworks like Hugging Face's `transformers` or OpenAI's fine-tuning API.
-   - Train on Cairo-specific datasets with a focus on accuracy and error reduction.
-4. **Evaluation**:
-   - Test the fine-tuned model on Cairo programming tasks.
-   - Use benchmarks like **HumanEval** adapted for Cairo.
+### 2. Deepseek R1
+- **Pros**:  
+  - Native Cairo 1.0 support (e.g., `#[starknet::contract]`).  
+  - Open-source, hostable via Hugging Face.  
+  - Outperforms GPT-4 in logic/correctness.  
+- **Cons**: Minor syntax errors (fixable via fine-tuning).  
+- **GitHub**: [Deepseek R1](https://github.com/deepseek-ai)
 
-### Computational Cost
-- Fine-tuning **Code Llama** is computationally efficient compared to larger models like GPT-4.
-- Requires access to GPUs (e.g., NVIDIA A100) or cloud services like AWS, GCP, or Azure.
+### 3. Grok 3 (Unreleased)
+- **Potential**: Real-time StarkNet data integration.  
+- **Risks**: Closed-source; unproven for Cairo.  
 
 ---
 
-## Best Model for Fine-Tuning
+## Data Collection for Fine-Tuning
 
-### **Code Llama**
-- **Why?**
-  - Specializes in code generation.
-  - Supports structured languages, making it ideal for Cairo.
-  - Lower computational cost compared to GPT-4.
-- **Fine-Tuning Process**:
-  - Use Cairo datasets from GitHub and StarkNet repositories.
-  - Train using Hugging Face's `transformers` library.
-- **Expected Outcome**:
-  - Improved accuracy in Cairo code generation.
-  - Reduced errors and better adherence to Cairo's constraints.
+### Critical Data Sources
+1. **Code Repositories**  
+   - Scrape GitHub for Cairo 1.0 contracts, tests, and StarkNet integrations (e.g., account abstraction).  
+   - Include error logs (compiler outputs, debugging workflows).  
 
----
+2. **User Interaction Logs**  
+   - Annotate real developer queries (e.g., "Fix `Array<felt252>` error") with intent labels.  
 
-## Recommendations
+3. **Synthetic Data**  
+   - Generate error-correction pairs using GPT-4/Deepseek R1.  
 
-1. **Use Specialized Models**: For immediate needs, leverage **StarkNet Agent** or **DevDock** for Cairo code generation.
-2. **Fine-Tune Code Llama**: For long-term solutions, fine-tune **Code Llama** with Cairo-specific datasets.
-3. **Community Collaboration**: Engage with the StarkNet community to share datasets and fine-tuned models.
+### Preprocessing Steps
+- Remove outdated Cairo 0.x examples.  
+- Balance dataset: 30% debugging, 40% codegen, 30% architecture.  
 
 ---
 
-## References
+## Fine-Tuning Strategy
 
-1. [StarkNet Official Documentation](https://starknet.io)
-2. [DevDock - Web3 Developer Copilot](https://devdock.ai)
-3. [StarkWizard GitHub Repository](https://github.com/starkwizard)
-4. [Code Llama by Meta AI](https://ai.meta.com/blog/code-llama-large-language-model-coding/)
-5. [Hugging Face Transformers Library](https://huggingface.co/transformers/)
-6. [HumanEval Benchmark by OpenAI](https://github.com/openai/human-eval)
+### Base Model Selection
+| Model          | Recommendation Reason          | Hosting Options        |
+|----------------|---------------------------------|------------------------|
+| **Deepseek R1**| Native Cairo syntax proficiency | Hugging Face, Local GPU|
+| **Code Llama** | Fallback for structured code    | AWS/GCP/Azure          |
+
+### Steps
+1. **Technique**: Use **LoRA** (Low-Rank Adaptation) for cost-efficient tuning.  
+2. **Focus Areas**:  
+   - Error recovery (e.g., `Panic` error fixes).  
+   - StarkNet ecosystem patterns (sequencer interactions).  
+3. **Tools**:  
+   ```bash
+   # Hugging Face Transformers Example
+   from transformers import AutoModelForCausalLM
+   model = AutoModelForCausalLM.from_pretrained("deepseek/r1-base")
