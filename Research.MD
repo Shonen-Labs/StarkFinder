@@ -77,3 +77,26 @@ This document evaluates LLMs for **Cairo programming** (StarkNet's language for 
    # Hugging Face Transformers Example
    from transformers import AutoModelForCausalLM
    model = AutoModelForCausalLM.from_pretrained("deepseek/r1-base")
+### Immediate Use
+1. ✅ Use Deepseek R1 for code scaffolding (best syntax/logic balance).
+
+2. ✅ Pair GPT-4 (problem breakdown) + StarkNet Agent (snippets).
+
+### Long-Term
+🛠️ Fine-Tune Deepseek R1 with curated Cairo datasets.
+
+🤝 Collaborate with StarkNet Community to crowdsource edge cases.
+
+Avoid
+❌ Relying solely on StarkNet Agent (poor usability).
+
+❌ Closed models like Grok 3 (unproven, vendor lock-in).
+
+References
+StarkNet Documentation
+
+Deepseek R1 GitHub
+
+Code Llama by Meta
+
+Hugging Face Transformers
