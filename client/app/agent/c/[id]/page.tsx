@@ -537,7 +537,7 @@ export default function TransactionPage() {
         {/* Sidebar */}
         <div className="w-64 border-r border-white/20 p-4 flex flex-col gap-2 bg-[#010101] backdrop-blur-sm">
           <h2 className="text-2xl text-white mb-4">StarkFinder</h2>
-          <Button
+          {/* <Button
             variant="ghost"
             className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
             onClick={createNewChat}
@@ -552,7 +552,7 @@ export default function TransactionPage() {
           >
             <span>Agent Txn</span>
             <Plus className="h-4 w-4" />
-          </Button>
+          </Button> */}
           <Separator className="my-2 bg-white/20" />
           {/* <Dialog>
             <DialogTrigger asChild>

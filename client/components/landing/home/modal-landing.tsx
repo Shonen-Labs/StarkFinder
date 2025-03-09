@@ -54,15 +54,15 @@ export function ModalLanding() {
 }
 
 const itemsButton = [
-  {
-    icon: <ChatIcon />,
-    text: 'New Chat',
-    link: '/agent/transaction/2fc5da97-6f45-4bf2-84f0-bbc1cbb57cdd',
-  },
+  // {
+  //   icon: <ChatIcon />,
+  //   text: 'New Chat',
+  //   link: '/agent/transaction/2fc5da97-6f45-4bf2-84f0-bbc1cbb57cdd',
+  // },
   {
     icon: <ContractIcon />,
     text: 'New Transaction',
-    link: '/agent/transaction/d1555821-60f5-4431-a765-6ac9f62c1792',
+    link: '/agent/c/d1555821-60f5-4431-a765-6ac9f62c1792',
   },
   { icon: <FilePenLine />, text: 'DevXStark', link: '/devx' },
 ]
