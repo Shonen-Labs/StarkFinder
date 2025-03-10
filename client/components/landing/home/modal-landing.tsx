@@ -9,7 +9,7 @@ import {
 
 import Link from 'next/link'
 import { Button, buttonVariants } from '@/components/ui/button'
-import { ChatIcon, ContractIcon, RocketLaunchIcon } from '@/components/icons'
+import { ContractIcon, RocketLaunchIcon } from '@/components/icons'
 import { cn } from '@/lib/utils'
 import { FilePenLine } from 'lucide-react'
 
