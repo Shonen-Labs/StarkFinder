@@ -67,9 +67,29 @@ const CommandList: React.FC<CommandListProps> = ({
               setShowTransferModal={setShowModal} 
             />
           ) : selectedCommand === "Deposit" ? (
-            <Deposit setSelectedCommand={setSelectedCommand} />
+            <Deposit 
+              setSelectedCommand={setSelectedCommand}
+              setMessages={setMessages}
+              inputValue={inputValue}
+              setIsLoading={setIsLoading}
+              messages={messages}
+              userPreferences={userPreferences}
+              setInputValue={setInputValue}
+              isLoading={isLoading}
+              setShowDepositModal={setShowModal}
+            />
           ) : selectedCommand === "Withdraw" ? (
-            <Withdraw setSelectedCommand={setSelectedCommand} />
+            <Withdraw 
+              setSelectedCommand={setSelectedCommand}
+              setMessages={setMessages}
+              inputValue={inputValue}
+              setIsLoading={setIsLoading}
+              messages={messages}
+              userPreferences={userPreferences}
+              setInputValue={setInputValue}
+              isLoading={isLoading}
+              setShowWithdrawModal={setShowModal}
+            />
           ) : selectedCommand === "Bridge" ? (
             <Bridge setSelectedCommand={setSelectedCommand} />
           ) : null}
