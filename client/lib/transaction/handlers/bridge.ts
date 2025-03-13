@@ -29,6 +29,7 @@ export class BridgeHandler extends BaseTransactionHandler {
   }> {
     try {
       const networks = await this.layerswapClient.getNetworks();
+      console.log("Available Networks:", JSON.stringify(networks, null, 2));
 
       const sourceNetworkFormatted = await this.checkNetwork(
         sourceNetwork,
@@ -38,6 +39,8 @@ export class BridgeHandler extends BaseTransactionHandler {
         destinationNetwork,
         networks
       );
+      console.log("Source Network:", sourceNetworkFormatted.name, "Tokens:", sourceNetworkFormatted.tokens);
+      console.log("Destination Network:", destinationNetworkFormatted.name, "Tokens:", destinationNetworkFormatted.tokens);
 
       const sourceTokenFormatted = this.checkToken(
         sourceToken,
@@ -181,11 +184,13 @@ export class BridgeHandler extends BaseTransactionHandler {
       const sourceAddress = data.bridge?.sourceAddress || params.address;
       const destinationAddress =
         data.bridge?.destinationAddress || params.address;
+      
+        const destChain = params.dest_chain === "base" ? "ethereum" : params.dest_chain;
 
       // Validate route before proceeding
       const formattedData = await this.validateRoute(
         params.chain || "starknet",
-        params.dest_chain || "base",
+        destChain || "ethereum",
         params.token1.toUpperCase(),
         params.token2.toUpperCase(),
         Number.parseFloat(params.amount)

@@ -9,12 +9,14 @@ export type CryptoCoin = {
   id: string;
   name: string;
   logo: string;
+  chain: string; // Add chain property
 };
+
 export const CoinsLogo: CryptoCoin[] = [
-  { id: "1", name: "STRK", logo: strk },
-  { id: "2", name: "ETH", logo: eth },
-  { id: "3", name: "USDC", logo: usdc },
-  { id: "4", name: "USDT", logo: usdt },
-  { id: "5", name: "WBTC", logo: btc },
-  { id: "6", name: "BROTHER", logo: brother },
+  { id: "1", name: "STRK", logo: strk, chain: "Starknet" },
+  { id: "2", name: "ETH", logo: eth, chain: "Ethereum" },
+  { id: "3", name: "USDC", logo: usdc, chain: "Ethereum" },
+  { id: "4", name: "USDT", logo: usdt, chain: "Ethereum" },
+  { id: "5", name: "BTC", logo: btc, chain: "Bitcoin" },
+  { id: "6", name: "BROTHER", logo: brother, chain: "Starknet" }, // Example chain, adjust as needed
 ];
