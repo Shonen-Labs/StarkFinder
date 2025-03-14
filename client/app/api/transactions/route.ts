@@ -427,7 +427,7 @@ async function callBrianAI(prompt: string, address: string, chainId: string, mes
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				"x-brian-api-key": process.env.BRIAN_API_KEY || "",
+				"x-brian-api-key": process.env.NEXT_PUBLIC_BRIAN_API_KEY || "",
 			},
 			body: JSON.stringify(payload),
 		});
