@@ -76,6 +76,7 @@ const Withdraw: React.FC<WithdrawProps> = ({ setSelectedCommand }) => {
     setShowModal(false);
   };
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const prepareWithdrawTransaction = async () => {
     if (!fromAmount || parseFloat(fromAmount) <= 0) {
       setError("Please enter a valid amount.");

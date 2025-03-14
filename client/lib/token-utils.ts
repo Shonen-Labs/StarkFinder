@@ -51,6 +51,7 @@ export const parseUint256ToDecimal = (result: string[]): string => {
   }
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Fetch token balance
 export const fetchTokenBalance = async (
   account: any, 
