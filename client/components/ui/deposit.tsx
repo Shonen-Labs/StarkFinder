@@ -75,6 +75,7 @@ const Deposit: React.FC<DepositProps> = ({ setSelectedCommand }) => {
     setShowModal(false);
   };
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const prepareDepositTransaction = async () => {
     if (!fromAmount || parseFloat(fromAmount) <= 0) {
       setError("Please enter a valid amount.");
