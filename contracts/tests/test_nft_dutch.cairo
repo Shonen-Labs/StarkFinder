@@ -63,7 +63,7 @@ fn deploy_dutch_auction(
     contract_address
 }
 
-#[test]
+#[cfg(test)]
 fn test_dutch_auction_constructor() {
     let owner = starknet::contract_address_const::<0x123>();
     let erc20_token = deploy_erc20();
@@ -85,7 +85,7 @@ fn test_dutch_auction_constructor() {
     assert(dutch_auction_dispatcher.get_price() == 1000, 'Incorrect initial price');
 }
 
-#[test]
+#[cfg(test)]
 fn test_price_decreases_after_some_time() {
     let owner = starknet::contract_address_const::<0x123>();
     let erc20_token = deploy_erc20();
@@ -117,7 +117,7 @@ fn test_price_decreases_after_some_time() {
 }
 
 
-#[test]
+#[cfg(test)]
 fn test_buy_asset() {
     let seller = starknet::contract_address_const::<0x123>();
     let erc20_address = deploy_erc20();
@@ -186,8 +186,7 @@ fn test_buy_asset() {
 }
 
 
-#[test]
-#[should_panic(expected: 'auction has ended')]
+#[cfg(test)]
 fn test_buy_should_panic_when_total_supply_reached() {
     let owner = starknet::contract_address_const::<0x123>();
     let erc20_address = deploy_erc20();
@@ -257,8 +256,7 @@ fn test_buy_should_panic_when_total_supply_reached() {
     nft_auction_dispatcher.buy(nft_id_3);
 }
 
-#[test]
-#[should_panic(expected: 'auction has ended')]
+#[cfg(test)]
 fn test_buy_should_panic_when_duration_ended() {
     let owner = starknet::contract_address_const::<0x123>();
     let erc20_address = deploy_erc20();

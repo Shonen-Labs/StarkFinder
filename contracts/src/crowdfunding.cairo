@@ -67,7 +67,7 @@ pub struct CampaignFunded {
 #[starknet::contract]
 pub mod Crowdfunding {
     use core::num::traits::Zero;
-    use core::starknet::{
+    use starknet::{
         ContractAddress, get_block_timestamp, get_caller_address, get_contract_address,
     };
     use alexandria_storage::{ListTrait, List};
