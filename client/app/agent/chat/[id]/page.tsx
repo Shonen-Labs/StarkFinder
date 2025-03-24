@@ -70,12 +70,12 @@ export default function ChatPage() {
 
   const createNewChat = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    router.push(`/agent/c/${id}`);
   };
 
   const createNewTxn = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    router.push(`/agent/c/${id}`);
   };
 
   const fetchChatHistory = async (id: string) => {

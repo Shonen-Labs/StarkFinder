@@ -22,6 +22,7 @@
     "@langchain/core": "^0.3.31",
     "@langchain/langgraph": "^0.2.41",
     "@langchain/openai": "^0.3.17",
+    "@next/swc-win32-x64-msvc": "^15.2.3",
     "@prisma/client": "^6.3.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.1",
