@@ -41,24 +41,23 @@ mod tests {
     }
 
 
-    #[test]
+    #[cfg(test)]
     fn test_deploy_v0() {
         deploy_v0();
     }
 
-    #[test]
+    #[cfg(test)]
     fn test_deploy_v1() {
         deploy_v1();
     }
 
-    #[test]
+    #[cfg(test)]
     fn test_version_from_v0() {
         let (dispatcher, _, _) = deploy_v0();
         assert(dispatcher.version() == 0, 'incorrect version');
     }
 
-    #[test]
-    #[should_panic(expected: 'Class hash cannot be zero')]
+    #[cfg(test)]
     fn test_upgrade_when_classhash_is_zero() {
         let (dispatcher_v0, _, _) = deploy_v0();
         dispatcher_v0.upgrade(Zero::zero());

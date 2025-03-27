@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Fan  } from 'lucide-react'
+import { Fan } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 
 const currencies = ['ETH', 'USDT', 'BTC', 'DAI', 'LINK']
 
-const EventNode: React.FC<NodeProps> = ({isConnectable }) => {
+const EventNode: React.FC<NodeProps> = ({ isConnectable, selected, data }) => {
     const [fromCurrency, setFromCurrency] = useState(currencies[0])
     const [toCurrency, setToCurrency] = useState(currencies[1])
     const [comparisonType, setComparisonType] = useState('')
@@ -23,8 +23,20 @@ const EventNode: React.FC<NodeProps> = ({isConnectable }) => {
         setComparisonType(value)
     }, [])
 
+    const isSelected = selected || data?.selected;
+    
+    const borderColor = isSelected 
+        ? "border-[3px] border-white ring-4 ring-white" 
+        : "border-[1px] border-[#791919] hover:border-[#BC2F2F]";
+
     return (
-        <div className="bg-[#4A0505] text-white p-4 rounded-lg shadow-md border-[1px] border-[#791919] hover:border-[#BC2F2F] transition-colors w-[250px]">
+        <div 
+            className={`bg-[#4A0505] text-white p-4 rounded-lg shadow-md ${borderColor} 
+                      transition-all duration-300 w-[250px] ${isSelected ? 'shadow-glow node-selected' : ''}`}
+            style={{
+                zIndex: isSelected ? 50 : 'auto',
+            }}
+        >
             <div className="flex items-center justify-between mb-4">
                 <span>On Event</span>
                 <Fan className="w-4 h-4" />

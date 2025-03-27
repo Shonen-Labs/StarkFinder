@@ -54,14 +54,14 @@ export const TransactionHandler = ({
 
   return (
     <div className="mt-4">
-      <p className="text-sm text-white/80 mb-4">{description}</p>
+      <p className="text-sm text-black mb-4">{description}</p>
       <button
         onClick={executeTransaction}
         disabled={isProcessing}
-        className={`w-full py-2 px-4 rounded-lg ${
+        className={`bg-[#060606] text-white w-full py-3 rounded-2xl text-lg flex items-center justify-center ${
           isProcessing
-            ? 'bg-white/20 cursor-not-allowed'
-            : 'bg-white/10 hover:bg-white/20'
+            ? 'opacity-50 cursor-not-allowed'
+            : 'hover:bg-[#2a2a2a] transition-colors duration-200'
         }`}
       >
         {isProcessing ? 'Processing...' : 'Execute Transaction'}

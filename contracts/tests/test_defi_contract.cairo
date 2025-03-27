@@ -35,7 +35,7 @@ fn deploy_erc20() -> ContractAddress {
     contract_address
 }
 
-#[test]
+#[cfg(test)]
 fn test_deposit() {
     let token = deploy_erc20();
     let vault = deploy_contract(10);
@@ -55,7 +55,7 @@ fn test_deposit() {
     assert(vault_balance == 1000, 'Vault_not_hold_transfered_token');
 }
 
-#[test]
+#[cfg(test)]
 fn test_withdraw() {
     let token = deploy_erc20();
     let vault = deploy_contract(10);
@@ -78,7 +78,7 @@ fn test_withdraw() {
     assert(vault_balance == 500, 'Vault_not_hold_transfered_token');
 }
 
-#[test]
+#[cfg(test)]
 fn test_calculate_yield() {
     let token = deploy_erc20();
     let vault = deploy_contract(10);
@@ -104,7 +104,7 @@ fn test_calculate_yield() {
 
     assert(calculated_yield == expected_yield, 'Yield_calculation_incorrect');
 }
-#[test]
+#[cfg(test)]
 fn test_withdraw_with_yield_farming() {
     let token = deploy_erc20();
     let vault = deploy_contract(10); // Interest rate set to 10

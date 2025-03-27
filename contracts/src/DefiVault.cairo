@@ -7,7 +7,7 @@ mod DefiVault {
     use core::num::traits::Zero;
     use contracts::interfaces::IDefiVault::IDefiVault;
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
-    use core::starknet::storage::Map;
+    use starknet::storage::Map;
     use starknet::storage::StorageMapReadAccess;
     use starknet::storage::StorageMapWriteAccess;
 

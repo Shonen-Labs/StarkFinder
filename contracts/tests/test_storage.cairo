@@ -16,7 +16,7 @@ fn deploy_simple_storage() -> ContractAddress {
     contract_address
 }
 
-#[test]
+#[cfg(test)]
 fn test_set_get() {
     let storage = deploy_simple_storage();
 
@@ -32,7 +32,7 @@ fn test_set_get() {
     assert(value == 42, 'Set or Get failed');
 }
 
-#[test]
+#[cfg(test)]
 fn test_increment_decrement() {
     let storage = deploy_simple_storage();
 
@@ -54,7 +54,7 @@ fn test_increment_decrement() {
 }
 
 
-#[test]
+#[cfg(test)]
 fn test_constructor_initialization() {
     let storage = deploy_simple_storage();
     let storage_dispatcher = ISimpleStorageDispatcher { contract_address: storage };

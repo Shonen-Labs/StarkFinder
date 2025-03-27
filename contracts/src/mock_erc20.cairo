@@ -22,7 +22,7 @@ pub trait IERC20<TContractState> {
 pub mod MockToken {
     use starknet::event::EventEmitter;
     use starknet::{ContractAddress, get_caller_address};
-    use core::starknet::storage::{
+    use starknet::storage::{
         StoragePointerReadAccess, StoragePointerWriteAccess, Map, StoragePathEntry,
     };
     use super::IERC20;

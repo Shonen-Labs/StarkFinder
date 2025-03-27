@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { SessionAccountInterface } from '@argent/tma-wallet';
+import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { initWebApp } from './WebApp';
-import { getArgentTMA } from '@/lib/wallet/argentwallet';
-import { Message, MessageContentProps } from './types';
+import { initWebApp } from "./WebApp";
+import { getArgentTMA } from "@/lib/wallet/argentwallet";
+import { Message, MessageContentProps } from "./types";
+import { SessionAccountInterface } from "@argent/invisible-sdk";
 
 const MessageContent: React.FC<MessageContentProps> = ({
   message,
@@ -80,12 +81,9 @@ const MessageContent: React.FC<MessageContentProps> = ({
   return <p className="text-[var(--tg-theme-text-color)]">{message.content}</p>;
 };
 
-
-
-
 interface ButtonAction {
   label: string;
-  type: 'wallet' | 'transaction' | 'balance' | 'general';
+  type: "wallet" | "transaction" | "balance" | "general";
   action: () => void;
 }
 
@@ -109,28 +107,32 @@ function TelegramMiniApp(): JSX.Element {
           timestamp: new Date().toLocaleTimeString(),
           user: "Agent",
         };
-        setMessages(prev => [...prev, errorMessage]);
+        setMessages((prev) => [...prev, errorMessage]);
         return;
       }
 
-      await argentTMA.requestConnection({ callbackData: 'test' });
-      const connection = await argentTMA.connect();
+      const connection = await argentTMA.requestConnection({
+        callbackData: "test",
+      });
+
+      // const connection = await argentTMA.connect();
 
       if (connection && connection.account.getSessionStatus() === "VALID") {
         setAccount(connection.account);
         const successMessage: Message = {
           id: uuidv4(),
           role: "agent",
-          content: "Wallet connected successfully! You can now proceed with transactions.",
+          content:
+            "Wallet connected successfully! You can now proceed with transactions.",
           timestamp: new Date().toLocaleTimeString(),
           user: "Agent",
         };
-        setMessages(prev => [...prev, successMessage]);
+        setMessages((prev) => [...prev, successMessage]);
       } else {
         throw new Error("Invalid session after connection");
       }
     } catch (error) {
-      console.error('Connection failed:', error);
+      console.error("Connection failed:", error);
       const errorMessage: Message = {
         id: uuidv4(),
         role: "agent",
@@ -138,7 +140,7 @@ function TelegramMiniApp(): JSX.Element {
         timestamp: new Date().toLocaleTimeString(),
         user: "Agent",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     }
   };
 
@@ -147,21 +149,21 @@ function TelegramMiniApp(): JSX.Element {
     const buttons: ButtonAction[] = [
       {
         label: account ? "Connected Wallet" : "Connect Wallet",
-        type: 'wallet',
-        action: handleConnect
+        type: "wallet",
+        action: handleConnect,
       },
       {
         label: "Check Balance",
-        type: 'balance',
-        action: handleCheckBalance
-      }
+        type: "balance",
+        action: handleCheckBalance,
+      },
     ];
 
     if (account) {
       buttons.push({
         label: "New Transaction",
-        type: 'transaction',
-        action: () => setInputValue("/txn")
+        type: "transaction",
+        action: () => setInputValue("/txn"),
       });
     }
 
@@ -178,7 +180,7 @@ function TelegramMiniApp(): JSX.Element {
         timestamp: new Date().toLocaleTimeString(),
         user: "Agent",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
       return;
     }
 
@@ -190,7 +192,7 @@ function TelegramMiniApp(): JSX.Element {
         },
         body: JSON.stringify({
           address: account.address,
-          chainId: "4012"
+          chainId: "4012",
         }),
       });
 
@@ -198,11 +200,15 @@ function TelegramMiniApp(): JSX.Element {
       const balanceMessage: Message = {
         id: uuidv4(),
         role: "agent",
-        content: `Your wallet balance:\n${JSON.stringify(data.balances, null, 2)}`,
+        content: `Your wallet balance:\n${JSON.stringify(
+          data.balances,
+          null,
+          2
+        )}`,
         timestamp: new Date().toLocaleTimeString(),
         user: "Agent",
       };
-      setMessages(prev => [...prev, balanceMessage]);
+      setMessages((prev) => [...prev, balanceMessage]);
     } catch (error) {
       const errorMessage: Message = {
         id: uuidv4(),
@@ -211,7 +217,7 @@ function TelegramMiniApp(): JSX.Element {
         timestamp: new Date().toLocaleTimeString(),
         user: "Agent",
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     }
   };
 
@@ -237,7 +243,8 @@ function TelegramMiniApp(): JSX.Element {
       const argentTMA = getArgentTMA();
 
       if (argentTMA) {
-        argentTMA.connect()
+        argentTMA
+          .connect()
           .then((res) => {
             if (res && res.account.getSessionStatus() === "VALID") {
               setAccount(res.account);
@@ -375,8 +382,6 @@ function TelegramMiniApp(): JSX.Element {
     }
   };
 
-
-
   // Rest of the existing component methods remain the same
   // (handleConnect, handleSendMessage, etc.)
 
@@ -409,7 +414,9 @@ function TelegramMiniApp(): JSX.Element {
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSendMessage()}
+            onKeyPress={(e) =>
+              e.key === "Enter" && !isLoading && handleSendMessage()
+            }
             placeholder="Type your message..."
             className="flex-1 bg-white/5"
             disabled={isLoading}

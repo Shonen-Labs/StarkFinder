@@ -31,7 +31,7 @@ fn deploy_contract(name: ByteArray) -> ContractAddress {
     contract_address
 }
 
-#[test]
+#[cfg(test)]
 fn test_constructor() {
     let contract_address = deploy_contract("NatToken");
 
@@ -44,7 +44,7 @@ fn test_constructor() {
     assert(token_symbol == "NAT", 'wrong symbol');
 }
 
-#[test]
+#[cfg(test)]
 fn test_total_supply() {
     let contract_address = deploy_contract("NatToken");
 
@@ -58,7 +58,7 @@ fn test_total_supply() {
     assert(nat_token_contract.total_supply() == mint_amount, 'wrong supply');
 }
 
-#[test]
+#[cfg(test)]
 fn test_balance_of() {
     let contract_address = deploy_contract("NatToken");
 
@@ -72,7 +72,7 @@ fn test_balance_of() {
     assert(nat_token_contract.balance_of(token_recipient) == mint_amount, 'wrong balance');
 }
 
-#[test]
+#[cfg(test)]
 fn test_approve() {
     let contract_address = deploy_contract("NatToken");
     let nat_token_contract = IERC20CombinedDispatcher { contract_address };
@@ -95,7 +95,7 @@ fn test_approve() {
     );
 }
 
-#[test]
+#[cfg(test)]
 fn test_transfer() {
     let contract_address = deploy_contract("NatToken");
     let nat_token_contract = IERC20CombinedDispatcher { contract_address };

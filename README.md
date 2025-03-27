@@ -72,12 +72,37 @@ The application's architecture follows a multi-agent design, where each agent sp
    cd tg_bot
    npm install
    ```
-4. Set up the database (both into `client` and `tg_bot` directories):
+4. Setup the Environment variables
+   ```sh
+   cp .env.example .env
+   ```    
+   - Copy the following environment variables
+   ```sh
+   BOT_USERNAME=""
+   BRIAN_API_KEY=""
+   DATABASE_URL=""
+   MY_TOKEN=""
+   WEBHOOK_URL=""
+   LAYERSWAP_API_KEY=""
+   TELEGRAM_APP_URL=""
+   OPENAI_API_KEY=""
+   ANTHROPIC_API_KEY=""
+   ```
+   - For `BOT_USERNAME`, go to [Bot Father](https://t.me/BotFather) and create a Bot || *`NOT REQUIRED`*
+   - For `BRIAN_API_KEY`, visit [Brian AI](http://docs.brianknows.org/brian-api/api-key) website and create your API key || *`REQUIRED`*
+   - For `DATABASE_URL`, create or use a provider for PostgreSQL db url || *`REQUIRED`*
+   - `MY_TOKEN` is your Telegram Bot Token, created from [Bot Father](https://t.me/BotFather) || *`NOT REQUIRED`*
+   - `WEBHOOK_URL` is not required || *`NOT REQUIRED`*
+   - For `LAYERSWAP_API_KEY`, Go to [Layerswap Dashboard](https://v0-docs.layerswap.io/api-reference/api-keys) and create one || *`REQUIRED`*
+   - For `TELEGRAM_APP_URL`, go to [Bot Father](https://t.me/BotFather) and create a miniapp || *`NOT REQUIRED`*
+   - For `OPENAI_API_KEY`, go to [OpenAI API website](https://openai.com/index/openai-api/) and create one || *`REQUIRED`*
+   - For `ANTHROPIC_API_KEY`, go to [Dashboard](https://console.anthropic.com/settings/keys) || *`REQUIRED`*
+5. Set up the database (both into `client` and `tg_bot` directories):
    ```
    npx prisma generate
    npx prisma migrate dev
    ```
-5. Start the development server:
+6. Start the development server:
    ```
    npm run dev
    ```
