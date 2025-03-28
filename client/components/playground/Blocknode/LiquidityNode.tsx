@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 
 const currencies = ["ETH", "USDT", "BTC", "DAI", "LINK"];
 
-const LiquidityNode: React.FC<NodeProps> = ({ isConnectable }) => {
+const LiquidityNode: React.FC<NodeProps> = ({ isConnectable, selected, data }) => {
   const [fromCurrency, setFromCurrency] = useState(currencies[0]);
   const [toCurrency, setToCurrency] = useState("");
   const [error, setError] = useState("");
@@ -39,8 +39,16 @@ const LiquidityNode: React.FC<NodeProps> = ({ isConnectable }) => {
     }
   };
 
+  const isSelected = selected || data?.selected;
+  const borderClass = isSelected 
+    ? "border-[3px] border-white ring-4 ring-white" 
+    : "border-[1px] border-[#2F5B87] hover:border-[#4C86C1]";
+
   return (
-    <div className="bg-[#17273E] text-white p-4 rounded-lg shadow-md border-[1px] border-[#2F5B87] hover:border-[#4C86C1] transition-colors w-[250px]">
+    <div 
+      className={`bg-[#17273E] text-white p-4 rounded-lg shadow-md ${borderClass} transition-colors w-[250px] ${isSelected ? 'shadow-glow' : ''}`}
+      style={{ zIndex: isSelected ? 50 : 'auto' }}
+    >
       <div className="flex items-center justify-between mb-4">
         <span>Add Liquidity</span>
         <Droplets className="w-4 h-4" />

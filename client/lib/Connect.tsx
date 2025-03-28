@@ -150,7 +150,11 @@ const ConnectButton: React.FC<ConnectButtonProps> = ({
   );
 };
 
-const DisconnectButton: React.FC = () => {
+interface DisconnectButtonProps {
+  className?: string;
+}
+
+const DisconnectButton: React.FC<DisconnectButtonProps> = ({ className = "" }) => {
   const { disconnect } = useDisconnect({});
   const handleDisconnect = () => {
     disconnect();
@@ -161,7 +165,7 @@ const DisconnectButton: React.FC = () => {
       variant="outline"
       size="sm"
       onClick={handleDisconnect}
-      className="text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+      className={`text-red-600 border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 ${className}`}
     >
       <X className="h-4 w-4 mr-2" />
       Disconnect

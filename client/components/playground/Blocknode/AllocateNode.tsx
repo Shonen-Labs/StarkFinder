@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input"
 import { HandCoins } from 'lucide-react'
 
-const AllocateNode:React.FC<NodeProps> = ({ data, isConnectable }) => {
+const AllocateNode:React.FC<NodeProps> = ({ data, isConnectable, selected }) => {
     const [allocationType, setAllocationType] = useState('')
     const [amount, setAmount] = useState('')
 
@@ -15,8 +15,19 @@ const AllocateNode:React.FC<NodeProps> = ({ data, isConnectable }) => {
         }
     }
 
+    const isSelected = selected || data?.selected;
+    const borderColor = isSelected 
+        ? "border-[3px] border-white ring-4 ring-white" 
+        : "border-[1px] border-[#35285B] hover:border-[#4a397e]";
+
     return (
-        <div className="bg-[#21173E] text-white p-4 rounded-lg shadow-md border-[1px] border-[#35285B] hover:border-[#4a397e] transition-colors w-[300px]">
+        <div 
+            className={`bg-[#21173E] text-white p-4 rounded-lg shadow-md ${borderColor} 
+                       transition-all duration-300 w-[300px] ${isSelected ? 'shadow-glow node-selected' : ''}`}
+            style={{
+                zIndex: isSelected ? 50 : 'auto',
+            }}
+        >
             <div className="flex items-center justify-between mb-4">
                 <span>Allocate Tokens</span>
                 <HandCoins className="w-4 h-4" />
@@ -44,5 +55,4 @@ const AllocateNode:React.FC<NodeProps> = ({ data, isConnectable }) => {
         </div>
     )
 }
-
 export default AllocateNode

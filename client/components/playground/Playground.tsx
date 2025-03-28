@@ -12,7 +12,7 @@ import {
 
 // Third-party libraries
 import { motion } from "framer-motion";
-import { } from "lucide-react";
+import {} from "lucide-react";
 import ReactFlow, {
   Background,
   Edge,
@@ -83,9 +83,23 @@ export default function Playground() {
   }, [nodes]);
 
   // Function to handle node click (currently logs the node ID)
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    setSelectedNode(node.id);
-  }, []);
+  const handleNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      setSelectedNode(node.id);
+
+      setNodes((nds) =>
+        nds.map((n) => ({
+          ...n,
+          data: {
+            ...n.data,
+            selected: n.id === node.id,
+          },
+          zIndex: n.id === node.id ? 50 : 0
+        }))
+      );
+    },
+    [setNodes]
+  );
 
   const { getNodes, getEdges } = useReactFlow();
 
@@ -203,11 +217,8 @@ export default function Playground() {
           selectedNode={selectedNode}
           handleDelete={handleDeleteNode}
         />
-
-
       </motion.div>
       <div className="flex flex-row">
-
         <div className="h-screen w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent hide-scrollbar">
           <FloatingSidebar addBlock={addBlock} />
         </div>
@@ -236,7 +247,7 @@ export default function Playground() {
                 key={edge.id}
                 style={
                   selectedNode &&
-                    (edge.source === selectedNode || edge.target === selectedNode)
+                  (edge.source === selectedNode || edge.target === selectedNode)
                     ? edgeStyles.selected
                     : edgeStyles.default
                 }
@@ -247,7 +258,6 @@ export default function Playground() {
           </ReactFlow>
         </div>
       </div>
-
     </div>
   );
 
@@ -315,12 +325,12 @@ export default function Playground() {
         block.id === "stake"
           ? "stakeNode"
           : block.id === "swap"
-            ? "swapNode"
-            : block.id === "liquidity"
-              ? "liquidityNode"
-              : block.id === "event"
-                ? "eventNode"
-                : "blockNode",
+          ? "swapNode"
+          : block.id === "liquidity"
+          ? "liquidityNode"
+          : block.id === "event"
+          ? "eventNode"
+          : "blockNode",
       position: { x: 500, y: 100 + nodes.length * 100 },
       data: {
         ...block,
@@ -493,10 +503,11 @@ export default function Playground() {
               {lintErrors.map((error, index) => (
                 <div
                   key={index}
-                  className={`flex items-start space-x-2 ${error.severity === "error"
+                  className={`flex items-start space-x-2 ${
+                    error.severity === "error"
                       ? "text-red-400"
                       : "text-yellow-400"
-                    }`}
+                  }`}
                 >
                   <span className="font-mono">Line {error.line}:</span>
                   <span className="flex-1">{error.message}</span>

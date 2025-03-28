@@ -542,6 +542,7 @@ async function generateInvestmentRecommendations(
   }
 }
 
+
 async function callBrianAI(
   prompt: string,
   address: string,
@@ -606,6 +607,64 @@ async function callBrianAI(
     console.error("Error calling Brian AI:", error);
     throw error;
   }
+async function callBrianAI(prompt: string, address: string, chainId: string, messages: any[] = []): Promise<BrianResponse> {
+	try {
+		// Format conversation history in the way Brian API expects
+		const conversationHistory = messages.map((msg) => ({
+			sender: msg.role === "user" ? "user" : "brian",
+			content: msg.content,
+		}));
+
+		// Prepare the request payload
+		const payload = {
+			prompt,
+			address,
+			chainId,
+			messages: conversationHistory,
+		};
+
+		// Call the Brian AI API
+		const response = await fetch(BRIAN_TRANSACTION_API_URL, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"x-brian-api-key": process.env.BRIAN_API_KEY || "",
+			},
+			body: JSON.stringify(payload),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(`Brian AI API error: ${errorData.error || response.statusText}`);
+		}
+
+		console.log("response from BRIAN", response);
+
+		const brianData = await response.json();
+
+		if (!brianData.result || !brianData.result.length) {
+			throw new Error("No result returned from Brian AI");
+		}
+
+		// Convert Brian API response to our BrianResponse format
+		const transactionResult = brianData.result[0];
+		// console.log("transactionResult from BRIAN", transactionResult);
+
+		// Map the response to our expected format
+		const brianResponse: BrianResponse = {
+			solver: transactionResult.solver,
+			action: transactionResult.action,
+			type: transactionResult.type,
+			extractedParams: transactionResult.extractedParams,
+			data: transactionResult.data,
+		};
+
+		return brianResponse;
+	} catch (error) {
+		console.error("Error calling Brian AI:", error);
+		throw error;
+	}
+
 }
 
 // Main API route handler

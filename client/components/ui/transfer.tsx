@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { ChevronDown, ExternalLink, Loader } from "lucide-react";
@@ -8,7 +8,7 @@ import { CryptoCoin, CoinsLogo } from "../../types/crypto-coin";
 import { Message } from "@/app/tg/types";
 import { useAccount } from "@starknet-react/core";
 import { v4 as uuidv4 } from "uuid";
-
+import { fetchTokenBalance} from "../../lib/token-utils";
 
 interface UserPreferences {
   riskTolerance: "low" | "medium" | "high";
@@ -46,11 +46,37 @@ const Transfer: React.FC<TransferProps> = ({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [walletAddress, setWalletAddress] = useState<string>("");
   const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">("from");
+  const [tokenBalance, setTokenBalance] = useState<string>("0");
+  const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
   
   console.log("input value", inputValue);
   console.log(toCoin);
   
-  const { address } = useAccount();
+  const { address, account } = useAccount();
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!address || !account || !fromCoin.name) return;
+      
+      setIsLoadingBalance(true);
+      try {
+        const balance = await fetchTokenBalance(
+          account,
+          address,
+          fromCoin.name,
+          false // or true if you need interest-bearing balance
+        );
+        setTokenBalance(balance);
+      } catch (error) {
+        console.error("Error fetching token balance:", error);
+        setTokenBalance("0");
+      } finally {
+        setIsLoadingBalance(false);
+      }
+    };
+  
+    fetchBalance();
+  }, [address, account, fromCoin.name]);
   
   const openModal = (type: "from" | "to") => {
     setSelectingCoinFor(type);
@@ -191,8 +217,16 @@ const Transfer: React.FC<TransferProps> = ({
         </div>
 
         <div className="mt-6 bg-[#242424] rounded-lg p-4">
-          <p className="text-gray-400 text-sm">Total Balance</p>
-          <p className="text-2xl font-bold text-white">$11,485.30</p>
+          <p className="text-gray-400 text-sm">Token Balance</p>
+          <p className="text-2xl font-bold text-white">
+            {isLoadingBalance ? (
+              <Loader className="animate-spin inline" size={20} />
+            ) : (
+              `${Number(tokenBalance).toLocaleString(undefined, {
+                maximumFractionDigits: 4,
+              })} ${fromCoin.name}`
+            )}
+          </p>
         </div>
 
         <div className="mt-6 bg-[#242424] rounded-lg p-4 flex justify-between items-center">
