@@ -13,7 +13,13 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Send, Home, Mic, Ban } from "lucide-react";
 import { useAccount, useProvider } from "@starknet-react/core";
 import { ConnectButton, DisconnectButton } from "@/lib/Connect";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import Link from "next/link";
 import { TransactionSuccess } from "@/components/TransactionSuccess";
 import CommandList from "@/components/ui/command";
@@ -22,65 +28,64 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 interface UserPreferences {
-	riskTolerance: "low" | "medium" | "high";
-	preferredAssets: string[];
-	preferredChains: string[];
-	investmentHorizon: "short" | "medium" | "long";
+  riskTolerance: "low" | "medium" | "high";
+  preferredAssets: string[];
+  preferredChains: string[];
+  investmentHorizon: "short" | "medium" | "long";
 }
 
 interface Message {
-	role: string;
-	id: string;
-	content: string;
-	timestamp: string;
-	user: string;
-	transaction?: {
-		data: {
-			transactions: Array<{
-				contractAddress: string;
-				entrypoint: string;
-				calldata: string[];
-			}>;
-			fromToken?: any;
-			toToken?: any;
-			fromAmount?: string;
-			toAmount?: string;
-			receiver?: string;
-			gasCostUSD?: string;
-			solver?: string;
-		};
-		type: string;
-	};
-	recommendations?: {
-		pools: Array<{
-			name: string;
-			apy: number;
-			tvl: number;
-			riskLevel: string;
-			impermanentLoss: string;
-			chain: string;
-			protocol: string;
-		}>;
-		strategy: string;
-	};
+  role: string;
+  id: string;
+  content: string;
+  timestamp: string;
+  user: string;
+  transaction?: {
+    data: {
+      transactions: Array<{
+        contractAddress: string;
+        entrypoint: string;
+        calldata: string[];
+      }>;
+      fromToken?: any;
+      toToken?: any;
+      fromAmount?: string;
+      toAmount?: string;
+      receiver?: string;
+      gasCostUSD?: string;
+      solver?: string;
+    };
+    type: string;
+  };
+  recommendations?: {
+    pools: Array<{
+      name: string;
+      apy: number;
+      tvl: number;
+      riskLevel: string;
+      impermanentLoss: string;
+      chain: string;
+      protocol: string;
+    }>;
+    strategy: string;
+  };
 }
 
 interface TransactionHandlerProps {
-	transactions: Array<{
-		contractAddress: string;
-		entrypoint: string;
-		calldata: string[];
-	}>;
-	description: string;
-	onSuccess: (hash: string) => void;
-	onError: (error: any) => void;
+  transactions: Array<{
+    contractAddress: string;
+    entrypoint: string;
+    calldata: string[];
+  }>;
+  description: string;
+  onSuccess: (hash: string) => void;
+  onError: (error: any) => void;
 }
 
 interface MessageContentProps {
-	message: Message;
-	onTransactionSuccess: (hash: string) => void;
+  message: Message;
+  onTransactionSuccess: (hash: string) => void;
 }
-
 
 const TransactionHandler: React.FC<TransactionHandlerProps> = ({
   transactions,
@@ -90,99 +95,107 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
 }) => {
   const { account } = useAccount();
   const [isProcessing, setIsProcessing] = React.useState(false);
-  
+
   const executeTransaction = async () => {
     if (!account) {
       onError(new Error("Wallet not connected"));
       return;
     }
 
+    setIsProcessing(true);
+    try {
+      for (const tx of transactions) {
+        const response = await account.execute({
+          contractAddress: tx.contractAddress,
+          entrypoint: tx.entrypoint,
+          calldata: tx.calldata,
+        });
+        await account.waitForTransaction(response.transaction_hash);
+        if (tx === transactions[transactions.length - 1]) {
+          onSuccess(response.transaction_hash);
+        }
+      }
+    } catch (error) {
+      console.error("Transaction failed:", error);
+      onError(error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-		setIsProcessing(true);
-		try {
-			for (const tx of transactions) {
-				const response = await account.execute({
-					contractAddress: tx.contractAddress,
-					entrypoint: tx.entrypoint,
-					calldata: tx.calldata,
-				});
-				await account.waitForTransaction(response.transaction_hash);
-				if (tx === transactions[transactions.length - 1]) {
-					onSuccess(response.transaction_hash);
-				}
-			}
-		} catch (error) {
-			console.error("Transaction failed:", error);
-			onError(error);
-		} finally {
-			setIsProcessing(false);
-		}
-	};
-
-	return (
-		<div className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10">
-			<p className="text-sm text-white/80 mb-4">{description}</p>
-			<button
-				onClick={executeTransaction}
-				disabled={isProcessing}
-				className={`w-full py-2 px-4 rounded-lg ${isProcessing ? "bg-white/20 cursor-not-allowed" : "bg-white/10 hover:bg-white/20"} transition-colors duration-200`}>
-				{isProcessing ? "Processing Transaction..." : "Execute Transaction"}
-			</button>
-		</div>
-	);
+  return (
+    <div className="mt-4 p-4 rounded-lg bg-white/5 border border-white/10">
+      <p className="text-sm text-white/80 mb-4">{description}</p>
+      <button
+        onClick={executeTransaction}
+        disabled={isProcessing}
+        className={`w-full py-2 px-4 rounded-lg ${
+          isProcessing
+            ? "bg-white/20 cursor-not-allowed"
+            : "bg-white/10 hover:bg-white/20"
+        } transition-colors duration-200`}
+      >
+        {isProcessing ? "Processing Transaction..." : "Execute Transaction"}
+      </button>
+    </div>
+  );
 };
 
 const PreferencesDialog: React.FC<{
-	open: boolean;
-	onClose: () => void;
-	onSubmit: (preferences: UserPreferences) => void;
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (preferences: UserPreferences) => void;
 }> = ({ open, onClose, onSubmit }) => {
-	const [preferences, setPreferences] = useState<UserPreferences>({
-		riskTolerance: "medium",
-		preferredAssets: [],
-		preferredChains: [],
-		investmentHorizon: "medium",
-	});
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    riskTolerance: "medium",
+    preferredAssets: [],
+    preferredChains: [],
+    investmentHorizon: "medium",
+  });
 
-	return (
-		<Dialog
-			open={open}
-			onOpenChange={onClose}>
-			<DialogContent className="bg-gray-900 border border-white/20 text-white">
-				<DialogHeader>
-					<DialogTitle>Investment Preferences</DialogTitle>
-				</DialogHeader>
-				<div className="space-y-4">
-					<div>
-						<label>Risk Tolerance</label>
-						<select
-							className="w-full bg-white/5 border border-white/20 rounded-md p-2"
-							value={preferences.riskTolerance}
-							onChange={(e) =>
-								setPreferences((prev) => ({
-									...prev,
-									riskTolerance: e.target.value as UserPreferences["riskTolerance"],
-								}))
-							}>
-							<option value="low">Low Risk</option>
-							<option value="medium">Medium Risk</option>
-							<option value="high">High Risk</option>
-						</select>
-					</div>
-					{/* Add similar inputs for other preferences */}
-					<Button
-						onClick={() => onSubmit(preferences)}
-						className="w-full bg-white/10 hover:bg-white/20">
-						Save Preferences
-					</Button>
-				</div>
-			</DialogContent>
-		</Dialog>
-	);
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="bg-gray-900 border border-white/20 text-white">
+        <DialogHeader>
+          <DialogTitle>Investment Preferences</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label>Risk Tolerance</label>
+            <select
+              className="w-full bg-white/5 border border-white/20 rounded-md p-2"
+              value={preferences.riskTolerance}
+              onChange={(e) =>
+                setPreferences((prev) => ({
+                  ...prev,
+                  riskTolerance: e.target
+                    .value as UserPreferences["riskTolerance"],
+                }))
+              }
+            >
+              <option value="low">Low Risk</option>
+              <option value="medium">Medium Risk</option>
+              <option value="high">High Risk</option>
+            </select>
+          </div>
+          {/* Add similar inputs for other preferences */}
+          <Button
+            onClick={() => onSubmit(preferences)}
+            className="w-full bg-white/10 hover:bg-white/20"
+          >
+            Save Preferences
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
-const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionSuccess }) => {
-	const [txHash, setTxHash] = React.useState<string | null>(null);
+const MessageContent: React.FC<MessageContentProps> = ({
+  message,
+  onTransactionSuccess,
+}) => {
+  const [txHash, setTxHash] = React.useState<string | null>(null);
 
   if (message.recommendations) {
     return (
@@ -245,9 +258,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message, onTransactionS
     );
   }
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-      {message.content}
-    </ReactMarkdown>
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
   );
 };
 
@@ -261,8 +272,7 @@ export default function TransactionPage() {
   const [streamedResponse, setStreamedResponse] = useState("");
   const { address } = useAccount();
   const { provider } = useProvider();
-  console.log(provider.getChainId())
-
+  console.log(provider.getChainId());
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
@@ -310,20 +320,20 @@ export default function TransactionPage() {
   // Generates a unique chat ID and navigates to the new Transaction route.
   const createNewTxn = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    await router.push(`/agent/c/${id}`);
   };
 
-
-	const handleTransactionSuccess = (hash: string) => {
-		const successMessage: Message = {
-			id: uuidv4(),
-			role: "agent",
-			content: "Great! Would you like to perform another transaction? You can try swapping, transferring, depositing, or bridging tokens.",
-			timestamp: new Date().toLocaleTimeString(),
-			user: "Agent",
-		};
-		setMessages((prev) => [...prev, successMessage]);
-	};
+  const handleTransactionSuccess = (hash: string) => {
+    const successMessage: Message = {
+      id: uuidv4(),
+      role: "agent",
+      content:
+        "Great! Would you like to perform another transaction? You can try swapping, transferring, depositing, or bridging tokens.",
+      timestamp: new Date().toLocaleTimeString(),
+      user: "Agent",
+    };
+    setMessages((prev) => [...prev, successMessage]);
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -340,7 +350,7 @@ export default function TransactionPage() {
       setMessages((prev) => [...prev, errorMessage]);
       return;
     }
-  
+
     const userMessage: Message = {
       id: uuidv4(),
       role: "user",
@@ -348,7 +358,7 @@ export default function TransactionPage() {
       timestamp: new Date().toLocaleTimeString(),
       user: "User",
     };
-  
+
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
@@ -360,30 +370,30 @@ export default function TransactionPage() {
       const formattedMessages = Array.from(
         new Set(
           messages
-            .filter(msg => msg.role === "user")
-            .map(msg => msg.content)
+            .filter((msg) => msg.role === "user")
+            .map((msg) => msg.content)
         )
-      ).map(content => ({
+      ).map((content) => ({
         sender: "user",
-        content
+        content,
       }));
-  
+
       // Add the current message if it's not already included
-      if (!formattedMessages.some(msg => msg.content === inputValue)) {
+      if (!formattedMessages.some((msg) => msg.content === inputValue)) {
         formattedMessages.push({
           sender: "user",
-          content: inputValue
+          content: inputValue,
         });
       }
-  
+
       const requestBody = {
         prompt: inputValue,
         address: address,
         messages: messages,
         userPreferences,
-        stream: true
+        stream: true,
       };
-  
+
       const response = await fetch("/api/transactions", {
         method: "POST",
         headers: {
@@ -391,22 +401,22 @@ export default function TransactionPage() {
         },
         body: JSON.stringify(requestBody),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.details?.message || 'Failed to get response');
+        throw new Error(errorData.details?.message || "Failed to get response");
       }
 
       const contentType = response.headers.get("Content-Type") || "";
 
-      if(!response.body || contentType.includes('application/json')){
+      if (!response.body || contentType.includes("application/json")) {
         // Handle non-streamed response
         const data = await response.json();
-        
+
         if (data.error) {
           throw new Error(data.error);
         }
-        
+
         if (data.result?.[0]?.data) {
           // We have transaction data
           const { description, transaction } = data.result[0].data;
@@ -418,7 +428,7 @@ export default function TransactionPage() {
             user: "Agent",
             transaction: transaction,
           };
-          
+
           setMessages((prevMessages) => [...prevMessages, agentMessage]);
         } else {
           // Normal response
@@ -437,18 +447,18 @@ export default function TransactionPage() {
         // Handle streaming response
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let accumulatedResponse = '';
-  
+        let accumulatedResponse = "";
+
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-  
+
             const chunk = decoder.decode(value);
-            const lines = chunk.split('\n').filter(Boolean);
-  
+            const lines = chunk.split("\n").filter(Boolean);
+
             for (const line of lines) {
-              if (line.startsWith('data: ')) {
+              if (line.startsWith("data: ")) {
                 try {
                   const data = JSON.parse(line.slice(5));
                   if (data.content) {
@@ -458,7 +468,7 @@ export default function TransactionPage() {
                     throw new Error(data.error);
                   }
                 } catch (e) {
-                  console.error('Error parsing JSON:', e);
+                  console.error("Error parsing JSON:", e);
                 }
               }
             }
@@ -466,7 +476,7 @@ export default function TransactionPage() {
         } finally {
           reader.releaseLock();
         }
-  
+
         // Add final message to chat
         if (accumulatedResponse) {
           // Check if the response contains transaction data
@@ -474,63 +484,77 @@ export default function TransactionPage() {
             const jsonResponse = JSON.parse(accumulatedResponse);
             if (jsonResponse.result?.[0]?.data) {
               const { description, transaction } = jsonResponse.result[0].data;
-              setMessages(prev => [...prev, {
-                id: uuidv4(),
-                role: "agent",
-                content: description,
-                timestamp: new Date().toLocaleTimeString(),
-                user: "Agent",
-                transaction: transaction,
-              }]);
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: uuidv4(),
+                  role: "agent",
+                  content: description,
+                  timestamp: new Date().toLocaleTimeString(),
+                  user: "Agent",
+                  transaction: transaction,
+                },
+              ]);
             } else {
-              setMessages(prev => [...prev, {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: uuidv4(),
+                  role: "agent",
+                  content: accumulatedResponse,
+                  timestamp: new Date().toLocaleTimeString(),
+                  user: "Agent",
+                },
+              ]);
+            }
+          } catch {
+            // If it's not valid JSON, add it as a regular message
+            setMessages((prev) => [
+              ...prev,
+              {
                 id: uuidv4(),
                 role: "agent",
                 content: accumulatedResponse,
                 timestamp: new Date().toLocaleTimeString(),
                 user: "Agent",
-              }]);
-            }
-          } catch {
-            // If it's not valid JSON, add it as a regular message
-            setMessages(prev => [...prev, {
-              id: uuidv4(),
-              role: "agent",
-              content: accumulatedResponse,
-              timestamp: new Date().toLocaleTimeString(),
-              user: "Agent",
-            }]);
+              },
+            ]);
           }
         }
       }
     } catch (err: any) {
-      console.error('Transaction error:', err);
+      console.error("Transaction error:", err);
       setError(err.message || "Unable to get response");
-      
+
       // Add error message to chat
-      setMessages(prev => [...prev, {
-        id: uuidv4(),
-        role: "agent",
-        content: err.message || "Sorry, something went wrong. Please try again.",
-        timestamp: new Date().toLocaleTimeString(),
-        user: "Agent",
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          role: "agent",
+          content:
+            err.message || "Sorry, something went wrong. Please try again.",
+          timestamp: new Date().toLocaleTimeString(),
+          user: "Agent",
+        },
+      ]);
     } finally {
       setIsLoading(false);
       setStreamedResponse("");
     }
   };
 
-	return (
-		<div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
-			{/* Dotted background */}
-			<div
-				className="absolute inset-0 bg-repeat opacity-5"
-				style={{
-					backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-					backgroundSize: "20px 20px",
-				}}
-			/>
+  return (
+    <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
+      {/* Dotted background */}
+      <div
+        className="absolute inset-0 bg-repeat opacity-5"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, white 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+      />
 
       {/* Content wrapper */}
       <div className="flex w-full h-full relative z-10">
@@ -586,30 +610,34 @@ export default function TransactionPage() {
             </DialogContent>
           </Dialog> */}
 
-					<div className="flex flex-col gap-4">
-						<h4 className="text-sm">Transaction History</h4>
-						<Input
-							placeholder="Search"
-							className="bg-transparent border border-white/20 text-white py-4 text-sm rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-						/>
-						<div
-							className="overflow-y-auto h-64 flex flex-col gap-2 pr-2
+          <div className="flex flex-col gap-4">
+            <h4 className="text-sm">Transaction History</h4>
+            <Input
+              placeholder="Search"
+              className="bg-transparent border border-white/20 text-white py-4 text-sm rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
+            />
+            <div
+              className="overflow-y-auto h-64 flex flex-col gap-2 pr-2
               [&::-webkit-scrollbar]:w-2
               [&::-webkit-scrollbar-track]:bg-[#060606]
               [&::-webkit-scrollbar-thumb]:bg-white/10
               [&::-webkit-scrollbar-thumb]:rounded-full
               dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-              dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
-							{[0, 1, 2, 4, 5].map((index) => (
-								<div
-									key={index}
-									className="flex flex-col p-2 px-2 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer gap-1">
-									<span>0x86ecca95fec</span>
-									<span className="text-[#eee] text-[0.8em]">12th Dec, 2025</span>
-								</div>
-							))}
-						</div>
-					</div>
+              dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+            >
+              {[0, 1, 2, 4, 5].map((index) => (
+                <div
+                  key={index}
+                  className="flex flex-col p-2 px-2 text-xs rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer gap-1"
+                >
+                  <span>0x86ecca95fec</span>
+                  <span className="text-[#eee] text-[0.8em]">
+                    12th Dec, 2025
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div className="mt-auto flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
@@ -617,31 +645,31 @@ export default function TransactionPage() {
           </div>
         </div>
 
-
-				{/* Main Content */}
-				<div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
-					{/* Header */}
-					<div className="flex justify-between items-center p-4 border-b border-white/20 bg-[#010101]">
-						<div className="flex flex-col">
-							<Link
-								href="/"
-								className="flex items-center gap-2">
-								<Home className="h-4 w-4" />
-								Home
-							</Link>
-							<h4 className="text-xl">StarkFinder - Transactions</h4>
-						</div>
-						<div className="flex items-center gap-4">
-							{address ? (
-								<div className="flex items-center gap-4">
-									<div className="px-3 py-1 bg-muted rounded-md bg-slate-900">{`${address?.slice(0, 5)}...${address?.slice(-3)}`}</div>
-									<DisconnectButton />
-								</div>
-							) : (
-								<ConnectButton />
-							)}
-						</div>
-					</div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col bg-[#060606] backdrop-blur-sm">
+          {/* Header */}
+          <div className="flex justify-between items-center p-4 border-b border-white/20 bg-[#010101]">
+            <div className="flex flex-col">
+              <Link href="/" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+              <h4 className="text-xl">StarkFinder - Transactions</h4>
+            </div>
+            <div className="flex items-center gap-4">
+              {address ? (
+                <div className="flex items-center gap-4">
+                  <div className="px-3 py-1 bg-muted rounded-md bg-slate-900">{`${address?.slice(
+                    0,
+                    5
+                  )}...${address?.slice(-3)}`}</div>
+                  <DisconnectButton />
+                </div>
+              ) : (
+                <ConnectButton />
+              )}
+            </div>
+          </div>
 
           {/* Chat Area */}
           <ScrollArea className="flex-1 p-4">
@@ -668,7 +696,7 @@ export default function TransactionPage() {
                 </div>
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex items-center justify-center space-x-2 mb-4">
                 <div
@@ -685,7 +713,7 @@ export default function TransactionPage() {
                 ></div>
               </div>
             )}
-            
+
             {streamedResponse && (
               <div className="flex gap-2 mb-4 animate-fadeIn">
                 <div className="h-8 w-8 rounded-full border border-white/20 flex items-center justify-center text-xs bg-white/5">
@@ -706,12 +734,21 @@ export default function TransactionPage() {
                 </div>
               </div>
             )}
-            
+
             <div ref={scrollRef} />
           </ScrollArea>
 
-
-          {isInputClicked && <CommandList setMessages={setMessages} inputValue={inputValue} userPreferences={userPreferences} messages={messages} setIsLoading={setIsLoading} setInputValue={setInputValue} isLoading={isLoading} />}
+          {isInputClicked && (
+            <CommandList
+              setMessages={setMessages}
+              inputValue={inputValue}
+              userPreferences={userPreferences}
+              messages={messages}
+              setIsLoading={setIsLoading}
+              setInputValue={setInputValue}
+              isLoading={isLoading}
+            />
+          )}
           {/* Input Area */}
           <div className="p-4 border-t border-white/20 bg-[#010101]">
             <div className="relative">
@@ -734,14 +771,18 @@ export default function TransactionPage() {
                 onClick={handleSendMessage}
                 disabled={isLoading}
               >
-                {isLoading ? <Ban className="h-5 w-5" /> : <Send className="h-5 w-5" />}
+                {isLoading ? (
+                  <Ban className="h-5 w-5" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
                 <span className="sr-only">Send message</span>
               </Button>
             </div>
           </div>
         </div>
       </div>
-      
+
       <Button
         onClick={() => setShowPreferences(true)}
         className="absolute right-20 top-4"
@@ -749,15 +790,14 @@ export default function TransactionPage() {
         Investment Preferences
       </Button>
 
-
-			<PreferencesDialog
-				open={showPreferences}
-				onClose={() => setShowPreferences(false)}
-				onSubmit={(prefs) => {
-					setUserPreferences(prefs);
-					setShowPreferences(false);
-				}}
-			/>
-		</div>
-	);
+      <PreferencesDialog
+        open={showPreferences}
+        onClose={() => setShowPreferences(false)}
+        onSubmit={(prefs) => {
+          setUserPreferences(prefs);
+          setShowPreferences(false);
+        }}
+      />
+    </div>
+  );
 }
