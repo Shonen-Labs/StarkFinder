@@ -13,6 +13,7 @@ import prisma from "@/lib/db";
 import { TxType } from "@prisma/client";
 import { UserPreferences, InvestmentRecommendation, Pool } from "./types";
 import { BRIAN_API_KEY, BRIAN_API_URL, BRIAN_TRANSACTION_API_URL, BRIAN_DEFAULT_RESPONSE, createOrGetChat, fetchTokenData, fetchYieldData, getOrCreateUser, OPENAI_API_KEY, storeMessage } from "./helper";
+import { createGrokClient } from "@/lib/devxstark/grok-client";
 import axios from "axios";
 
 // Initialize OpenAI models
@@ -22,6 +23,8 @@ const agent = new ChatOpenAI({
 	openAIApiKey: OPENAI_API_KEY,
 	streaming: true,
 });
+
+const grokAgent = createGrokClient();
 
 const transactionLLM = new ChatOpenAI({
 	model: "gpt-4",
@@ -175,6 +178,15 @@ async function isTransactionIntent(prompt: string, messages: any[]): Promise<boo
 		console.error("Error determining transaction intent:", error);
 		return false;
 	}
+}
+
+async function getTransactionIntentFromGrok(prompt: string, address: string, chainId: string, messages: any[]): Promise<BrianResponse> {
+    const response = await grokAgent.invoke([
+        { role: "system", content: "You analyze blockchain transaction requests and extract parameters." },
+        { role: "user", content: prompt }
+    ]);
+    // Process response similar to OpenAI version
+    // return response;
 }
 
 // Function for transaction intent processing

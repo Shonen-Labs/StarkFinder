@@ -12,7 +12,8 @@ const nextConfig = {
   publicRuntimeConfig: {
     API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://default-api.example.com',
     OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'dummy-key',
-    BRIAN_API_KEY: process.env.BRIAN_API_KEY || 'dummy-key'
+    BRIAN_API_KEY: process.env.BRIAN_API_KEY || 'dummy-key',
+    XAI_API_KEY: process.env.XAI_API_KEY || 'dummy-key'
   }
 }
 

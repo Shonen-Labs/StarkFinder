@@ -1,5 +1,6 @@
 import path from "path";
 import { createAnthropicClient } from "./anthropic-client";
+import { createGrokClient } from "./grok-client";
 import { contractPromptTemplate } from "./prompt-generate";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import fs from "fs/promises";
