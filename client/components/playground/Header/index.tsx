@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { useAccount, useConnect } from "@starknet-react/core";
-import { ConnectButton, DisconnectButton } from "@/lib/Connect";
+import { DisconnectButton } from "@/lib/Connect";
 
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import Argent from "@/public/img/Argent Wallet.png";

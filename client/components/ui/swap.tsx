@@ -7,6 +7,7 @@ import TokensModal from "./tokens-modal";
 import { CryptoCoin, CoinsLogo } from "../../types/crypto-coin";
 import { useAccount } from "@starknet-react/core";
 import useDebounce from "../useDebounce";
+import { fetchTokenBalance} from "../../lib/token-utils";
 
 interface SwapProps {
 	setSelectedCommand: React.Dispatch<React.SetStateAction<string | null>>;
@@ -22,19 +23,44 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [selectingCoinFor, setSelectingCoinFor] = useState<"from" | "to">("from");
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [tokenBalance, setTokenBalance] = useState<string>("0");
 	/* eslint-disable */
 	const [transactionDetails, setTransactionDetails] = useState<any>(null);
 	const [txHash, setTxHash] = useState<string | null>(null);
+	const [isLoadingBalance, setIsLoadingBalance] = useState<boolean>(false);
 
 	// Debounce the fromAmount with a 1 second delay
 	const debouncedFromAmount = useDebounce(fromAmount, 1000);
 
 	// Effect to trigger handleSwap when the debounced value changes
 	useEffect(() => {
-		if (debouncedFromAmount) {
-			handleSwap(debouncedFromAmount);
-		}
-	}, [debouncedFromAmount]);
+		const fetchData = async () => {
+			// Fetch token balance
+			if (address && account && fromCoin.name) {
+				setIsLoadingBalance(true);
+				try {
+					const balance = await fetchTokenBalance(
+						account,
+						address,
+						fromCoin.name,
+						false 
+					);
+					setTokenBalance(balance);
+				} catch (error) {
+					console.error("Error fetching token balance:", error);
+					setTokenBalance("0");
+				} finally {
+					setIsLoadingBalance(false);
+				}
+			}
+
+			if (debouncedFromAmount) {
+				handleSwap(debouncedFromAmount);
+			}
+		};
+
+		fetchData();
+	}, [debouncedFromAmount, address, account, fromCoin.name]);
 
 	const openModal = (type: "from" | "to") => {
 		setSelectingCoinFor(type);
@@ -118,8 +144,19 @@ const Swap: React.FC<SwapProps> = ({ setSelectedCommand }) => {
 					</button>
 					<div className={`text-center flex-1`}>
 						<h2 className="text-center text-2xl text-black font-bold mb-2">Swap Token</h2>
-						<p className="text-gray-500 text-sm">Total Balance</p>
-						<p className={`text-lg font-bold text-black`}>$11,485.30 </p>
+						<p className="text-gray-500 text-sm">Token Balance</p>
+						<p className={`text-lg font-bold text-black`}>
+							{isLoadingBalance ? (
+								"Loading..."
+							) : (
+								<>
+									{Number(tokenBalance).toLocaleString(undefined, {
+										maximumFractionDigits: 4,
+									})}{" "}
+									{fromCoin.name}
+								</>
+							)}
+						</p>
 					</div>
 				</div>
 

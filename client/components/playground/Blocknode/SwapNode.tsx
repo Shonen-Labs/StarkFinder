@@ -11,7 +11,7 @@ import { ArrowRightLeft } from "lucide-react";
 
 const currencies = ["ETH", "USDT", "BTC", "DAI", "LINK"];
 
-const SwapNode: React.FC<NodeProps> = ({ isConnectable }) => {
+const SwapNode: React.FC<NodeProps> = ({ isConnectable, selected, data }) => {
   const [fromCurrency, setFromCurrency] = useState(currencies[0]);
   const [toCurrency, setToCurrency] = useState(currencies[1]);
 
@@ -23,8 +23,19 @@ const SwapNode: React.FC<NodeProps> = ({ isConnectable }) => {
     setToCurrency(value);
   }, []);
 
+  const isSelected = selected || data?.selected;
+  const borderColor = isSelected 
+      ? "border-[3px] border-white ring-4 ring-white" 
+      : "border-[1px] border-[#245C3D] hover:border-[#6AFB8E]";
+
   return (
-    <div className="bg-[#142321] text-white p-4 rounded-lg shadow-md border-[1px] border-[#245C3D] hover:border-[#6AFB8E] transition-colors w-[250px]">
+    <div 
+      className={`bg-[#142321] text-white p-4 rounded-lg shadow-md ${borderColor} 
+                 transition-all duration-300 w-[250px] ${isSelected ? 'shadow-glow node-selected' : ''}`}
+      style={{
+        zIndex: isSelected ? 50 : 'auto',
+      }}
+    >
       <div className="flex items-center justify-between mb-4">
         <span>Swap Tokens</span>
         <ArrowRightLeft className="w-4 h-4" />
