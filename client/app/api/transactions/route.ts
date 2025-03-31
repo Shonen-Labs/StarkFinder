@@ -12,7 +12,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import prisma from "@/lib/db";
 import { TxType } from "@prisma/client";
 import { UserPreferences, InvestmentRecommendation, Pool } from "./types";
-import { BRIAN_API_KEY, BRIAN_API_URL, BRIAN_TRANSACTION_API_URL, BRIAN_DEFAULT_RESPONSE, createOrGetChat, fetchTokenData, fetchYieldData, getOrCreateUser, OPENAI_API_KEY, storeMessage } from "./helper";
+import { BRIAN_API_KEY, BRIAN_API_URL, BRIAN_TRANSACTION_API_URL, BRIAN_DEFAULT_RESPONSE, createOrGetChat, fetchTokenData, fetchYieldData, getOrCreateUser, OPENAI_API_KEY, storeMessage, storeChat } from "./helper";
 import axios from "axios";
 
 // Initialize OpenAI models
@@ -32,6 +32,7 @@ const systemPrompt = ASK_OPENAI_AGENT_PROMPT + "\nThe provided chat history incl
 const systemMessage = SystemMessagePromptTemplate.fromTemplate(systemPrompt);
 const userMessage = HumanMessagePromptTemplate.fromTemplate("{user_query}");
 const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([systemMessage, userMessage]);
+
 
 async function getChatHistory(chatId: string | { configurable?: { additional_args?: { chatId?: string } } }) {
 	try {
@@ -465,9 +466,28 @@ async function callBrianAI(prompt: string, address: string, chainId: string, mes
 	}
 }
 
-// Main API route handler
 export async function POST(request: Request) {
 	try {
+		// Parse the incoming JSON body for required fields
+		const body = await request.json();
+		
+		// NEW: If the payload includes a "storeOnly" flag, process only the chat storage using storeChat
+		if (body.storeOnly) {
+			const { chatId, content, userId } = body;
+			if (!chatId || !content || !userId) {
+				return NextResponse.json(
+					{ error: "Missing required fields: chatId, content, or userId" },
+					{ status: 400 }
+				);
+			}
+			const result = await storeChat({ chatId, content, userId });
+			return NextResponse.json(
+				{ message: "Chat message stored successfully", result },
+				{ status: 200 }
+			);
+		}
+
+		// Otherwise, proceed with the existing transaction/general processing
 		const {
 			prompt,
 			address,
@@ -476,7 +496,7 @@ export async function POST(request: Request) {
 			stream = false,
 			userPreferences,
 			chainId = "4012", // Default Starknet chain ID
-		} = await request.json();
+		} = body;
 
 		if (!prompt || !address) {
 			return NextResponse.json({ error: "Missing required parameters (prompt or address)" }, { status: 400 });
@@ -491,7 +511,7 @@ export async function POST(request: Request) {
 			currentChatId = newChat.id;
 		}
 
-		// Process messages
+		// Process messages: deduplicate user messages
 		const uniqueMessages = messages
 			.filter((msg: any) => msg.sender === "user")
 			.reduce((acc: any[], curr: any) => {
@@ -504,14 +524,14 @@ export async function POST(request: Request) {
 				return acc;
 			}, []);
 
-		// Store user message
+		// Store user message using storeMessage
 		await storeMessage({
 			content: uniqueMessages,
 			chatId: currentChatId,
 			userId,
 		});
 
-		// Determine if this is a transaction intent or a question
+		// Determine if this is a transaction intent or a general question
 		const isTransaction = await isTransactionIntent(prompt, uniqueMessages);
 
 		// Handle investment recommendations
@@ -547,12 +567,11 @@ export async function POST(request: Request) {
 			if (stream) {
 				// Handle streaming response
 				const encoder = new TextEncoder();
-				const stream = new TransformStream();
-				const writer = stream.writable.getWriter();
-				// Stream the response
+				const streamObj = new TransformStream();
+				const writer = streamObj.writable.getWriter();
 				await writer.write(encoder.encode(`data: ${JSON.stringify(response)}\n\n`));
 				await writer.close();
-				return new Response(stream.readable, {
+				return new Response(streamObj.readable, {
 					headers: {
 						"Content-Type": "text/event-stream",
 						"Cache-Control": "no-cache",
@@ -566,9 +585,7 @@ export async function POST(request: Request) {
 		// Handle transaction intents
 		else if (isTransaction) {
 			try {
-				// const transactionIntent = await getTransactionIntentFromOpenAI(prompt, address, chainId, uniqueMessages);
 				const transactionIntent = await callBrianAI(prompt, address, chainId, messages);
-
 				const processedTx = await transactionProcessor.processTransaction(transactionIntent);
 
 				if (["deposit", "withdraw"].includes(transactionIntent.action)) {
@@ -619,22 +636,8 @@ export async function POST(request: Request) {
 						},
 					],
 				});
-			} catch (error: string | any) {
+			} catch (error: any) {
 				console.error("Transaction processing error:", error);
-				// If transaction processing fails, fall back to BrianAI
-				// const response = await queryBrianAI(prompt, currentChatId);
-
-				// await storeMessage({
-				// 	content: [
-				// 		{
-				// 			role: "assistant",
-				// 			content: response,
-				// 		},
-				// 	],
-				// 	chatId: currentChatId,
-				// 	userId,
-				// });
-
 				return NextResponse.json({
 					answer: error.message,
 					chatId: currentChatId,
@@ -643,7 +646,6 @@ export async function POST(request: Request) {
 		}
 		// Handle general questions
 		else {
-			// Non-streaming response
 			const response = await queryBrianAI(prompt, currentChatId);
 
 			if (!response) {
@@ -677,7 +679,6 @@ export async function POST(request: Request) {
 				{ status: 401 }
 			);
 		}
-
 		return NextResponse.json({ error: "Unable to process request", details: error.message }, { status: 500 });
 	}
 }

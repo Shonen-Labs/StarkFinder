@@ -94,7 +94,7 @@ export default function Playground() {
             ...n.data,
             selected: n.id === node.id,
           },
-          zIndex: n.id === node.id ? 50 : 0
+          zIndex: n.id === node.id ? 50 : 0,
         }))
       );
     },
@@ -204,7 +204,7 @@ export default function Playground() {
     <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-8 selectable-none ">
       <motion.div
         className=" w-full flex flex-col ml-8"
-        animate={{ marginLeft: isOpen ? "1rem" : "2rem" }}
+        animate={{ style: { marginLeft: isOpen ? "1rem" : "2rem" } }}
         transition={{ duration: 0.3 }}
       >
         <Header
