@@ -1,6 +1,7 @@
 import { StarkFinderIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { MotionBox } from './motion-box'
+import Link from 'next/link'
 
 export function Hero() {
   return (
@@ -17,7 +18,7 @@ export function Hero() {
           simple.
         </p>
         <Button size="landing" variant="primary" className="h-[3.375rem] px-8">
-          Launch TG Bot
+         <Link href="/tg"> Launch TG Bot</Link>
         </Button>
       </MotionBox>
     </section>
