@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -7,16 +7,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { ContractIcon, RocketLaunchIcon } from '@/components/icons'
-import { cn } from '@/lib/utils'
-import { FilePenLine } from 'lucide-react'
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { ContractIcon, RocketLaunchIcon } from "@/components/icons";
+import { cn } from "@/lib/utils";
+import { FilePenLine } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 export function ModalLanding() {
-  const router = useRouter()
+  const router = useRouter();
+
+  const handleButtonClick = (type: string) => {
+    if (type === "New Transaction") {
+      router.push(`/agent/c/${uuidv4()}`);
+    } else {
+      router.push("/devx");
+    }
+  };
 
   return (
     <Dialog>
@@ -56,7 +65,7 @@ export function ModalLanding() {
                 className={cn(
                   "w-full font-bold text-base h-9 sm:h-11 px-4 sm:px-6 rounded-[1.5rem] sm:rounded-[1.75rem]"
                 )}
-                onClick={() => router.push(item.link)}
+                onClick={() => handleButtonClick(item.text)}
               >
                 {item.icon}
                 {item.text}
@@ -66,14 +75,18 @@ export function ModalLanding() {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 const itemsButton = [
   {
     icon: <ContractIcon className="text-grayscale-200" />,
-    text: 'New Transaction',
-    link: '/agent/c/d1555821-60f5-4431-a765-6ac9f62c1792',
+    text: "New Transaction",
+    link: "#",
   },
-  { icon: <FilePenLine className="text-grayscale-200" />, text: 'DevXStark', link: '/devx' },
-]
+  {
+    icon: <FilePenLine className="text-grayscale-200" />,
+    text: "DevXStark",
+    link: "/devx",
+  },
+];

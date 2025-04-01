@@ -9,9 +9,11 @@ import { DisconnectButton } from "@/lib/Connect";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import Argent from "@/public/img/Argent Wallet.png";
 import Bravoos from "@/public/img/bravoos wallet.jpeg";
-import { Home, Upload, MessageSquare, Book, Wallet } from "lucide-react"; 
+import { Home, Upload, MessageSquare, Book, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
-import Image from 'next/image';
+import Image from "next/image";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/router";
 
 interface HeaderProps {
   showClearButton: boolean;
@@ -44,15 +46,21 @@ export default function Header({
   const { connect, connectors } = useConnect();
   const isConnected = !!address;
 
+  const router = useRouter();
+
   // Format wallet address for display
   const formatAddress = (address?: string) => {
     if (!address) return "";
-    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    return `${address.substring(0, 6)}...${address.substring(
+      address.length - 4
+    )}`;
   };
 
   const handleConnect = async (connectorId: string) => {
     try {
-      await connect({ connector: connectors.find(c => c.id === connectorId) });
+      await connect({
+        connector: connectors.find((c) => c.id === connectorId),
+      });
       setIsWalletModalOpen(false);
     } catch (error) {
       console.error("Failed to connect wallet:", error);
@@ -117,12 +125,12 @@ export default function Header({
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/agent/transaction/someId"
-                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
+                <button
+                  onClick={() => router.push(`/agent/c/${uuidv4()}`)}
+                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110 duration-300"
                 >
                   <MessageSquare size={18} /> Agent
-                </Link>
+                </button>
               </li>
               <li>
                 <Link
