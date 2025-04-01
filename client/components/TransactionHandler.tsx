@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useAccount, useContract } from '@starknet-react/core';
+import { useAccount } from '@starknet-react/core';
 import { useState } from 'react';
 
 interface TransactionData {
@@ -56,7 +56,7 @@ export const TransactionHandler = ({
     <div className="mt-4">
       <p className="text-sm text-black mb-4">{description}</p>
       <button
-        onClick={executeTransaction}
+        onClick={executeTransaction} // No parameters needed
         disabled={isProcessing}
         className={`bg-[#060606] text-white w-full py-3 rounded-2xl text-lg flex items-center justify-center ${
           isProcessing

@@ -33,11 +33,11 @@ type FormData = {
 type ActionType = 'swap' | 'transfer' | 'deposit' | 'withdraw' | 'bridge';
 
 const actionFields: Record<ActionType, (keyof FormData)[]> = {
-  swap: ['token', 'amount', 'toToken'],
+  swap: ['token', 'amount', 'toToken'], // Reintroducing swap
   transfer: ['token', 'amount', 'recipient'],
   deposit: ['token', 'amount', 'protocol'],
   withdraw: ['protocol', 'token', 'amount'],
-  bridge: ['token', 'amount']
+  bridge: ['token', 'amount'] // Reintroducing bridge
 };
 
 export const TransactionForm: React.FC<TransactionFormProps> = ({ onSubmit }) => {
