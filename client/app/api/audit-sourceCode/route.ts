@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Anthropic } from '@anthropic-ai/sdk';
+import { createGrokClient } from "@/lib/devxstark/grok-client";
+
+const grok = createGrokClient();
 
 export async function POST(req: NextRequest) {
   try {
