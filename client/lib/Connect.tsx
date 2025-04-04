@@ -40,15 +40,12 @@ const WalletButton: React.FC<WalletButtonProps> = ({
 
   return (
     <motion.button
-      className="bg-gradient-to-r from-white to-indigo-500 dark:from-blue-900 dark:to-indigo-900 
-                 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-800 dark:hover:to-indigo-800 
-                 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-4 flex items-center 
-                 space-x-4 w-full border-r border-transparent hover:border-blue-200 dark:hover:border-blue-700"
+      className=" w-full bg-white flex items-center gap-5 rounded-lg py-1 px-5 text-base font-medium text-[#000000]  "
       onClick={handleConnectWallet}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
     >
-      <div className="h-10 w-10 rounded-full overflow-hidden bg-white dark:bg-gray-800 flex items-center justify-center shadow-inner">
+      <div className="h-10 w-10 rounded-full overflow-hidden bg-white dark:bg-gray-800 flex items-center justify-center ">
         {isSvg ? (
           <div
             className="h-8 w-8"
@@ -81,14 +78,14 @@ const ConnectModal: React.FC = () => {
   );
 
   return (
-    <DialogContent className="sm:max-w-[550px]  bg-gradient-to-br from-[#f6f6f6] to-[#4e4e4e]">
+    <DialogContent className="sm:max-w-[450px] w-[300px]  border border-gray-300  ">
       <DialogHeader>
-        <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        <DialogTitle className="text-2xl font-bold text-white">
           Connect a Wallet
         </DialogTitle>
       </DialogHeader>
       <ScrollArea className="h-[400px] pr-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2   ">
           {filteredConnectors.map((connector, index) => (
             <WalletButton
               key={connector.id || index}
@@ -107,6 +104,14 @@ const ConnectModal: React.FC = () => {
     </DialogContent>
   );
 };
+
+
+
+
+
+
+
+
 
 interface ConnectButtonProps {
   text?: string;
@@ -147,6 +152,14 @@ const ConnectButton: React.FC<ConnectButtonProps> = ({
       </DialogTrigger>
       <ConnectModal />
     </Dialog>
+
+
+
+
+
+
+
+
   );
 };
 
