@@ -38,7 +38,139 @@ fn setup() -> Deployment {
     calldata.append(fee.into());
     calldata.append(INITIAL_SQRT_PRICE_X96.into());
     
-    let (contract_address, _) = starknet::syscalls::deploy_syscall(
+    let contract_address = declare("ConcentratedLiquidityAMM").deploy(@calldata).unwrap();
+    let contract = IConcentratedLiquidityAMMDispatcher { contract_address };
+    
+    Deployment { contract, token0, token1 }
+}
+
+#[test]
+fn test_create_position() {
+    let deployment = setup();
+    let tick_lower: i32 = -1000;
+    let tick_upper: i32 = 1000;
+    let amount0_desired: u256 = 1000000000000000000; // 1 token
+    let amount1_desired: u256 = 1000000000000000000; // 1 token
+    
+    let (position_id, amount0, amount1) = deployment.contract.create_position(
+        deployment.token0.contract_address,
+        deployment.token1.contract_address,
+        3, // 0.3% fee
+        tick_lower,
+        tick_upper,
+        amount0_desired,
+        amount1_desired,
+        0, // min amounts
+        0
+    );
+    
+    assert(position_id == 1, 'Invalid position ID');
+    assert(amount0 == amount0_desired, 'Invalid amount0');
+    assert(amount1 == amount1_desired, 'Invalid amount1');
+}
+
+#[test]
+fn test_invalid_tick_range() {
+    let deployment = setup();
+    let tick_lower: i32 = 1000;
+    let tick_upper: i32 = -1000; // Invalid: upper < lower
+    
+    let mut success = false;
+    match deployment.contract.create_position(
+        deployment.token0.contract_address,
+        deployment.token1.contract_address,
+        3,
+        tick_lower,
+        tick_upper,
+        1000000000000000000,
+        1000000000000000000,
+        0,
+        0
+    ) {
+        Ok(_) => {},
+        Err(_) => { success = true; }
+    }
+    
+    assert(success, 'Should fail with invalid range');
+}
+
+#[test]
+fn test_collect_fees() {
+    let deployment = setup();
+    let (position_id, _, _) = deployment.contract.create_position(
+        deployment.token0.contract_address,
+        deployment.token1.contract_address,
+        3,
+        -1000,
+        1000,
+        1000000000000000000,
+        1000000000000000000,
+        0,
+        0
+    );
+    
+    let (fees0, fees1) = deployment.contract.collect_fees(position_id);
+    assert(fees0 == 0, 'Invalid fees0'); // No fees yet
+    assert(fees1 == 0, 'Invalid fees1'); // No fees yet
+}
+
+#[test]
+fn test_increase_liquidity() {
+    let deployment = setup();
+    let (position_id, _, _) = deployment.contract.create_position(
+        deployment.token0.contract_address,
+        deployment.token1.contract_address,
+        3,
+        -1000,
+        1000,
+        1000000000000000000,
+        1000000000000000000,
+        0,
+        0
+    );
+    
+    let amount0_desired: u256 = 500000000000000000; // 0.5 token
+    let amount1_desired: u256 = 500000000000000000; // 0.5 token
+    
+    let (amount0, amount1) = deployment.contract.increase_liquidity(
+        position_id,
+        amount0_desired,
+        amount1_desired,
+        0,
+        0
+    );
+    
+    assert(amount0 == amount0_desired, 'Invalid amount0');
+    assert(amount1 == amount1_desired, 'Invalid amount1');
+}
+
+#[test]
+fn test_decrease_liquidity() {
+    let deployment = setup();
+    let (position_id, _, _) = deployment.contract.create_position(
+        deployment.token0.contract_address,
+        deployment.token1.contract_address,
+        3,
+        -1000,
+        1000,
+        1000000000000000000,
+        1000000000000000000,
+        0,
+        0
+    );
+    
+    let liquidity_to_remove: u256 = 500000000000000000; // Remove half
+    
+    let (amount0, amount1) = deployment.contract.decrease_liquidity(
+        position_id,
+        liquidity_to_remove,
+        0,
+        0
+    );
+    
+    assert(amount0 > 0, 'Invalid amount0');
+    assert(amount1 > 0, 'Invalid amount1');
+}
         ConcentratedLiquidityAMM::TEST_CLASS_HASH.try_into().unwrap(), 0, calldata.span(), false,
     ).unwrap();
 
