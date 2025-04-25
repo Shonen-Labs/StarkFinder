@@ -19,7 +19,8 @@ const config: Config = {
   			'spin-around': 'spin-around calc(var(--speed) * 2) infinite linear',
   			slide: 'slide var(--speed) ease-in-out infinite alternate',
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+        'border': 'border 4s linear infinite',
   		},
   		keyframes: {
   			scroll: {
@@ -77,7 +78,10 @@ const config: Config = {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+        'border': {
+          to: { '--border-angle': '360deg' },
+        }
   		},
   		colors: {
   			background: 'hsl(var(--background))',

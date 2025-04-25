@@ -170,3 +170,21 @@ body {
   z-index: 50 !important;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
+
+@keyframes gradientBorder {
+  0% {
+    background-position: 100% 0;
+  }
+  50% {
+    background-position: 0 100%;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@property --border-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: '<angle>';
+}

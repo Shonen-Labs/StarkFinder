@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
+import { Header } from "@/components/devx/resources/header";
 
 const resources = [
   {
@@ -158,9 +159,8 @@ const ResourceCard = ({ item }: { item: ResourceItem }) => (
     rel="noopener noreferrer"
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
-    className="group relative flex flex-col justify-between p-6 bg-white/5 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
+    className="group relative flex flex-col justify-between p-6 [background:linear-gradient(45deg,#172033,theme(colors.slate.800)_50%,#172033)_padding-box] hover:[background:linear-gradient(45deg,#172033,theme(colors.slate.800)_50%,#172033)_padding-box,conic-gradient(from_var(--border-angle),theme(colors.slate.600/.48)_80%,_theme(colors.gray.500)_86%,_theme(colors.gray.300)_90%,_theme(colors.gray.500)_94%,_theme(colors.slate.600/.48))_border-box] rounded-2xl border border-transparent animate-border"
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
     <div>
       <div className="text-3xl mb-4">{item.icon}</div>
       <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
@@ -174,8 +174,9 @@ const ResourceCard = ({ item }: { item: ResourceItem }) => (
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#172033] py-12 px-4 sm:px-6 lg:px-8">
+      <Header />
+      <div className="max-w-7xl mt-24 mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
