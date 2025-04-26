@@ -13,15 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { Card } from "@/components/ui/card";
 import { Steps } from "@/components/ui/steps";
-
-interface DeploymentResponse {
-  success: boolean;
-  contractAddress?: string;
-  classHash?: string;
-  transactionHash?: string;
-  error?: string;
-  details?: string;
-}
+import { DeploymentResponse, DeploymentStep } from "@/types/main-types";
 
 interface ContractCodeProps {
   nodes: any; // Update with proper type if available
@@ -29,14 +21,10 @@ interface ContractCodeProps {
   flowSummary: any; // Update with proper type if available
   sourceCode: string;
   setSourceCode: (code: string) => void;
-  setDisplayState: (state: any) => void; // Update with proper type if available
-}
-
-interface DeploymentStep {
-  title: string;
-  status: "pending" | "processing" | "complete" | "error";
-  details?: string;
-  hash?: string;
+  setDisplayState?: (state: any) => void; // Update with proper type if available
+  showSourceCode?: boolean;
+  handleAudit?: () => void;
+  handleCompile?: () => void;
 }
 
 const initialSteps: DeploymentStep[] = [
@@ -54,6 +42,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   sourceCode,
   setSourceCode,
   setDisplayState,
+  showSourceCode = true,
 }) => {
   const [steps, setSteps] = useState<DeploymentStep[]>(initialSteps);
   const [isDeploying, setIsDeploying] = useState(false);
@@ -194,23 +183,25 @@ const ContractCode: React.FC<ContractCodeProps> = ({
             editable ? "bg-yellow-200" : "bg-yellow-100"
           }`}
         >
-          <pre className="p-6 overflow-y-auto max-h-[60vh]">
-            <code
-              contentEditable={editable}
-              spellCheck="false"
-              style={{
-                outline: "none",
-                border: "none",
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-                padding: "0",
-              }}
-              suppressContentEditableWarning={true}
-              onBlur={(e) => setSourceCode(e.currentTarget.textContent || "")}
-            >
-              {sourceCode}
-            </code>
-          </pre>
+          {showSourceCode && (
+            <pre className="p-6 overflow-y-auto max-h-[60vh]">
+              <code
+                contentEditable={editable}
+                spellCheck="false"
+                style={{
+                  outline: "none",
+                  border: "none",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  padding: "0",
+                }}
+                suppressContentEditableWarning={true}
+                onBlur={(e) => setSourceCode(e.currentTarget.textContent || "")}
+              >
+                {sourceCode}
+              </code>
+            </pre>
+          )}
         </div>
 
         <div className="flex gap-4 mt-2">

@@ -40,6 +40,8 @@ import SwapNode from "./Blocknode/SwapNode";
 import Header from "./Header";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { FlowSummaryItem } from "@/types/main-types";
+
 
 interface BlockNodeInterface extends NodeProps {
   isDragging: boolean;
@@ -64,10 +66,6 @@ export default function Playground() {
   const [isOpen, setIsOpen] = useState(true);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  interface FlowSummaryItem {
-    content: any;
-    id: string;
-  }
 
   const [flowSummary, setFlowSummary] = useState<FlowSummaryItem[]>([]);
   const [showClearButton, setShowClearButton] = useState(false);
@@ -187,7 +185,7 @@ export default function Playground() {
     default: {
       stroke: "#555",
       strokeWidth: 2,
-      transition: "stroke 0.3s, stroke-width 0.3s",
+      transition: "stroke 0.3s, strokeWidth 0.3s",
     },
     selected: {
       stroke: "#FE007A",
