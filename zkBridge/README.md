@@ -37,13 +37,16 @@ zkBridge implements a trustless bridge using zero-knowledge proofs to cryptograp
 
 ## Implementation Guide
 
-1. **Ethereum Light Client Implementation**
-   - Implement block header verification in Cairo
-   - Create Merkle-Patricia trie verification for transaction proofs
+1. **Ethereum Light Client Implementation with Helios**
+   - Integrate Helios (https://helios.a16zcrypto.com), a trustless, efficient Ethereum light client 
+   - Leverage Helios' optimistic sync protocol for fast block header verification
+   - Port Helios' verification logic to Cairo for on-chain verification
+   - Implement Merkle-Patricia trie verification for transaction proofs
 
 2. **ZK Proof Integration**
-   - Utilize Cairo's herodotus integrity STARK verifier
+   - Utilize Cairo's herodotus (https://docs.herodotus.dev/herodotus-docs/scaling-solutions/integrity-verifier) integrity STARK verifier
    - Implement proof validation for asset transfer events
+   - Connect Helios block header verification with STARK proof generation
 
 3. **Security Features**
    - Develop reorg handling mechanisms
@@ -57,6 +60,7 @@ zkBridge implements a trustless bridge using zero-knowledge proofs to cryptograp
 ## Expected Outcomes
 - Gas-efficient cross-chain transfers
 - Cryptographic security guarantees
+- Faster verification times through Helios' optimized light client
 - Elimination of trusted third parties
 - Resilience against common bridge attack vectors
 
