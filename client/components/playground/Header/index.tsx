@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
 
 interface HeaderProps {
   showClearButton: boolean;
@@ -67,11 +68,54 @@ export default function Header({
 
   const isDeleteVisible = !!selectedNode;
 
+  const centerItems = (
+    <motion.div
+      className="flex-1 flex justify-center pb-4 md:pb-0 text-black md:text-white"
+      initial={{ y: -50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 1.5, delay: 0.5 }}
+    >
+      <ul className="flex flex-col md:flex-row gap-6">
+        <li>
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110  duration-300 "
+          >
+            <Home size={18} /> Home
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/deploy"
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300 "
+          >
+            <Upload size={18} /> Deploy
+          </Link>
+        </li>
+        <li>
+          <button
+            onClick={() => router.push(`/agent/c/${uuidv4()}`)}
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+          >
+            <MessageSquare size={18} /> Agent
+          </button>
+        </li>
+        <li>
+          <Link
+            href="/devx/resources"
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110  duration-300 "
+          >
+            <Book size={18} /> Resources
+          </Link>
+        </li>
+      </ul>
+    </motion.div>
+  );
+
   return (
     <>
-      <div className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke shadow-md rounded-full w-[80%] mx-auto mb-6">
-        <div className="flex items-center m-4">
-          {/* Left: Editable Project Title */}
+      <header className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke text-white w-full">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <motion.div
             className="flex-1 flex items-center "
             initial={{ x: -200, opacity: 0 }}
@@ -79,69 +123,18 @@ export default function Header({
             transition={{ duration: 1.5 }}
           >
             <Link href={"/devx"}>
-              <h2 className="text-2xl font-semibold text-black cursor-pointer">
+              <h2 className="text-md md:text-2xl font-semibold text-black cursor-pointer">
                 DevXStark
               </h2>
             </Link>
           </motion.div>
 
           {/* Center: Navigation Links */}
-          <motion.div
-            className="flex-1 hidden md:flex  justify-center"
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1.5, delay: 0.5 }}
-          >
-            <ul className="flex gap-6">
-              <li>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
-                >
-                  <Home size={18} /> Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/deploy"
-                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110 duration-300 "
-                >
-                  <Upload size={18} /> Deploy
-                </Link>
-              </li>
-              <li>
-                <button
-                  onClick={() => router.push(`/agent/c/${uuidv4()}`)}
-                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110 duration-300"
-                >
-                  <MessageSquare size={18} /> Agent
-                </button>
-              </li>
-              <li>
-                <Link
-                  href="/devx/resources"
-                  className="flex items-center gap-2 hover:text-blue-500 transition-colors hover:scale-110  duration-300 "
-                >
-                  <Book size={18} /> Resources
-                </Link>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* CHANGE 4: Add Mobile Menu Button */}
-          <div className="md:hidden flex items-center mx-2">
-            <Button
-              variant="ghost"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2"
-            >
-              {mobileMenuOpen}
-            </Button>
-          </div>
+          <nav className="hidden md:flex gap-8 text-sm">{centerItems}</nav>
 
           {/* Right: Wallet Connection & Action Buttons */}
           <motion.div
-            className="flex-1 flex items-center justify-end gap-1 "
+            className="flex-1 flex items-center justify-start md:justify-end gap-1 "
             initial={{ x: 200, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -157,7 +150,7 @@ export default function Header({
               <Button
                 variant="primary"
                 onClick={() => setIsWalletModalOpen(true)}
-                className="flex items-center gap-2 hover:scale-110  duration-300 "
+                className="flex items-center gap-2 hover:scale-110  duration-300 text-xs md:text-l "
               >
                 <Wallet size={18} /> Connect Wallet
               </Button>
@@ -189,8 +182,17 @@ export default function Header({
               />
             )}
           </motion.div>
+
+          <div className="md:hidden">
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
-      </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && centerItems}
+      </header>
 
       {/* Wallet Connection Modal */}
       <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>

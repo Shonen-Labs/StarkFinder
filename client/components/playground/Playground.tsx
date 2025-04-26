@@ -201,9 +201,9 @@ export default function Playground() {
   }, []);
 
   return (
-    <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-8 selectable-none ">
+    <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black selectable-none ">
       <motion.div
-        className=" w-full flex flex-col ml-8"
+        className=" w-full flex flex-col"
         animate={{ style: { marginLeft: isOpen ? "1rem" : "2rem" } }}
         transition={{ duration: 0.3 }}
       >
