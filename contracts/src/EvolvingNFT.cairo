@@ -133,8 +133,43 @@ mod EvolvingNFT {
             self.total_supply.read()
         }
 
-        fn token_uri(self: @ContractState, token_id: u256) -> felt252 {
-            
+        fn token_uri(self: @ContractState, token_id: u256) -> ByteArray {
+            // Verify token exists
+            let owner = self.token_owners.read(token_id);
+            assert(!owner.is_zero(), Errors::TOKEN_NONEXISTENT);
+
+
+            // Get the evolution stage for the token
+            let stage = self.evolution_stages.read(token_id);
+
+            // Get metadata hash for the token
+            let metadata_hash = self.metadata_hashes.read(token_id);
+
+            // Construct the token URI
+            let token_id_str = u256_to_string(token_id);
+
+
+            // Get base URI
+            let base_uri = self.token_uri_base.read();
+            let base_uri_bytes = felt252_to_bytes(base_uri);
+
+            // Construct the full token URI
+            // Format: {base_uri}/{token_id}/{stage}/{metadata_hash}
+            let mut complete_uri = base_uri_bytes;
+
+            // Add slash at the end of base_uri if not present
+            if !ends_with_char(complete_uri, '/') {
+                complete_uri.append_byte(0x2f);
+            }
+
+            // Append token_id
+            complete_uri.append(token_id_str);
+            complete_uri.append_byte(0x2f);
+
+
+            // Append stage
+            let stage_str = u8_to_string(stage);
+            complete_uri.append(stage_str);
         }
     }
 
