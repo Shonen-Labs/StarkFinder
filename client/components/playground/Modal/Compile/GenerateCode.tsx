@@ -9,7 +9,8 @@ interface GenerateCodeProps {
   edges: any;
   flowSummary: { content: string }[];
   setDisplayState: (state: "generate" | "contract") => void; // Use the specific type here
-  setSourceCode: React.Dispatch<React.SetStateAction<string>>;
+  appendToSourceCode: (sourceCode: string) => void;
+  sourceCode?: string;
 }
 
 export default function GenerateCode({
@@ -17,7 +18,7 @@ export default function GenerateCode({
   edges,
   flowSummary,
   setDisplayState,
-  setSourceCode,
+  appendToSourceCode,
 }: GenerateCodeProps) {
   const [selectedOption, setSelectedOption] = useState("");
   return (
@@ -124,7 +125,7 @@ export default function GenerateCode({
 
           if (value) {
             // Decode the chunk and append it to the state
-            setSourceCode((prev) => prev + decoder.decode(value));
+            appendToSourceCode(decoder.decode(value));
           }
         }
       }

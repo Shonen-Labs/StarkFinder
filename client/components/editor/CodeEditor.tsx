@@ -10,10 +10,18 @@ import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-rust";
 import "prismjs/themes/prism-dark.css";
-import { ExternalLink, Play, Shield, CheckCircle, XCircle } from "lucide-react";
+import {
+  ExternalLink,
+  Play,
+  Shield,
+  CheckCircle,
+  XCircle,
+  ArrowLeft,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Steps } from "@/components/ui/steps";
 import { DeploymentResponse, DeploymentStep } from "@/types/main-types";
+import { useRouter } from "next/navigation";
 
 const DEFAULT_CONTRACT = `#[starknet::contract]
 mod contract {
@@ -79,6 +87,7 @@ const initialSteps: DeploymentStep[] = [
 ];
 
 export default function CodeEditor() {
+  const router = useRouter();
   const sourceCode = useCodeStore((state) => state.sourceCode);
   const setSourceCode = useCodeStore((state) => state.setSourceCodeStore);
   const [logs, setLogs] = useState<string[]>([]);
@@ -219,6 +228,15 @@ export default function CodeEditor() {
       setIsDeploying(false);
     }
   };
+
+  const backToDevx = async () => {
+    setSourceCode("");
+    setResult(null);
+    setSteps(initialSteps);
+    setLogs([]);
+
+    router.push("/devx");
+  };
   {
     return (
       <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-4 selectable-none">
@@ -241,6 +259,13 @@ export default function CodeEditor() {
             <div className="p-4 bg-[#252526] rounded-2xl border-b border-gray-700 flex justify-between items-center">
               <h2 className="text-white font-medium">Cairo Contract Editors</h2>
               <div className="space-x-2">
+                <Button
+                  onClick={() => backToDevx()}
+                  className="bg-gray-600 hover:bg-gray-700"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  Go Back to BlockPlayground
+                </Button>
                 <Button
                   onClick={() => handleAudit()}
                   className="bg-amber-600 hover:bg-amber-700"

@@ -14,6 +14,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Steps } from "@/components/ui/steps";
 import { DeploymentResponse, DeploymentStep } from "@/types/main-types";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useCodeStore } from "@/lib/codeStore";
 
 interface ContractCodeProps {
   nodes: any; // Update with proper type if available
@@ -25,6 +28,7 @@ interface ContractCodeProps {
   showSourceCode?: boolean;
   handleAudit?: () => void;
   handleCompile?: () => void;
+  onOpenChange?: (open: boolean) => void; // Update with proper type if available
 }
 
 const initialSteps: DeploymentStep[] = [
@@ -43,6 +47,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   setSourceCode,
   setDisplayState,
   showSourceCode = true,
+  onOpenChange,
 }) => {
   const [steps, setSteps] = useState<DeploymentStep[]>(initialSteps);
   const [isDeploying, setIsDeploying] = useState(false);
@@ -161,6 +166,24 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     fetchStreamedData();
   };
 
+  const router = useRouter();
+
+  const openInCodeEditor = () => {
+    setIsLoading(true);
+    const { setNodesStore, setEdgesStore, setFlowSummaryStore } =
+      useCodeStore.getState();
+
+    setEdgesStore(edges);
+    setNodesStore(nodes);
+    setFlowSummaryStore(flowSummary);
+
+    // Navigate to the code editor page
+    router.push(`/devx/code`);
+    if (onOpenChange) {
+      onOpenChange(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -222,7 +245,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               {isLoading ? "Deploying..." : "Deploy"}
             </span>
           </button>
-          <button
+          {/* <button
             className="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50"
             onClick={() => setEditable(!editable)}
             disabled={isDeploying}
@@ -231,7 +254,34 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               <Edit2 className="w-5 h-5" />
               {editable ? "Save" : "Edit"}
             </span>
-          </button>
+          </button> */}
+          {sourceCode && (
+            <button
+              className="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50"
+              onClick={() => openInCodeEditor()}
+              disabled={isDeploying || isLoading}
+            >
+              <span className="flex items-center justify-center gap-2 ">
+                <Edit2 className="w-5 h-5" />
+                Edit
+              </span>
+            </button>
+          )}
+
+          {/*  <Button
+              onClick={openInCodeEditor}
+              className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold hoverEffect transition-colors duration-300"
+              disabled={isLoading}
+              style={{
+                boxShadow: "0 0 15px rgba(100, 255, 218, 0.3)",
+              }}
+            >
+              <span className="flex items-center justify-center gap-2">
+                <Edit2 className="w-5 h-5" />
+                Open in Code editor
+              </span>
+            </Button>
+          )} */}
           <button
             className={`px-4 py-2 rounded-lg ${
               editable || isLoading

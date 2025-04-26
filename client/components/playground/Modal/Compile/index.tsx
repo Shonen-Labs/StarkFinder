@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Credenza, CredenzaBody, CredenzaContent } from "@/components/credeza";
 import GenerateCode from "./GenerateCode";
 import ContractCode from "./ContractCode";
-import { useRouter } from "next/navigation";
+import { useCodeStore } from "@/lib/codeStore";
 
 type displayComponentProps = "generate" | "contract";
 
@@ -26,13 +26,13 @@ export default function Compile({
 }: CompileProps) {
   const [displayState, setDisplayState] =
     useState<displayComponentProps>("generate");
-  const [sourceCode, setSourceCode] = useState("");
+  const sourceCode = useCodeStore((state) => state.sourceCode);
+  const setSourceCode = useCodeStore((state) => state.setSourceCodeStore);
 
-  const router = useRouter();
-
-  const openInCodeEditor = () => {
-    router.push(`/devx/code`);
-    onOpenChange(false);
+  const appendToSourceCode = (additionalCode: string) => {
+    useCodeStore.setState((state) => ({
+      sourceCode: state.sourceCode + additionalCode,
+    }));
   };
 
   return (
@@ -44,15 +44,6 @@ export default function Compile({
         Generates
       </Button>
 
-      {sourceCode && (
-        <Button
-          onClick={openInCodeEditor}
-          className="ml-2 bg-[#19344B] hover:bg-[#0F273B] text-white hoverEffect"
-        >
-          Open in Code editor
-        </Button>
-      )}
-
       <Credenza open={isOpen} onOpenChange={onOpenChange}>
         <CredenzaContent
           className={`border-white/10 bg-[#faf3dd] max-w-[100vh] ${
@@ -62,7 +53,8 @@ export default function Compile({
           <CredenzaBody className="max-h-[84vh] max-w-[95vh] p-5">
             {displayState === "generate" && (
               <GenerateCode
-                setSourceCode={setSourceCode}
+                appendToSourceCode={appendToSourceCode}
+                sourceCode={sourceCode}
                 nodes={nodes}
                 edges={edges}
                 flowSummary={flowSummary}
@@ -78,6 +70,7 @@ export default function Compile({
                 nodes={nodes}
                 edges={edges}
                 flowSummary={flowSummary}
+                onOpenChange={onOpenChange}
               />
             )}
           </CredenzaBody>
