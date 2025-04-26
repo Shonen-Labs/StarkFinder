@@ -51,7 +51,6 @@ export default function UserProfilePage() {
 
   const refreshUserData = () => {
     console.log('Refreshing user data...');
-    // Later, this will fetch fresh data from your database
   };
 
   return (
