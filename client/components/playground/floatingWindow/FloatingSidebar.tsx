@@ -222,53 +222,56 @@ function CustomBlockModal({
   if (!isOpen) return null;
 
   return (
-    <div className=" inset-0 bg-black bg-opacity-50 flex overflow-y-auto justify-center items-center">
-      <div className="bg-white p-6 rounded-lg 
-      w-96 max-h-[80vh] overflow-y-auto">
-        <h2 className="text-lg font-bold mb-4">Create Custom Block</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex overflow-y-auto justify-center items-center z-50 backdrop-blur-sm">
+      <div className="bg-white p-6 rounded-lg shadow-xl w-[500px] max-h-[80vh] overflow-y-auto border border-indigo-100 animate-fade-in">
+        <h2 className="text-xl font-bold mb-4 text-gray-800">
+          Create Custom Block
+        </h2>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Block Name
             </label>
             <input
               {...form.register("blockName")}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 text-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Enter block name"
             />
             {form.formState.errors.blockName && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-sm mt-1">
                 {form.formState.errors.blockName.message}
               </p>
             )}
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Cairo Code
             </label>
             <textarea
               {...form.register("cairoCode")}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 text-black rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              rows={4}
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 text-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              rows={6}
+              placeholder="Enter Cairo code here"
             />
             {form.formState.errors.cairoCode && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-500 text-sm mt-1">
                 {form.formState.errors.cairoCode.message}
               </p>
             )}
           </div>
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="mr-2 px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/30 animate-pulse-subtle"
             >
-              Create
+              Create Block
             </button>
           </div>
         </form>
@@ -300,11 +303,6 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     setOnToggleButton((prev) => !prev);
     console.log("print");
   }
-
-  const formSchema = z.object({
-    blockName: z.string().min(1, "Block name is required"),
-    cairoCode: z.string().min(1, "Cairo code is required"),
-  });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -854,6 +852,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       hoverBorderColor: "hover:border-[#9C9C9C]",
       icon: Code,
       code: values.cairoCode,
+      glowEffect: "shadow-lg shadow-indigo-500/30", // Add glowing effect
     };
 
     // Add the new block to both the interface and store it
