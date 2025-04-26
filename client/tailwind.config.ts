@@ -21,6 +21,7 @@ const config: Config = {
         slide: "slide var(--speed) ease-in-out infinite alternate",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        border: "border 4s linear infinite",
         "pulse-subtle": "pulse-subtle 2s infinite",
         "fade-in": "fadeIn 0.3s ease-out",
       },
@@ -80,6 +81,9 @@ const config: Config = {
           to: {
             height: "0",
           },
+        },
+        border: {
+          to: { "--border-angle": "360deg" },
         },
         "pulse-subtle": {
           "0%, 100%": {
