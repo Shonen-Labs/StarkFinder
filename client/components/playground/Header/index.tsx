@@ -36,8 +36,6 @@ export default function Header({
   selectedNode,
   handleDelete,
 }: HeaderProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [projectName, setProjectName] = useState("DevXStark");
   const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -80,24 +78,11 @@ export default function Header({
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5 }}
           >
-            {isEditing ? (
-              <input
-                type="text"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                onBlur={() => setIsEditing(false)}
-                onKeyDown={(e) => e.key === "Enter" && setIsEditing(false)}
-                className="text-2xl text-black font-semibold bg-transparent outline-none border-b border-white"
-                autoFocus
-              />
-            ) : (
-              <h2
-                className="text-2xl font-semibold text-black cursor-pointer"
-                onClick={() => setIsEditing(true)}
-              >
-                {projectName || "Project Name"}
+            <Link href={"/devx"}>
+              <h2 className="text-2xl font-semibold text-black cursor-pointer">
+                DevXStark
               </h2>
-            )}
+            </Link>
           </motion.div>
 
           {/* Center: Navigation Links */}
