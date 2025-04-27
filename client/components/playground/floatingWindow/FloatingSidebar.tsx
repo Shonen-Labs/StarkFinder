@@ -234,7 +234,7 @@ function CustomBlockModal({
             </label>
             <input
               {...form.register("blockName")}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 text-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 bg-gray-700 text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="Enter block name"
             />
             {form.formState.errors.blockName && (
@@ -249,7 +249,7 @@ function CustomBlockModal({
             </label>
             <textarea
               {...form.register("cairoCode")}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 text-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 bg-gray-700 text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               rows={6}
               placeholder="Enter Cairo code here"
             />
