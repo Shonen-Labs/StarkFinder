@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
+interface NavigationItem {
+  topic: string;
+  link: string;
+}
 
 const MultiSectionAccordion = () => {
+  const pathname = usePathname();
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     "getting-started": false,
     components: false,
@@ -19,50 +26,37 @@ const MultiSectionAccordion = () => {
     });
   };
 
-  const gettingStarted = [
+  const isActive = (path: string): boolean => pathname === path;
+
+  const gettingStarted: NavigationItem[] = [
     { topic: "Install Cairo", link: "/devx/contracts/getting-started/install" },
-    {
-      topic: "Create a new project",
-      link: "/devx/contracts/getting-started/create",
-    },
-    {
-      topic: "Build your project",
-      link: "/devx/contracts/getting-started/build",
-    },
+    { topic: "Create a new project", link: "/devx/contracts/getting-started/create" },
+    { topic: "Build your project", link: "/devx/contracts/getting-started/build" },
     { topic: "Testing", link: "/devx/contracts/getting-started/testing" },
   ];
 
-  const components = [
+  const components: NavigationItem[] = [
     { topic: "Components How-To", link: "/devx/contracts/components/how-to" },
-    {
-      topic: "Components Dependencies",
-      link: "/devx/contracts/components/dependencies",
-    },
+    { topic: "Components Dependencies", link: "/devx/contracts/components/dependencies" },
     { topic: "Storage Collisions", link: "/devx/contracts/components/storage" },
     { topic: "Ownable", link: "/devx/contracts/components/ownable" },
   ];
 
-  const applications = [
-    {
-      topic: "Upgradeable Contract",
-      link: "/devx/contracts/applications/upgradeable-contract",
-    },
+  const applications: NavigationItem[] = [
+    { topic: "Upgradeable Contract", link: "/devx/contracts/applications/upgradeable-contract" },
     { topic: "DeFi Vault", link: "/devx/contracts/applications/defi-vault" },
     { topic: "ERC20 Token", link: "/devx/contracts/applications/erc20-token" },
     { topic: "ERC721 NFT", link: "/devx/contracts/applications/erc721-nft" },
   ];
 
-  const advancedConcept = [
+  const advancedConcept: NavigationItem[] = [
     { topic: "Hashing", link: "/devx/contracts/advanced-concept/hashing" },
     { topic: "Plugins", link: "/devx/contracts/advanced-concept/plugins" },
-    {
-      topic: "Signature Verification",
-      link: "/devx/contracts/advanced-concept/verification",
-    },
+    { topic: "Signature Verification", link: "/devx/contracts/advanced-concept/verification" },
     { topic: "Sierra IR", link: "/devx/contracts/advanced-concept/sierra" },
   ];
 
-  const cairoCheatsheet = [
+  const cairoCheatsheet: NavigationItem[] = [
     { topic: "Felt", link: "/devx/contracts/cairo-cheatsheet/felt" },
     { topic: "Events", link: "/devx/contracts/cairo-cheatsheet/events" },
     { topic: "Maps", link: "/devx/contracts/cairo-cheatsheet/maps" },
@@ -88,9 +82,9 @@ const MultiSectionAccordion = () => {
             <div className="mt-2 ml-4 text-gray-300">
               <ul className="pl-2 space-y-1">
                 {gettingStarted.map((item, index) => (
-                  <ul key={index}>
+                  <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
                     <Link href={item.link}>{item.topic}</Link>
-                  </ul>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -113,7 +107,7 @@ const MultiSectionAccordion = () => {
             <div className="mt-2 ml-4 text-gray-300">
               <ul className="pl-2 space-y-1">
                 {components.map((item, index) => (
-                  <li key={index}>
+                  <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
                     <Link href={item.link}>{item.topic}</Link>
                   </li>
                 ))}
@@ -138,7 +132,7 @@ const MultiSectionAccordion = () => {
             <div className="mt-2 ml-4 text-gray-300">
               <ul className="pl-2 space-y-1">
                 {applications.map((item, index) => (
-                  <li key={index}>
+                  <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
                     <Link href={item.link}>{item.topic}</Link>
                   </li>
                 ))}
@@ -163,7 +157,7 @@ const MultiSectionAccordion = () => {
             <div className="mt-2 ml-4 text-gray-300">
               <ul className="pl-2 space-y-1">
                 {advancedConcept.map((item, index) => (
-                  <li key={index}>
+                  <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
                     <Link href={item.link}>{item.topic}</Link>
                   </li>
                 ))}
@@ -188,7 +182,7 @@ const MultiSectionAccordion = () => {
             <div className="mt-2 ml-4 text-gray-300">
               <ul className="pl-2 space-y-1">
                 {cairoCheatsheet.map((item, index) => (
-                  <li key={index}>
+                  <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
                     <Link href={item.link}>{item.topic}</Link>
                   </li>
                 ))}
