@@ -1,8 +1,12 @@
 #[starknet::contract]
 mod contract {
+    use core::num::traits::Zero;
     use starknet::{ContractAddress, get_caller_address};
     use core::traits::TryInto;
     use core::option::OptionTrait;
+    use starknet::storage::StoragePointerWriteAccess;
+    use starknet::storage::StoragePointerReadAccess;
+
 
     #[storage]
     struct Storage {
@@ -36,10 +40,10 @@ mod contract {
         new_balance: u256,
     }
 
-    mod Errors {
-        const INVALID_CALLER: felt252 = 'Caller is not the owner';
-        const CONTRACT_PAUSED: felt252 = 'Contract is paused';
-        const INVALID_ADDRESS: felt252 = 'Invalid address provided';
+    pub mod Errors {
+        pub const INVALID_CALLER: felt252 = 'Caller is not the owner';
+        pub const CONTRACT_PAUSED: felt252 = 'Contract is paused';
+        pub const INVALID_ADDRESS: felt252 = 'Invalid address provided';
     }
 
     #[constructor]
@@ -86,17 +90,20 @@ mod contract {
         }));
     }
 
-    #[view]
+    #[external(v0)]
+
     fn get_owner(self: @ContractState) -> ContractAddress {
         self.owner.read()
     }
 
-    #[view]
+    #[external(v0)]
+
     fn get_contract_status(self: @ContractState) -> bool {
         self.is_active.read()
     }
 
-    #[view]
+    #[external(v0)]
+
     fn get_balance(self: @ContractState) -> u256 {
         self.balance.read()
     }

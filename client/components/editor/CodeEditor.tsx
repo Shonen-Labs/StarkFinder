@@ -101,7 +101,8 @@ export default function CodeEditor() {
     if (!sourceCode) {
       setSourceCode(DEFAULT_CONTRACT);
     }
-  }, [sourceCode, setSourceCode]);
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, []);
 
   useEffect(() => {
     if (logsContainerRef.current) {
