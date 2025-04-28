@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NextRequest, NextResponse } from 'next/server';
-import { CairoContractGenerator } from '@/lib/devxstark/contract-generator1';
-import prisma from '@/lib/db';
-
+import { NextRequest, NextResponse } from "next/server";
+import { CairoContractGenerator } from "@/lib/devxstark/contract-generator1";
+import prisma from "@/lib/db";
+import { getOrCreateUser } from "@/app/api/transactions/helper";
+import { DojoContractGenerator } from "@/lib/devxstark/dojo-contract-generator";
 
 export async function POST(req: NextRequest) {
   const controller = new AbortController();
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
   const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
   try {
-    const { nodes, edges, flowSummary, userId } = await req.json();
+    const { nodes, edges, flowSummary, userId, blockchain } = await req.json();
     // Validate input
     if (
       !Array.isArray(nodes) ||
@@ -49,7 +50,11 @@ export async function POST(req: NextRequest) {
       })
       .join(", ");
 
-    const generator = new CairoContractGenerator();
+    const generators = {
+      blockchain1: new CairoContractGenerator(),
+      blockchain4: new DojoContractGenerator(),
+    };
+    const generator = generators[blockchain as "blockchain1" | "blockchain4"];
 
     // Create a response object that supports streaming
     const response = new NextResponse(
@@ -81,10 +86,10 @@ export async function POST(req: NextRequest) {
               result.sourceCode,
               "lib"
             );
-
+            await getOrCreateUser(userId);
             await prisma.generatedContract.create({
               data: {
-                name: 'Generated Contract',
+                name: "Generated Contract",
                 sourceCode: result.sourceCode,
                 userId,
               },
@@ -132,7 +137,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
-    
+
     console.error("API error:", error);
     return NextResponse.json(
       {

@@ -5,6 +5,7 @@ import { Credenza, CredenzaBody, CredenzaContent } from "@/components/credeza";
 import GenerateCode from "./GenerateCode";
 import ContractCode from "./ContractCode";
 import { useCodeStore } from "@/lib/codeStore";
+import { useAccount } from "@starknet-react/core";
 
 type displayComponentProps = "generate" | "contract";
 
@@ -24,6 +25,7 @@ export default function Compile({
   onOpenChange,
   flowSummary,
 }: CompileProps) {
+  const { address } = useAccount();
   const [displayState, setDisplayState] =
     useState<displayComponentProps>("generate");
   const sourceCode = useCodeStore((state) => state.sourceCode);
@@ -38,6 +40,7 @@ export default function Compile({
   return (
     <>
       <Button
+        disabled={!address}
         onClick={() => onOpenChange(true)}
         className="bg-[#322131] hover:bg-[#21173E] text-white hoverEffect"
       >

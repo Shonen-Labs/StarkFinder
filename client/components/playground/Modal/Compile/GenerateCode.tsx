@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Button } from "../../../ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap } from "lucide-react";
+import { useAccount } from "@starknet-react/core";
 
 interface GenerateCodeProps {
   nodes: any;
@@ -20,6 +21,7 @@ export default function GenerateCode({
   setDisplayState,
   appendToSourceCode,
 }: GenerateCodeProps) {
+  const { address } = useAccount();
   const [selectedOption, setSelectedOption] = useState("");
   return (
     <motion.div
@@ -75,6 +77,7 @@ export default function GenerateCode({
           <option value="blockchain2">Base</option>
           <option value="blockchain3">Polygon</option>
           <option value="blockchain3">Supra MoveVM</option>
+          <option value="blockchain4">Dojo</option>
         </select>
       </div>
       <AnimatePresence>
@@ -111,7 +114,13 @@ export default function GenerateCode({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nodes, edges, flowSummary }),
+        body: JSON.stringify({
+          nodes,
+          edges,
+          flowSummary,
+          userId: address,
+          blockchain: selectedOption,
+        }),
       }); // Fetch data from the server
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
