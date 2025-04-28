@@ -6,4 +6,5 @@ pub mod IERC721;
 pub mod IConstantProductAmm;
 pub mod IRandomness;
 pub mod IDynamicMilestoneVesting;
+pub mod IIdentityRegistry;
 
