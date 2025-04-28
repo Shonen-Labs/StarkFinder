@@ -74,9 +74,6 @@ export default function GenerateCode({
         >
           <option value="" disabled />
           <option value="blockchain1">Starknet</option>
-          <option value="blockchain2">Base</option>
-          <option value="blockchain3">Polygon</option>
-          <option value="blockchain3">Supra MoveVM</option>
           <option value="blockchain4">Dojo</option>
         </select>
       </div>
