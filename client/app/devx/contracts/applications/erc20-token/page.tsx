@@ -65,7 +65,7 @@ This pattern is widely used in Starknet to create standard-compliant tokens that
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
       <Sidebar />
-      <div className="pl-64 w-full">
+      <div className="pl-64 w-full min-h-screen overflow-y-auto">
         <div className="max-w-4xl mx-auto px-8 py-10">
           <h1 className="text-3xl font-bold text-white mb-2">ERC20 Token Contract</h1>
           <p className="text-lg text-white/80 mb-8">
@@ -73,12 +73,15 @@ This pattern is widely used in Starknet to create standard-compliant tokens that
           </p>
 
           <div className="bg-[#1e1e3f] rounded-lg overflow-hidden mb-8">
-            <pre className="p-6 text-white overflow-auto text-sm leading-relaxed">
+            <div className="flex items-center px-4 py-2 bg-[#191932] border-b border-gray-700">
+              <span className="text-white/80 font-mono text-sm">NatToken.cairo</span>
+            </div>
+            <pre className="p-6 text-white overflow-x-auto text-sm leading-relaxed">
               <code>{contractCode}</code>
             </pre>
           </div>
 
-          <div className="bg-gray-800/50 p-6 rounded-lg">
+          <div className="bg-gray-800/50 p-6 rounded-lg mb-10">
             <h2 className="text-xl font-semibold text-white mb-4">Explanation</h2>
             <div className="text-white/80 space-y-4">
               {explanation.split('\n\n').map((paragraph, idx) => (

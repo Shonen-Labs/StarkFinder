@@ -99,7 +99,7 @@ const MultiSectionAccordion = () => {
   ];
 
   return (
-    <div className="w-full max-w-md h-full overflow-y-auto max-h-[calc(100vh-120px)] pb-4 px-4">
+    <div className="w-full px-4 overflow-y-auto pb-6">
       <div className="space-y-2">
         <div className="cursor-pointer pb-3 rounded-md">
           <div
