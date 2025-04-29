@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,6 +18,35 @@ const MultiSectionAccordion = () => {
     "advanced-concepts": false,
     "cairo-cheatsheet": false,
   });
+
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      const sections = {
+        "getting-started": false,
+        components: false,
+        applications: false,
+        "advanced-concept": false,
+        "cairo-cheatsheet": false,
+      };
+
+      if (pathname?.includes('/getting-started/')) {
+        sections["getting-started"] = true;
+      } else if (pathname?.includes('/components/')) {
+        sections.components = true;
+      } else if (pathname?.includes('/applications/')) {
+        sections.applications = true;
+      } else if (pathname?.includes('/advanced-concept/')) {
+        sections["advanced-concept"] = true;
+      } else if (pathname?.includes('/cairo-cheatsheet/')) {
+        sections["cairo-cheatsheet"] = true;
+      }
+
+      setOpenSections(sections);
+      setIsInitialized(true);
+    }
+  }, [pathname, isInitialized]);
 
   const toggleSection = (section: string) => {
     setOpenSections({
@@ -43,7 +72,10 @@ const MultiSectionAccordion = () => {
   ];
 
   const applications: NavigationItem[] = [
-    { topic: "Upgradeable Contract", link: "/devx/contracts/applications/upgradeable-contract" },
+    {
+      topic: "Upgradeable Contract",
+      link: "/devx/contracts/applications/upgradeable-contract",
+    },
     { topic: "DeFi Vault", link: "/devx/contracts/applications/defi-vault" },
     { topic: "ERC20 Token", link: "/devx/contracts/applications/erc20-token" },
     { topic: "ERC721 NFT", link: "/devx/contracts/applications/erc721-nft" },
@@ -52,7 +84,10 @@ const MultiSectionAccordion = () => {
   const advancedConcept: NavigationItem[] = [
     { topic: "Hashing", link: "/devx/contracts/advanced-concept/hashing" },
     { topic: "Plugins", link: "/devx/contracts/advanced-concept/plugins" },
-    { topic: "Signature Verification", link: "/devx/contracts/advanced-concept/verification" },
+    {
+      topic: "Signature Verification",
+      link: "/devx/contracts/advanced-concept/verification",
+    },
     { topic: "Sierra IR", link: "/devx/contracts/advanced-concept/sierra" },
   ];
 
@@ -64,9 +99,9 @@ const MultiSectionAccordion = () => {
   ];
 
   return (
-    <div className="w-full max-w-md mx-auto h-full overflow-y-auto max-h-[550px] pb-4">
+    <div className="w-full max-w-md h-full overflow-y-auto max-h-[calc(100vh-120px)] pb-4 px-4">
       <div className="space-y-2">
-        <div className="cursor-pointer pb-3 pr-3 rounded-md">
+        <div className="cursor-pointer pb-3 rounded-md">
           <div
             className="flex justify-between items-center"
             onClick={() => toggleSection("getting-started")}
@@ -83,7 +118,7 @@ const MultiSectionAccordion = () => {
               <ul className="pl-2 space-y-1">
                 {gettingStarted.map((item, index) => (
                   <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
-                    <Link href={item.link}>{item.topic}</Link>
+                    <Link href={item.link} prefetch={false}>{item.topic}</Link>
                   </li>
                 ))}
               </ul>
@@ -91,7 +126,7 @@ const MultiSectionAccordion = () => {
           )}
         </div>
 
-        <div className="cursor-pointer pb-3 pr-3 rounded-md">
+        <div className="cursor-pointer pb-3 rounded-md">
           <div
             className="flex justify-between items-center"
             onClick={() => toggleSection("components")}
@@ -108,7 +143,7 @@ const MultiSectionAccordion = () => {
               <ul className="pl-2 space-y-1">
                 {components.map((item, index) => (
                   <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
-                    <Link href={item.link}>{item.topic}</Link>
+                    <Link href={item.link} prefetch={false}>{item.topic}</Link>
                   </li>
                 ))}
               </ul>
@@ -116,7 +151,7 @@ const MultiSectionAccordion = () => {
           )}
         </div>
 
-        <div className="cursor-pointer pb-3 pr-3 rounded-md">
+        <div className="cursor-pointer pb-3 rounded-md">
           <div
             className="flex justify-between items-center"
             onClick={() => toggleSection("applications")}
@@ -133,7 +168,7 @@ const MultiSectionAccordion = () => {
               <ul className="pl-2 space-y-1">
                 {applications.map((item, index) => (
                   <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
-                    <Link href={item.link}>{item.topic}</Link>
+                    <Link href={item.link} prefetch={false}>{item.topic}</Link>
                   </li>
                 ))}
               </ul>
@@ -141,24 +176,24 @@ const MultiSectionAccordion = () => {
           )}
         </div>
 
-        <div className="cursor-pointer pb-3 pr-3 rounded-md">
+        <div className="cursor-pointer pb-3 rounded-md">
           <div
             className="flex justify-between items-center"
-            onClick={() => toggleSection("advanced-concepts")}
+            onClick={() => toggleSection("advanced-concept")}
           >
             <h1 className="text-lg font-medium">Advanced Concepts</h1>
-            {openSections["advanced-concepts"] ? (
+            {openSections["advanced-concept"] ? (
               <ChevronUp size={20} />
             ) : (
               <ChevronDown size={20} />
             )}
           </div>
-          {openSections["advanced-concepts"] && (
+          {openSections["advanced-concept"] && (
             <div className="mt-2 ml-4 text-gray-300">
               <ul className="pl-2 space-y-1">
                 {advancedConcept.map((item, index) => (
                   <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
-                    <Link href={item.link}>{item.topic}</Link>
+                    <Link href={item.link} prefetch={false}>{item.topic}</Link>
                   </li>
                 ))}
               </ul>
@@ -166,7 +201,7 @@ const MultiSectionAccordion = () => {
           )}
         </div>
 
-        <div className="cursor-pointer pb-3 pr-3 rounded-md">
+        <div className="cursor-pointer pb-3 rounded-md">
           <div
             className="flex justify-between items-center"
             onClick={() => toggleSection("cairo-cheatsheet")}
@@ -183,7 +218,7 @@ const MultiSectionAccordion = () => {
               <ul className="pl-2 space-y-1">
                 {cairoCheatsheet.map((item, index) => (
                   <li key={index} className={isActive(item.link) ? "text-white font-bold" : ""}>
-                    <Link href={item.link}>{item.topic}</Link>
+                    <Link href={item.link} prefetch={false}>{item.topic}</Link>
                   </li>
                 ))}
               </ul>
