@@ -14,7 +14,7 @@ import {
 import {
   Credenza,
   CredenzaBody,
-  CredenzaClose,
+  /*CredenzaClose,*/
   CredenzaContent,
   CredenzaHeader,
   CredenzaTitle,
