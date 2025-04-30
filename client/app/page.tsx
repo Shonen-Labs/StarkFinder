@@ -9,9 +9,6 @@ import {
   Question,
 } from '@/components/landing/home'
 
-import FloatingSidebar from "../components/playground/floatingWindow/FloatingSidebar"; 
-
-
 // import FloatingSidebar from "../components/playground/floatingWindow/FloatingSidebar"; 
 
 
