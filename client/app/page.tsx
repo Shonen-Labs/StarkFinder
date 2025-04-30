@@ -1,6 +1,6 @@
 "use client";
 
-import {
+/*0import {
   Hero,
   Header,
   Feature,
@@ -8,7 +8,7 @@ import {
   Offer,
   Question,
 } from '@/components/landing/home'
-
+*/
 import FloatingSidebar from "../components/playground/floatingWindow/FloatingSidebar"; 
 
 export default function HomePage() {
