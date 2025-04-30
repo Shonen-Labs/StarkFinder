@@ -3,9 +3,10 @@
 import { Globe, Layers, Grid3X3, FileText, Box } from "lucide-react";
 import dojoBlocks from "./DojoBlocks";
 import DojoCategory from "./DojoCategory";
+import { DojoBlock } from "./types";
 
 interface DojoBlocksSidebarProps {
-  addBlock: (block: any) => void;
+  addBlock: (block: DojoBlock) => void;
 }
 
 export default function DojoBlocksSidebar({ addBlock }: DojoBlocksSidebarProps) {

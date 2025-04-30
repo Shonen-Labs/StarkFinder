@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useReducer, useEffect, useRef } from "react";
+import { useState, useReducer, useEffect, useRef, ComponentType, SVGProps } from "react";
 import groupedBlocks from "./data";
-import dojoBlocks from "../Dojo/DojoBlocks";
+
+// import dojoBlocks from "../Dojo/DojoBlocks";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -15,6 +16,8 @@ import { Code } from "lucide-react";
 import EnvironmentSwitch from "../Dojo/EnvironmentSwitch";
 import DojoBlocksSidebar from "../Dojo/DojoBlocksSidebar";
 import CustomBlockModal from "../Modal/CustomBlock";
+// Import the DojoBlock type from your types file, but rename it to avoid conflict
+import { DojoBlock as ImportedDojoBlock } from "../Dojo/types";
 
 // Icons
 import StartIcon from "@/components/svgs/StartIcon";
@@ -61,6 +64,44 @@ const po = groupedBlocks["Portfolio Management"];
 const inst = groupedBlocks["Analytics"];
 const go = groupedBlocks["Governance"];
 const ev = groupedBlocks["Events"];
+
+// Define an IconType for SVG components
+type IconType = ComponentType<SVGProps<SVGSVGElement>>;
+
+// Define a Block type to replace 'any'
+interface Block {
+  id: string;
+  content: string;
+  color: string;
+  borderColor: string;
+  hoverBorderColor: string;
+  icon: IconType;
+  code?: string;
+}
+
+// Define a local DojoBlock interface to avoid conflict with imported one
+// interface DojoBlock {
+//   id: string;
+//   title: string;
+//   description?: string;
+//   color?: string;
+//   borderColor?: string;
+//   hoverBorderColor?: string;
+//   icon?: IconType;
+//   code?: string;
+// }
+
+const dojoBlockAdapter = (dojoBlock: ImportedDojoBlock): Block => {
+  return {
+    id: dojoBlock.id,
+    content: dojoBlock.title || dojoBlock.content || '', 
+    color: dojoBlock.color || "bg-[#3C3C3C]", 
+    borderColor: dojoBlock.borderColor || "border-[#6C6C6C]", 
+    hoverBorderColor: dojoBlock.hoverBorderColor || "hover:border-[#9C9C9C]",
+    icon: dojoBlock.icon || Code,
+    code: dojoBlock.code || dojoBlock.description || '', 
+  };
+};
 
 // Menu item data
 const triggerActions = [
@@ -119,7 +160,7 @@ const eventsAndAutomation = [
 ];
 
 interface FloatingSidebarProps {
-  addBlock: (block: any) => void;
+  addBlock: (block: Block) => void;
 }
 
 interface ToggleState {
@@ -199,7 +240,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
   const [state, dispatch] = useReducer(toggleReducer, initialState);
   const [onToggleButton, setOnToggleButton] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
-  const [customBlocks, setCustomBlocks] = useState<any[]>([]);
+  const [customBlocks, setCustomBlocks] = useState<Block[]>([]);
   const [sidebarHeight, setSidebarHeight] = useState<number | null>(null);
   const starknetRef = useRef<HTMLDivElement>(null);
 
@@ -233,7 +274,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
   function onSubmitCustomBlock(values: z.infer<typeof formSchema>) {
     // Create a custom block with the same structure as other blocks
-    const newCustomBlock = {
+    const newCustomBlock: Block = {
       id: `custom-${Date.now()}`, // Generate a unique ID
       content: values.blockName,
       color: "bg-[#3C3C3C]",
@@ -702,9 +743,13 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           </div>
         </div>
       ) : (
-       
         <div className="h-full flex flex-col">
-          <DojoBlocksSidebar addBlock={addBlock} />
+          <DojoBlocksSidebar
+            addBlock={(dojoBlock) => {
+              const convertedBlock = dojoBlockAdapter(dojoBlock);
+              addBlock(convertedBlock);
+            }}
+          />
 
           <div className="flex-grow"></div>
         </div>
@@ -755,6 +800,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
           )}
         </div>
       </div>
+
 
       {/* Promotional Section */}
       <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">

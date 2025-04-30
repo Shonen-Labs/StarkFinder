@@ -3,20 +3,13 @@
 import { ReactNode, useState } from "react";
 import DropdownArrowIcon from "@/components/svgs/DropdownArrowIcon";
 import clsx from "clsx";
+import { DojoBlock } from "./types";
 
 interface DojoCategoryProps {
   title: string;
   icon: ReactNode;
-  blocks: Array<{
-    id: string;
-    content: string;
-    color: string;
-    borderColor: string;
-    hoverBorderColor: string;
-    icon: any;
-    code: string;
-  }>;
-  addBlock: (block: any) => void;
+  blocks: DojoBlock[];
+  addBlock: (block: DojoBlock) => void;
 }
 
 export default function DojoCategory({ 
@@ -58,7 +51,15 @@ export default function DojoCategory({
               <div
                 key={block.id}
                 className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                onClick={() => addBlock(block)}
+                onClick={() => {
+                  // Ensure block has title property before passing to addBlock
+                  // If title doesn't exist, use content as title
+                  const blockWithTitle = {
+                    ...block,
+                    title: block.title || block.content
+                  };
+                  addBlock(blockWithTitle);
+                }}
               >
                 <div className="flex gap-3 items-center">
                   <IconComponent className="h-4 w-4" />
