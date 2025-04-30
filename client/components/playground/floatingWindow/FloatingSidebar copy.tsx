@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useReducer, useEffect, useRef } from "react";
+import { useState, useReducer } from "react";
 import groupedBlocks from "./data";
 import dojoBlocks from "../Dojo/DojoBlocks";
 import { useForm } from "react-hook-form";
@@ -14,7 +14,7 @@ import { Code } from "lucide-react";
 // Components
 import EnvironmentSwitch from "../Dojo/EnvironmentSwitch";
 import DojoBlocksSidebar from "../Dojo/DojoBlocksSidebar";
-import CustomBlockModal from "../Modal/CustomBlock";
+import CustomBlockModal from "../Dojo/CustomBlockModal";
 
 // Icons
 import StartIcon from "@/components/svgs/StartIcon";
@@ -193,15 +193,11 @@ const combined = triggerActions.map((action, index) => ({
 }));
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
-  const [environment, setEnvironment] = useState<"starknet" | "dojo">(
-    "starknet"
-  );
+  const [environment, setEnvironment] = useState<"starknet" | "dojo">("starknet");
   const [state, dispatch] = useReducer(toggleReducer, initialState);
   const [onToggleButton, setOnToggleButton] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [customBlocks, setCustomBlocks] = useState<any[]>([]);
-  const [sidebarHeight, setSidebarHeight] = useState<number | null>(null);
-  const starknetRef = useRef<HTMLDivElement>(null);
 
   const formSchema = z.object({
     blockName: z.string().min(1, "Block name is required"),
@@ -215,13 +211,6 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       cairoCode: "",
     },
   });
-
-  // Save the starknet sidebar height when component mounts
-  useEffect(() => {
-    if (starknetRef.current && environment === "starknet") {
-      setSidebarHeight(starknetRef.current.scrollHeight);
-    }
-  }, [environment]);
 
   function switchToggleBtn() {
     setOnToggleButton((prev) => !prev);
@@ -254,26 +243,17 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     toast.success("Custom block added successfully");
   }
 
-  // Create dynamic styles for the main container based on environment
-  const sidebarStyle =
-    environment === "dojo" && sidebarHeight
-      ? { minHeight: `${sidebarHeight}px` }
-      : {};
-
   return (
-    <div
-      className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg transition-all duration-300 ease-out mb-5 text-sm"
-      style={sidebarStyle}
-    >
+    <div className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg transition-all duration-300 ease-out mb-5 text-sm">
       {/* Environment Switch */}
-      <EnvironmentSwitch
-        onChange={handleEnvironmentChange}
+      <EnvironmentSwitch 
+        onChange={handleEnvironmentChange} 
         defaultEnvironment="starknet"
       />
 
       {/* Render Either Starknet or Dojo Blocks based on environment */}
       {environment === "starknet" ? (
-        <div ref={starknetRef}>
+        <>
           {/* Defi Section */}
           <div>
             <h4 className="text-gray-400">Defi</h4>
@@ -296,9 +276,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                     <span>
                       <StartIcon />
                     </span>
-                    <div className="text-black cursor-default">
-                      Trigger Actions
-                    </div>
+                    <div className="text-black cursor-default">Trigger Actions</div>
                   </div>
                   <div>
                     {state.triggerActionToggle ? (
@@ -329,15 +307,9 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                           <span>
                             {item.toggle &&
                               (onToggleButton ? (
-                                <ToggleBtn
-                                  mode="on"
-                                  onClick={switchToggleBtn}
-                                />
+                                <ToggleBtn mode="on" onClick={switchToggleBtn} />
                               ) : (
-                                <ToggleBtn
-                                  mode="off"
-                                  onClick={switchToggleBtn}
-                                />
+                                <ToggleBtn mode="off" onClick={switchToggleBtn} />
                               ))}
                           </span>
                         </div>
@@ -364,9 +336,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                     <span>
                       <CoinIcon />
                     </span>
-                    <div className="text-black cursor-default">
-                      Token Actions
-                    </div>
+                    <div className="text-black cursor-default">Token Actions</div>
                   </div>
                   <div>
                     {state.tokenActionsToggle ? (
@@ -401,15 +371,9 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                             <span>
                               {child.toggle &&
                                 (onToggleButton ? (
-                                  <ToggleBtn
-                                    mode="on"
-                                    onClick={switchToggleBtn}
-                                  />
+                                  <ToggleBtn mode="on" onClick={switchToggleBtn} />
                                 ) : (
-                                  <ToggleBtn
-                                    mode="off"
-                                    onClick={switchToggleBtn}
-                                  />
+                                  <ToggleBtn mode="off" onClick={switchToggleBtn} />
                                 ))}
                             </span>
                           </div>
@@ -609,9 +573,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                       <span>
                         <GovernanceIcon />
                       </span>
-                      <div className="text-black cursor-default">
-                        Governance
-                      </div>
+                      <div className="text-black cursor-default">Governance</div>
                     </div>
                     <div>
                       {state.governanceToggle ? (
@@ -700,17 +662,13 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
               </div>
             </div>
           </div>
-        </div>
+        </>
       ) : (
-       
-        <div className="h-full flex flex-col">
-          <DojoBlocksSidebar addBlock={addBlock} />
-
-          <div className="flex-grow"></div>
-        </div>
+        // Render Dojo Blocks when environment is "dojo"
+        <DojoBlocksSidebar addBlock={addBlock} />
       )}
 
-      {/* Custom Block Section */}
+      {/* Custom Block Section - Available in both environments */}
       <div className="mt-4">
         <div className="hover:bg-gray-200 rounded-lg">
           <div
@@ -788,7 +746,6 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
         isOpen={isCustomModalOpen}
         onClose={() => setIsCustomModalOpen(false)}
         onSubmit={onSubmitCustomBlock}
-        environment={environment}
       />
     </div>
   );
