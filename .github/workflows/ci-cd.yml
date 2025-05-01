@@ -75,7 +75,7 @@ jobs:
 
       - name: Run Starknet Foundry tests
         # Use the full path to ensure it's found
-        run: ${HOME}/.starknet-foundry/bin/snforge test --workspace
+        run: scarb test
 
   nextjs-build-and-test:
     # Rest of your workflow remains the same
