@@ -63,17 +63,10 @@ jobs:
             # sudo cp target/release/snforge /usr/local/bin/forge
             # cd ..
             # rm -rf starknet-foundry
-            git clone https://github.com/asdf-vm/asdf.git --branch v0.16.0
-            cd asdf
-            make
-            sudo cp ./asdf /usr/local/bin/asdf
-            echo "Installed asdf to /usr/local/bin/asdf"
-            echo ". /usr/local/bin/asdf.sh" >> $GITHUB_ENV
-            echo "install foundry"
-            asdf plugin add starknet-foundry
-            asdf install starknet-foundry 0.39.0
+            curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.39.0
+            # Add to PATH
+            echo "${HOME}/.starknet-foundry/bin" >> $GITHUB_PATH
           fi
-          forge --version
 
       - name: Install dependencies
         run: |
@@ -84,7 +77,7 @@ jobs:
         run: scarb build
 
       - name: Run forge tests
-        run: forge test --workspace
+        run: snforge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
