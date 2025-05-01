@@ -63,9 +63,14 @@ jobs:
             # sudo cp target/release/snforge /usr/local/bin/forge
             # cd ..
             # rm -rf starknet-foundry
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            brew install asdf
-            asdf plugin add scarb
+            git clone https://github.com/asdf-vm/asdf.git --branch v0.16.0
+            cd asdf
+            make
+            sudo cp ./asdf /usr/local/bin/asdf
+            echo "Installed asdf to /usr/local/bin/asdf"
+            echo ". /usr/local/bin/asdf.sh" >> $GITHUB_ENV
+            echo "install foundry"
+            asdf plugin add starknet-foundry
             asdf install starknet-foundry 0.39.0
           fi
           forge --version
