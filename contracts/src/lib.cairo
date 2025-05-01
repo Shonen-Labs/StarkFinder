@@ -13,3 +13,4 @@ pub mod ConstantProductAmm;
 pub mod upgradable;
 pub mod random_num;
 pub mod SimpleStorage;
+pub mod EvolvingNFT;

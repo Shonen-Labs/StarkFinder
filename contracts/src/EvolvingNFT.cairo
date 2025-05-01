@@ -1,6 +1,50 @@
+use EvolvingNFT::ContractState;
+use starknet::ContractAddress;
+
+
+#[starknet::interface]
+pub trait IEvolvingNFT<TContractState> {
+    // Basic NFT FUnctionality
+    fn name(self: @TContractState) -> felt252;
+    fn symbol(self: @TContractState) -> felt252;
+    fn owner_of(self: @TContractState, token_id: u256) -> ContractAddress;
+    fn balance_of(self: @TContractState, owner: ContractAddress) -> u256;
+    fn total_supply(self: @TContractState) -> u256;
+    fn token_uri(self: @TContractState, token_id: u256) -> felt252;
+    fn mint(ref self: TContractState, to: ContractAddress, initial_metadata_hash: felt252) -> u256;
+
+    //Evolution Mechanics
+    fn get_evolution_stage(self: @TContractState, token_id: u256) -> u256;
+    fn evolve_by_time(ref self: TContractState, token_id: u256);
+    fn register_interaction(ref self: TContractState, token_id: u256);
+
+
+    // Metadata Management
+    fn update_metadata(ref self: TContractState, token_id: u256, new_metadata_hash: felt252);
+    fn update_metadata_if_condition_met(ref self: TContractState, token_id: u256, new_metadata_hash: felt252, required_stage: u8);
+
+
+
+
+    // Access Control
+    fn set_authorized_updater(ref self: TContractState, updater: ContractAddress, authorized: bool);
+    fn is_authorized_updater(self: @TContractState, address: ContractAddress) -> bool;
+    fn update_metadata_if_conditions_met(ref self: TContractState, token_id: u256, new_metadata_hash: felt252, required_stage: u8);
+    
+    fn get_metadata_hash(self: @TContractState, token_id: u256) -> felt252;
+    fn get_evolution_timestamp(self: @TContractState, token_id: u256) -> u64;
+    fn get_interaction_count(self: @TContractState, token_id: u256) -> u32;
+    fn set_evolution_stage(ref self: TContractState, token_id: u256, stage: u8);
+}
+
+
+
+
+
 #[starknet::contract]
 mod EvolvingNFT {
-    use starknet::{ContractAddress, get_block_timestamp, get_caller_address};
+    use core::num::traits::Zero;
+use starknet::{ContractAddress, get_block_timestamp, get_caller_address};
     use starknet::storage::{
         StoragePointerReadAccess, StoragePointerWriteAccess,
         Map, StorageMapReadAccess, StorageMapWriteAccess
@@ -66,6 +110,9 @@ mod EvolvingNFT {
         self.token_id_counter.write(0);
     }
 
+
+
+
     #[abi(embed_v0)]
     impl EvolvingNFTImpl of super::IEvolvingNFT<ContractState> {
         // Basic NFT Functionality
@@ -92,11 +139,9 @@ mod EvolvingNFT {
             self.total_supply.read()
         }
 
-        fn token_uri(self: @ContractState, token_id: u256) -> ByteArray {
+        fn token_uri(self: @ContractState, token_id: u256) -> felt252 {
             assert(self.owners.read(token_id).is_non_zero(), 'Token does not exist');
-            let metadata_hash = self.token_metadata.read(token_id);
-            // Convert metadata hash to string for URI
-            metadata_hash.to_string()
+            self.token_metadata.read(token_id)
         }
 
         fn mint(ref self: ContractState, to: ContractAddress, initial_metadata_hash: felt252) -> u256 {
@@ -112,15 +157,15 @@ mod EvolvingNFT {
             self.evolution_timestamps.write(token_id, get_block_timestamp());
             self.interaction_counts.write(token_id, 0);
 
-            self.emit(Transfer { from: Zeroable::zero(), to, token_id });
-            self.emit(MetadataUpdated { token_id, new_metadata_hash: initial_metadata_hash });
+            // self.emit(Transfer { from: ContractAddress::zero(), to, token_id });
+            // self.emit(MetadataUpdated { token_id, new_metadata_hash: initial_metadata_hash });
             token_id
         }
 
         // Evolution Mechanics
-        fn get_evolution_stage(self: @ContractState, token_id: u256) -> u8 {
+        fn get_evolution_stage(self: @ContractState, token_id: u256) -> u256 {
             assert(self.owners.read(token_id).is_non_zero(), 'Token does not exist');
-            self.evolution_stages.read(token_id)
+            self.evolution_stages.read(token_id).into()
         }
 
         fn evolve_by_time(ref self: ContractState, token_id: u256) {
@@ -214,6 +259,6 @@ mod EvolvingNFT {
             self.evolution_stages.write(token_id, stage);
             self.evolution_timestamps.write(token_id, get_block_timestamp());
             self.emit(EvolutionStageChanged { token_id, new_stage: stage });
-        }
+        }fn update_metadata_if_condition_met(ref self: contracts::EvolvingNFT::EvolvingNFT::ContractState, token_id: core::integer::u256, new_metadata_hash: core::felt252, required_stage: core::integer::u8) {}
     }
 }
