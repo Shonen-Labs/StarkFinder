@@ -50,21 +50,25 @@ jobs:
           path: ~/.cargo/bin
           key: ${{ runner.os }}-forge-${{ hashFiles('**/Cargo.lock') }}
 
+      - name: Install Universal Sierra Compiler
+        run: curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
+
       - name: Install Starknet Foundry (snforge)
         run: |
           if ! command -v forge &> /dev/null; then
-            git clone https://github.com/foundry-rs/starknet-foundry.git
-            cd starknet-foundry
-            git checkout v0.39.0
-            cargo build --release
-            sudo cp target/release/snforge /usr/local/bin/forge
-            cd ..
-            rm -rf starknet-foundry
+            # git clone https://github.com/foundry-rs/starknet-foundry.git
+            # cd starknet-foundry
+            # git checkout v0.39.0
+            # cargo build --release
+            # sudo cp target/release/snforge /usr/local/bin/forge
+            # cd ..
+            # rm -rf starknet-foundry
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            brew install asdf
+            asdf plugin add scarb
+            asdf install starknet-foundry 0.39.0
           fi
           forge --version
-
-      - name: Install Universal Sierra Compiler
-        run: curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
 
       - name: Install dependencies
         run: |
