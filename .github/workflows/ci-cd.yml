@@ -55,7 +55,7 @@ jobs:
           if ! command -v forge &> /dev/null; then
             git clone https://github.com/foundry-rs/starknet-foundry.git
             cd starknet-foundry
-            git checkout v0.34.0
+            git checkout v0.39.0
             cargo build --release
             sudo cp target/release/snforge /usr/local/bin/forge
             cd ..
