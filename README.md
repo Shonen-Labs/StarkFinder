@@ -1,262 +1,159 @@
-# StarkFinder: Your AI-Powered Starknet Navigator
+# StarkFinder: Unified StarkNet Data and AI Assistant
 
-[![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://t.me/shogenlabs)
-[![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-light--blue?logo=telegram)](https://t.me/starkfinder_bot)
-[![Website](https://img.shields.io/badge/Website-StarkFinder-green)](https://www.starkfinder.ai](https://stark-finder-mq45.vercel.app/))
+## Vision
 
-![image](https://github.com/user-attachments/assets/22bf72f4-0edd-4af6-a3c2-1397e85ca0f8)
-
-
-## Table of Contents
-- [Introduction](#introduction)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Using StarkFinder](#using-starkfinder)
-  - [Available Agents](#available-agents)
-    - [Trade Agent](#trade-agent)
-    - [Investment Agent](#investment-agent)
-    - [Exploration Agent](#exploration-agent)
-    - [Research Agent](#research-agent)
-- [Design](#design)
-   - [Landing Page](#landing-page)
-   - [Starkfinder Transaction Page](#starkfinder-transaction-page)
-- [Future Plans](#future-plans)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Introduction
-StarkFinder is an innovative AI-powered application that helps users navigate the Starknet ecosystem with ease. Developed for the EthGlobal AI Web3 Hackathon, StarkFinder leverages the power of multi-agent AI to automate various tasks, making the Starknet experience more efficient and streamlined for users.
+StarkFinder is an innovative application designed to help users navigate and interact with the StarkNet ecosystem.  It combines AI-powered assistance with comprehensive data access, providing tools for both exploring StarkNet and automating tasks. StarkFinder leverages a multi-agent AI architecture to streamline the StarkNet experience, making it more efficient and user-friendly.
 
 ## Features
-- **Multi-Agent Architecture**: StarkFinder supports a diverse set of specialized agents, each with its own capabilities, such as trading, investing, exploring, and researching Starknet protocols.
-- **Starknet Integration**: The agents seamlessly interact with the Starknet Layer 2 network, allowing users to leverage the benefits of this high-performance blockchain.
-- **Conversational Interface**: Users can communicate with the agents through an intuitive chat-like interface, making the experience natural and user-friendly.
-- **Automation and Task Delegation**: Users can delegate tasks to the agents, which will then execute them on their behalf, saving time and effort.
-- **Comprehensive Starknet Insights**: The application provides users with in-depth information about Starknet, including DeFi platforms, trading opportunities, and research insights.
-- **Advanced DeFi Features**: Implementation of sophisticated DeFi primitives including a Concentrated Liquidity AMM for efficient capital utilization in liquidity provision.
+
+StarkFinder offers a range of features, including:
+
+* **Multi-Agent Architecture:** StarkFinder employs a diverse set of specialized agents, each with specific capabilities, such as trading, investing, exploring, and researching StarkNet protocols.
+* **StarkNet Integration:** The agents seamlessly interact with the StarkNet Layer 2 network.
+* **Conversational Interface:** Users can communicate with the agents through an intuitive chat-like interface.
+* **Task Automation:** Users can delegate tasks to the agents, which will execute them, saving time and effort.
+* **StarkNet Insights:** The application provides in-depth information about StarkNet, including DeFi platforms, trading opportunities, and research.
+* **Advanced DeFi Features:** Implementation of sophisticated DeFi primitives, including a Concentrated Liquidity AMM.
 
 ## Architecture
+
 StarkFinder is built using the following technologies:
 
-- **Next.js**: A React framework for building server-rendered and static websites.
-- **Prisma**: A type-safe ORM for interacting with the database.
-- **PostgreSQL**: The relational database used for storing user data and agent configurations.
-- **TypeScript**: A superset of JavaScript that adds optional static typing.
-- **Cairo**: A domain-specific language used for writing Starknet smart contracts.
+* **Next.js:** A React framework.
+* **Prisma:** A type-safe ORM.
+* **PostgreSQL:** A relational database.
+* **TypeScript:** A superset of JavaScript.
+* **Cairo:** A domain-specific language for Starknet smart contracts.
 
-The application's architecture follows a multi-agent design, where each agent specializes in a specific task or domain. The agents communicate with the Starknet network through a set of APIs and integrate with various Starknet-based protocols and services.
+The application's architecture follows a multi-agent design, where each agent specializes in a specific task. The agents communicate with the StarkNet network through a set of APIs and integrate with various StarkNet-based protocols and services.
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (version 14 or higher)
-- PostgreSQL (version 12 or higher)
-- Create `.env` file both in `client` and `tg_bot` directories with different `DATABASE_URL`. For BrianAI API key go to their [app](https://www.brianknows.org/app) connect wallet and get your key.
+
+* Node.js (version 14 or higher)
+* PostgreSQL (version 12 or higher)
 
 ### Installation
-1. Clone the repository:
-   ```
-   git clone https://github.com/username/StarkFinder.git
-   ```
-2. Navigate to the project directory:
-   ```
-   cd StarkFinder
-   ```
-3. Install the dependencies:
-   ```
-   cd client
-   npm install
-   cd ..
-   cd tg_bot
-   npm install
-   ```
-4. Setup the Environment variables
-   ```sh
-   cp .env.example .env
-   ```    
-   - Copy the following environment variables
-   ```sh
-   BOT_USERNAME=""
-   BRIAN_API_KEY=""
-   DATABASE_URL=""
-   MY_TOKEN=""
-   WEBHOOK_URL=""
-   LAYERSWAP_API_KEY=""
-   TELEGRAM_APP_URL=""
-   OPENAI_API_KEY=""
-   ANTHROPIC_API_KEY=""
-   ```
-   - For `BOT_USERNAME`, go to [Bot Father](https://t.me/BotFather) and create a Bot || *`NOT REQUIRED`*
-   - For `BRIAN_API_KEY`, visit [Brian AI](http://docs.brianknows.org/brian-api/api-key) website and create your API key || *`REQUIRED`*
-   - For `DATABASE_URL`, create or use a provider for PostgreSQL db url || *`REQUIRED`*
-   - `MY_TOKEN` is your Telegram Bot Token, created from [Bot Father](https://t.me/BotFather) || *`NOT REQUIRED`*
-   - `WEBHOOK_URL` is not required || *`NOT REQUIRED`*
-   - For `LAYERSWAP_API_KEY`, Go to [Layerswap Dashboard](https://v0-docs.layerswap.io/api-reference/api-keys) and create one || *`REQUIRED`*
-   - For `TELEGRAM_APP_URL`, go to [Bot Father](https://t.me/BotFather) and create a miniapp || *`NOT REQUIRED`*
-   - For `OPENAI_API_KEY`, go to [OpenAI API website](https://openai.com/index/openai-api/) and create one || *`REQUIRED`*
-   - For `ANTHROPIC_API_KEY`, go to [Dashboard](https://console.anthropic.com/settings/keys) || *`REQUIRED`*
-5. Set up the database (both into `client` and `tg_bot` directories):
-   ```
-   npx prisma generate
-   npx prisma migrate dev
-   ```
-6. Start the development server:
-   ```
-   npm run dev
-   ```
+
+1.  Clone the repository:
+
+    ```bash
+    git clone [https://github.com/username/StarkFinder.git](https://github.com/username/StarkFinder.git)
+    
+    git clone <YOUR_REPOSITORY_URL> # TODO: Replace with actual URL
+    cd StarkFinder
+    ```
+
+2.  Install dependencies:
+
+    ```bash
+    cd client
+    npm install # Install client dependencies
+    cd ..
+    cd tg_bot
+    npm install
+    ```
+
+3.  Set up environment variables:
+
+    * Create `.env` files in both the `client` and `tg_bot` directories.
+    * Copy the environment variable structure:
+
+        ```bash
+        # In the 'client' directory
+        cp .env.example .env
+
+        # In the 'tg_bot' directory
+        cp .env.example .env
+        ```
+
+    * Populate the `.env` files with the following variables:
+
+        ```dotenv
+        # === client/.env ===
+        # REQUIRED: PostgreSQL connection URL for the client application database
+        DATABASE_URL="postgresql://user:password@host:port/client_db?schema=public"
+
+        # === tg_bot/.env ===
+        # REQUIRED: PostgreSQL connection URL for the Telegram bot database (MUST be separate from client DB)
+        DATABASE_URL="postgresql://user:password@host:port/tgbot_db?schema=public"
+
+        # REQUIRED: Brian AI API Key
+        BRIAN_API_KEY="your_brian_ai_api_key"
+        # REQUIRED: Layerswap API Key
+        LAYERSWAP_API_KEY="your_layerswap_api_key"
+        # REQUIRED: OpenAI API Key
+        OPENAI_API_KEY="your_openai_api_key"
+        # REQUIRED: Anthropic API Key
+        ANTHROPIC_API_KEY="your_anthropic_api_key"
+
+        # --- Optional Variables ---
+        # Your Telegram bot username (from BotFather)
+        BOT_USERNAME="your_bot_username"
+        # Your Telegram Bot Token (from BotFather)
+        MY_TOKEN="your_telegram_bot_token"
+        # Webhook URL (if using webhooks instead of polling)
+        WEBHOOK_URL="your_webhook_url"
+        # Telegram Mini App URL (from BotFather)
+        TELEGRAM_APP_URL="your_telegram_app_url"
+        ```
+
+        * **`BOT_USERNAME`**: Your Telegram bot username (from BotFather). *Not Required*
+        * **`BRIAN_API_KEY`**: Your Brian AI API key (from the Brian AI website). *Required*
+        * **`DATABASE_URL`**:  PostgreSQL database URL. *Required* (Create separate databases for `client` and `tg_bot`)
+        * **`MY_TOKEN`**: Your Telegram Bot Token (from BotFather). *Not Required*
+        * **`WEBHOOK_URL`**:  Webhook URL. *Not Required*
+        * **`LAYERSWAP_API_KEY`**:  Layerswap API key (from Layerswap Dashboard). *Required*
+        * **`TELEGRAM_APP_URL`**:  Telegram Mini App URL (from BotFather). *Not Required*
+        * **`OPENAI_API_KEY`**: OpenAI API key. *Required*
+        * **`ANTHROPIC_API_KEY`**: Anthropic API key. *Required*
+
+4.  Set up the databases (in both the `client` and `tg_bot` directories):
+
+    ```bash
+    npx prisma generate
+    npx prisma migrate dev
+    ```
+
+5.  Start the development server:
+
+    ```bash
+    npm run dev
+    ```
+
 ### Setting up Telegram Test Environment
-- Please go through this [doc](https://docs.ton.org/v3/guidelines/dapps/tma/guidelines/testing-apps) to setup the telegram mini app test environment
+
+Refer to this [doc](link_to_telegram_test_env_doc) to set up the Telegram mini app test environment.
+
 ## Using StarkFinder
 
 ### Available Agents
 
-#### Trade Agent
-The Trade Agent is responsible for executing trades on the Starknet network based on user-defined conditions. Users can interact with this agent using the `/trade` command.
+StarkFinder provides several specialized agents:
 
-#### Investment Agent
-The Investment Agent researches and automatically invests in Starknet-based decentralized finance (DeFi) platforms on the user's behalf. Users can interact with this agent using the `/invest` command.
-
-#### Exploration Agent
-The Exploration Agent helps users discover new Starknet-based projects, protocols, and services. Users can interact with this agent using the `/explore` command.
-
-#### Research Agent
-The Research Agent provides in-depth analysis and insights about the Starknet ecosystem. Users can interact with this agent using the `/research` command.
+* **Trade Agent:** Executes trades on the Starknet network based on user-defined conditions (using the `/trade` command).
+* **Investment Agent:** Researches and invests in StarkNet-based DeFi platforms (using the `/invest` command).
+* **Exploration Agent:** Helps users discover new StarkNet projects, protocols, and services (using the `/explore` command).
+* **Research Agent:** Provides in-depth analysis and insights about the StarkNet ecosystem (using the `/research` command).
 
 ## Design
 
-### Landing Page
-Kindly refer to the following for the [landing page](https://www.figma.com/design/pfxBpMpBiiJvXQtF7zUgFy/Starkfinder?node-id=0-1&t=sgOod3BsqDHeHuhC-1) design.
-
-### Starkfinder Transaction Page
-Kindly refer to [web app](https://www.figma.com/file/AJEN6n4Wi8ltjYW7mNSPKX?node-id=0:1&locale=en&type=design) for the web application transaction page.
+* **Landing Page:** [Landing Page Design](link_to_landing_page_design)
+* **Web Application Transaction Page:** [Web App Transaction Page](link_to_web_app_design)
 
 ## Future Plans
-In the future, the StarkFinder team plans to expand the application's capabilities by integrating with more Starknet-based protocols and services. Additionally, the team aims to explore the integration of XMTP (Cross-Message Transport Protocol) to enhance the decentralized and secure communication between the agents and users.
+
+The StarkFinder team plans to expand the application's capabilities by integrating with more StarkNet-based protocols and services.  The team also aims to explore the integration of XMTP (Cross-Message Transport Protocol) to enhance decentralized and secure communication between agents and users.
 
 ## Contributing
-Contributions to the StarkFinder project are welcome. If you'd like to contribute, please follow these steps:
 
-Refer to [Contributing](./CONTRIBUTING.md) for contributing.
+Contributions are welcome! See the [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
-This project is licensed under the [MIT License](https://opensource.org/license/mit).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+This project is licensed under the [MIT License](LICENSE).
 
 ## Contributors
 
-<a href='https://github.com/actions-user' target='_blank'><img src='https://avatars.githubusercontent.com/u/65916846?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='actions-user' /></a><a href='https://github.com/PoulavBhowmick03' target='_blank'><img src='https://avatars.githubusercontent.com/u/133862694?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='PoulavBhowmick03' /></a><a href='https://github.com/tosoham' target='_blank'><img src='https://avatars.githubusercontent.com/u/144812467?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='tosoham' /></a><a href='https://github.com/TheRanomial' target='_blank'><img src='https://avatars.githubusercontent.com/u/129299316?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='TheRanomial' /></a><a href='https://github.com/guha-rahul' target='_blank'><img src='https://avatars.githubusercontent.com/u/52607971?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='guha-rahul' /></a><a href='https://github.com/Nityam573' target='_blank'><img src='https://avatars.githubusercontent.com/u/100020368?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Nityam573' /></a><a href='https://github.com/jaykayudo' target='_blank'><img src='https://avatars.githubusercontent.com/u/58009744?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='jaykayudo' /></a><a href='https://github.com/laryhills' target='_blank'><img src='https://avatars.githubusercontent.com/u/43778211?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='laryhills' /></a><a href='https://github.com/od-hunter' target='_blank'><img src='https://avatars.githubusercontent.com/u/146340502?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='od-hunter' /></a><a href='https://github.com/OnyemaAnthony' target='_blank'><img src='https://avatars.githubusercontent.com/u/50530242?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='OnyemaAnthony' /></a><a href='https://github.com/Reallanky' target='_blank'><img src='https://avatars.githubusercontent.com/u/107430741?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Reallanky' /></a><a href='https://github.com/Jagadeeshftw' target='_blank'><img src='https://avatars.githubusercontent.com/u/92681651?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Jagadeeshftw' /></a><a href='https://github.com/akintewe' target='_blank'><img src='https://avatars.githubusercontent.com/u/85641756?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='akintewe' /></a><a href='https://github.com/SudiptaPaul-31' target='_blank'><img src='https://avatars.githubusercontent.com/u/117905151?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='SudiptaPaul-31' /></a><a href='https://github.com/omsant02' target='_blank'><img src='https://avatars.githubusercontent.com/u/102831123?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='omsant02' /></a><a href='https://github.com/ryzen-xp' target='_blank'><img src='https://avatars.githubusercontent.com/u/92181599?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='ryzen-xp' /></a><a href='https://github.com/kimcascante' target='_blank'><img src='https://avatars.githubusercontent.com/u/72054684?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='kimcascante' /></a><a href='https://github.com/Bosun-Josh121' target='_blank'><img src='https://avatars.githubusercontent.com/u/96661657?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Bosun-Josh121' /></a><a href='https://github.com/armaanansari121' target='_blank'><img src='https://avatars.githubusercontent.com/u/145029005?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='armaanansari121' /></a><a href='https://github.com/Verifieddanny' target='_blank'><img src='https://avatars.githubusercontent.com/u/103733496?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Verifieddanny' /></a><a href='https://github.com/manassehO' target='_blank'><img src='https://avatars.githubusercontent.com/u/111440385?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='manassehO' /></a><a href='https://github.com/Luluameh' target='_blank'><img src='https://avatars.githubusercontent.com/u/104063177?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Luluameh' /></a><a href='https://github.com/ishitab02' target='_blank'><img src='https://avatars.githubusercontent.com/u/139248026?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='ishitab02' /></a><a href='https://github.com/psychemist' target='_blank'><img src='https://avatars.githubusercontent.com/u/76947677?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='psychemist' /></a><a href='https://github.com/luighis' target='_blank'><img src='https://avatars.githubusercontent.com/u/41096968?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='luighis' /></a><a href='https://github.com/kingjosmel' target='_blank'><img src='https://avatars.githubusercontent.com/u/175310260?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='kingjosmel' /></a><a href='https://github.com/RareMmemshima' target='_blank'><img src='https://avatars.githubusercontent.com/u/180828156?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='RareMmemshima' /></a><a href='https://github.com/Ndifreke000' target='_blank'><img src='https://avatars.githubusercontent.com/u/111875002?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Ndifreke000' /></a><a href='https://github.com/Ocheretovich' target='_blank'><img src='https://avatars.githubusercontent.com/u/107276324?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Ocheretovich' /></a><a href='https://github.com/Birdmannn' target='_blank'><img src='https://avatars.githubusercontent.com/u/95439583?v=4' width='50' height='50' style='border-radius: 50%; margin: 5px;' title='Birdmannn' /></a>
-
+[List Contributors here]
