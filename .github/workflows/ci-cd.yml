@@ -44,29 +44,26 @@ jobs:
       - name: Install wasm32 target
         run: rustup target add wasm32-unknown-unknown
 
-      - name: Cache forge
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin
-          key: ${{ runner.os }}-forge-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Install Universal Sierra Compiler
-        run: curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
-
-      - name: Install Starknet Foundry (snforge)
         run: |
-          if ! command -v forge &> /dev/null; then
-            # git clone https://github.com/foundry-rs/starknet-foundry.git
-            # cd starknet-foundry
-            # git checkout v0.39.0
-            # cargo build --release
-            # sudo cp target/release/snforge /usr/local/bin/forge
-            # cd ..
-            # rm -rf starknet-foundry
-            curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.39.0
-            # Add to PATH
-            echo "${HOME}/.starknet-foundry/bin" >> $GITHUB_PATH
-          fi
+          curl -L https://raw.githubusercontent.com/software-mansion/universal-sierra-compiler/master/scripts/install.sh | sh
+          echo "${HOME}/.local/bin" >> $GITHUB_PATH
+
+      # Important fix: Separate installation from PATH setting
+      - name: Install Starknet Foundry
+        run: |
+          curl -L https://raw.githubusercontent.com/foundry-rs/starknet-foundry/master/scripts/install.sh | sh -s -- -v 0.39.0
+
+      # Make PATH changes in a separate step
+      - name: Add Starknet Foundry to PATH
+        run: echo "${HOME}/.starknet-foundry/bin" >> $GITHUB_PATH
+
+      # Verify installation in a separate step
+      - name: Verify Starknet Foundry installation
+        run: |
+          ls -la ${HOME}/.starknet-foundry/bin
+          # Use the full path to ensure we can run it
+          ${HOME}/.starknet-foundry/bin/snforge --version
 
       - name: Install dependencies
         run: |
@@ -76,10 +73,13 @@ jobs:
       - name: Build Starknet contracts
         run: scarb build
 
-      - name: Run forge tests
-        run: snforge test --workspace
+      - name: Run Starknet Foundry tests
+        # Use the full path to ensure it's found
+        run: ${HOME}/.starknet-foundry/bin/snforge test --workspace
 
   nextjs-build-and-test:
+    # Rest of your workflow remains the same
+    # ...
     runs-on: ubuntu-latest
     defaults:
       run:
