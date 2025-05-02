@@ -20,35 +20,76 @@ import {
   CredenzaTitle,
 } from "@/components/credeza"
 
-const formSchema = z.object({
-  blockName: z.string().min(1, "Block name is required"),
-  solidityCode: z.string().min(1, "Solidity code is required"), // Add this
-});
+// Create a union type for environment
+type Environment = "starknet" | "dojo";
 
 interface CustomBlockModalProps {
   isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  onSubmitCustomBlock: (data: { blockName: string; solidityCode: string }) => void;
+  onClose: () => void;
+  onSubmit: (values: { blockName: string; cairoCode: string }) => void;
+  environment: Environment;
 }
 
-export default function CustomBlock({ isOpen, onOpenChange, onSubmitCustomBlock }: CustomBlockModalProps) {
+export default function CustomBlock({ isOpen, onClose, onSubmit, environment }: CustomBlockModalProps) {
+  // Create the form schema based on environment
+  const formSchema = z.object({
+    blockName: z.string().min(1, "Block name is required"),
+    cairoCode: z.string().min(1, environment === "dojo" 
+      ? "Dojo code is required" 
+      : "Cairo code is required"),
+  });
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       blockName: "",
-      solidityCode: "", // Add this
+      cairoCode: "",
     },
   });
 
+  // Handle cancel button click
+  const handleCancel = () => {
+    form.reset();
+    onClose();
+  };
+
+  // Handle form submission
+  const handleSubmit = (data: z.infer<typeof formSchema>) => {
+    onSubmit(data);
+    form.reset();
+  };
+
+  // Get the code field label based on environment
+  const getCodeFieldLabel = () => {
+    return environment === "dojo" ? "Dojo Code" : "Cairo Code";
+  };
+
+  // Get the modal title based on environment
+  const getModalTitle = () => {
+    return environment === "dojo" 
+      ? "Add a Custom Dojo Block" 
+      : "Add a Custom Cairo Block";
+  };
+
+  // Get the background color based on environment
+  const getBackgroundColor = () => {
+    return environment === "dojo" 
+      ? "bg-[#e3d5ca]"  
+      : "bg-[#faf3dd]";
+  };
+
   return (
-    <Credenza open={isOpen} onOpenChange={onOpenChange}>
-      <CredenzaContent className="border-white/10 bg-[#faf3dd]">
+    <Credenza open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <CredenzaContent className={`border-white/10 ${getBackgroundColor()}`}>
         <CredenzaHeader>
-          <CredenzaTitle className="text-black">Add a Custom Block</CredenzaTitle>
+          <CredenzaTitle className="text-black">{getModalTitle()}</CredenzaTitle>
+          <CredenzaClose>
+            <span className="sr-only">Close</span>
+          </CredenzaClose>
         </CredenzaHeader>
         <CredenzaBody>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitCustomBlock)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               {/* Block Name */}
               <FormField
                 control={form.control}
@@ -67,17 +108,21 @@ export default function CustomBlock({ isOpen, onOpenChange, onSubmitCustomBlock 
                 )}
               />
 
-              {/* Solidity Code */}
+              {/* Code Field */}
               <FormField
                 control={form.control}
-                name="solidityCode" // Add this
+                name="cairoCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-black">Solidity Code</FormLabel>
+                    <FormLabel className="text-black">{getCodeFieldLabel()}</FormLabel>
                     <FormControl>
                       <textarea
                         {...field}
                         className="w-full p-2 rounded bg-[#d5bdaf] text-black border-2 border-[#2A2A2A] focus:border-[#4A4A4A]"
+                        rows={8}
+                        placeholder={environment === "dojo" 
+                          ? "Enter your Dojo code here..." 
+                          : "Enter your Cairo code here..."}
                       />
                     </FormControl>
                     <FormMessage />
@@ -86,12 +131,18 @@ export default function CustomBlock({ isOpen, onOpenChange, onSubmitCustomBlock 
               />
 
               <div className="flex justify-end space-x-2">
-                <CredenzaClose asChild>
-                  <Button variant="outline" type="button">
-                    Cancel
-                  </Button>
-                </CredenzaClose>
-                <Button type="submit">Create Block</Button>
+                <Button 
+                  variant="outline" 
+                  type="button" 
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" 
+                  className={environment === "dojo" ? "bg-white/60 hover:bg-white/50" : ""}
+                >
+                  Create Block
+                </Button>
               </div>
             </form>
           </Form>

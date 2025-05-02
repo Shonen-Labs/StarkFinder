@@ -41,13 +41,13 @@ fn setup() -> (
     (erc20_address, erc20, timelock_address, timelock, timelock_safe)
 }
 
-#[cfg(test)]
+#[test]
 fn test_lock_delay() {
     let (_, _, _, timelock, _) = setup();
     assert_eq!(timelock.lock_delay(), LOCK_DELAY);
 }
 
-#[cfg(test)]
+#[test]
 fn test_set_lock_delay_not_owner() {
     let (_, _, _, _, timelock_safe) = setup();
     match timelock_safe.set_lock_delay(LOCK_DELAY * 2) {
@@ -58,7 +58,7 @@ fn test_set_lock_delay_not_owner() {
     };
 }
 
-#[cfg(test)]
+#[test]
 fn test_set_lock_delay() {
     let (_, _, timelock_address, timelock, _) = setup();
     cheat_caller_address(timelock_address, OWNER(), CheatSpan::TargetCalls(1));
@@ -66,7 +66,7 @@ fn test_set_lock_delay() {
     assert_eq!(timelock.lock_delay(), LOCK_DELAY * 2);
 }
 
-#[cfg(test)]
+#[test]
 fn test_deposit_zero_amount() {
     let (erc20_address, _, _, _, timelock_safe) = setup();
     match timelock_safe.deposit(erc20_address, 0) {
@@ -77,7 +77,7 @@ fn test_deposit_zero_amount() {
     };
 }
 
-#[cfg(test)]
+#[test]
 fn test_deposit_invalid_token_address() {
     let (_, _, _, _, timelock_safe) = setup();
     match timelock_safe.deposit(ZERO(), DEPOSIT_AMOUNT) {
@@ -88,7 +88,7 @@ fn test_deposit_invalid_token_address() {
     }
 }
 
-#[cfg(test)]
+#[test]
 fn test_single_deposit() {
     let (erc20_address, erc20, timelock_address, timelock, _) = setup();
     start_cheat_caller_address(timelock_address, ALICE());
@@ -116,7 +116,7 @@ fn test_single_deposit() {
     assert_eq!(erc20.balance_of(timelock_address), DEPOSIT_AMOUNT);
 }
 
-#[cfg(test)]
+#[test]
 fn test_multiple_deposits() {
     let (erc20_address, erc20, timelock_address, timelock, _) = setup();
     start_cheat_caller_address(timelock_address, ALICE());
@@ -128,7 +128,7 @@ fn test_multiple_deposits() {
     assert_eq!(erc20.balance_of(timelock_address), DEPOSIT_AMOUNT * 2);
 }
 
-#[cfg(test)]
+#[test]
 fn test_withdraw_zero_amount() {
     let (erc20_address, _, _, _, timelock_safe) = setup();
     match timelock_safe.withdraw(erc20_address, 0) {
@@ -139,7 +139,7 @@ fn test_withdraw_zero_amount() {
     };
 }
 
-#[cfg(test)]
+#[test]
 fn test_withdraw_invalid_token_address() {
     let (_, _, _, _, timelock_safe) = setup();
     match timelock_safe.withdraw(ZERO(), DEPOSIT_AMOUNT) {
@@ -150,7 +150,7 @@ fn test_withdraw_invalid_token_address() {
     }
 }
 
-#[cfg(test)]
+#[test]
 fn test_withdraw_insufficient_withdrawable_balance() {
     let (erc20_address, _, timelock_address, timelock, timelock_safe) = setup();
     start_cheat_caller_address(timelock_address, ALICE());
@@ -163,7 +163,7 @@ fn test_withdraw_insufficient_withdrawable_balance() {
     }
 }
 
-#[cfg(test)]
+#[test]
 fn test_withdraw_after_lock_delay() {
     let (erc20_address, erc20, timelock_address, timelock, _) = setup();
     start_cheat_caller_address(timelock_address, ALICE());
@@ -195,7 +195,7 @@ fn test_withdraw_after_lock_delay() {
     assert_eq!(erc20.balance_of(timelock_address), 0);
 }
 
-#[cfg(test)]
+#[test]
 fn test_withdraw_partial_amount() {
     let (erc20_address, _, timelock_address, timelock, _) = setup();
     start_cheat_caller_address(timelock_address, ALICE());
@@ -217,7 +217,7 @@ fn test_withdraw_partial_amount() {
     assert_eq!(timelock.withdrawable_balance_of(ALICE(), erc20_address), 0);
 }
 
-#[cfg(test)]
+#[test]
 fn test_withdraw_from_multiple_deposits() {
     let (erc20_address, _, timelock_address, timelock, _) = setup();
     start_cheat_caller_address(timelock_address, ALICE());

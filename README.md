@@ -36,6 +36,7 @@ StarkFinder is an innovative AI-powered application that helps users navigate th
 - **Conversational Interface**: Users can communicate with the agents through an intuitive chat-like interface, making the experience natural and user-friendly.
 - **Automation and Task Delegation**: Users can delegate tasks to the agents, which will then execute them on their behalf, saving time and effort.
 - **Comprehensive Starknet Insights**: The application provides users with in-depth information about Starknet, including DeFi platforms, trading opportunities, and research insights.
+- **Advanced DeFi Features**: Implementation of sophisticated DeFi primitives including a Concentrated Liquidity AMM for efficient capital utilization in liquidity provision.
 
 ## Architecture
 StarkFinder is built using the following technologies:
