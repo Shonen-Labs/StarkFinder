@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Header}  from '@/components/landing/home';
+import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
+import { useParams } from 'next/navigation';
 
 type Contract = {
   id: string;
@@ -16,58 +16,92 @@ type Contract = {
 type UserData = {
   name: string;
   email: string;
+  address?: string;
   createdAt: string;
   deployedContracts: Contract[];
   generatedContracts: Contract[];
 };
 
-const mockUserData: UserData = {
-  name: 'John Doe',
-  email: 'john@example.com',
-  createdAt: '2024-01-01T00:00:00.000Z',
-  deployedContracts: [
-    {
-      id: '1',
-      name: 'Token Contract',
-      description: 'ERC20 Token Contract',
-      address: '0x123...abc',
-      createdAt: '2024-02-01T00:00:00.000Z',
-      updatedAt: '2024-02-10T00:00:00.000Z',
-    },
-  ],
-  generatedContracts: [
-    {
-      id: '2',
-      name: 'Voting Contract',
-      description: 'Decentralized Voting System',
-      createdAt: '2024-03-05T00:00:00.000Z',
-    },
-  ],
-};
-
 export default function UserProfilePage() {
-  const [userData, setUserData] = useState<UserData>(mockUserData);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [activeTab, setActiveTab] = useState<'deployed' | 'generated'>('deployed');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const params = useParams();
+  const id = params?.id;
 
-  const refreshUserData = () => {
-    console.log('Refreshing user data...');
+  const fetchUserData = async () => {
+    if (!id) {
+      setError('User ID is required');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/user/${id}`);
+      console.log(response)
+      // if (!response.ok) {
+      //   throw new Error('Failed to fetch user data');
+      // }
+      const data = await response.json();
+      setUserData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-white text-xl">Loading profile...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="text-red-500 text-xl">{error}</div>
+          <button
+            onClick={fetchUserData}
+            className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white text-sm transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
-     <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
-           User Profile
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center mb-16"
+      >
+        <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
+          User Profile
+        </h1>
+        <p className="text-xl text-white/80 max-w-2xl mx-auto">
           View and manage your activity—deployed contracts, generated templates, and on-chain contributions in one place.
-          </p>
-        </motion.div>
+        </p>
+      </motion.div>
       <div className="max-w-7xl mx-auto">
         {/* User Profile Header */}
         <div className="bg-gray-800 bg-opacity-70 rounded-lg shadow-xl p-6 mb-8">
@@ -82,6 +116,11 @@ export default function UserProfilePage() {
                 {userData.name || 'Anonymous User'}
               </h1>
               <p className="text-purple-200 mb-2">{userData.email}</p>
+              {userData.address && (
+                <p className="text-purple-200 mb-2 text-sm font-mono">
+                  {userData.address}
+                </p>
+              )}
               <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                 <span className="px-3 py-1 bg-indigo-800 rounded-full text-xs text-indigo-100">
                   {userData.deployedContracts.length} Deployed
@@ -95,7 +134,7 @@ export default function UserProfilePage() {
               </div>
             </div>
             <button
-              onClick={refreshUserData}
+              onClick={fetchUserData}
               className="mt-4 sm:mt-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white text-sm transition-colors"
             >
               Refresh Data
@@ -210,4 +249,4 @@ function ContractCard({ contract, type }: { contract: Contract; type: 'deployed'
       </div>
     </div>
   );
-}
+} 
