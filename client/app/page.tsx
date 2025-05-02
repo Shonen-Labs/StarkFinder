@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Hero,
   Header,
@@ -7,7 +9,16 @@ import {
   Question,
 } from '@/components/landing/home'
 
+// import FloatingSidebar from "../components/playground/floatingWindow/FloatingSidebar"; 
+
+
 export default function HomePage() {
+  // Create a function to handle adding blocks
+  // const handleAddBlock = (block) => {
+  //   console.log("Block added:", block);
+  //   // Here you can implement the logic to add the block to your application
+  // };
+  
   return (
     <>
       <Header />
@@ -18,6 +29,7 @@ export default function HomePage() {
         <Question />
       </main>
       <Footer />
+      {/* <FloatingSidebar addBlock={handleAddBlock} /> */}
     </>
   )
 }

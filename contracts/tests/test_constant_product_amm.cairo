@@ -68,7 +68,7 @@ fn add_liquidity(deploy: Deployment, amount: u256) -> u256 {
     deploy.contract.add_liquidity(amount, amount)
 }
 
-#[cfg(test)]
+#[test]
 fn test_should_deploy() {
     let deploy = setup();
     let bank: ContractAddress = BANK.try_into().unwrap();
@@ -76,7 +76,7 @@ fn test_should_deploy() {
     assert(deploy.token1.balance_of(bank) == INITIAL_SUPPLY, 'Wrong balance token1');
 }
 
-#[cfg(test)]
+#[test]
 fn should_add_liquidity() {
     let deploy = setup();
     let shares = add_liquidity(deploy, INITIAL_SUPPLY / 2);
@@ -86,7 +86,7 @@ fn should_add_liquidity() {
     assert(shares > 0, 'Wrong shares');
 }
 
-#[cfg(test)]
+#[test]
 fn should_remove_liquidity() {
     let deploy = setup();
     let shares = add_liquidity(deploy, INITIAL_SUPPLY / 2);
@@ -96,7 +96,7 @@ fn should_remove_liquidity() {
     assert(deploy.token1.balance_of(provider) == INITIAL_SUPPLY, 'Wrong balance token1');
 }
 
-#[cfg(test)]
+#[test]
 fn should_swap() {
     let deploy = setup();
     let _shares = add_liquidity(deploy, INITIAL_SUPPLY / 2);

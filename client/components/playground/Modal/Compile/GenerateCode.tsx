@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import { Button } from "../../../ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap } from "lucide-react";
+import { useAccount } from "@starknet-react/core";
 
 interface GenerateCodeProps {
   nodes: any;
   edges: any;
   flowSummary: { content: string }[];
   setDisplayState: (state: "generate" | "contract") => void; // Use the specific type here
-  setSourceCode: React.Dispatch<React.SetStateAction<string>>;
+  appendToSourceCode: (sourceCode: string) => void;
+  sourceCode?: string;
 }
 
 export default function GenerateCode({
@@ -17,8 +19,9 @@ export default function GenerateCode({
   edges,
   flowSummary,
   setDisplayState,
-  setSourceCode,
+  appendToSourceCode,
 }: GenerateCodeProps) {
+  const { address } = useAccount();
   const [selectedOption, setSelectedOption] = useState("");
   return (
     <motion.div
@@ -71,9 +74,7 @@ export default function GenerateCode({
         >
           <option value="" disabled />
           <option value="blockchain1">Starknet</option>
-          <option value="blockchain2">Base</option>
-          <option value="blockchain3">Polygon</option>
-          <option value="blockchain3">Supra MoveVM</option>
+          <option value="blockchain4">Dojo</option>
         </select>
       </div>
       <AnimatePresence>
@@ -110,7 +111,13 @@ export default function GenerateCode({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ nodes, edges, flowSummary }),
+        body: JSON.stringify({
+          nodes,
+          edges,
+          flowSummary,
+          userId: address,
+          blockchain: selectedOption,
+        }),
       }); // Fetch data from the server
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
@@ -124,7 +131,7 @@ export default function GenerateCode({
 
           if (value) {
             // Decode the chunk and append it to the state
-            setSourceCode((prev) => prev + decoder.decode(value));
+            appendToSourceCode(decoder.decode(value));
           }
         }
       }
