@@ -1,0 +1,29 @@
+## evolving-nft.mdx
+
+```mdx
+# Evolving NFT Contract
+
+A dynamic NFT implementation that can change attributes, metadata, or visuals based on time or interactions.
+
+## Contract Interface
+
+```cairo
+#[starknet::interface]
+pub trait IEvolvingNFT<TContractState> {
+    // Core ERC721 functions
+    fn get_name(self: @TContractState) -> felt252;
+    fn get_symbol(self: @TContractState) -> felt252;
+    fn token_uri(self: @TContractState, token_id: u256) -> felt252;
+    fn owner_of(self: @TContractState, token_id: u256) -> ContractAddress;
+    
+    // Evolution functions
+    fn get_evolution_stage(self: @TContractState, token_id: u256) -> u8;
+    fn evolve(ref self: TContractState, token_id: u256) -> bool;
+    fn can_evolve(self: @TContractState, token_id: u256) -> bool;
+    
+    // Minting function
+    fn mint(ref self: TContractState, to: ContractAddress, token_id: u256);
+    
+    // Admin functions
+    fn set_evolution_parameters(ref self: TContractState, time_threshold: u64, action_threshold: u64);
+}
