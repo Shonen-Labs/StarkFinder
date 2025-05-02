@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "prisma": {
+  "seed": "ts-node --esm prisma/seed.js"
+  },
   "scripts": {
     "dev": "concurrently \"next dev\" \"sh ./bot.sh\"",
     "bot": "sh ./bot.sh",
