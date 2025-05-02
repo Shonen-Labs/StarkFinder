@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import type { Config } from "tailwindcss";
 import { default as flattenColorPalette } from "tailwindcss/lib/util/flattenColorPalette";
-  
+
 const config: Config = {
   darkMode: ["class"],
   content: [
@@ -21,6 +21,9 @@ const config: Config = {
         slide: "slide var(--speed) ease-in-out infinite alternate",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        border: "border 4s linear infinite",
+        "pulse-subtle": "pulse-subtle 2s infinite",
+        "fade-in": "fadeIn 0.3s ease-out",
       },
       keyframes: {
         scroll: {
@@ -29,12 +32,20 @@ const config: Config = {
           },
         },
         marquee: {
-          from: { transform: "translateX(0)" },
-          to: { transform: "translateX(calc(-100% - var(--gap)))" },
+          from: {
+            transform: "translateX(0)",
+          },
+          to: {
+            transform: "translateX(calc(-100% - var(--gap)))",
+          },
         },
         "marquee-vertical": {
-          from: { transform: "translateY(0)" },
-          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+          from: {
+            transform: "translateY(0)",
+          },
+          to: {
+            transform: "translateY(calc(-100% - var(--gap)))",
+          },
         },
         "spin-around": {
           "0%": {
@@ -56,12 +67,41 @@ const config: Config = {
           },
         },
         "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
         },
         "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+        border: {
+          to: { "--border-angle": "360deg" },
+        },
+        "pulse-subtle": {
+          "0%, 100%": {
+            "box-shadow": "0 0 0 0 rgba(79, 70, 229, 0.4)",
+          },
+          "50%": {
+            "box-shadow": "0 0 0 8px rgba(79, 70, 229, 0)",
+          },
+        },
+        fadeIn: {
+          from: {
+            opacity: "0",
+            transform: "scale(0.95)",
+          },
+          to: {
+            opacity: "1",
+            transform: "scale(1)",
+          },
         },
       },
       colors: {
@@ -113,18 +153,28 @@ const config: Config = {
         purple: "#5530d6",
         "purple-light": "#7e3dff",
         grayscale: {
-          100: "#F0F4F8",
-          200: "#F2FCF9",
-          300: "#F7F8F8",
-          400: "#E8F1F2",
-          500: "#E1E1E1",
-          600: "#D0D6E0",
-          800: "#8A8F98",
+          "100": "#F0F4F8",
+          "200": "#F2FCF9",
+          "300": "#F7F8F8",
+          "400": "#E8F1F2",
+          "500": "#E1E1E1",
+          "600": "#D0D6E0",
+          "800": "#8A8F98",
         },
-        "black-scale": {  
-          300: "#121319",
-          400: "#040F15",
-          500: "#152329"
+        "black-scale": {
+          "300": "#121319",
+          "400": "#040F15",
+          "500": "#152329",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
         },
       },
       borderRadius: {
@@ -133,12 +183,42 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontSize: {
-        "lp-h2": ["4rem", { lineHeight: "5.4rem" }],
-        "lp-sub": ["2rem", { lineHeight: "2.688rem" }],
-        "lp-sub2": ["2.5rem", { lineHeight: "3.375rem" }],
-        "lp-text": ["1.5rem", { lineHeight: "2.025rem" }],
-        "lp-text2": ["1.302rem", { lineHeight: "2.213rem" }],
-        "lp-text3": ["1.25rem", { lineHeight: "1.688rem" }],
+        "lp-h2": [
+          "4rem",
+          {
+            lineHeight: "5.4rem",
+          },
+        ],
+        "lp-sub": [
+          "2rem",
+          {
+            lineHeight: "2.688rem",
+          },
+        ],
+        "lp-sub2": [
+          "2.5rem",
+          {
+            lineHeight: "3.375rem",
+          },
+        ],
+        "lp-text": [
+          "1.5rem",
+          {
+            lineHeight: "2.025rem",
+          },
+        ],
+        "lp-text2": [
+          "1.302rem",
+          {
+            lineHeight: "2.213rem",
+          },
+        ],
+        "lp-text3": [
+          "1.25rem",
+          {
+            lineHeight: "1.688rem",
+          },
+        ],
       },
     },
   },

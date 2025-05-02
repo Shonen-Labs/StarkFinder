@@ -109,7 +109,25 @@ export async function createOrGetChat(userId: string) {
 	}
 }
 
-
+// Store a chat message by updating an existing chat record with a new message.
+export async function storeChat({ chatId, content, userId }: { chatId: string; content: any; userId: string; transactionId?: string | null }) {
+	try {
+		return await prisma.chat.update({
+			where: { id: chatId },
+			data: {
+				Message: {
+					create: {
+						content,
+						userId,
+					},
+				},
+			},
+		});
+	} catch (error) {
+		console.error("Error storing chat message:", error);
+		throw error;
+	}
+}
 
 function determineRiskLevel(apy: number, tvl: number): string {
 	if (!apy || !tvl) return "unknown";

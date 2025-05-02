@@ -46,7 +46,7 @@ fn deploy_starkfinder(
     contract_address
 }
 
-#[cfg(test)]
+#[test]
 fn test_setup() {
     let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
@@ -63,7 +63,7 @@ fn test_setup() {
     assert!(starkfinder.get_token_address() == token_address, "Token not initialized");
 }
 
-#[cfg(test)]
+#[test]
 fn test_register() {
     let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
@@ -93,7 +93,7 @@ fn test_register() {
 }
 
 
-#[cfg(test)]
+#[test]
 fn test_send_transaction_should_panic_with_unregistered_user() {
     let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
@@ -114,7 +114,7 @@ fn test_send_transaction_should_panic_with_unregistered_user() {
 }
 
 
-#[cfg(test)]
+#[test]
 fn test_send_transaction_should_panic_with_insufficient_balance() {
     let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
@@ -137,7 +137,7 @@ fn test_send_transaction_should_panic_with_insufficient_balance() {
 }
 
 
-#[cfg(test)]
+#[test]
 fn test_send_transaction_should_panic_with_insufficient_allowance() {
     let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);
@@ -163,7 +163,7 @@ fn test_send_transaction_should_panic_with_insufficient_allowance() {
     stop_cheat_caller_address(starkfinder_address);
 }
 
-#[cfg(test)]
+#[test]
 fn test_send_transaction() {
     let token_address = deploy_token();
     let starkfinder_address = deploy_starkfinder(ADMIN(), token_address);

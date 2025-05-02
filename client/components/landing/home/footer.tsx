@@ -2,6 +2,26 @@ import Link from 'next/link'
 import { XIcon, TelegramIcon, GithubIcon } from '@/components/icons'
 import { MotionBox } from './motion-box'
 
+interface MenuItem {
+  name: string
+  url: string
+  target?: string
+  rel?: string
+}
+
+interface MenuSection {
+  title: string
+  subItems: MenuItem[]
+}
+
+interface SocialMediaItem {
+  name: string
+  icon: React.ComponentType
+  href: string
+  target?: string
+  rel?: string
+}
+
 export function Footer() {
   return (
     <footer className="bg-blue-dark text-white pt-20 px-5 pb-10">
@@ -38,6 +58,8 @@ function MenuFooter() {
               key={`${index}-${subItem.name}`}
               href={subItem.url}
               className="hover:text-white/80 transition-colors"
+              target={subItem.target}
+              rel={subItem.rel}
             >
               {subItem.name}
             </Link>
@@ -62,6 +84,8 @@ function InfoFooter() {
             href={social.href}
             className="cursor-pointer [&_path]:hover:fill-grayscale-100 [&_path]:transition-colors"
             role="menuitem"
+            target={social.target}
+            rel={social.rel}
           >
             <social.icon />
           </Link>
@@ -71,13 +95,14 @@ function InfoFooter() {
   )
 }
 
-const menuItems = [
+const menuItems: MenuSection[] = [
   {
-    title: 'Site Map',
+    title: 'Navigation',
     subItems: [
-      { name: 'Home', url: '/' },
-      { name: 'Launch TG Bot', url: '#' },
-      { name: 'About', url: '#' },
+      { name: 'DevX', url: '/app/devx' },
+      { name: 'Transact', url: '/app/transactions' },
+      { name: 'Contracts', url: '/app/contracts' },
+      { name: 'Resources', url: '/app/resources' },
     ],
   },
   {
@@ -89,17 +114,17 @@ const menuItems = [
     ],
   },
   {
-    title: 'Resource',
+    title: 'Social',
     subItems: [
-      { name: 'Partner', url: '#' },
-      { name: 'Blog', url: '#' },
-      { name: 'Newsletter', url: '#' },
+      { name: 'Twitter', url: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
+      { name: 'Github', url: 'https://github.com/Shonen-Labs/StarkFinder', target: '_blank', rel: 'noopener noreferrer' },
+      { name: 'Telegram', url: 'https://t.me/starkfinder_bot/', target: '_blank', rel: 'noopener noreferrer' },
     ],
   },
 ]
 
-const socialMedia = [
-  { name: 'Twitter', icon: XIcon, href: 'https://x.com/StrkFinder' },
-  { name: 'Github', icon: GithubIcon, href: 'https://github.com/Shonen-Labs/StarkFinder' },
-  { name: 'Telegram', icon: TelegramIcon, href: 'https://t.me/starkfinder_bot/' },
+const socialMedia: SocialMediaItem[] = [
+  { name: 'Twitter', icon: XIcon, href: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
+  { name: 'Github', icon: GithubIcon, href: 'https://github.com/Shonen-Labs/StarkFinder', target: '_blank', rel: 'noopener noreferrer' },
+  { name: 'Telegram', icon: TelegramIcon, href: 'https://t.me/starkfinder_bot/', target: '_blank', rel: 'noopener noreferrer' },
 ]

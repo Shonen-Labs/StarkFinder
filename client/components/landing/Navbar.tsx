@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,15 +8,25 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LogOut, MessageSquarePlus, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
-const MenuItem = ({ children, href, isActive }: { children: React.ReactNode; href: string; isActive: boolean }) => {
+const MenuItem = ({
+  children,
+  href,
+  isActive,
+}: {
+  children: React.ReactNode;
+  href: string;
+  isActive: boolean;
+}) => {
   return (
     <Link href={href}>
       <motion.li
         className={cn(
           "relative cursor-pointer text-white px-4 py-2 rounded-full transition-colors",
-          isActive ? "bg-white bg-opacity-20" : "hover:bg-white hover:bg-opacity-10"
+          isActive
+            ? "bg-white bg-opacity-20"
+            : "hover:bg-white hover:bg-opacity-10"
         )}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -49,12 +59,12 @@ function Navbar({ className }: { className?: string }) {
 
   const createNewChat = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    await router.push(`/agent/c/${id}`);
   };
 
   const createNewTxn = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    await router.push(`/agent/c/${id}`);
   };
 
   return (
@@ -70,7 +80,9 @@ function Navbar({ className }: { className?: string }) {
       >
         <ul className="flex justify-center items-center py-3">
           <div className="flex items-center space-x-4 px-10">
-            <MenuItem href="/" isActive={active === "home"}>Home</MenuItem>
+            <MenuItem href="/" isActive={active === "home"}>
+              Home
+            </MenuItem>
             {/* Add more menu items here */}
           </div>
           <Button
@@ -97,7 +109,9 @@ function Navbar({ className }: { className?: string }) {
               className="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Choose an option</h2>
+              <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+                Choose an option
+              </h2>
               <div className="space-y-4">
                 <Button
                   onClick={createNewChat}

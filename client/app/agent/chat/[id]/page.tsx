@@ -53,6 +53,7 @@ export default function ChatPage() {
   const [inputValue, setInputValue] = React.useState("");
   const { address } = useAccount();
 
+
   React.useEffect(() => {
     if (chatId) {
       console.log("Chat ID:", chatId);
@@ -70,12 +71,12 @@ export default function ChatPage() {
 
   const createNewChat = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    await router.push(`/agent/c/${id}`);
   };
 
   const createNewTxn = async () => {
     const id = uuidv4();
-    await router.push(`/agent/transaction/${id}`);
+    await router.push(`/agent/c/${id}`);
   };
 
   const fetchChatHistory = async (id: string) => {
@@ -91,9 +92,23 @@ export default function ChatPage() {
     ]);
   };
 
+  const [authChecked, setAuthChecked] = useState(
+    typeof window !== "undefined" && localStorage.getItem("walletConnected") === "true"
+  );
+
+  React.useEffect(() => {
+    if (address) {
+      setAuthChecked(true);
+      localStorage.setItem("walletConnected", "true");
+      localStorage.setItem("connected_address", address);
+    } else {
+      localStorage.removeItem("walletConnected");
+    }
+  }, [address]);
+
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
-  
+
     const newMessage = {
       id: uuidv4(),
       role: "user",
@@ -101,41 +116,41 @@ export default function ChatPage() {
       timestamp: new Date().toLocaleTimeString(),
       user: "User",
     };
-  
+
     setMessages((prevMessages) => [...prevMessages, newMessage]);
     setInputValue("");
     setIsLoading(true);
     setStreamedResponse("");
     setError("");
-  
+
     try {
       // Format messages for the API - only include unique user messages
       const formattedMessages = Array.from(
         new Set(
           messages
-            .filter(msg => msg.role === "user")
-            .map(msg => msg.content)
+            .filter((msg) => msg.role === "user")
+            .map((msg) => msg.content)
         )
-      ).map(content => ({
+      ).map((content) => ({
         sender: "user",
-        content
+        content,
       }));
-  
+
       // Add the current message if it's not already included
-      if (!formattedMessages.some(msg => msg.content === inputValue)) {
+      if (!formattedMessages.some((msg) => msg.content === inputValue)) {
         formattedMessages.push({
           sender: "user",
-          content: inputValue
+          content: inputValue,
         });
       }
-  
+
       const requestBody = {
         prompt: inputValue,
         address: address || "0x0",
         messages: formattedMessages,
-        stream: true
+        stream: true,
       };
-  
+
       const response = await fetch("/api/ask", {
         method: "POST",
         headers: {
@@ -143,22 +158,21 @@ export default function ChatPage() {
         },
         body: JSON.stringify(requestBody),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.details?.message || 'Failed to get response');
+        throw new Error(errorData.details?.message || "Failed to get response");
       }
 
       const contentType = response.headers.get("Content-Type") || "";
 
-      if(!response.body || contentType.includes('application/json')){
-        
+      if (!response.body || contentType.includes("application/json")) {
         const data = await response.json();
-        
+
         if (data.error) {
           throw new Error(data.error);
         }
-  
+
         setMessages((prevMessages) => [
           ...prevMessages,
           {
@@ -171,22 +185,24 @@ export default function ChatPage() {
         ]);
 
         setAnswer(data.answer);
-        
       } else {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let accumulatedResponse = '';
-  
+
+        let accumulatedResponse = "";
+
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-  
+
             const chunk = decoder.decode(value);
-            const lines = chunk.split('\n').filter(Boolean);
-  
+
+            const lines = chunk.split("\n").filter(Boolean);
+
+
             for (const line of lines) {
-              if (line.startsWith('data: ')) {
+              if (line.startsWith("data: ")) {
                 try {
                   const data = JSON.parse(line.slice(5));
                   if (data.content) {
@@ -196,7 +212,7 @@ export default function ChatPage() {
                     throw new Error(data.error);
                   }
                 } catch (e) {
-                  console.error('Error parsing JSON:', e);
+                  console.error("Error parsing JSON:", e);
                 }
               }
             }
@@ -204,22 +220,24 @@ export default function ChatPage() {
         } finally {
           reader.releaseLock();
         }
-  
+
         // Add final message to chat
         if (accumulatedResponse) {
-          setMessages(prev => [...prev, {
-            id: uuidv4(),
-            role: "agent",
-            content: accumulatedResponse,
-            timestamp: new Date().toLocaleTimeString(),
-            user: "Agent",
-          }]);
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: uuidv4(),
+              role: "agent",
+              content: accumulatedResponse,
+              timestamp: new Date().toLocaleTimeString(),
+              user: "Agent",
+            },
+          ]);
           setAnswer(accumulatedResponse);
         }
-
       }
     } catch (err: any) {
-      console.error('Chat error:', err);
+      console.error("Chat error:", err);
       setError(err.message || "Unable to get response");
       setAnswer("");
     } finally {
@@ -227,6 +245,17 @@ export default function ChatPage() {
       setStreamedResponse("");
     }
   };
+
+  if (!authChecked || !address) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black text-white">
+        <div className="text-center">
+          <p className="mb-4">Please connect your wallet to access chat agent</p>
+          <ConnectButton text="Connect Wallet" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-black text-white font-mono relative overflow-hidden">
@@ -298,10 +327,10 @@ export default function ChatPage() {
         <div className="flex-1 flex flex-col bg-black/30 backdrop-blur-sm">
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-white/20 bg-black/50">
-              <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               Home
-              </Link>
+            </Link>
             <div className="flex items-center gap-4">
               {address ? (
                 <div className="flex items-center gap-4">
@@ -377,7 +406,11 @@ export default function ChatPage() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
                 onClick={handleSendMessage}
               >
-                {isLoading ? <Ban className="h-5 w-5" /> : <Send className="h-5 w-5" />}
+                {isLoading ? (
+                  <Ban className="h-5 w-5" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
                 <span className="sr-only">Send message</span>
               </Button>
               {/* <Button

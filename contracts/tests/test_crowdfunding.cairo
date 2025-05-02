@@ -54,7 +54,7 @@ fn init_default_campaign(dispatcher: ICrowdfundingDispatcher) -> u256 {
 
 /// TESTS
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_creation_success() {
     let token_contract = deploy_token();
     let contract = deploy_crowdfunding(token_contract);
@@ -74,7 +74,7 @@ fn test_crowdfunding_creation_success() {
     spy.assert_emitted(@array![(contract, creation_event)]);
 }
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_fund_success() {
     let token_contract = deploy_token();
     let contract = deploy_crowdfunding(token_contract);
@@ -103,7 +103,7 @@ fn test_crowdfunding_fund_success() {
     spy.assert_emitted(@array![(contract, fund_event)]);
 }
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_resolution_success() {
     // The contract should fund campaign creator on success
     let token_contract = deploy_token();
@@ -148,7 +148,7 @@ fn test_crowdfunding_resolution_success() {
     spy.assert_emitted(@array![(contract, successful_event)]);
 }
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_resolution_failure() {
     // should refund funders automatically on failure.
     let token_contract = deploy_token();
@@ -200,7 +200,7 @@ fn test_crowdfunding_resolution_failure() {
     spy.assert_emitted(@array![(contract, failure_event)]);
 }
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_should_panic_on_campaign_not_active() {
     let token_contract = deploy_token();
     let contract = deploy_crowdfunding(token_contract);
@@ -232,7 +232,7 @@ fn test_crowdfunding_should_panic_on_campaign_not_active() {
     dispatcher.resolve_campaign(campaign_id);
 }
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_should_panic_on_early_resolution() {
     let token_contract = deploy_token();
     let contract = deploy_crowdfunding(token_contract);
@@ -241,7 +241,7 @@ fn test_crowdfunding_should_panic_on_early_resolution() {
     dispatcher.resolve_campaign(campaign_id);
 }
 
-#[cfg(test)]
+#[test]
 fn test_crowdfunding_should_panic_funding_on_exceeded_deadline() {
     let token_contract = deploy_token();
     let contract = deploy_crowdfunding(token_contract);
@@ -255,7 +255,7 @@ fn test_crowdfunding_should_panic_funding_on_exceeded_deadline() {
     dispatcher.fund(campaign_id, 300);
 }
 
-#[cfg(test)]
+#[test]
 fn test_get_user_campaigns() {
     let token_contract = deploy_token();
     let contract = deploy_crowdfunding(token_contract);
