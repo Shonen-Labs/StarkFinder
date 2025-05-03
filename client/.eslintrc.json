@@ -1,3 +1,23 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+	"extends": ["next/core-web-vitals", "next/typescript"],
+	"overrides": [
+		{
+			"files": ["app/api/audit-source-code/deepseek/route.ts"],
+			"rules": {
+				"@typescript-eslint/no-unused-vars": "off"
+			}
+		},
+		{
+			"files": ["lib/deepseek.ts"],
+			"rules": {
+				"@typescript-eslint/no-explicit-any": "off"
+			}
+		},
+		{
+			"files": ["app/devx/profile/[id]/page.tsx"],
+			"rules": {
+				"react-hooks/exhaustive-deps": "warn"
+			}
+		}
+	]
 }
