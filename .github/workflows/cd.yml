@@ -1,0 +1,60 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push client image
+        run: |
+          docker build -t yourdockeruser/starkfinder-client:${{ github.sha }} ./client || exit 1
+          docker push yourdockeruser/starkfinder-client:${{ github.sha }} || exit 1
+
+      - name: Build and push tg_bot image
+        run: |
+          docker build -t yourdockeruser/starkfinder-tgbot:${{ github.sha }} ./tg_bot || exit 1
+          docker push yourdockeruser/starkfinder-tgbot:${{ github.sha }} || exit 1
+
+  deploy-to-staging:
+    needs: build-and-push-images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm upgrade
+        run: |
+          helm upgrade --install starkfinder ./helm-chart \
+            --namespace staging \
+            --set client.image.repository=yourdockeruser/starkfinder-client \
+            --set client.image.tag=${{ github.sha }} \
+            --set tgbot.image.repository=yourdockeruser/starkfinder-tgbot \
+            --set tgbot.image.tag=${{ github.sha }}
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/your-client-deployment -n staging
+          kubectl rollout status deployment/your-tgbot-deployment -n staging
+
+      - name: Run smoke tests
+        run: |
+          curl -f https://staging.yourdomain.com/healthz
