@@ -20,6 +20,15 @@ This document provides guidelines for contributing to the project.
     9.  Open a pull request against the `main` (or `develop`) branch of the original StarkFinder repository. Use the Pull Request template.
     10. Be prepared to discuss your changes and make adjustments based on feedback.
 
+ 
+- If you cannot complete the task within your ETA + 1 day, **you must inform us** on Telegram. Failure to do so will result in you being unassigned from the issue.
+- Contributors can reach out for help regarding the project anytime via:
+  - Project Telegram: [StarkFinder](https://t.me/shogenlabs) 
+- Maintainers
+  - Poulav Bhowmick (@impoulav)[https://t.me/impoulav]
+  - Soham Das (@tosoham)[https://t.me/tosoham]
+  - Rahul guha (@darkdanate)[https://t.me/darkdanate]
+
 ## Issue and Pull Request Templates
 
 We use GitHub templates to ensure consistency and gather necessary information. When you open a new issue or pull request, please use the appropriate template provided.
