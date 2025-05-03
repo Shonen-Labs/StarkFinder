@@ -132,6 +132,7 @@ pub mod mock_erc721;
 pub mod NFTDutchAuction;
 pub mod random_num;
 pub mod SimpleStorage;
+pub mod EvolvingNFT;
 pub mod starkfinder;
 pub mod starkidentity;
 pub mod timelock;

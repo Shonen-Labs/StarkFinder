@@ -51,7 +51,7 @@ fn deploy_identity_contract() -> (ContractAddress, IStarkIdentityDispatcher) {
     )
 }
 
-#[cfg(test)]
+#[test]
 fn test_create_identity() {
     // Deploy StarkIdentity contract
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
@@ -80,7 +80,7 @@ fn test_create_identity() {
     assert(identity.reputation_score == 0, 'Should have zero reputation');
 }
 
-#[cfg(test)]
+#[test]
 fn test_create_duplicate_identity() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -101,7 +101,7 @@ fn test_create_duplicate_identity() {
     contract_dispatcher.create_identity(USERNAME, ENS_NAME, STARK_NAME, RECOVERY());
 }
 
-#[cfg(test)]
+#[test]
 fn test_update_identity() {
     // Cheat sender address and timestamp and create an identity
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
@@ -123,7 +123,7 @@ fn test_update_identity() {
 // assert(identity.username == 'bobby', 'Update: Username not updated');
 }
 
-#[cfg(test)]
+#[test]
 fn test_request_verification() {
     // Test that a verification request can be made.
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
@@ -139,7 +139,7 @@ fn test_request_verification() {
     assert(identity.created_at != 0, 'Request: Identity missing');
 }
 
-#[cfg(test)]
+#[test]
 fn test_update_reputation() {
     // Test updating reputation — requires a verifier.
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
@@ -163,7 +163,7 @@ fn test_update_reputation() {
     assert(identity.reputation_score == 50, 'Reputation update failed');
 }
 
-#[cfg(test)]
+#[test]
 fn test_submit_and_verify_address_signature_new() {
     // Test generating and submitting an address signature for ownership verification.
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
@@ -183,7 +183,7 @@ fn test_submit_and_verify_address_signature_new() {
     assert(verified, 'Verification failed');
 }
 
-#[cfg(test)]
+#[test]
 fn test_record_activity() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -215,7 +215,7 @@ fn test_record_activity() {
     assert(*activity.value == value, 'Wrong activity value');
 }
 
-#[cfg(test)]
+#[test]
 fn test_social_verification() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -247,7 +247,7 @@ fn test_social_verification() {
     assert(identity.social_connections == 1, 'Wrong social connection count');
 }
 
-#[cfg(test)]
+#[test]
 fn test_protocol_usage() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -267,7 +267,7 @@ fn test_protocol_usage() {
     assert(has_used, 'Should have used protocol');
 }
 
-#[cfg(test)]
+#[test]
 fn test_address_linking() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -291,7 +291,7 @@ fn test_address_linking() {
     assert(is_linked, 'Addresses should be linked');
 }
 
-#[cfg(test)]
+#[test]
 fn test_time_based_operations() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -316,7 +316,7 @@ fn test_time_based_operations() {
 }
 
 // Test for IdentityCreated event.
-#[cfg(test)]
+#[test]
 fn test_event_identity_created() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
     cheat_caller_address(contract_address, USER1(), CheatSpan::TargetCalls(1));
@@ -346,7 +346,7 @@ fn test_event_identity_created() {
 }
 
 // Test for IdentityUpdated event.
-#[cfg(test)]
+#[test]
 fn test_event_identity_updated() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
     cheat_caller_address(contract_address, USER1(), CheatSpan::TargetCalls(2));
@@ -374,7 +374,7 @@ fn test_event_identity_updated() {
 }
 
 // Test for ActivityRecorded event.
-#[cfg(test)]
+#[test]
 fn test_event_activity_recorded() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
     cheat_caller_address(contract_address, USER1(), CheatSpan::TargetCalls(2));
@@ -406,7 +406,7 @@ fn test_event_activity_recorded() {
 }
 
 // Test for AddressLinked event.
-#[cfg(test)]
+#[test]
 fn test_event_address_linked() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -439,7 +439,7 @@ fn test_event_address_linked() {
 }
 
 // Test for  VerificationRequested event
-#[cfg(test)]
+#[test]
 fn test_event_verification_request() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
@@ -467,7 +467,7 @@ fn test_event_verification_request() {
         );
 }
 
-#[cfg(test)]
+#[test]
 fn test_event_social_verification() {
     let (contract_address, contract_dispatcher) = deploy_identity_contract();
 
