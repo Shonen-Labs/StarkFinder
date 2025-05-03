@@ -136,3 +136,4 @@ pub mod starkfinder;
 pub mod starkidentity;
 pub mod timelock;
 pub mod upgradable;
+pub mod DynamicMilestoneVesting;

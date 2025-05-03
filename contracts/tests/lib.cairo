@@ -10,4 +10,5 @@ mod test_upgradable_contract;
 mod test_storage;
 #[feature("safe_dispatcher")]
 mod test_timelock;
+mod test_milestone_vesting;
 
