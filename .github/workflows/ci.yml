@@ -26,6 +26,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+        name: Set dummy DATABASE_URL for Prisma
+        run: echo "DATABASE_URL=postgresql://user:password@localhost:5432/db" >> $GITHUB_ENV
+
       - name: Prisma Schema Validation
         run: npx prisma validate
 
@@ -50,6 +53,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+        name: Set dummy DATABASE_URL for Prisma
+        run: echo "DATABASE_URL=postgresql://user:password@localhost:5432/db" >> $GITHUB_ENV
 
       - name: Prisma Schema Validation
         run: npx prisma validate
