@@ -3,7 +3,6 @@ import { Anthropic } from '@anthropic-ai/sdk';
 
 export async function POST(req: NextRequest) {
 	try {
-		// Parse request body
 		const { sourceCode } = await req.json();
 		const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -25,7 +24,7 @@ export async function POST(req: NextRequest) {
 				let fullResponse = '';
 				for await (const messageStream of stream) {
 					if (messageStream.type === 'content_block_delta') {
-						const deltaText = messageStream.delta.type; // Adjust if incorrect
+						const deltaText = messageStream.delta.type; 
 						fullResponse += deltaText;
 						controller.enqueue(
 							`data: ${JSON.stringify({ chunk: deltaText })}\n\n`
@@ -34,11 +33,10 @@ export async function POST(req: NextRequest) {
 				}
 				controller.close();
 
-				// Log full response and extract JSON
 				console.log(fullResponse);
 				const jsonContent = extractJSON(fullResponse);
 				try {
-					JSON.parse(jsonContent); // Verify JSON structure
+					JSON.parse(jsonContent); 
 				} catch (parseError) {
 					console.error('JSON Parsing Error:', parseError);
 					throw new Error('Invalid JSON response received.');
