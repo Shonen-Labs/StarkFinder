@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createDeepSeekClient, MessageRole } from '@/lib/deepseek';
 import { Anthropic } from '@anthropic-ai/sdk';
@@ -19,6 +22,7 @@ export async function POST(req: NextRequest) {
 			return handleDeepSeekStream(sourceCode);
 		} else if (defaultProvider === 'anthropic') {
 			return handleClaudeStream(sourceCode);
+			
 		} else {
 			return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });
 		}
