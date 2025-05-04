@@ -59,22 +59,22 @@ const MultiSectionAccordion = () => {
 
   const tokenContracts: NavigationItem[] = [
     { topic: "ERC20 Token", link: "/devx/contracts/token-contracts/erc20" },
-    { topic: "Mock ERC20", link: "/devx/contracts/token-contracts/mock-erc20" },
-    { topic: "Mock ERC721", link: "/devx/contracts/token-contracts/mock-erc721" },
+    { topic: "Mock ERC20", link: "/devx/contracts/token-contracts/mockerc20" },
+    { topic: "Mock ERC721", link: "/devx/contracts/token-contracts/mockerc721" },
   ];
 
   const defiContracts: NavigationItem[] = [
-    { topic: "Constant Product AMM", link: "/devx/contracts/defi-contracts/constant-product-amm" },
-    { topic: "Concentrated Liquidity AMM", link: "/devx/contracts/defi-contracts/concentrated-liquidity-amm" },
-    { topic: "DeFi Vault", link: "/devx/contracts/defi-contracts/defi-vault" },
-    { topic: "NFT Dutch Auction", link: "/devx/contracts/defi-contracts/nft-dutch-auction" },
-    { topic: "Crowdfunding", link: "/devx/contracts/defi-contracts/crowdfunding" },
+    { topic: "Constant Product AMM", link: "/devx/contracts/defi-contracts/const-amm" },
+    { topic: "Concentrated Liquidity AMM", link: "/devx/contracts/defi-contracts/conc-liq-amm" },
+    { topic: "DeFi Vault", link: "/devx/contracts/defi-contracts/defivault" },
+    { topic: "NFT Dutch Auction", link: "/devx/contracts/defi-contracts/dutch-auction" },
+    { topic: "Crowdfunding", link: "/devx/contracts/defi-contracts/crowdfund" },
     { topic: "Staking Contract", link: "/devx/contracts/defi-contracts/staking-contract" },
   ];
 
   const utilityContracts: NavigationItem[] = [
-    { topic: "Simple Storage", link: "/devx/contracts/utility-contracts/simple-storage" },
-    { topic: "Random Number", link: "/devx/contracts/utility-contracts/random-num" },
+    { topic: "Simple Storage", link: "/devx/contracts/utility-contracts/simplestorage" },
+    { topic: "Random Number", link: "/devx/contracts/utility-contracts/randomnum" },
     { topic: "Merkle", link: "/devx/contracts/utility-contracts/merkle" },
     { topic: "Timelock", link: "/devx/contracts/utility-contracts/timelock" },
     { topic: "Evolving NFT", link: "/devx/contracts/utility-contracts/evolving-nft" },
@@ -83,7 +83,7 @@ const MultiSectionAccordion = () => {
   const governanceContracts: NavigationItem[] = [
     { topic: "Upgradable", link: "/devx/contracts/governance-contracts/upgradable" },
     { topic: "Stark Identity", link: "/devx/contracts/governance-contracts/starkidentity" },
-    { topic: "Starkfinder", link: "/devx/contracts/governance-contracts/starkfinder" },
+    { topic: "Starkfinder", link: "/devx/contracts/governance-contracts/sf" },
   ];
 
   return (

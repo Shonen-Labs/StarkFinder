@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/agent/transaction/[id]/page.tsx
 "use client";
 
 import * as React from "react";
@@ -18,7 +17,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Sidebar,
@@ -27,7 +25,6 @@ import {
   SidebarHeader,
   SidebarProvider,
   SidebarTrigger,
-  SidebarInset,
 } from "@/components/ui/sidebar";
 
 import Link from "next/link";
@@ -140,10 +137,11 @@ const TransactionHandler: React.FC<TransactionHandlerProps> = ({
       <button
         onClick={executeTransaction}
         disabled={isProcessing}
-        className={`w-full py-2 px-4 rounded-lg ${isProcessing
-          ? "bg-white/20 cursor-not-allowed"
-          : "bg-white/10 hover:bg-white/20"
-          } transition-colors duration-200`}
+        className={`w-full py-2 px-4 rounded-lg ${
+          isProcessing
+            ? "bg-white/20 cursor-not-allowed"
+            : "bg-white/10 hover:bg-white/20"
+        } transition-colors duration-200`}
       >
         {isProcessing ? "Processing Transaction..." : "Execute Transaction"}
       </button>
@@ -287,8 +285,8 @@ export default function TransactionPage() {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [isInputClicked, setIsInputClicked] = React.useState<boolean>(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  const [showAuthScreen, setShowAuthScreen] = useState(true)
-  const [showLoader, setShowloader] = useState(true)
+  const [showAuthScreen, setShowAuthScreen] = useState(true);
+  const [showLoader, setShowloader] = useState(true);
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({
     riskTolerance: "medium",
     preferredAssets: [],
@@ -298,7 +296,7 @@ export default function TransactionPage() {
   const [error, setError] = useState("");
 
   setTimeout(() => {
-    setShowloader(false)
+    setShowloader(false);
   }, 5000);
 
   React.useEffect(() => {
@@ -308,14 +306,12 @@ export default function TransactionPage() {
       // If we have an address, user has connected wallet
       console.log("Wallet connected:", address);
       setShowAuthScreen(false);
-      
     } else {
       // No wallet connected
       console.log("No wallet connected");
       setShowAuthScreen(true);
     }
   }, [address]);
-
 
   React.useEffect(() => {
     if (scrollRef.current) {
@@ -576,8 +572,8 @@ export default function TransactionPage() {
     }
   };
 
-  if(showLoader){
-    return <LoadingScreen />
+  if (showLoader) {
+    return <LoadingScreen />;
   }
 
   if (showAuthScreen) {
@@ -592,7 +588,10 @@ export default function TransactionPage() {
           <div className="flex flex-col gap-4">
             <ConnectButton text="Connect Wallet" />
 
-            <Button className="w-[60%] self-center" onClick={() => router.push('/')}>
+            <Button
+              className="w-[60%] self-center"
+              onClick={() => router.push("/")}
+            >
               Return Home
             </Button>
           </div>
@@ -606,54 +605,7 @@ export default function TransactionPage() {
       <Sidebar className="border-r border-white/20 bg-[#010101] px-2">
         <SidebarHeader>
           <h2 className="text-2xl text-white mb-4">StarkFinder</h2>
-          {/* <Button
-            variant="ghost"
-            className="border border-white/20 transition-colors bg-[#1E1E1E] mb-2 flex justify-between"
-            onClick={createNewChat}
-          >
-            <span>Agent Chat</span>
-            <Plus className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            className="border border-white/20 transition-colors bg-[#1E1E1E] flex justify-between"
-            onClick={createNewTxn}
-          >
-            <span>Agent Txn</span>
-            <Plus className="h-4 w-4" />
-          </Button> */}
           <Separator className="my-2 bg-white/20" />
-          {/* <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                className="justify-start gap-2 border border-white/20 hover:bg-white/10 transition-colors"
-              >
-                <Plus className="h-4 w-4" /> New
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-gray-900 border border-white/20 text-white">
-              <DialogHeader>
-                <DialogTitle>Create New</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-2 mt-4">
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewChat}
-                >
-                  Chat
-                </Button>
-                <Button
-                  variant="outline"
-                  className="bg-slate-900 justify-start border border-white/20 hover:bg-white/10 transition-colors"
-                  onClick={createNewTxn}
-                >
-                  Txn
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog> */}
         </SidebarHeader>
 
         <SidebarContent>
@@ -832,6 +784,12 @@ export default function TransactionPage() {
                   onClick={() => setIsInputClicked(!isInputClicked)}
                 />
                 <Button
+                  onClick={() => setShowPreferences(true)}
+                  className="absolute right-20 top-1/2 -translate-y-1/2"
+                >
+                  Investment Preferences
+                </Button>
+                <Button
                   variant="ghost"
                   size="icon"
                   className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
@@ -867,46 +825,7 @@ export default function TransactionPage() {
             isLoading={isLoading}
           />
         )}
-        {/* Input Area */}
-        <div className="p-4 border-t border-white/20 bg-[#010101]">
-          <div className="relative">
-            <Input
-              placeholder="Type your message..."
-              className="bg-white/5 border border-white/20 text-white pl-4 pr-24 py-6 rounded-lg focus:ring-2 focus:ring-white/50 transition-all"
-              value={inputValue}
-              onChange={(e) => {
-                setInputValue(e.target.value);
-                setIsInputClicked(false);
-              }}
-              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-              disabled={isLoading}
-              onClick={() => setIsInputClicked(!isInputClicked)}
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-white/10 transition-colors rounded-full"
-              onClick={handleSendMessage}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Ban className="h-5 w-5" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-              <span className="sr-only">Send message</span>
-            </Button>
-          </div>
-        </div>
       </div>
-
-      <Button
-        onClick={() => setShowPreferences(true)}
-        className="absolute right-20 top-4"
-      >
-        Investment Preferences
-      </Button>
-
       <PreferencesDialog
         open={showPreferences}
         onClose={() => setShowPreferences(false)}
