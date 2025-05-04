@@ -17,9 +17,6 @@
     "delete-webhook": "ts-node scripts/tg-set-webhook.ts",
     "seed": "tsx prisma/seed.ts"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@argent/invisible-sdk": "^1.0.0",
