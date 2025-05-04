@@ -136,8 +136,6 @@ pub mod EvolvingNFT;
 pub mod starkfinder;
 pub mod starkidentity;
 pub mod timelock;
+pub mod identityregistry;
 pub mod upgradable;
 pub mod DynamicMilestoneVesting;
-pub mod identityregistry;
-
->>>>>>> c2db1e7 (feat: add decentralized identity contract with revocable credentials)
