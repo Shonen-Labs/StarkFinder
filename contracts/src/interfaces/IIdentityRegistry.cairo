@@ -29,7 +29,10 @@ pub trait IIdentityRegistry<TContractState> {
         revocation_nonce: felt252
     );
     fn revoke_credential(ref self: TContractState, credential_id: CredentialId);
-    fn verify_proof(self: @TContractState, owner: ContractAddress, proof_data: felt252) -> bool;
+
+    fn update_revocation_root(ref self: TContractState, new_root: felt252);
+    fn assert_valid_proof(ref self: TContractState, root: felt252, leaf: CredentialId, proof: Span<felt252>);
+    fn compute_merkle_root(ref self: TContractState, current: felt252, proof: Span<felt252>) -> felt252;
 
     // Governance functions
     fn add_issuer(ref self: TContractState, issuer: ContractAddress);
