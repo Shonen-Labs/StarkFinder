@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ChevronDown, ExternalLink, Loader } from "lucide-react";
 import TokensModal from "./tokens-modal";
 import { CryptoCoin, CoinsLogo } from "../../types/crypto-coin";
-import { Message } from "@/app/tg/types";
+import { Message } from "@/legacy/tg/types";
 import { useAccount } from "@starknet-react/core";
 import { v4 as uuidv4 } from "uuid";
 import { fetchTokenBalance} from "../../lib/token-utils";

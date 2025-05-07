@@ -11,4 +11,6 @@ mod test_constant_product_amm;
 mod test_upgradable_contract;
 #[feature("safe_dispatcher")]
 mod test_timelock;
+mod test_milestone_vesting;
+mod test_identity_registry;
 
