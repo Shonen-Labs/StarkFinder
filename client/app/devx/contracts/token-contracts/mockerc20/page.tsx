@@ -4,6 +4,7 @@ import { MDXProvider } from "@mdx-js/react";
 import type { MDXComponents } from "mdx/types";
 import MockErc20 from "./mock-erc20.mdx";
 import { Highlight, type Language, themes } from "prism-react-renderer";
+import Sidebar from "@/components/devx/contracts/Sidebar";
 
 const components: MDXComponents = {
   h1: ({ children }) => (
@@ -13,7 +14,7 @@ const components: MDXComponents = {
     <h2 className="text-2xl font-bold mb-4 mt-6">{children}</h2>
   ),
   p: ({ children }) => (
-    <p className="mb-4 text-gray-700 leading-relaxed">{children}</p>
+    <p className="mb-4 text-gray-400 leading-relaxed">{children}</p>
   ),
   pre: ({ children }) => <>{children}</>,
   code: ({ className, children }) => {
@@ -58,10 +59,16 @@ const components: MDXComponents = {
 
 export default function ConcLiqAmm() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <MDXProvider components={components}>
-        <MockErc20 />
-      </MDXProvider>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
+      <Sidebar />
+
+      <div className="md:pl-64">
+        <div className="max-w-4xl mx-auto px-4 py-16 md:py-12">
+          <MDXProvider components={components}>
+            <MockErc20 />
+          </MDXProvider>
+        </div>
+      </div>
     </div>
   );
 }
