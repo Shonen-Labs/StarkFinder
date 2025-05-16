@@ -2,6 +2,7 @@
 
 [![Telegram Channel](https://img.shields.io/badge/Telegram-Channel-blue?logo=telegram)](https://t.me/shogenlabs)
 [![Telegram Bot](https://img.shields.io/badge/Telegram-Bot-light--blue?logo=telegram)](https://t.me/starkfinder_bot)
+[![Twitter](https://img.shields.io/twitter/follow/shonenlabsai)](https://x.com/shonenlabsai)
 [![Website](https://img.shields.io/badge/Website-StarkFinder-green)](https://www.starkfinder.ai](https://stark-finder-mq45.vercel.app/))
 
 ![image](https://github.com/user-attachments/assets/22bf72f4-0edd-4af6-a3c2-1397e85ca0f8)
