@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "prisma": {
+    "seed": "ts-node --esm prisma/seed.js"
+  },
   "scripts": {
     "dev": "concurrently \"next dev\" \"sh ./bot.sh\"",
     "bot": "sh ./bot.sh",
@@ -11,7 +14,9 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "setup-webhook": "ts-node scripts/tg-delete-webhook.ts",
-    "delete-webhook": "ts-node scripts/tg-set-webhook.ts"
+    "delete-webhook": "ts-node scripts/tg-set-webhook.ts",
+    "seed": "tsx prisma/seed.ts",
+    "start:agent": "node --loader ts-node/esm agents/hello-agent.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -19,11 +24,15 @@
     "@argent/tma-wallet": "^1.17.1",
     "@brian-ai/langchain": "^1.2.9",
     "@brian-ai/sdk": "^0.3.6",
+    "@elizaos/core": "^0.25.9",
     "@hookform/resolvers": "^3.10.0",
     "@langchain/anthropic": "^0.3.11",
     "@langchain/core": "^0.3.31",
     "@langchain/langgraph": "^0.2.41",
     "@langchain/openai": "^0.3.17",
+    "@mdx-js/loader": "^3.1.0",
+    "@mdx-js/react": "^2.3.0",
+    "@next/mdx": "^15.3.2",
     "@prisma/client": "^6.3.1",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -43,6 +52,7 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.0",
     "@twa-dev/sdk": "^8.0.1",
+    "@types/mdx": "^2.0.6",
     "@vercel/analytics": "^1.4.1",
     "@vercel/kv": "^1.0.1",
     "axios": "^1.7.9",
@@ -60,6 +70,7 @@
     "lucide-react": "^0.456.0",
     "next": "14.2.17",
     "next-themes": "^0.4.3",
+    "prism-react-renderer": "^2.0.6",
     "prismjs": "^1.30.0",
     "react": "^18.3.1",
     "react-blockies": "^1.4.1",
@@ -80,7 +91,6 @@
     "stream-http": "^3.2.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
     "url": "^0.11.4",
     "uuid": "^11.0.3",
@@ -91,7 +101,7 @@
   },
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.6",
-    "@types/node": "^20",
+    "@types/node": "^20.17.31",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^18.3.19",
     "@types/react-dom": "^18",
@@ -103,7 +113,9 @@
     "prisma": "^6.3.1",
     "raw-loader": "^4.0.2",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.7.3"
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
   },
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "main": "index.js",

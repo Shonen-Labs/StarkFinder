@@ -7,7 +7,7 @@ import Withdraw from "./withdraw";
 import Bridge from "./bridge";
 
 // Import Message type or define it here if needed
-import { Message } from "@/app/tg/types"; // Adjust the import path as needed
+import { Message } from "@/legacy/tg/types"; // Adjust the import path as needed
 
 // Define UserPreferences interface
 interface UserPreferences {

@@ -74,6 +74,40 @@ model DeployedContract {
   createdAt   DateTime @default(now())
 }
 
+model Agent {
+  id         Int           @id @default(autoincrement())
+  name       String
+  configJson Json
+  status     String
+  characterFiles CharacterFile[]
+  memoryEntries  MemoryEntry[]
+  actionLogs     ActionLog[]
+}
+
+model CharacterFile {
+  id         Int    @id @default(autoincrement())
+  agentId    Int
+  agent      Agent  @relation(fields: [agentId], references: [id])
+  jsonSchema Json
+}
+
+model MemoryEntry {
+  id         Int    @id @default(autoincrement())
+  agentId    Int
+  agent      Agent  @relation(fields: [agentId], references: [id])
+  vector     Float[]
+  metadata   Json
+}
+
+model ActionLog {
+  id         Int      @id @default(autoincrement())
+  agentId    Int
+  agent      Agent    @relation(fields: [agentId], references: [id])
+  timestamp  DateTime @default(now())
+  actionType String
+  payload    Json
+}
+
 enum Role {
   USER
   ASSISTANT
