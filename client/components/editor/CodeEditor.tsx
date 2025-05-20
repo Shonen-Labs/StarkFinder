@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { motion, AnimatePresence } from "framer-motion";
 import { useCodeStore } from "@/lib/codeStore";
 import { useEffect, useRef, useState } from "react";
@@ -86,30 +84,70 @@ const initialSteps: DeploymentStep[] = [
   { title: "Confirming Transaction", status: "pending" },
 ];
 
+// Create a function to initialize the codeStore with the right value
+const initializeCodeStore = (setSourceCode: (code: string) => void) => {
+  const savedEditorCode = localStorage.getItem("editorCode");
+
+  if (savedEditorCode) {
+    setSourceCode(savedEditorCode);
+    return true;
+  } else {
+    setSourceCode(DEFAULT_CONTRACT);
+    localStorage.setItem("editorCode", DEFAULT_CONTRACT);
+    return false;
+  }
+};
+
 export default function CodeEditor() {
   const router = useRouter();
-  const sourceCode = useCodeStore((state) => state.sourceCode);
   const setSourceCode = useCodeStore((state) => state.setSourceCodeStore);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  // Get sourceCode AFTER initialization to ensure we have the right value
+  const sourceCode = useCodeStore((state) => state.sourceCode);
+
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<DeploymentResponse | null>(null);
   const [steps, setSteps] = useState<DeploymentStep[]>(initialSteps);
-
   const logsContainerRef = useRef<HTMLDivElement>(null);
+  const [contractName, setContractName] = useState("");
 
-  // Initialize with default if no code was passed
+  // Initialize code store and component state from localStorage on mount
   useEffect(() => {
-    if (!sourceCode) {
-      setSourceCode(DEFAULT_CONTRACT);
-    }
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, []);
+    // Only initialize once
+    if (!hasInitialized) {
+      const hadSavedCode = initializeCodeStore(setSourceCode);
 
+      // Load contract name if available
+      const savedContractName = localStorage.getItem("contractName");
+      if (savedContractName) {
+        setContractName(savedContractName);
+      }
+
+      setHasInitialized(true);
+    }
+  }, [hasInitialized, setSourceCode]);
+
+  // Save to localStorage whenever sourceCode changes (but only after initialization)
+  useEffect(() => {
+    if (hasInitialized && sourceCode) {
+      localStorage.setItem("editorCode", sourceCode);
+    }
+  }, [sourceCode, hasInitialized]);
+
+  // Save contract name to localStorage when it changes
+  useEffect(() => {
+    if (contractName) {
+      localStorage.setItem("contractName", contractName);
+    }
+  }, [contractName]);
+
+  // Scroll logs to bottom when they change
   useEffect(() => {
     if (logsContainerRef.current) {
-      logsContainerRef.current.scrollTop =
-        logsContainerRef.current.scrollHeight;
+      logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
     }
-  }, [sourceCode, logs]);
+  }, [logs]);
 
   const updateStep = (index: number, updates: Partial<DeploymentStep>) => {
     setSteps((current) =>
@@ -121,7 +159,13 @@ export default function CodeEditor() {
   const [isDeploying, setIsDeploying] = useState(false);
 
   const handleAudit = async (): Promise<void> => {
+    if (!sourceCode) {
+      console.error("Source code is empty, cannot audit");
+      return;
+    }
+
     setIsAuditing(true);
+
     const fetchStreamedData = async () => {
       try {
         const response = await fetch("/api/audit-sourcecode", {
@@ -131,17 +175,21 @@ export default function CodeEditor() {
           },
           body: JSON.stringify({ sourceCode }),
         });
-        setSourceCode("");
+
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
 
         if (reader) {
           let done = false;
+          let accumulatedCode = sourceCode; // Start with current code
+
           while (!done) {
             const { value, done: isDone } = await reader.read();
             done = isDone;
+
             if (value) {
               const decodedValue = decoder.decode(value);
+
               try {
                 const parsedValue = JSON.parse(decodedValue);
                 if (parsedValue.error) {
@@ -154,13 +202,13 @@ export default function CodeEditor() {
                   throw new Error(parsedValue.error);
                 } else {
                   // If it's valid JSON but not an error, update source code
-                  const newSourceCode = sourceCode + decodedValue;
-                  setSourceCode(newSourceCode);
+                  accumulatedCode += decodedValue;
+                  setSourceCode(accumulatedCode);
                 }
               } catch (jsonError) {
                 // If it's not valid JSON, just treat it as regular text
-                const newSourceCode = sourceCode + decodedValue;
-                setSourceCode(newSourceCode);
+                accumulatedCode += decodedValue;
+                setSourceCode(accumulatedCode);
               }
             }
           }
@@ -230,14 +278,18 @@ export default function CodeEditor() {
     }
   };
 
-  const backToDevx = async () => {
+  const backToDevx = () => {
+    // Clear the state and local storage before navigating away
+    localStorage.removeItem("editorCode");
+    localStorage.removeItem("contractName");
     setSourceCode("");
     setResult(null);
     setSteps(initialSteps);
     setLogs([]);
-
     router.push("/devx");
   };
+
+  // Add a DEBUG button in development to view state (remove in production)
   {
     return (
       <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-4 selectable-none">
@@ -358,11 +410,10 @@ export default function CodeEditor() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 100 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${
-                    result.success
-                      ? "bg-green-900/95 border-green-700"
-                      : "bg-red-900/95 border-red-700"
-                  }`}
+                  className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${result.success
+                    ? "bg-green-900/95 border-green-700"
+                    : "bg-red-900/95 border-red-700"
+                    }`}
                 >
                   {result.success ? (
                     <div className="flex flex-col gap-2">

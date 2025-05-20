@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { FlowSummaryItem } from "@/types/main-types";
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface CodeStore {
   sourceCode: string;
@@ -14,13 +13,22 @@ interface CodeStore {
   setFlowSummaryStore: (summary: FlowSummaryItem[]) => void;
 }
 
-export const useCodeStore = create<CodeStore>((set) => ({
-  sourceCode: "",
-  setSourceCodeStore: (code) => set({ sourceCode: code }),
-  nodes: [],
-  setNodesStore: (nodes) => set({ nodes }),
-  edges: [],
-  setEdgesStore: (edges) => set({ edges }),
-  flowSummary: [],
-  setFlowSummaryStore: (flowSummary) => set({ flowSummary }),
-}));
+// Use the persist middleware to automatically save state to localStorage
+export const useCodeStore = create<CodeStore>()(
+  persist(
+    (set) => ({
+      sourceCode: "",  // Default empty - will be populated from localStorage or by component
+      setSourceCodeStore: (code) => set({ sourceCode: code }),
+      nodes: [],
+      setNodesStore: (nodes) => set({ nodes }),
+      edges: [],
+      setEdgesStore: (edges) => set({ edges }),
+      flowSummary: [],
+      setFlowSummaryStore: (flowSummary) => set({ flowSummary }),
+    }),
+    {
+      name: "code-store", // Name for localStorage key
+      partialize: (state) => ({ sourceCode: state.sourceCode }), // Only persist sourceCode
+    }
+  )
+);

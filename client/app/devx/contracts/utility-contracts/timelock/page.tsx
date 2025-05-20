@@ -5,6 +5,7 @@ import type { MDXComponents } from "mdx/types";
 import TimeLock from "./timelock.mdx";
 import { Highlight, type Language, themes } from "prism-react-renderer";
 import Sidebar from "@/components/devx/contracts/Sidebar";
+import OpenEditorButton from "@/components/OpenEditorButton";
 
 const components: MDXComponents = {
   h1: ({ children }) => (
@@ -27,6 +28,10 @@ const components: MDXComponents = {
 
     return (
       <div className="my-6 rounded-lg overflow-hidden">
+        <OpenEditorButton
+          contractCode={children.trim()}
+          contractName="TimeLock"
+        />
         <Highlight
           theme={themes.nightOwl}
           code={children.trim()}
