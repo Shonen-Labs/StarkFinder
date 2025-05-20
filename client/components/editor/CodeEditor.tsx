@@ -116,7 +116,7 @@ export default function CodeEditor() {
   useEffect(() => {
     // Only initialize once
     if (!hasInitialized) {
-      const hadSavedCode = initializeCodeStore(setSourceCode);
+      initializeCodeStore(setSourceCode);
 
       // Load contract name if available
       const savedContractName = localStorage.getItem("contractName");
@@ -206,6 +206,7 @@ export default function CodeEditor() {
                   setSourceCode(accumulatedCode);
                 }
               } catch (jsonError) {
+                console.log(jsonError)
                 // If it's not valid JSON, just treat it as regular text
                 accumulatedCode += decodedValue;
                 setSourceCode(accumulatedCode);
@@ -290,6 +291,8 @@ export default function CodeEditor() {
   };
 
   // Add a DEBUG button in development to view state (remove in production)
+
+
   {
     return (
       <div className="flex h-full relative justify-start flex-col bg-[#f9f7f3] text-black pt-4 selectable-none">
