@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -28,7 +29,7 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
-  const id = params?.id;
+  const id = params?.id as string;
 
   const fetchUserData = async () => {
     if (!id) {
@@ -40,16 +41,82 @@ export default function UserProfilePage() {
     try {
       setLoading(true);
       const response = await fetch(`/api/user/${id}`);
-      console.log(response)
-      // if (!response.ok) {
-      //   throw new Error('Failed to fetch user data');
-      // }
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
       const data = await response.json();
       setUserData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGenerateContract = async () => {
+    try {
+      const generateData = {
+        nodes: ["node1", "node2"],
+        edges: ["edge1", "edge2"],
+        flowSummary: ["step1", "step2"],
+        userId: id,
+        blockchain: "blockchain1", 
+      };
+
+      const response = await fetch("/api/generate-contract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(generateData),
+      });
+
+      if (!response.body) throw new Error("No response body");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let finalResult = "";
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          finalResult += chunk;
+        }
+      }
+
+      const result = JSON.parse(finalResult.split("\n\n").filter(Boolean).pop() || "{}");
+      if (result.success) {
+        await fetchUserData();
+      } else {
+        throw new Error(result.error || "Failed to generate contract");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred while generating the contract");
+    }
+  };
+
+  const handleDeployContract = async (contractId?: string) => {
+    try {
+      const deployData = {
+        contractName: "lib",
+        userId: id,
+      };
+
+      const response = await fetch("/api/deploy-contract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(deployData),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        await fetchUserData();
+      } else {
+        throw new Error(data.error || "Failed to deploy contract");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred while deploying the contract");
     }
   };
 
@@ -73,7 +140,7 @@ export default function UserProfilePage() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="text-red-500 text-xl">{error}</div>
           <button
-            onClick={fetchUserData}
+            onClick={() => { setError(null); fetchUserData(); }}
             className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white text-sm transition-colors"
           >
             Retry
@@ -172,11 +239,11 @@ export default function UserProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activeTab === 'deployed' && userData.deployedContracts.length > 0 ? (
             userData.deployedContracts.map((contract) => (
-              <ContractCard key={contract.id} contract={contract} type="deployed" />
+              <ContractCard key={contract.id} contract={contract} type="deployed" onDeploy={handleDeployContract} />
             ))
           ) : activeTab === 'generated' && userData.generatedContracts.length > 0 ? (
             userData.generatedContracts.map((contract) => (
-              <ContractCard key={contract.id} contract={contract} type="generated" />
+              <ContractCard key={contract.id} contract={contract} type="generated" onDeploy={handleDeployContract} />
             ))
           ) : (
             <div className="col-span-full text-center p-12">
@@ -189,7 +256,10 @@ export default function UserProfilePage() {
                     ? "You haven't deployed any contracts yet."
                     : "You haven't generated any contracts yet."}
                 </p>
-                <button className="mt-4 px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white transition-colors">
+                <button
+                  onClick={activeTab === 'deployed' ? () => handleDeployContract() : handleGenerateContract}
+                  className="mt-4 px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white transition-colors"
+                >
                   {activeTab === 'deployed'
                     ? "Deploy Your First Contract"
                     : "Generate Your First Contract"}
@@ -203,7 +273,7 @@ export default function UserProfilePage() {
   );
 }
 
-function ContractCard({ contract, type }: { contract: Contract; type: 'deployed' | 'generated' }) {
+function ContractCard({ contract, type, onDeploy }: { contract: Contract; type: 'deployed' | 'generated'; onDeploy: (contractId?: string) => void }) {
   return (
     <div className="bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
       <div className="p-6">
@@ -242,11 +312,14 @@ function ContractCard({ contract, type }: { contract: Contract; type: 'deployed'
           View Details
         </button>
         {type === 'generated' && !contract.address && (
-          <button className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
+          <button
+            onClick={() => onDeploy(contract.id)}
+            className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+          >
             Deploy Contract
           </button>
         )}
       </div>
     </div>
   );
-} 
+}
