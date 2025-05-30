@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "3000:3000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - BRIAN_API_KEY=${BRIAN_API_KEY}
+      - DEFAULT_LLM_PROVIDER=${DEFAULT_LLM_PROVIDER}
+      - STARKNET_RPC_URL=${STARKNET_RPC_URL}
+      - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
+      - OZ_ACCOUNT_PRIVATE_KEY=${OZ_ACCOUNT_PRIVATE_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - db
+      - agent
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    ports:
+      - "4000:4000"
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
