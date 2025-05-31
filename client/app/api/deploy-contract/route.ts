@@ -187,7 +187,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
     console.log('Initializing Starknet provider...');
     const provider = new RpcProvider({
       nodeUrl: process.env.STARKNET_RPC_URL,
