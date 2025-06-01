@@ -53,16 +53,16 @@ jobs:
 
       - name: Install Starknet Foundry (snforge)
         run: |
-          if ! command -v forge &> /dev/null; then
+          if ! command -v snforge &> /dev/null; then
             git clone https://github.com/foundry-rs/starknet-foundry.git
             cd starknet-foundry
-            git checkout v0.39.0
+            git checkout v0.44.0
             cargo build --release
-            sudo cp target/release/snforge /usr/local/bin/forge
+            sudo cp target/release/snforge /usr/local/bin/snforge
             cd ..
             rm -rf starknet-foundry
           fi
-          forge --version
+          snforge --version
 
       - name: Install dependencies
         run: |
@@ -73,7 +73,7 @@ jobs:
         run: scarb build
 
       - name: Run forge tests
-        run: forge test --workspace
+        run: snforge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
