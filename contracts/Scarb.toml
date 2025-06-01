@@ -7,14 +7,9 @@ edition = "2024_07"
 
 [dependencies]
 starknet = "2.9.1"
-openzeppelin = "0.20.0"
-alexandria_storage = { git = "https://github.com/keep-starknet-strange/alexandria", tag = "v0.2.0" }  
 
 [dev-dependencies]
-snforge_std = "0.34.0"
-openzeppelin_testing = "0.20.0"
-# cairo_test = "2.9.1"
-assert_macros = "2.9.1"
+snforge_std = "0.44.0"
 
 [[target.starknet-contract]]
 casm = true
