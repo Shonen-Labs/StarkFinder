@@ -17,3 +17,7 @@ sierra = true
 
 [scripts]
 test = "snforge test"
+
+# Patch to use older cairo-vm without type mismatch bugs
+[patch.crates-io]
+cairo-vm = { git = "https://github.com/lambdaclass/cairo-vm", tag = "v0.9.1" }
