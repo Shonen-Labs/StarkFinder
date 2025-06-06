@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "types": ["react", "next", "node"],
+    "paths": {
+      "@/public/img/*": ["public/img/*"]
+    }
+  }
+}
