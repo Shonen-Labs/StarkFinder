@@ -5,16 +5,22 @@ import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { DisconnectButton } from "@/lib/Connect";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import Argent from "@/public/img/Argent Wallet.png";
-import Bravoos from "@/public/img/bravoos wallet.jpeg";
-import { Home, Upload, MessageSquare, Book, Wallet } from "lucide-react";
+import { Home, Upload, MessageSquare, Book, Wallet, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+
+const MODELS = [
+  { id: "deepseek", name: "DeepSeek", icon: "🔍" },
+  { id: "claude", name: "Claude", icon: "🤖" },
+  { id: "openai", name: "OpenAI", icon: "⚡" },
+  { id: "llama", name: "Llama 3", icon: "🦙" },
+  { id: "mistral", name: "Mistral", icon: "🌪️" },
+];
 
 interface HeaderProps {
   showClearButton: boolean;
@@ -25,6 +31,8 @@ interface HeaderProps {
   flowSummary: any;
   selectedNode: any;
   handleDelete: (node: any) => void;
+  selectedModel?: string;
+  onModelChange?: (model: string) => void;
 }
 
 export default function Header({
@@ -36,6 +44,8 @@ export default function Header({
   flowSummary,
   selectedNode,
   handleDelete,
+  selectedModel = "deepseek",
+  onModelChange,
 }: HeaderProps) {
   const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -47,13 +57,12 @@ export default function Header({
 
   const router = useRouter();
 
-  // Format wallet address for display
-  const formatAddress = (address?: string) => {
+  function formatAddress(address?: string) {
     if (!address) return "";
     return `${address.substring(0, 6)}...${address.substring(
       address.length - 4
     )}`;
-  };
+  }
 
   const handleConnect = async (connectorId: string) => {
     try {
@@ -79,7 +88,7 @@ export default function Header({
         <li>
           <Link
             href="/"
-            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110  duration-300 "
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
           >
             <Home size={18} /> Home
           </Link>
@@ -87,7 +96,7 @@ export default function Header({
         <li>
           <Link
             href="/deploy"
-            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300 "
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
           >
             <Upload size={18} /> Deploy
           </Link>
@@ -103,7 +112,7 @@ export default function Header({
         <li>
           <Link
             href="/devx/resources"
-            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110  duration-300 "
+            className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
           >
             <Book size={18} /> Resources
           </Link>
@@ -117,7 +126,7 @@ export default function Header({
       <header className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke text-white w-full">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <motion.div
-            className="flex-1 flex items-center "
+            className="flex-1 flex items-center"
             initial={{ x: -200, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5 }}
@@ -129,16 +138,41 @@ export default function Header({
             </Link>
           </motion.div>
 
-          {/* Center: Navigation Links */}
           <nav className="hidden md:flex gap-8 text-sm">{centerItems}</nav>
 
-          {/* Right: Wallet Connection & Action Buttons */}
           <motion.div
-            className="flex-1 flex items-center justify-start md:justify-end gap-1 "
+            className="flex-1 flex items-center justify-start md:justify-end gap-2"
             initial={{ x: 200, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5, delay: 1 }}
           >
+            <div className="hidden md:flex items-center gap-2">
+              <Bot size={18} className="text-black" />
+              <Select 
+                value={selectedModel}
+                onValueChange={onModelChange}
+              >
+                <SelectTrigger className="w-[150px] bg-white text-black">
+                  <div className="flex items-center gap-2">
+                    <span>
+                      {MODELS.find(m => m.id === selectedModel)?.icon}
+                    </span>
+                    <SelectValue placeholder="Select Model" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {MODELS.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{model.icon}</span>
+                        {model.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {isConnected ? (
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
@@ -148,9 +182,8 @@ export default function Header({
               </div>
             ) : (
               <Button
-                variant="primary"
                 onClick={() => setIsWalletModalOpen(true)}
-                className="flex items-center gap-2 hover:scale-110  duration-300 text-xs md:text-l "
+                className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-l bg-primary hover:bg-primary-dark"
               >
                 <Wallet size={18} /> Connect Wallet
               </Button>
@@ -184,50 +217,75 @@ export default function Header({
           </motion.div>
 
           <div className="md:hidden">
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-black hover:text-gray-700"
+            >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && centerItems}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white p-4 rounded-lg shadow-lg">
+            {centerItems}
+            <div className="mt-4 flex flex-col gap-2">
+              <Select 
+                value={selectedModel}
+                onValueChange={onModelChange}
+              >
+                <SelectTrigger className="w-full bg-gray-100">
+                  <div className="flex items-center gap-2">
+                    <Bot size={16} />
+                    <SelectValue placeholder="Select Model" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {MODELS.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{model.icon}</span>
+                        {model.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Wallet Connection Modal */}
       <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <h2>Connect your Starknet wallet</h2>
+            <h2 className="text-xl font-bold">Connect your Starknet wallet</h2>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <Button
-              onClick={() => handleConnect("argentX")}
-              className="flex items-center justify-center gap-2"
-            >
-              <Image src={Argent.src} alt="Argent" width={40} height={40} />
-              Connect with Argent
-            </Button>
-            <Button
-              onClick={() => handleConnect("braavos")}
-              className="flex items-center justify-center gap-2"
-            >
-              <Image
-                src={Bravoos.src}
-                alt="Braavos"
-                width={36} // Set the width in pixels
-                height={36} // Set the height in pixels
-                className="rounded-md"
-              />
-              Connect with Braavos
-            </Button>
-            <Button
-              onClick={() => handleConnect("injected")}
-              variant="outline"
-              className="flex items-center justify-center gap-2"
-            >
-              Other Starknet Wallet
-            </Button>
+            {connectors.map((connector) => {
+              const iconSrc = typeof connector.icon === 'object' 
+                ? connector.icon.light
+                : connector.icon;
+              
+              return (
+                <Button
+                  key={connector.id}
+                  onClick={() => handleConnect(connector.id)}
+                  className="flex items-center justify-center gap-3 bg-primary hover:bg-primary-dark py-4"
+                >
+                  {iconSrc && (
+                    <Image
+                      src={iconSrc}
+                      alt={connector.name}
+                      width={32}
+                      height={32}
+                      className="rounded-md"
+                    />
+                  )}
+                  Connect with {connector.name}
+                </Button>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>

@@ -1,9 +1,20 @@
 {
   "dependencies": {
-    "prismjs-cairo": "^1.0.1"
+    "@langchain/community": "^0.3.45",
+    "@starknet-react/core": "^3.7.4",
+    "framer-motion": "^12.16.0",
+    "lucide-react": "^0.513.0",
+    "next": "^15.3.3",
+    "prismjs-cairo": "^1.0.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "devDependencies": {
+    "@types/next": "^8.0.7",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
     "ts-node": "^10.9.2"
   }
 }
