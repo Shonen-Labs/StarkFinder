@@ -12,3 +12,4 @@ export * from './integration.icon'
 
 export * from './chat.icon'
 export * from './contract.icon'
+export * from "./google.icon"
