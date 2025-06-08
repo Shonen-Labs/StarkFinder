@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, 
   Droplets, 
@@ -50,6 +50,9 @@ interface LiquidityStats {
   utilizationRate: number;
 }
 
+type TabType = 'create' | 'manage' | 'liquidity';
+type LiquidityActionType = 'provide' | 'withdraw';
+
 // Constants
 const POLICY_TYPES = {
   0: { name: 'Crop Insurance', icon: Droplets, color: 'text-green-600', bgColor: 'bg-green-50' },
@@ -57,7 +60,7 @@ const POLICY_TYPES = {
   2: { name: 'Hurricane', icon: Wind, color: 'text-red-600', bgColor: 'bg-red-50' },
   3: { name: 'Earthquake', icon: AlertTriangle, color: 'text-orange-600', bgColor: 'bg-orange-50' },
   4: { name: 'Temperature', icon: Thermometer, color: 'text-purple-600', bgColor: 'bg-purple-50' }
-};
+} as const;
 
 const DATA_TYPES = {
   0: 'Weather Data',
@@ -65,7 +68,7 @@ const DATA_TYPES = {
   2: 'Seismic Activity',
   3: 'Temperature',
   4: 'Rainfall'
-};
+} as const;
 
 const OPERATORS = {
   0: '>',
@@ -73,10 +76,10 @@ const OPERATORS = {
   2: '=',
   3: '>=',
   4: '<='
-};
+} as const;
 
 const ParametricInsurance: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'create' | 'manage' | 'liquidity'>('create');
+  const [activeTab, setActiveTab] = useState<TabType>('create');
   const [loading, setLoading] = useState(false);
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [liquidityStats, setLiquidityStats] = useState<LiquidityStats | null>(null);
@@ -92,29 +95,10 @@ const ParametricInsurance: React.FC = () => {
 
   // Liquidity form state
   const [liquidityAmount, setLiquidityAmount] = useState('');
-  const [liquidityAction, setLiquidityAction] = useState<'provide' | 'withdraw'>('provide');
+  const [liquidityAction, setLiquidityAction] = useState<LiquidityActionType>('provide');
 
-  // Load data on component mount
-  useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    setLoading(true);
-    try {
-      await Promise.all([
-        loadUserPolicies(),
-        loadLiquidityStats()
-      ]);
-    } catch (error) {
-      console.error('Failed to load user data:', error);
-      addNotification('Failed to load user data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadUserPolicies = async () => {
+  // Memoized functions to prevent dependency issues
+  const loadUserPolicies = useCallback(async () => {
     // Mock data - replace with actual contract calls
     const mockPolicies: Policy[] = [
       {
@@ -136,9 +120,9 @@ const ParametricInsurance: React.FC = () => {
       }
     ];
     setPolicies(mockPolicies);
-  };
+  }, []);
 
-  const loadLiquidityStats = async () => {
+  const loadLiquidityStats = useCallback(async () => {
     // Mock data - replace with actual contract calls
     const mockStats: LiquidityStats = {
       totalLiquidity: '500000',
@@ -147,14 +131,34 @@ const ParametricInsurance: React.FC = () => {
       utilizationRate: 65
     };
     setLiquidityStats(mockStats);
-  };
+  }, []);
 
-  const addNotification = (message: string) => {
+  const loadUserData = useCallback(async () => {
+    setLoading(true);
+    try {
+      await Promise.all([
+        loadUserPolicies(),
+        loadLiquidityStats()
+      ]);
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+      addNotification('Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  }, [loadUserPolicies, loadLiquidityStats]);
+
+  // Load data on component mount
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
+
+  const addNotification = useCallback((message: string) => {
     setNotifications(prev => [...prev, message]);
     setTimeout(() => {
       setNotifications(prev => prev.slice(1));
     }, 5000);
-  };
+  }, []);
 
   const handleCreatePolicy = async () => {
     if (!policyForm.coverageAmount || policyForm.triggerConditions.length === 0) {
@@ -182,6 +186,77 @@ const ParametricInsurance: React.FC = () => {
     }
   };
 
+  const handlePayPremium = async (policyId: string) => {
+    setLoading(true);
+    try {
+      // Pay premium (integrate with your contract calls)
+      addNotification('Premium paid successfully!');
+      await loadUserPolicies();
+    } catch (error) {
+      console.error('Failed to pay premium:', error);
+      addNotification('Failed to pay premium');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClaimPayout = async (policyId: string) => {
+    setLoading(true);
+    try {
+      // Claim payout (integrate with your contract calls)
+      const success = Math.random() > 0.5; // Mock success rate
+      if (success) {
+        addNotification('Payout claimed successfully!');
+      } else {
+        addNotification('Trigger conditions not met yet');
+      }
+      await loadUserPolicies();
+    } catch (error) {
+      console.error('Failed to claim payout:', error);
+      addNotification('Failed to claim payout');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLiquidityAction = async () => {
+    if (!liquidityAmount) {
+      addNotification('Please enter an amount');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (liquidityAction === 'provide') {
+        addNotification('Liquidity provided successfully!');
+      } else {
+        addNotification('Liquidity withdrawn successfully!');
+      }
+      
+      setLiquidityAmount('');
+      await loadLiquidityStats();
+    } catch (error) {
+      console.error('Liquidity action failed:', error);
+      addNotification('Liquidity action failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClaimRewards = async () => {
+    setLoading(true);
+    try {
+      const rewards = (Math.random() * 1000).toFixed(2);
+      addNotification(`Claimed ${rewards} tokens in rewards!`);
+      await loadLiquidityStats();
+    } catch (error) {
+      console.error('Failed to claim rewards:', error);
+      addNotification('Failed to claim rewards');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addTriggerCondition = () => {
     setPolicyForm(prev => ({
       ...prev,
@@ -197,7 +272,7 @@ const ParametricInsurance: React.FC = () => {
     }));
   };
 
-  const updateTriggerCondition = (index: number, field: keyof TriggerCondition, value: any) => {
+  const updateTriggerCondition = (index: number, field: keyof TriggerCondition, value: string | number) => {
     setPolicyForm(prev => ({
       ...prev,
       triggerConditions: prev.triggerConditions.map((condition, i) =>
@@ -260,13 +335,13 @@ const ParametricInsurance: React.FC = () => {
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-lg p-1 shadow-md">
             {[
-              { id: 'create', label: 'Create Policy', icon: Plus },
-              { id: 'manage', label: 'My Policies', icon: Shield },
-              { id: 'liquidity', label: 'Liquidity Pool', icon: TrendingUp }
+              { id: 'create' as const, label: 'Create Policy', icon: Plus },
+              { id: 'manage' as const, label: 'My Policies', icon: Shield },
+              { id: 'liquidity' as const, label: 'Liquidity Pool', icon: TrendingUp }
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
-                onClick={() => setActiveTab(id as any)}
+                onClick={() => setActiveTab(id)}
                 className={`flex items-center px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
                   activeTab === id
                     ? 'bg-blue-600 text-white shadow-md'
@@ -300,7 +375,8 @@ const ParametricInsurance: React.FC = () => {
               loading={loading}
               formatCurrency={formatCurrency}
               formatDate={formatDate}
-              addNotification={addNotification}
+              handlePayPremium={handlePayPremium}
+              handleClaimPayout={handleClaimPayout}
             />
           )}
           
@@ -313,7 +389,8 @@ const ParametricInsurance: React.FC = () => {
               setLiquidityAction={setLiquidityAction}
               loading={loading}
               formatCurrency={formatCurrency}
-              addNotification={addNotification}
+              handleLiquidityAction={handleLiquidityAction}
+              handleClaimRewards={handleClaimRewards}
             />
           )}
         </div>
@@ -323,15 +400,17 @@ const ParametricInsurance: React.FC = () => {
 };
 
 // Create Policy Tab Component
-const CreatePolicyTab: React.FC<{
+interface CreatePolicyTabProps {
   policyForm: PolicyFormData;
   setPolicyForm: React.Dispatch<React.SetStateAction<PolicyFormData>>;
   addTriggerCondition: () => void;
-  updateTriggerCondition: (index: number, field: keyof TriggerCondition, value: any) => void;
+  updateTriggerCondition: (index: number, field: keyof TriggerCondition, value: string | number) => void;
   removeTriggerCondition: (index: number) => void;
   handleCreatePolicy: () => void;
   loading: boolean;
-}> = ({
+}
+
+const CreatePolicyTab: React.FC<CreatePolicyTabProps> = ({
   policyForm,
   setPolicyForm,
   addTriggerCondition,
@@ -463,13 +542,23 @@ const CreatePolicyTab: React.FC<{
 };
 
 // Manage Policies Tab Component
-const ManagePoliciesTab: React.FC<{
+interface ManagePoliciesTabProps {
   policies: Policy[];
   loading: boolean;
   formatCurrency: (amount: string) => string;
   formatDate: (timestamp: number) => string;
-  addNotification: (message: string) => void;
-}> = ({ policies, loading, formatCurrency, formatDate, addNotification }) => {
+  handlePayPremium: (policyId: string) => void;
+  handleClaimPayout: (policyId: string) => void;
+}
+
+const ManagePoliciesTab: React.FC<ManagePoliciesTabProps> = ({ 
+  policies, 
+  loading, 
+  formatCurrency, 
+  formatDate,
+  handlePayPremium,
+  handleClaimPayout
+}) => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Insurance Policies</h2>
@@ -538,13 +627,19 @@ const ManagePoliciesTab: React.FC<{
                 
                 <div className="flex space-x-3">
                   {!policy.premiumPaid && (
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <button 
+                      onClick={() => handlePayPremium(policy.id)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
                       Pay Premium
                     </button>
                   )}
                   
                   {policy.isActive && !policy.payoutClaimed && (
-                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    <button 
+                      onClick={() => handleClaimPayout(policy.id)}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
                       Check Payout
                     </button>
                   )}
@@ -559,16 +654,19 @@ const ManagePoliciesTab: React.FC<{
 };
 
 // Liquidity Tab Component
-const LiquidityTab: React.FC<{
+interface LiquidityTabProps {
   liquidityStats: LiquidityStats | null;
   liquidityAmount: string;
   setLiquidityAmount: React.Dispatch<React.SetStateAction<string>>;
-  liquidityAction: 'provide' | 'withdraw';
-  setLiquidityAction: React.Dispatch<React.SetStateAction<'provide' | 'withdraw'>>;
+  liquidityAction: LiquidityActionType;
+  setLiquidityAction: React.Dispatch<React.SetStateAction<LiquidityActionType>>;
   loading: boolean;
   formatCurrency: (amount: string) => string;
-  addNotification: (message: string) => void;
-}> = ({
+  handleLiquidityAction: () => void;
+  handleClaimRewards: () => void;
+}
+
+const LiquidityTab: React.FC<LiquidityTabProps> = ({
   liquidityStats,
   liquidityAmount,
   setLiquidityAmount,
@@ -576,7 +674,8 @@ const LiquidityTab: React.FC<{
   setLiquidityAction,
   loading,
   formatCurrency,
-  addNotification
+  handleLiquidityAction,
+  handleClaimRewards
 }) => {
   return (
     <div className="space-y-8">
@@ -664,6 +763,7 @@ const LiquidityTab: React.FC<{
             className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <button
+            onClick={handleLiquidityAction}
             disabled={loading || !liquidityAmount}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
@@ -680,7 +780,10 @@ const LiquidityTab: React.FC<{
               <h3 className="text-lg font-semibold text-green-900">Rewards Available</h3>
               <p className="text-green-700">You have {formatCurrency(liquidityStats.pendingRewards)} in unclaimed rewards</p>
             </div>
-            <button className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+            <button 
+              onClick={handleClaimRewards}
+              className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+            >
               Claim Rewards
             </button>
           </div>
