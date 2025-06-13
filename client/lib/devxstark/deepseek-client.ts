@@ -1,47 +1,51 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ChatCompletionMessageParam } from "openai/resources/index";
 // client/lib/devxstark/deepseek-client.ts
-import { ChatDeepSeek } from "@langchain/community/chat_models/deepseek"; // Assuming LangChain adds DeepSeek support
+type Message = ChatCompletionMessageParam;
 
-export const createDeepSeekClient = () => {
-    return new ChatDeepSeek({
-        modelName: "deepseek-chat",
-        temperature: 0.2,
-        maxTokens: undefined,
-        maxRetries: 3,
-        apiKey: process.env.DEEPSEEK_API_KEY,
-        // Additional DeepSeek-specific options can go here
-    });
-};
+interface DeepSeekInterface {
+	chat(messages: Message[], stream?: boolean): Promise<any>;
+}
 
-// Alternative implementation if LangChain doesn't support DeepSeek yet:
-export class DeepSeekClient {
-    private apiKey: string;
-    
-    constructor() {
-        this.apiKey = process.env.DEEPSEEK_API_KEY!;
-        if (!this.apiKey) {
-            throw new Error("DEEPSEEK_API_KEY is not configured");
-        }
-    }
+export class DeepSeekClient implements DeepSeekInterface {
+	private apiKey: string;
+	private useOpenAI: boolean;
 
-    async chat(messages: Array<{ role: string; content: string }>) {
-        const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.apiKey}`
-            },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages,
-                temperature: 0.2
-            })
-        });
+	constructor() {
+		this.apiKey = process.env.DEEPSEEK_API_KEY!;
+		if (!this.apiKey) throw new Error("Deepseek is not configured");
 
-        if (!response.ok) {
-            throw new Error(`DeepSeek API error: ${response.statusText}`);
-        }
+		this.useOpenAI = true;
+	}
 
-        const data = await response.json();
-        return data.choices[0].message.content;
-    }
+	async chat(messages: Message[], stream = false): Promise<any> {
+		if (this.useOpenAI && stream) {
+			const OpenAI = (await import("openai")).default;
+			const openai = new OpenAI({
+				baseURL: "https://api.deepseek.com",
+				apiKey: this.apiKey
+			});
+			return openai.chat.completions.create({
+				model: "deepseek-chat",
+				messages,
+				stream: true,
+			});
+		}
+		const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+			method: "POST",
+			headers: {
+				"Content-type": "application/json",
+				"Authorization": `Bearer ${this.apiKey}`
+			},
+			body: JSON.stringify({
+				model: "deepseek-chat",
+				messages,
+				temperature: 0.2
+			})
+		});
+
+		if (!response.ok) throw new Error(`Deepseek api error: ${response.statusText}`);
+		const data = await response.json();
+		return data.choices[0].message.content;
+	}
 }
