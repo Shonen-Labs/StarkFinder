@@ -5,77 +5,48 @@ export default function TestDeepseek() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    try {
-      setLoading(true);
-      setOutput("");
+    setLoading(true);
+    setOutput("");
 
-      const res = await fetch("/api/generate-contract/deepseek/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requeriments: "Create a basic ERC20 token in Cairo 1.0 with mint, transfer, and burn functions.",
-        }),
-      });
+    const response = await fetch("/api/generate-contract/deepseek/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requeriments:
+          "Create a basic ERC20 token in Cairo 1.0 with mint, transfer, and burn functions.",
+      }),
+    });
 
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}: ${await res.text()}`);
-      }
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder("utf-8");
 
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let buffer = "";
+    while (reader) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      console.log("Raw chunk:", chunk);
 
-      while (reader) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      // Match multiple data: {...} entries in the same chunk
+      const matches = [...chunk.matchAll(/data: ({.*?})/g)];
 
-        buffer += decoder.decode(value, { stream: true });
-
-        // Procesar líneas completas
-        const lines = buffer.split(/\r?\n/);
-        buffer = lines.pop() || ""; // Guarda línea incompleta para la próxima iteración
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-
-          const raw = line.slice(6).trim();
-
-          try {
-            const json = JSON.parse(raw);
-
-            if (json.original_contract_code) {
-              const formattedCode = json.original_contract_code
-                .replace(/\\n/g, "\n")
-                .replace(/\\t/g, "\t")
-                .replace(/\\"/g, '"')
-                .replace(/\\\\/g, "\\");
-
-              const { original_contract_code, ...rest } = json;
-              const meta = JSON.stringify(rest, null, 2);
-
-              setOutput(prev =>
-                prev + `\n${meta}\n\nContract Code:\n\n${formattedCode}\n`
-              );
-            } else if (json.chunk) {
-              const chunk = json.chunk
-                .replace(/\\n/g, "\n")
-                .replace(/\\t/g, "\t")
-                .replace(/\\"/g, '"')
-                .replace(/\\\\/g, "\\")
-                .trim();
-
-              setOutput(prev => prev + chunk);
-            }
-          } catch {
-            setOutput(prev => prev + raw + "\n");
-          }
+      for (const match of matches) {
+        try {
+          const json = JSON.parse(match[1]);
+          const cleaned = (json.chunk || "")
+            .replace(/\\n/g, "\n")
+            .replace(/\\"/g, '"')
+            .replace(/\\t/g, "  ")
+            .replace(/\\\\/g, "\\");
+          setOutput((prev) => prev + cleaned);
+        } catch (e) {
+          console.error("Error parsing JSON:", match[1], e);
         }
       }
-    } catch (error) {
-      setOutput(`❌ ${error.message}`);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -92,15 +63,15 @@ export default function TestDeepseek() {
             color: "#0f0",
             padding: 16,
             borderRadius: 8,
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
+            whiteSpace: "pre-wrap", // wrappea si se sale del ancho
+            wordBreak: "break-word", // evita que se rompa el diseño
             fontSize: 14,
             fontFamily: "monospace",
             maxHeight: "70vh",
             overflowY: "auto",
           }}
         >
-          <code>{output}</code>
+          {output}
         </pre>
       </div>
     </div>
