@@ -18,9 +18,6 @@ import Link from "next/link";
 import { Code } from "lucide-react";
 import DropdownArrowIcon from "@/components/svgs/DropdownArrowIcon";
 
-import RewardIcon from "@/components/svgs/RewardIcon";
-import MenuIcon from "@/components/svgs/MenuIcon";
-
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
 // Define a Block type to replace 'any'
@@ -87,10 +84,10 @@ function Section({ title, icon: Icon, blocks, isOpen, onToggle, addBlock }: Sect
         onClick={onToggle}
       >
         <div className="flex gap-3 items-center">
-          <Icon className="h-4 w-4 text-gray-700" />
+          <Icon className="h-4 w-4 text-gray-700"/>
           <span className="text-black">{title}</span>
         </div>
-        <DropdownArrowIcon status={isOpen ? "open" : "closed"} />
+        <DropdownArrowIcon status={isOpen ? "open" : "closed"}/>
       </div>
       {isOpen && (
         <div className="ml-8 mt-2 flex flex-col gap-2">
@@ -115,45 +112,27 @@ interface FloatingSidebarProps {
 }
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
+  const [env, setEnv] = useState<"starknet" | "dojo">("starknet");
   const [toggles, dispatch] = useReducer(toggleReducer, initialToggles);
   const [customBlocks, setCustomBlocks] = useState<Block[]>([]);
   const [sidebarHeight, setSidebarHeight] = useState<number | null>(null);
-  const starknetRef = useRef<HTMLDivElement>(null);
-  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
-  const [environment, setEnvironment] = useState<"starknet" | "dojo">(
-    "starknet"
-  );
+  const starkRef = useRef<HTMLDivElement>(null);
 
   const formSchema = z.object({
-    blockName: z.string().min(1, "Block name is required"),
-    cairoCode: z.string().min(1, "Cairo code is required"),
+    blockName: z.string().min(1),
+    cairoCode: z.string().min(1),
   });
+  const form = useForm({ resolver: zodResolver(formSchema) });
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      blockName: "",
-      cairoCode: "",
-    },
-  });
-
-  // Save the starknet sidebar height when component mounts
   useEffect(() => {
-    if (starknetRef.current && environment === "starknet") {
-      setSidebarHeight(starknetRef.current.scrollHeight);
+    if (starkRef.current && env === "starknet") {
+      setSidebarHeight(starkRef.current.scrollHeight);
     }
-  }, [environment]);
+  }, [env]);
 
-  const sidebarStyle = environment === "dojo" && sidebarHeight ? { minHeight: sidebarHeight } : {};
-
-  function handleEnvironmentChange(newEnvironment: "starknet" | "dojo") {
-    setEnvironment(newEnvironment);
-  }
-
-  function onSubmitCustomBlock(values: z.infer<typeof formSchema>) {
-    // Create a custom block with the same structure as other blocks
-    const newCustomBlock: Block = {
-      id: `custom-${Date.now()}`, // Generate a unique ID
+  function handleCustom(values: z.infer<typeof formSchema>) {
+    const newBlock: Block = {
+      id: `custom-${Date.now()}`,
       content: values.blockName,
       color: "bg-[#3C3C3C]",
       borderColor: "border-[#6C6C6C]",
@@ -161,32 +140,20 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       icon: Code,
       code: values.cairoCode,
     };
-
-    // Add the new block to both the interface and store it
-    addBlock(newCustomBlock);
-
-    // Store the custom block in our local state to display in the sidebar
-    setCustomBlocks((prevBlocks) => [...prevBlocks, newCustomBlock]);
-
-    setIsCustomModalOpen(false);
+    addBlock(newBlock);
+    setCustomBlocks((b) => [...b, newBlock]);
+    toast.success("Custom block added");
     form.reset();
-    toast.success("Custom block added successfully");
   }
 
-  return (
-    <div
-      className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg transition-all duration-300 ease-out mb-5 text-sm"
-      style={sidebarStyle}
-    >
-      {/* Environment Switch */}
-      <EnvironmentSwitch
-        onChange={handleEnvironmentChange}
-        defaultEnvironment="starknet"
-      />
+  const sidebarStyle = env === "dojo" && sidebarHeight ? { minHeight: sidebarHeight } : {};
 
-      {/* Render Either Starknet or Dojo Blocks based on environment */}
-      {environment === "starknet" ? (
-        <div ref={starknetRef} className="text-[12px]">
+  return (
+    <div className="w-[300px] bg-white p-6 rounded-lg shadow-lg text-sm" style={sidebarStyle}>
+      <EnvironmentSwitch onChange={setEnv} defaultEnvironment="starknet" />
+
+      {env === "starknet" ? (
+        <div ref={starkRef} className="text-[18px]">
           {Object.entries(groupedBlocks).map(([section, { icon, blocks }]) => {
             const adaptedBlocks: Block[] = blocks.map((b) => ({
               id: b.id,
@@ -214,86 +181,59 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
         <DojoBlocksSidebar addBlock={(d) => addBlock(dojoBlockAdapter(d))} />
       )}
 
-      {/* Custom Block Section */}
-      <div className="mt-4">
-        <div className="hover:bg-gray-200 rounded-lg">
-          <div
-            onClick={() => setIsCustomModalOpen(true)}
-            className="px-3 py-2 flex justify-between items-center cursor-pointer"
-          >
-            <div className="flex gap-3">
-              <span>
-                <MenuIcon />
-              </span>
-              <div className="text-black">Custom</div>
-            </div>
-            <div>
-              <Code className="h-4 w-4 text-gray-500" />
-            </div>
+      {/* Custom Blocks */}
+      <div className="mt-6">
+        <div
+          className="px-3 py-2 flex justify-between items-center rounded-lg hover:bg-gray-200 cursor-pointer"
+          onClick={() => form.setValue("blockName", "")}
+        >
+          <div className="flex gap-3 items-center">
+            <Code className="h-4 w-4 text-gray-700" />
+            <span className="text-black">Custom</span>
           </div>
-
-          {/* Display custom blocks if any */}
-          {customBlocks.length > 0 && (
-            <div className="ml-10 my-2 mr-2 flex flex-col gap-2">
-              {customBlocks.map((block, index) => (
-                <div
-                  key={`custom-${index}-${block.content}`}
-                  className="px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md mr-2"
-                >
-                  <div
-                    className="flex justify-between items-center"
-                    onClick={() => addBlock(block)}
-                  >
-                    <div className="flex gap-3">
-                      <span>
-                        <Code className="h-4 w-4" />
-                      </span>
-                      <div className="text-black hover:font-medium">
-                        {block.content}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
+        {customBlocks.length > 0 && (
+          <div className="ml-8 mt-2 flex flex-col gap-2">
+            {customBlocks.map((b) => (
+              <div
+                key={b.id}
+                className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer flex items-center gap-3"
+                onClick={() => addBlock(b)}
+              >
+                <Code className="h-4 w-4 text-gray-600" />
+                <span className="text-black">{b.content}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-
-      {/* Promotional Section */}
-      <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">
-        <div>Take full control of your rewards! 🚀</div>
-        <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71] shadow-sm transition transform hover:hover:bg-opacity-80 hover:shadow-md active:shadow-lg active:scale-95 ease-out">
-          <span>
-            <RewardIcon />
-          </span>
-          <div>Claim Token</div>
+      {/* Promo & Links */}
+      <div className="mt-8 p-4 bg-[#104926] rounded-md text-white text-center">
+        <p>Take full control of your rewards! 🚀</p>
+        <button className="mt-4 py-2 w-full bg-[#F6FFFE] text-[#297E71] rounded-md shadow">
+          Claim Token
         </button>
       </div>
 
-      {/* Navigation Links */}
-      <div className="mt-4">
-        <Link
-          href="/devx/contracts"
-          className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
-        >
-          Contracts
-        </Link>
-      </div>
+      <Link
+        href="/devx/contracts"
+        className="mt-4 block py-2 text-center bg-neutral-50 rounded-md hover:bg-gray-200"
+      >
+        Contracts
+      </Link>
       <Link
         href="/devx/resources"
-        className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
+        className="mt-2 block py-2 text-center bg-neutral-50 rounded-md hover:bg-gray-200"
       >
         Resources
       </Link>
 
-      {/* Custom Block Modal */}
       <CustomBlockModal
-        isOpen={isCustomModalOpen}
-        onClose={() => setIsCustomModalOpen(false)}
-        onSubmit={onSubmitCustomBlock}
-        environment={environment}
+        isOpen={form.formState.isSubmitting}
+        onClose={() => {}}
+        onSubmit={handleCustom}
+        environment={env}
       />
     </div>
   );
