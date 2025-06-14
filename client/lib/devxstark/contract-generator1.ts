@@ -1,8 +1,11 @@
 import path from "path";
 import { createAnthropicClient } from "./anthropic-client";
+import { DeepSeekClient } from "./deepseek-client";
 import { contractPromptTemplate } from "./prompt-generate";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import fs from "fs/promises";
+import { getStarknetSystemPrompt } from "@/app/api/audit-sourceCode/route";
+import { ChatCompletionMessageParam } from "openai/resources/index";
 
 const parser = new StringOutputParser();
 
@@ -78,5 +81,28 @@ export class CairoContractGenerator {
         }`
       );
     }
+  }
+}
+
+export class DeepSeekContractGenerator {
+  private deepseek = new DeepSeekClient();
+  
+  async generateContract(requeriments: string, options: GenerateOptions = {}){
+    const messages: ChatCompletionMessageParam[] = [
+      { role: "system", content: getStarknetSystemPrompt() },
+      { role: "user", content: requeriments},
+    ];
+
+    const stream = await this.deepseek.chat(messages, true);
+    const chunks: string[] = [];
+
+    for await (const chunk of stream) {
+      const text = chunk.choices[0]?.delta?.content || "";
+      chunks.push(text);
+      options.onProgress?.(text);
+    }
+
+    const sourceCode = chunks.join("");
+    return sourceCode.trim() || null;
   }
 }

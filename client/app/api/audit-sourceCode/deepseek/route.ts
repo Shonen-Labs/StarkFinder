@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
         const messages: ChatCompletionMessageParam[] = [
             { role: "system", content: getStarknetSystemPrompt() },
-            { role: "user", content: "write your contract" }
+            { role: "user", content: "write your code" }
         ];
 
         const completion = await deepseek.chat(messages, true);
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
                 async start(controller) {
                     for await (const chunk of completion) {
                         const text = chunk.choices[0]?.delta?.content || "";
-                        controller.enqueue(`data: ${JSON.stringify({ chunk: text })}\n\n`);
+                        controller.enqueue(`data: ${ JSON.stringify({ chunk: text }) }\n\n`);
                     }
                     controller.close();
                 },
@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
             })
         }
         return NextResponse.json({ completion });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-        return NextResponse.json({error: err.message || "Unknown error"}, { status: 500 });
+        return NextResponse.json({ error: err.message || "Unknown error" }, { status: 500 });
     }
 }
