@@ -119,6 +119,8 @@ export default function GenerateCode({
           blockchain: selectedOption,
         }),
       }); // Fetch data from the server
+      if (!response.ok)
+          throw new Error("Failed to generate contract");
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
 

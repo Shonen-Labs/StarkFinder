@@ -69,7 +69,7 @@ function extractJSON(text: string) {
   return cleanedText;
 }
 
-function getStarknetSystemPrompt() {
+export function getStarknetSystemPrompt() {
   return `You are a Starknet Smart Contract security expert. Your task is to audit a smart contract focusing on the following security aspects:
 
 1. Contract Anatomy
