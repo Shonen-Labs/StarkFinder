@@ -1,18 +1,35 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Compile from "../Modal/Compile";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { DisconnectButton } from "@/lib/Connect";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { Home, Upload, MessageSquare, Book, Wallet, Bot } from "lucide-react";
+import {
+  Home,
+  Upload,
+  MessageSquare,
+  Book,
+  Wallet,
+  Bot,
+  LogOut,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 
 const MODELS = [
   { id: "deepseek", name: "DeepSeek", icon: "🔍" },
@@ -53,6 +70,7 @@ export default function Header({
 
   const { address } = useAccount();
   const { connect, connectors } = useConnect();
+  const { data: session, status } = useSession();
   const isConnected = !!address;
 
   const router = useRouter();
@@ -72,6 +90,17 @@ export default function Header({
       setIsWalletModalOpen(false);
     } catch (error) {
       console.error("Failed to connect wallet:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut({
+        callbackUrl: "/",
+        redirect: true,
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
     }
   };
 
@@ -148,14 +177,11 @@ export default function Header({
           >
             <div className="hidden md:flex items-center gap-2">
               <Bot size={18} className="text-black" />
-              <Select 
-                value={selectedModel}
-                onValueChange={onModelChange}
-              >
+              <Select value={selectedModel} onValueChange={onModelChange}>
                 <SelectTrigger className="w-[150px] bg-white text-black">
                   <div className="flex items-center gap-2">
                     <span>
-                      {MODELS.find(m => m.id === selectedModel)?.icon}
+                      {MODELS.find((m) => m.id === selectedModel)?.icon}
                     </span>
                     <SelectValue placeholder="Select Model" />
                   </div>
@@ -189,6 +215,25 @@ export default function Header({
               </Button>
             )}
 
+            {/* User Session Info & Logout */}
+            {status === "loading" ? (
+              <div className="hidden md:flex items-center gap-2">
+                <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+              </div>
+            ) : session ? (
+              <div className="hidden md:flex items-center gap-2">
+                <motion.button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <LogOut size={16} />
+                  <span className="hidden lg:inline">Sign Out</span>
+                </motion.button>
+              </div>
+            ) : null}
+
             {isDeleteVisible && (
               <Button
                 onClick={() => handleDelete(selectedNode)}
@@ -217,7 +262,7 @@ export default function Header({
           </motion.div>
 
           <div className="md:hidden">
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-black hover:text-gray-700"
             >
@@ -230,10 +275,7 @@ export default function Header({
           <div className="md:hidden bg-white p-4 rounded-lg shadow-lg">
             {centerItems}
             <div className="mt-4 flex flex-col gap-2">
-              <Select 
-                value={selectedModel}
-                onValueChange={onModelChange}
-              >
+              <Select value={selectedModel} onValueChange={onModelChange}>
                 <SelectTrigger className="w-full bg-gray-100">
                   <div className="flex items-center gap-2">
                     <Bot size={16} />
@@ -251,6 +293,23 @@ export default function Header({
                   ))}
                 </SelectContent>
               </Select>
+
+              {/* Mobile User Session & Logout */}
+              {status === "loading" ? (
+                <div className="flex justify-center py-2">
+                  <div className="w-6 h-6 border-2 border-gray-400 border-t-gray-800 rounded-full animate-spin" />
+                </div>
+              ) : session ? (
+                <div className="flex flex-col gap-2 pt-2 border-t border-gray-200">
+                  <Button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </div>
         )}
@@ -263,10 +322,11 @@ export default function Header({
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {connectors.map((connector) => {
-              const iconSrc = typeof connector.icon === 'object' 
-                ? connector.icon.light
-                : connector.icon;
-              
+              const iconSrc =
+                typeof connector.icon === "object"
+                  ? connector.icon.light
+                  : connector.icon;
+
               return (
                 <Button
                   key={connector.id}
@@ -275,7 +335,7 @@ export default function Header({
                 >
                   {iconSrc && (
                     <Image
-                      src={iconSrc}
+                      src={iconSrc || "/placeholder.svg"}
                       alt={connector.name}
                       width={32}
                       height={32}

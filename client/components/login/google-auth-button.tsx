@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
 
 // Google icon component
 function GoogleIcon({ className }: { className?: string }) {
@@ -34,8 +35,11 @@ interface GoogleAuthButtonProps {
 export function GoogleAuthButton({ isLoading }: GoogleAuthButtonProps) {
   const handleGoogleSignIn = async () => {
     try {
-      // Redirect to Google OAuth
-      window.location.href = "/api/auth/signin/google";
+      // Use Auth.js v5 signIn function with proper provider
+      await signIn("google", {
+        callbackUrl: "/devx",
+        redirect: true,
+      });
     } catch (error) {
       console.error("Google sign-in error:", error);
     }
