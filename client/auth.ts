@@ -48,9 +48,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           return {
             id: user.id,
-            email: user.email,
-            name: user.name,
-            username: user.username,
+            email: user.email ?? undefined,
+            name: user.name ?? undefined,
+            username: user.username ?? undefined,
           };
         } catch (error) {
           console.error("Auth error:", error);
