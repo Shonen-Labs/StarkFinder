@@ -7,16 +7,12 @@
     "seed": "ts-node --esm prisma/seed.js"
   },
   "scripts": {
-    "dev": "concurrently \"next dev\" \"sh ./bot.sh\"",
-    "bot": "sh ./bot.sh",
+    "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "setup-webhook": "ts-node scripts/tg-delete-webhook.ts",
-    "delete-webhook": "ts-node scripts/tg-set-webhook.ts",
-    "seed": "tsx prisma/seed.ts",
-    "start:agent": "node --loader ts-node/esm agents/hello-agent.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -71,7 +67,7 @@
     "https-browserify": "^1.0.0",
     "langchain": "^0.3.10",
     "lucide-react": "^0.456.0",
-    "next": "14.2.17",
+    "next": "^14.2.20",
     "next-auth": "^5.0.0-beta.28",
     "next-themes": "^0.4.3",
     "prism-react-renderer": "^2.0.6",
