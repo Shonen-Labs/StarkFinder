@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 
 #[starknet::interface]
-trait IERC20Mock<TContractState> {
+pub trait IERC20Mock<TContractState> {
     fn name(self: @TContractState) -> ByteArray;
     fn symbol(self: @TContractState) -> ByteArray;
     fn decimals(self: @TContractState) -> u8;
@@ -17,7 +17,7 @@ trait IERC20Mock<TContractState> {
 }
 
 #[starknet::contract]
-mod MockERC20 {
+pub mod MockERC20 {
     use super::IERC20Mock;
     use starknet::{ContractAddress, get_caller_address, contract_address_const};
 

@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 
 #[starknet::interface]
-trait IParametricInsurancePool<TContractState> {
+pub trait IParametricInsurancePool<TContractState> {
     // Core insurance functions
     fn create_policy(
         ref self: TContractState,
@@ -33,7 +33,7 @@ trait IParametricInsurancePool<TContractState> {
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-enum PolicyType {
+pub enum PolicyType {
     CropInsurance,
     FlightDelay,
     Hurricane,
@@ -42,7 +42,7 @@ enum PolicyType {
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-enum DataType {
+pub enum DataType {
     WeatherData,
     FlightStatus,
     SeismicActivity,
@@ -51,15 +51,15 @@ enum DataType {
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-struct TriggerCondition {
-    data_type: DataType,
-    operator: ComparisonOperator,
-    threshold: u256,
-    duration: u64,
+pub struct TriggerCondition {
+    pub data_type: DataType,
+    pub operator: ComparisonOperator,
+    pub threshold: u256,
+    pub duration: u64,
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-enum ComparisonOperator {
+pub enum ComparisonOperator {
     GreaterThan,
     LessThan,
     Equal,
@@ -68,37 +68,37 @@ enum ComparisonOperator {
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-struct Policy {
-    id: u256,
-    holder: ContractAddress,
-    policy_type: PolicyType,
-    coverage_amount: u256,
-    premium: u256,
-    trigger_conditions: Array<TriggerCondition>,
-    created_at: u64,
-    expires_at: u64,
-    is_active: bool,
-    premium_paid: bool,
-    payout_claimed: bool,
+pub struct Policy {
+    pub id: u256,
+    pub holder: ContractAddress,
+    pub policy_type: PolicyType,
+    pub coverage_amount: u256,
+    pub premium: u256,
+    pub trigger_conditions: Array<TriggerCondition>,
+    pub created_at: u64,
+    pub expires_at: u64,
+    pub is_active: bool,
+    pub premium_paid: bool,
+    pub payout_claimed: bool,
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-struct LiquidityProvider {
-    amount_provided: u256,
-    rewards_earned: u256,
-    last_reward_claim: u64,
-    entry_timestamp: u64,
+pub struct LiquidityProvider {
+    pub amount_provided: u256,
+    pub rewards_earned: u256,
+    pub last_reward_claim: u64,
+    pub entry_timestamp: u64,
 }
 
 #[derive(Drop, Serde, starknet::Store)]
-struct OracleData {
-    value: u256,
-    timestamp: u64,
-    is_valid: bool,
+pub struct OracleData {
+    pub value: u256,
+    pub timestamp: u64,
+    pub is_valid: bool,
 }
 
 #[starknet::contract]
-mod ParametricInsurancePool {
+pub mod ParametricInsurancePool {
     use super::{
         IParametricInsurancePool, Policy, PolicyType, TriggerCondition, DataType,
         ComparisonOperator, LiquidityProvider, OracleData
