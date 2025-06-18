@@ -14,7 +14,7 @@ pub trait IOracle<TContractState> {
 // Oracle integration interface for aggregating multiple sources
 #[starknet::interface]
 pub trait IOracleIntegration<TContractState> {
-    fn register_oracle(ref self: TContractState, oracle_address: ContractAddress, data_types: Array<u8>);
+    fn register_oracle(ref self: TContractState, oracle_address: ContractAddress, data_types: Span<u8>);
     fn update_insurance_pool_data(ref self: TContractState, insurance_pool: ContractAddress);
     fn get_aggregated_data(self: @TContractState, data_type: u8) -> (u256, u64, bool);
     fn register_insurance_pool(ref self: TContractState, pool: ContractAddress);
@@ -29,8 +29,8 @@ pub mod MockOracle {
     #[storage]
     struct Storage {
         owner: ContractAddress,
-        oracle_data: LegacyMap<u8, (u256, u64)>, // data_type -> (value, timestamp)
-        authorized_updaters: LegacyMap<ContractAddress, bool>,
+        oracle_data: Map<u8, (u256, u64)>, // data_type -> (value, timestamp)
+        authorized_updaters: Map<ContractAddress, bool>,
     }
 
     #[event]
@@ -140,17 +140,18 @@ pub mod MockOracle {
 // Oracle Integration for aggregating multiple oracle sources
 #[starknet::contract]
 pub mod OracleIntegration {
-    use super::{IOracleIntegration, IOracle};
+    use super::IOracleIntegration;
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
 
     #[storage]
     struct Storage {
         owner: ContractAddress,
-        registered_oracles: LegacyMap<ContractAddress, bool>,
-        oracle_data_types: LegacyMap<ContractAddress, Array<u8>>,
-        oracle_weights: LegacyMap<ContractAddress, u256>,
-        aggregated_data: LegacyMap<u8, (u256, u64, u8)>, // data_type -> (value, timestamp, source_count)
-        insurance_pools: LegacyMap<ContractAddress, bool>,
+        registered_oracles: Map<ContractAddress, bool>,
+        oracle_data_types_count: Map<ContractAddress, u32>,
+        oracle_data_types: Map<(ContractAddress, u32), u8>, // (oracle, index) -> data_type
+        oracle_weights: Map<ContractAddress, u256>,
+        aggregated_data: Map<u8, (u256, u64, u8)>, // data_type -> (value, timestamp, source_count)
+        insurance_pools: Map<ContractAddress, bool>,
         oracle_count: u256,
         total_weight: u256,
     }
@@ -166,7 +167,7 @@ pub mod OracleIntegration {
     #[derive(Drop, starknet::Event)]
     struct OracleRegistered {
         oracle: ContractAddress,
-        data_types: Array<u8>,
+        data_types_count: u32,
         weight: u256,
     }
 
@@ -194,7 +195,7 @@ pub mod OracleIntegration {
 
     #[abi(embed_v0)]
     impl OracleIntegrationImpl of IOracleIntegration<ContractState> {
-        fn register_oracle(ref self: ContractState, oracle_address: ContractAddress, data_types: Array<u8>) {
+        fn register_oracle(ref self: ContractState, oracle_address: ContractAddress, data_types: Span<u8>) {
             let caller = get_caller_address();
             assert(caller == self.owner.read(), 'Only owner can register');
             assert(!self.registered_oracles.read(oracle_address), 'Oracle already registered');
@@ -202,7 +203,18 @@ pub mod OracleIntegration {
             let default_weight: u256 = 100;
             
             self.registered_oracles.write(oracle_address, true);
-            self.oracle_data_types.write(oracle_address, data_types.clone());
+            self.oracle_data_types_count.write(oracle_address, data_types.len());
+            
+            // Store data types
+            let mut i = 0;
+            loop {
+                if i >= data_types.len() {
+                    break;
+                }
+                self.oracle_data_types.write((oracle_address, i), *data_types.at(i));
+                i += 1;
+            };
+            
             self.oracle_weights.write(oracle_address, default_weight);
             
             // Update counters
@@ -214,7 +226,7 @@ pub mod OracleIntegration {
             
             self.emit(OracleRegistered {
                 oracle: oracle_address,
-                data_types,
+                data_types_count: data_types.len(),
                 weight: default_weight,
             });
         }
@@ -223,7 +235,7 @@ pub mod OracleIntegration {
             assert(self.insurance_pools.read(insurance_pool), 'Pool not registered');
             
             // Common data types to update
-            let data_types_to_update = array![1_u8, 2, 3, 4, 10, 20, 30];
+            let data_types_to_update: Array<u8> = array![1_u8, 2, 3, 4, 10, 20, 30];
             
             let mut i = 0;
             loop {
