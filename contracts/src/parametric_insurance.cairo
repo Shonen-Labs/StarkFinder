@@ -8,7 +8,7 @@ pub trait IParametricInsurancePool<TContractState> {
         policy_type: PolicyType,
         coverage_amount: u256,
         premium: u256,
-        trigger_conditions: Array<TriggerCondition>,
+        trigger_conditions: Span<TriggerCondition>,
         duration: u64
     ) -> u256;
     
@@ -30,10 +30,13 @@ pub trait IParametricInsurancePool<TContractState> {
     fn calculate_premium(self: @TContractState, policy_type: PolicyType, coverage_amount: u256) -> u256;
     fn get_liquidity_rewards(self: @TContractState, provider: ContractAddress) -> u256;
     fn get_policy_count(self: @TContractState) -> u256;
+    fn get_trigger_condition(self: @TContractState, policy_id: u256, index: u32) -> TriggerCondition;
+    fn get_trigger_conditions_count(self: @TContractState, policy_id: u256) -> u32;
 }
 
 #[derive(Drop, Serde, starknet::Store)]
 pub enum PolicyType {
+    #[default]
     CropInsurance,
     FlightDelay,
     Hurricane,
@@ -43,6 +46,7 @@ pub enum PolicyType {
 
 #[derive(Drop, Serde, starknet::Store)]
 pub enum DataType {
+    #[default]
     WeatherData,
     FlightStatus,
     SeismicActivity,
@@ -50,7 +54,7 @@ pub enum DataType {
     Rainfall,
 }
 
-#[derive(Drop, Serde, starknet::Store)]
+#[derive(Drop, Serde, starknet::Store, Copy)]
 pub struct TriggerCondition {
     pub data_type: DataType,
     pub operator: ComparisonOperator,
@@ -60,6 +64,7 @@ pub struct TriggerCondition {
 
 #[derive(Drop, Serde, starknet::Store)]
 pub enum ComparisonOperator {
+    #[default]
     GreaterThan,
     LessThan,
     Equal,
@@ -67,14 +72,14 @@ pub enum ComparisonOperator {
     LessThanOrEqual,
 }
 
-#[derive(Drop, Serde, starknet::Store)]
+#[derive(Drop, Serde, starknet::Store, Copy)]
 pub struct Policy {
     pub id: u256,
     pub holder: ContractAddress,
     pub policy_type: PolicyType,
     pub coverage_amount: u256,
     pub premium: u256,
-    pub trigger_conditions: Array<TriggerCondition>,
+    pub trigger_conditions_count: u32,
     pub created_at: u64,
     pub expires_at: u64,
     pub is_active: bool,
@@ -82,7 +87,7 @@ pub struct Policy {
     pub payout_claimed: bool,
 }
 
-#[derive(Drop, Serde, starknet::Store)]
+#[derive(Drop, Serde, starknet::Store, Copy)]
 pub struct LiquidityProvider {
     pub amount_provided: u256,
     pub rewards_earned: u256,
@@ -90,7 +95,7 @@ pub struct LiquidityProvider {
     pub entry_timestamp: u64,
 }
 
-#[derive(Drop, Serde, starknet::Store)]
+#[derive(Drop, Serde, starknet::Store, Copy)]
 pub struct OracleData {
     pub value: u256,
     pub timestamp: u64,
@@ -104,10 +109,12 @@ pub mod ParametricInsurancePool {
         ComparisonOperator, LiquidityProvider, OracleData
     };
     use starknet::{
-        ContractAddress, get_caller_address, get_block_timestamp,
-        contract_address_const
+        ContractAddress, get_caller_address, get_block_timestamp
     };
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
+
+    // Define zero address constant
+    const ZERO_ADDRESS: felt252 = 0;
 
     #[storage]
     struct Storage {
@@ -116,21 +123,24 @@ pub mod ParametricInsurancePool {
         payment_token: IERC20Dispatcher,
         
         // Policies
-        policies: LegacyMap<u256, Policy>,
+        policies: Map<u256, Policy>,
         policy_counter: u256,
         
+        // Trigger conditions storage - separate mapping
+        trigger_conditions: Map<(u256, u32), TriggerCondition>, // (policy_id, index) -> condition
+        
         // Liquidity
-        liquidity_providers: LegacyMap<ContractAddress, LiquidityProvider>,
+        liquidity_providers: Map<ContractAddress, LiquidityProvider>,
         total_liquidity: u256,
         total_coverage_exposure: u256,
         
         // Oracle data
-        oracle_data: LegacyMap<DataType, OracleData>,
-        authorized_oracles: LegacyMap<ContractAddress, bool>,
+        oracle_data: Map<DataType, OracleData>,
+        authorized_oracles: Map<ContractAddress, bool>,
         
         // Risk parameters
         base_premium_rate: u256,
-        risk_multipliers: LegacyMap<PolicyType, u256>,
+        risk_multipliers: Map<PolicyType, u256>,
         liquidity_reward_rate: u256,
         
         // Constants
@@ -199,6 +209,16 @@ pub mod ParametricInsurancePool {
         timestamp: u64,
     }
 
+    // Helper function to check if address is zero
+    fn is_zero_address(address: ContractAddress) -> bool {
+        address.into() == ZERO_ADDRESS
+    }
+
+    // Helper function to get zero address
+    fn zero_address() -> ContractAddress {
+        ZERO_ADDRESS.try_into().unwrap()
+    }
+
     #[constructor]
     fn constructor(
         ref self: ContractState,
@@ -233,16 +253,16 @@ pub mod ParametricInsurancePool {
             policy_type: PolicyType,
             coverage_amount: u256,
             premium: u256,
-            trigger_conditions: Array<TriggerCondition>,
+            trigger_conditions: Span<TriggerCondition>,
             duration: u64
         ) -> u256 {
             let caller = get_caller_address();
             let current_time = get_block_timestamp();
             
             // Validate inputs
-            assert(coverage_amount > 0, 'Coverage amount must be positive');
-            assert(duration > 0, 'Duration must be positive');
-            assert(trigger_conditions.len() > 0, 'Must have trigger conditions');
+            assert(coverage_amount > 0, 'Coverage amount > 0');
+            assert(duration > 0, 'Duration > 0');
+            assert(trigger_conditions.len() > 0, 'Need trigger conditions');
             
             // Calculate required premium
             let calculated_premium = self.calculate_premium(policy_type, coverage_amount);
@@ -263,7 +283,7 @@ pub mod ParametricInsurancePool {
                 policy_type,
                 coverage_amount,
                 premium,
-                trigger_conditions,
+                trigger_conditions_count: trigger_conditions.len(),
                 created_at: current_time,
                 expires_at: current_time + duration,
                 is_active: false,
@@ -271,7 +291,19 @@ pub mod ParametricInsurancePool {
                 payout_claimed: false,
             };
             
+            // Store policy
             self.policies.write(policy_id, policy);
+            
+            // Store trigger conditions separately
+            let mut i = 0;
+            loop {
+                if i >= trigger_conditions.len() {
+                    break;
+                }
+                self.trigger_conditions.write((policy_id, i), *trigger_conditions.at(i));
+                i += 1;
+            };
+            
             self.total_coverage_exposure.write(new_exposure);
             
             self.emit(PolicyCreated {
@@ -396,7 +428,7 @@ pub mod ParametricInsurancePool {
             let total_liquidity = self.total_liquidity.read();
             let total_exposure = self.total_coverage_exposure.read();
             let new_liquidity = total_liquidity - amount;
-            assert(total_exposure <= new_liquidity * 8 / 10, 'Would exceed utilization cap');
+            assert(total_exposure <= new_liquidity * 8 / 10, 'Would exceed util cap');
             
             // Calculate and add pending rewards
             let pending_rewards = self._calculate_pending_rewards(caller);
@@ -475,12 +507,12 @@ pub mod ParametricInsurancePool {
             let mut i = 0;
             
             loop {
-                if i >= policy.trigger_conditions.len() {
+                if i >= policy.trigger_conditions_count {
                     break;
                 }
                 
-                let condition = policy.trigger_conditions.at(i);
-                let oracle_data = self.oracle_data.read(*condition.data_type);
+                let condition = self.trigger_conditions.read((policy_id, i));
+                let oracle_data = self.oracle_data.read(condition.data_type);
                 
                 // Check if oracle data is valid and recent (within 1 hour)
                 if !oracle_data.is_valid {
@@ -495,11 +527,11 @@ pub mod ParametricInsurancePool {
                 
                 // Check condition
                 let condition_met = match condition.operator {
-                    ComparisonOperator::GreaterThan => oracle_data.value > *condition.threshold,
-                    ComparisonOperator::LessThan => oracle_data.value < *condition.threshold,
-                    ComparisonOperator::Equal => oracle_data.value == *condition.threshold,
-                    ComparisonOperator::GreaterThanOrEqual => oracle_data.value >= *condition.threshold,
-                    ComparisonOperator::LessThanOrEqual => oracle_data.value <= *condition.threshold,
+                    ComparisonOperator::GreaterThan => oracle_data.value > condition.threshold,
+                    ComparisonOperator::LessThan => oracle_data.value < condition.threshold,
+                    ComparisonOperator::Equal => oracle_data.value == condition.threshold,
+                    ComparisonOperator::GreaterThanOrEqual => oracle_data.value >= condition.threshold,
+                    ComparisonOperator::LessThanOrEqual => oracle_data.value <= condition.threshold,
                 };
                 
                 if !condition_met {
@@ -547,6 +579,15 @@ pub mod ParametricInsurancePool {
 
         fn get_policy_count(self: @ContractState) -> u256 {
             self.policy_counter.read()
+        }
+
+        fn get_trigger_condition(self: @ContractState, policy_id: u256, index: u32) -> TriggerCondition {
+            self.trigger_conditions.read((policy_id, index))
+        }
+
+        fn get_trigger_conditions_count(self: @ContractState, policy_id: u256) -> u32 {
+            let policy = self.policies.read(policy_id);
+            policy.trigger_conditions_count
         }
     }
 

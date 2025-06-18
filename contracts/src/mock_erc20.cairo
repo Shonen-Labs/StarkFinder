@@ -19,7 +19,10 @@ pub trait IERC20Mock<TContractState> {
 #[starknet::contract]
 pub mod MockERC20 {
     use super::IERC20Mock;
-    use starknet::{ContractAddress, get_caller_address, contract_address_const};
+    use starknet::{ContractAddress, get_caller_address};
+
+    // Define zero address constant
+    const ZERO_ADDRESS: felt252 = 0;
 
     #[storage]
     struct Storage {
@@ -27,10 +30,10 @@ pub mod MockERC20 {
         symbol: ByteArray,
         decimals: u8,
         total_supply: u256,
-        balances: LegacyMap<ContractAddress, u256>,
-        allowances: LegacyMap<(ContractAddress, ContractAddress), u256>,
+        balances: Map<ContractAddress, u256>,
+        allowances: Map<(ContractAddress, ContractAddress), u256>,
         owner: ContractAddress,
-        minters: LegacyMap<ContractAddress, bool>,
+        minters: Map<ContractAddress, bool>,
     }
 
     #[event]
@@ -66,6 +69,16 @@ pub mod MockERC20 {
         minter: ContractAddress,
     }
 
+    // Helper function to check if address is zero
+    fn is_zero_address(address: ContractAddress) -> bool {
+        address.into() == ZERO_ADDRESS
+    }
+
+    // Helper function to get zero address
+    fn zero_address() -> ContractAddress {
+        ZERO_ADDRESS.try_into().unwrap()
+    }
+
     #[constructor]
     fn constructor(
         ref self: ContractState,
@@ -84,7 +97,7 @@ pub mod MockERC20 {
         self.minters.write(owner, true);
         
         self.emit(Transfer {
-            from: contract_address_const::<0>(),
+            from: zero_address(),
             to: owner,
             value: initial_supply,
         });
@@ -143,7 +156,7 @@ pub mod MockERC20 {
         fn mint(ref self: ContractState, to: ContractAddress, amount: u256) {
             let caller = get_caller_address();
             assert(self.minters.read(caller), 'Not authorized to mint');
-            assert(!to.is_zero(), 'Cannot mint to zero address');
+            assert(!is_zero_address(to), 'Cannot mint to zero address');
             
             let current_supply = self.total_supply.read();
             let new_supply = current_supply + amount;
@@ -153,7 +166,7 @@ pub mod MockERC20 {
             self.balances.write(to, current_balance + amount);
             
             self.emit(Transfer {
-                from: contract_address_const::<0>(),
+                from: zero_address(),
                 to,
                 value: amount,
             });
@@ -162,7 +175,7 @@ pub mod MockERC20 {
         fn burn(ref self: ContractState, from: ContractAddress, amount: u256) {
             let caller = get_caller_address();
             assert(self.minters.read(caller), 'Not authorized to burn');
-            assert(!from.is_zero(), 'Cannot burn from zero address');
+            assert(!is_zero_address(from), 'Cannot burn from zero address');
             
             let current_balance = self.balances.read(from);
             assert(current_balance >= amount, 'Insufficient balance to burn');
@@ -173,7 +186,7 @@ pub mod MockERC20 {
             
             self.emit(Transfer {
                 from,
-                to: contract_address_const::<0>(),
+                to: zero_address(),
                 value: amount,
             });
         }
@@ -186,8 +199,8 @@ pub mod MockERC20 {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn _transfer(ref self: ContractState, sender: ContractAddress, recipient: ContractAddress, amount: u256) {
-            assert(!sender.is_zero(), 'Transfer from zero address');
-            assert(!recipient.is_zero(), 'Transfer to zero address');
+            assert(!is_zero_address(sender), 'Transfer from zero address');
+            assert(!is_zero_address(recipient), 'Transfer to zero address');
             
             let sender_balance = self.balances.read(sender);
             assert(sender_balance >= amount, 'Insufficient balance');
