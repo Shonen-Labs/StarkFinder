@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 
 // Oracle interface for external data feeds
 #[starknet::interface]
-trait IOracle<TContractState> {
+pub trait IOracle<TContractState> {
     fn get_latest_data(self: @TContractState, data_type: u8) -> (u256, u64);
     fn is_data_fresh(self: @TContractState, data_type: u8, max_age: u64) -> bool;
     fn update_data(ref self: TContractState, data_type: u8, value: u256);
@@ -13,7 +13,7 @@ trait IOracle<TContractState> {
 
 // Oracle integration interface for aggregating multiple sources
 #[starknet::interface]
-trait IOracleIntegration<TContractState> {
+pub trait IOracleIntegration<TContractState> {
     fn register_oracle(ref self: TContractState, oracle_address: ContractAddress, data_types: Array<u8>);
     fn update_insurance_pool_data(ref self: TContractState, insurance_pool: ContractAddress);
     fn get_aggregated_data(self: @TContractState, data_type: u8) -> (u256, u64, bool);
@@ -22,7 +22,7 @@ trait IOracleIntegration<TContractState> {
 
 // Mock Oracle for testing and demonstration
 #[starknet::contract]
-mod MockOracle {
+pub mod MockOracle {
     use super::IOracle;
     use starknet::{get_block_timestamp, get_caller_address, ContractAddress};
 
@@ -139,8 +139,8 @@ mod MockOracle {
 
 // Oracle Integration for aggregating multiple oracle sources
 #[starknet::contract]
-mod OracleIntegration {
-    use super::{IOracleIntegration, IOracle, IOracleDispatcher, IOracleDispatcherTrait};
+pub mod OracleIntegration {
+    use super::{IOracleIntegration, IOracle};
     use starknet::{ContractAddress, get_caller_address, get_block_timestamp};
 
     #[storage]
