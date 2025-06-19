@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Shield, 
@@ -133,6 +134,13 @@ const ParametricInsurance: React.FC = () => {
     setLiquidityStats(mockStats);
   }, []);
 
+  const addNotification = useCallback((message: string) => {
+    setNotifications(prev => [...prev, message]);
+    setTimeout(() => {
+      setNotifications(prev => prev.slice(1));
+    }, 5000);
+  }, []);
+  
   const loadUserData = useCallback(async () => {
     setLoading(true);
     try {
@@ -146,19 +154,12 @@ const ParametricInsurance: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [loadUserPolicies, loadLiquidityStats]);
+  }, [loadUserPolicies, loadLiquidityStats, addNotification]);
 
   // Load data on component mount
   useEffect(() => {
     loadUserData();
   }, [loadUserData]);
-
-  const addNotification = useCallback((message: string) => {
-    setNotifications(prev => [...prev, message]);
-    setTimeout(() => {
-      setNotifications(prev => prev.slice(1));
-    }, 5000);
-  }, []);
 
   const handleCreatePolicy = async () => {
     if (!policyForm.coverageAmount || policyForm.triggerConditions.length === 0) {

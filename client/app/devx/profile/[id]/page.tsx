@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from "framer-motion";
 import { useParams } from 'next/navigation';
 
@@ -30,7 +30,7 @@ export default function UserProfilePage() {
   const params = useParams();
   const id = params?.id;
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     if (!id) {
       setError('User ID is required');
       setLoading(false);
@@ -51,11 +51,11 @@ export default function UserProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchUserData();
-  }, [id]);
+  }, [id, fetchUserData]);
 
   if (loading) {
     return (
