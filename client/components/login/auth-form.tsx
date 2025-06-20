@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,24 +82,20 @@ export function AuthForm({ isLogin }: AuthFormProps) {
 
     try {
       if (isLogin) {
-        // Handle login with Auth.js v5 - using signIn from auth.ts
-        const response = await fetch("/api/auth/signin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: formData.username,
-            password: formData.password,
-          }),
+        // Use Auth.js signIn function
+        const result = await signIn("credentials", {
+          username: formData.username,
+          password: formData.password,
+          redirect: false,
         });
 
-        if (response.ok) {
+        if (result?.error) {
+          setErrors({
+            general: "Invalid credentials. Please check your username/email and password.",
+          });
+        } else {
           router.push("/devx");
           router.refresh();
-        } else {
-          setErrors({
-            general:
-              "Invalid credentials. Please check your username/email and password.",
-          });
         }
       } else {
         // Handle registration
@@ -119,23 +116,19 @@ export function AuthForm({ isLogin }: AuthFormProps) {
           setErrors({ general: data.error || "Registration failed" });
         } else {
           // Auto-login after successful registration
-          const loginResponse = await fetch("/api/auth/signin", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: formData.username,
-              password: formData.password,
-            }),
+          const loginResult = await signIn("credentials", {
+            username: formData.username,
+            password: formData.password,
+            redirect: false,
           });
 
-          if (loginResponse.ok) {
+          if (loginResult?.error) {
+            setErrors({
+              general: "Registration successful! Please try logging in with your credentials.",
+            });
+          } else {
             router.push("/devx");
             router.refresh();
-          } else {
-            setErrors({
-              general:
-                "Registration successful! Please try logging in with your credentials.",
-            });
           }
         }
       }
