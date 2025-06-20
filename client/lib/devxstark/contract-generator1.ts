@@ -1,10 +1,9 @@
+// lib/devxstark/contract-generator1.ts
 import path from "path";
-import { createAnthropicClient } from "./anthropic-client";
 import { contractPromptTemplate } from "./prompt-generate";
-import { StringOutputParser } from "@langchain/core/output_parsers";
 import fs from "fs/promises";
-
-const parser = new StringOutputParser();
+import { createDeepSeekClient, DeepSeekClient } from "./deepseek-client";
+import type { BaseMessage } from "@langchain/core/messages";
 
 interface ContractGenerationResult {
   success: boolean;
@@ -17,34 +16,69 @@ interface GenerateOptions {
 }
 
 export class CairoContractGenerator {
-  private model = createAnthropicClient();
-  private chain = contractPromptTemplate.pipe(this.model).pipe(parser);
+  private model: DeepSeekClient;
+
+  constructor() {
+    this.model = createDeepSeekClient();
+  }
 
   async generateContract(
     requirements: string,
     options: GenerateOptions = {}
   ): Promise<ContractGenerationResult> {
     try {
-      const stream = await this.chain.stream(requirements);
-      const chunks: string[] = [];
+      // Format the messages using LangChain's ChatPromptTemplate
+      const messages = await contractPromptTemplate.formatMessages({ requirements });
+      
+      // Convert LangChain messages to our DeepSeek format
+      const deepseekMessages = this.convertLangChainMessages(messages);
+      
+      if (options.onProgress) {
+        // Use streaming to get real-time updates
+        const stream = await this.model.chatStream(deepseekMessages);
+        const reader = stream.getReader();
+        const chunks: string[] = [];
 
-      for await (const chunk of stream) {
-        chunks.push(chunk);
-        if (options.onProgress) {
-          options.onProgress(chunk);
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            
+            if (done) {
+              break;
+            }
+
+            chunks.push(value);
+            if (options.onProgress) {
+              options.onProgress(value);
+            }
+          }
+        } finally {
+          reader.releaseLock();
         }
+
+        const sourceCode = chunks.join("");
+
+        if (!sourceCode.trim()) {
+          throw new Error("Generated source code is empty");
+        }
+
+        return {
+          success: true,
+          sourceCode,
+        };
+      } else {
+        // Use non-streaming for simpler cases
+        const sourceCode = await this.model.chat(deepseekMessages);
+
+        if (!sourceCode.trim()) {
+          throw new Error("Generated source code is empty");
+        }
+
+        return {
+          success: true,
+          sourceCode,
+        };
       }
-
-      const sourceCode = chunks.join("");
-
-      if (!sourceCode.trim()) {
-        throw new Error("Generated source code is empty");
-      }
-
-      return {
-        success: true,
-        sourceCode,
-      };
     } catch (error) {
       console.error("Error generating contract:", error);
       return {
@@ -55,20 +89,80 @@ export class CairoContractGenerator {
     }
   }
 
+  async generateContractNonStreaming(
+    requirements: string
+  ): Promise<ContractGenerationResult> {
+    return this.generateContract(requirements, {});
+  }
+
+  private convertLangChainMessages(messages: BaseMessage[]) {
+    return messages.map(message => {
+      // Handle different message types
+      const messageType = message._getType();
+      let role: 'system' | 'user' | 'assistant';
+      
+      switch (messageType) {
+        case 'system':
+          role = 'system';
+          break;
+        case 'human':
+          role = 'user';
+          break;
+        case 'ai':
+          role = 'assistant';
+          break;
+        default:
+          role = 'user'; // Fallback
+      }
+
+      return {
+        role,
+        content: typeof message.content === 'string' ? message.content : String(message.content)
+      };
+    });
+  }
+
   async saveContract(
     sourceCode: string,
-    contractName: string
   ): Promise<string> {
     if (!sourceCode?.trim()) {
       throw new Error("Cannot save empty contract source code");
     }
-
-    const contractsDir = path.join(process.cwd(), "..", "contracts", "src");
-
+  
+    const contractsDir = path.join(process.cwd(), "contracts", "src");
+  
     try {
+      // Ensure the directory exists
       await fs.mkdir(contractsDir, { recursive: true });
-      const filePath = path.join(contractsDir, `${contractName}.cairo`);
-      await fs.writeFile(filePath, sourceCode);
+      
+      const filePath = path.join(process.cwd(), "contracts", "src");
+
+      // Check if file exists and get its stats
+      let fileExists = false;
+      try {
+        await fs.access(filePath);
+        fileExists = true;
+      } catch {
+        // File doesn't exist
+      }
+      
+      if (fileExists) {
+        // If file exists, explicitly clear it by writing an empty string first
+        await fs.writeFile(filePath, '', { encoding: 'utf8', flag: 'w' });
+      }
+      
+      // Now write the actual content
+      await fs.writeFile(filePath, sourceCode, { 
+        encoding: 'utf8',
+        flag: 'w' // Ensures we start from the beginning
+      });
+      
+      // Verify the file was written correctly
+      const writtenContent = await fs.readFile(filePath, 'utf8');
+      if (writtenContent !== sourceCode) {
+        throw new Error('File content verification failed');
+      }
+      
       return filePath;
     } catch (error) {
       console.error("Error saving contract:", error);
@@ -78,5 +172,74 @@ export class CairoContractGenerator {
         }`
       );
     }
+  }
+
+  // Utility method to generate and save in one step
+  async generateAndSaveContract(
+    requirements: string,
+    contractName: string,
+    options: GenerateOptions = {}
+  ): Promise<{ success: boolean; filePath?: string; error?: string }> {
+    try {
+      const result = await this.generateContract(requirements, options);
+      
+      if (!result.success || !result.sourceCode) {
+        return {
+          success: false,
+          error: result.error || "Failed to generate contract"
+        };
+      }
+
+      const filePath = await this.saveContract(result.sourceCode);
+      
+      return {
+        success: true,
+        filePath
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred"
+      };
+    }
+  }
+
+  // Method to validate generated Cairo code (basic validation)
+  validateCairoCode(sourceCode: string): { isValid: boolean; issues: string[] } {
+    const issues: string[] = [];
+    
+    // Basic Cairo contract validation
+    if (!sourceCode.includes('#[starknet::contract]') && !sourceCode.includes('mod contract')) {
+      issues.push("Missing contract definition (#[starknet::contract] or mod contract)");
+    }
+    
+    if (!sourceCode.includes('use ')) {
+      issues.push("No imports found - Cairo contracts typically need imports");
+    }
+    
+    // Check for balanced braces
+    const openBraces = (sourceCode.match(/{/g) || []).length;
+    const closeBraces = (sourceCode.match(/}/g) || []).length;
+    if (openBraces !== closeBraces) {
+      issues.push("Unbalanced braces in generated code");
+    }
+    
+    return {
+      isValid: issues.length === 0,
+      issues
+    };
+  }
+
+  // Utility method for simple completions
+  async complete(prompt: string, systemPrompt?: string): Promise<string> {
+    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
+    
+    if (systemPrompt) {
+      messages.push({ role: 'system', content: systemPrompt });
+    }
+    
+    messages.push({ role: 'user', content: prompt });
+    
+    return await this.model.chat(messages);
   }
 }

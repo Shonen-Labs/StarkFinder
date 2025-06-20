@@ -13,6 +13,7 @@ import {
   NotificationIcon,
 } from '@/components/icons'
 import { MotionBox } from './motion-box'
+import Link from 'next/link'
 
 export function Offer() {
   return (
@@ -55,7 +56,9 @@ export function Offer() {
         motionProps={{ initial: { opacity: 0, y: 30 } }}
       >
         <Button size="landing-xl" variant="tertiary">
+          <Link href={`/devx`}>
           Launch App
+          </Link>
         </Button>
       </MotionBox>
     </section>

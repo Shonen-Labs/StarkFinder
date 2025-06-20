@@ -19,16 +19,16 @@ import { useRouter } from "next/navigation";
 import { useCodeStore } from "@/lib/codeStore";
 
 interface ContractCodeProps {
-  nodes: any; // Update with proper type if available
-  edges: any; // Update with proper type if available
-  flowSummary: any; // Update with proper type if available
+  nodes: any;
+  edges: any;
+  flowSummary: any;
   sourceCode: string;
   setSourceCode: (code: string) => void;
-  setDisplayState?: (state: any) => void; // Update with proper type if available
+  setDisplayState?: (state: any) => void;
   showSourceCode?: boolean;
   handleAudit?: () => void;
   handleCompile?: () => void;
-  onOpenChange?: (open: boolean) => void; // Update with proper type if available
+  onOpenChange?: (open: boolean) => void;
 }
 
 const initialSteps: DeploymentStep[] = [
@@ -52,6 +52,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   const [steps, setSteps] = useState<DeploymentStep[]>(initialSteps);
   const [isDeploying, setIsDeploying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [editable, setEditable] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<DeploymentResponse | null>(null);
@@ -88,7 +89,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     try {
       // Step 1: Building Contract
       updateStep(0, { status: "processing" });
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate build time
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       updateStep(0, { status: "complete" });
 
       // Step 2: Declaring Sierra Hash
@@ -102,7 +103,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       const data = await response.json();
 
       if (data.success) {
-        // Update steps with actual data
         updateStep(1, {
           status: "complete",
           hash: data.classHash,
@@ -137,33 +137,73 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     }
   };
 
-  const auditCodeHandler = async (): Promise<void> => {
-    const fetchStreamedData = async () => {
+  const generateCodeHandler = async (): Promise<void> => {
+    if (isGenerating) return;
+    
+    setIsGenerating(true);
+    addLog("Starting contract generation...");
+    
+    try {
       const response = await fetch("/api/generate-contract", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ sourceCode }),
+        body: JSON.stringify({ 
+          nodes: nodes || [],
+          edges: edges || [],
+          flowSummary: flowSummary || [],
+          userId: "default-user", // Replace with actual user ID
+          blockchain: "blockchain1" // or "blockchain4" for Dojo
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Clear existing code
       setSourceCode("");
+      addLog("Generating contract...");
+      
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
+      
+      if (!reader) {
+        throw new Error("No reader available");
+      }
 
-      if (reader) {
-        let done = false;
-        while (!done) {
-          const { value, done: isDone } = await reader.read();
-          done = isDone;
-          if (value) {
-            const newSourceCode = sourceCode + decoder.decode(value);
-            setSourceCode(newSourceCode);
-          }
+      const chunks: string[] = [];
+      let done = false;
+
+      while (!done) {
+        const { value, done: isDone } = await reader.read();
+        done = isDone;
+        
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          chunks.push(chunk);
         }
       }
-    };
-
-    fetchStreamedData();
+      
+      reader.releaseLock();
+      
+      // Set the final code (all chunks joined)
+      const finalCode = chunks.join("");
+      
+      if (finalCode.trim()) {
+        setSourceCode(finalCode);
+        addLog("Contract generated successfully");
+      } else {
+        throw new Error("No code generated");
+      }
+      
+    } catch (error) {
+      console.error('Generation error:', error);
+      addLog(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const router = useRouter();
@@ -177,7 +217,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     setNodesStore(nodes);
     setFlowSummaryStore(flowSummary);
 
-    // Navigate to the code editor page
     router.push(`/devx/code`);
     if (onOpenChange) {
       onOpenChange(false);
@@ -200,6 +239,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         >
           Contract Code
         </motion.div>
+        
         <div
           ref={containerRef}
           className={`text-black relative overflow-hidden rounded-xl bg-navy-800 border border-navy-600" ${
@@ -229,8 +269,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
         <div className="flex gap-4 mt-2">
           <button
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none ocus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 font-bold ${
-              isLoading || editable
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 font-bold ${
+              isLoading || editable || isGenerating
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-cyan-500 hover:bg-cyan-600 text-black"
             }`}
@@ -238,28 +278,23 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               boxShadow: "0 0 15px rgba(100, 255, 218, 0.3)",
             }}
             onClick={compileContractHandler}
-            disabled={isDeploying || editable}
+            disabled={isDeploying || editable || isGenerating}
           >
             <span className="flex items-center justify-center gap-2">
               <Play className="w-5 h-5" />
-              {isLoading ? "Deploying..." : "Deploy"}
+              {isDeploying ? "Deploying..." : "Deploy"}
             </span>
           </button>
-          {/* <button
-            className="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50"
-            onClick={() => setEditable(!editable)}
-            disabled={isDeploying}
-          >
-            <span className="flex items-center justify-center gap-2 ">
-              <Edit2 className="w-5 h-5" />
-              {editable ? "Save" : "Edit"}
-            </span>
-          </button> */}
+
           {sourceCode && (
             <button
-              className="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50"
+              className={`px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 ${
+                isDeploying || isLoading || isGenerating
+                  ? "bg-gray-500 cursor-not-allowed text-gray-300"
+                  : "bg-gray-500 hover:bg-gray-600 text-white"
+              }`}
               onClick={() => openInCodeEditor()}
-              disabled={isDeploying || isLoading}
+              disabled={isDeploying || isLoading || isGenerating}
             >
               <span className="flex items-center justify-center gap-2 ">
                 <Edit2 className="w-5 h-5" />
@@ -268,35 +303,21 @@ const ContractCode: React.FC<ContractCodeProps> = ({
             </button>
           )}
 
-          {/*  <Button
-              onClick={openInCodeEditor}
-              className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-600 text-black font-bold hoverEffect transition-colors duration-300"
-              disabled={isLoading}
-              style={{
-                boxShadow: "0 0 15px rgba(100, 255, 218, 0.3)",
-              }}
-            >
-              <span className="flex items-center justify-center gap-2">
-                <Edit2 className="w-5 h-5" />
-                Open in Code editor
-              </span>
-            </Button>
-          )} */}
           <button
             className={`px-4 py-2 rounded-lg ${
-              editable || isLoading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50"
+              editable || isLoading || isGenerating
+                ? "bg-gray-500 cursor-not-allowed text-gray-300"
+                : "bg-green-500 hover:bg-green-600 text-white font-bold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
             }`}
             style={{
-              boxShadow: "0 0 15px rgba(255, 255, 0, 0.3)",
+              boxShadow: editable || isLoading || isGenerating ? "none" : "0 0 15px rgba(34, 197, 94, 0.3)",
             }}
-            onClick={auditCodeHandler}
-            disabled={editable || isDeploying}
+            onClick={generateCodeHandler}
+            disabled={editable || isDeploying || isGenerating}
           >
             <span className="flex items-center justify-center gap-2">
               <Shield className="w-5 h-5" />
-              Audit
+              {isGenerating ? "Generating..." : "Generate New"}
             </span>
           </button>
         </div>
@@ -329,16 +350,24 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         </Card>
       </div>
 
-      {/* Deployment Logs */}
+      {/* Simple Logs */}
       {logs.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-semibold mb-2">Deployment Logs</h3>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold text-cyan-300">Logs</h3>
+            <button
+              onClick={() => setLogs([])}
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              Clear
+            </button>
+          </div>
           <div
             ref={logsContainerRef}
-            className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[200px] overflow-y-auto"
+            className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[200px] overflow-y-auto border border-gray-700"
           >
             {logs.map((log, index) => (
-              <div key={index} className="font-mono text-sm mb-1">
+              <div key={index} className="font-mono text-sm mb-1 text-green-400">
                 {log}
               </div>
             ))}
@@ -347,7 +376,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       )}
 
       {/* Deployment Result */}
-
       <AnimatePresence>
         {result && (
           <motion.div
@@ -355,7 +383,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${
+            className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 rounded-lg ${
               result.success
                 ? "bg-green-900/95 border-green-700"
                 : "bg-red-900/95 border-red-700"
@@ -363,7 +391,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           >
             {result.success ? (
               <div className="flex flex-col gap-2">
-                <div className="font-semibold text-white">
+                <div className="font-semibold text-white flex items-center gap-2">
                   <CheckCircle className="w-6 h-6" />
                   Deployment Successful!
                 </div>
@@ -373,13 +401,13 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                     href={`https://sepolia.starkscan.co/tx/${result.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                    className="text-blue-400 hover:text-blue-300 flex items-center gap-1"
                   >
                     View on Starkscan
                     <ExternalLink size={14} />
                   </a>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-300">
                   <div className="mt-1">
                     <span className="font-medium">Contract Address:</span>{" "}
                     {result.contractAddress}
@@ -392,11 +420,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               </div>
             ) : (
               <div className="">
-                <div className="font-semibold text-xl flex items-center gap-2">
+                <div className="font-semibold text-xl flex items-center gap-2 text-white">
                   <XCircle className="w-6 h-6" />
                   Deployment Failed
                 </div>
-                <div className="text-sm mt-2">{result.error}</div>
+                <div className="text-sm mt-2 text-red-200">{result.error}</div>
                 {result.details && (
                   <div className="text-sm mt-2 text-white">
                     {result.details}

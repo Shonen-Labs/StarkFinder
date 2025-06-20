@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { nodes, edges, flowSummary, userId, blockchain } = await req.json();
+    
     // Validate input
     if (
       !Array.isArray(nodes) ||
@@ -60,64 +61,82 @@ export async function POST(req: NextRequest) {
     const response = new NextResponse(
       new ReadableStream({
         async start(controller) {
+          let accumulatedContent = "";
+
+          // Helper function to extract code from content
+          const extractCodeFromContent = (content: string): string => {
+            // Look for ALL Cairo/Rust code blocks
+            const cairoCodeBlockRegex = /```(?:cairo|rust)?\s*([\s\S]*?)```/g;
+            const matches = [...content.matchAll(cairoCodeBlockRegex)];
+            
+            if (matches && matches.length > 0) {
+              // Get the LAST code block (most recent/final)
+              const lastMatch = matches[matches.length - 1];
+              const code = lastMatch[1]?.trim() || '';
+              
+              // Ensure it contains a proper Cairo contract
+              if (code.includes('mod contract') || code.includes('#[starknet::contract]')) {
+                return code;
+              }
+            }
+            
+            // If no proper code blocks found, look for mod contract pattern directly
+            const modContractRegex = /mod contract\s*\{[\s\S]*?\n\}/g;
+            const contractMatches = [...content.matchAll(modContractRegex)];
+            
+            if (contractMatches && contractMatches.length > 0) {
+              return contractMatches[contractMatches.length - 1][0].trim();
+            }
+            
+            return '';
+          };
+
           try {
-            // Generate the contract with streaming support
+            // Generate the contract - accumulate content silently
             const result = await generator.generateContract(bodyOfTheCall, {
-              /* onProgress: (chunk) => {
-                controller.enqueue(
-                  new TextEncoder().encode(
-                    JSON.stringify({ type: 'progress', data: chunk }) + '\n'
-                  )
-                );
-              }, */
-              //uncomment the above code block to enable progress tracking
-              // output only the chunk
               onProgress: (chunk) => {
-                controller.enqueue(new TextEncoder().encode(chunk));
+                accumulatedContent += chunk;
               },
             });
 
-            if (!result.sourceCode) {
-              throw new Error("Failed to generate source code.");
+            if (!result.success || !result.sourceCode) {
+              throw new Error(result.error || "Failed to generate source code.");
+            }
+
+            // Extract final clean code
+            let finalCode = result.sourceCode;
+            
+            // If the result doesn't look like proper code, try extracting from accumulated content
+            if (!finalCode.includes('mod contract') && !finalCode.includes('#[starknet::contract]')) {
+              const extractedFinalCode = extractCodeFromContent(accumulatedContent);
+              if (extractedFinalCode) {
+                finalCode = extractedFinalCode;
+              }
+            }
+
+            if (!finalCode || finalCode.length < 50) {
+              throw new Error("Generated code is empty or too short");
             }
 
             // Save the contract source code
-            const savedPath = await generator.saveContract(
-              result.sourceCode,
-              "lib"
-            );
+            const savedPath = await generator.saveContract(finalCode, "lib");
+            
             await getOrCreateUser(userId);
             await prisma.generatedContract.create({
               data: {
                 name: "Generated Contract",
-                sourceCode: result.sourceCode,
+                sourceCode: finalCode,
                 userId,
               },
             });
-            // Send final success message
-            controller.enqueue(
-              new TextEncoder().encode(
-                "\n\n" +
-                  JSON.stringify({
-                    type: "complete",
-                    success: true,
-                    message: "Contract generated and saved successfully.",
-                    path: savedPath,
-                  }) +
-                  "\n"
-              )
-            );
+
+            // Send ONLY the final clean code
+            controller.enqueue(new TextEncoder().encode(finalCode));
+
           } catch (error) {
+            console.error('Generation error:', error);
             controller.enqueue(
-              new TextEncoder().encode(
-                JSON.stringify({
-                  type: "error",
-                  error:
-                    error instanceof Error
-                      ? error.message
-                      : "An unexpected error occurred",
-                }) + "\n"
-              )
+              new TextEncoder().encode(`// Error: ${error instanceof Error ? error.message : "An unexpected error occurred"}`)
             );
           } finally {
             controller.close();
@@ -127,7 +146,7 @@ export async function POST(req: NextRequest) {
       }),
       {
         headers: {
-          "Content-Type": "text/event-stream",
+          "Content-Type": "text/plain",
           "Cache-Control": "no-cache",
           Connection: "keep-alive",
         },
@@ -137,14 +156,10 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
-
     console.error("API error:", error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred",
+        error: error instanceof Error ? error.message : "An unexpected error occurred",
       },
       { status: 500 }
     );
