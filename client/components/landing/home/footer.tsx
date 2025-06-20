@@ -126,5 +126,5 @@ const menuItems: MenuSection[] = [
 const socialMedia: SocialMediaItem[] = [
   { name: 'Twitter', icon: XIcon, href: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
   { name: 'Github', icon: GithubIcon, href: 'https://github.com/Shonen-Labs/StarkFinder', target: '_blank', rel: 'noopener noreferrer' },
-  { name: 'Telegram', icon: TelegramIcon, href: 'https://t.me/starkfinder_bot/', target: '_blank', rel: 'noopener noreferrer' },
+  { name: 'Telegram', icon: TelegramIcon, href: 'https://t.me/shogenlabs/', target: '_blank', rel: 'noopener noreferrer' },
 ]
