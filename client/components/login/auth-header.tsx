@@ -124,5 +124,5 @@ export function AuthHeader({
         </AnimatePresence>
       </motion.div>
     </div>
-  );
+  )
 }
