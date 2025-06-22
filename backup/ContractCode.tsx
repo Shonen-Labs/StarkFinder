@@ -8,8 +8,6 @@ import {
   Shield,
   CheckCircle,
   XCircle,
-  RefreshCw,
-  AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -31,13 +29,6 @@ interface ContractCodeProps {
   handleAudit?: () => void;
   handleCompile?: () => void;
   onOpenChange?: (open: boolean) => void;
-}
-
-interface GenerationStatus {
-  status: 'idle' | 'starting' | 'cleared' | 'generating' | 'streaming' | 'saving' | 'database' | 'completed' | 'error';
-  message: string;
-  contract?: string;
-  error?: boolean;
 }
 
 const initialSteps: DeploymentStep[] = [
@@ -65,15 +56,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   const [editable, setEditable] = useState<boolean>(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<DeploymentResponse | null>(null);
-  const [generationStatus, setGenerationStatus] = useState<GenerationStatus>({
-    status: 'idle',
-    message: 'Ready to generate contract'
-  });
-  const [streamedContent, setStreamedContent] = useState<string>('');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
 
   const addLog = (message: string): void => {
     setLogs((prev) => [
@@ -90,17 +75,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       logsContainerRef.current.scrollTop =
         logsContainerRef.current.scrollHeight;
     }
-  }, [sourceCode, logs, streamedContent]);
-
-  // Clear source code on component mount to fix pre-generated contract issue
-  useEffect(() => {
-    setSourceCode('');
-    setStreamedContent('');
-    setGenerationStatus({
-      status: 'idle',
-      message: 'Ready to generate contract'
-    });
-  }, []);
+  }, [sourceCode, logs]);
 
   const updateStep = (index: number, updates: Partial<DeploymentStep>) => {
     setSteps((current) =>
@@ -109,45 +84,32 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   };
 
   const compileContractHandler = async () => {
-    if (!sourceCode.trim()) {
-      addLog("No contract code available for deployment");
-      return;
-    }
-
     setIsDeploying(true);
 
     try {
       // Step 1: Building Contract
       updateStep(0, { status: "processing" });
-      addLog("Starting contract compilation...");
       await new Promise((resolve) => setTimeout(resolve, 1000));
       updateStep(0, { status: "complete" });
 
       // Step 2: Declaring Sierra Hash
       updateStep(1, { status: "processing" });
-      addLog("Deploying contract to StarkNet...");
-      
       const response = await fetch("/api/deploy-contract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          contractName: "lib", // Use lib as the contract name since that's where we save
-          userId: "default-user" // You should pass the actual user ID
-        }),
+        body: JSON.stringify({ contractName: "contractww_contractww" }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        addLog(`Contract deployed successfully! Address: ${data.contractAddress}`);
-        
         updateStep(1, {
           status: "complete",
           hash: data.classHash,
         });
         updateStep(2, {
           status: "complete",
-          hash: data.classHash, // CASM hash might be the same
+          hash: data.casmHash,
         });
         updateStep(3, {
           status: "complete",
@@ -157,35 +119,19 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           status: "complete",
           hash: data.transactionHash,
         });
-
-        setResult({
-          success: true,
-          contractAddress: data.contractAddress,
-          classHash: data.classHash,
-          transactionHash: data.transactionHash,
-        });
       } else {
         throw new Error(data.error || "Deployment failed");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      addLog(`Deployment failed: ${errorMessage}`);
-      
       const currentStep = steps.findIndex(
         (step) => step.status === "processing"
       );
       if (currentStep !== -1) {
         updateStep(currentStep, {
           status: "error",
-          details: errorMessage,
+          details: error instanceof Error ? error.message : "Unknown error",
         });
       }
-
-      setResult({
-        success: false,
-        error: errorMessage,
-        details: "Check the logs for more information"
-      });
     } finally {
       setIsDeploying(false);
     }
@@ -195,20 +141,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     if (isGenerating) return;
     
     setIsGenerating(true);
-    setSourceCode(''); // Clear existing code immediately
-    setStreamedContent('');
-    setGenerationStatus({
-      status: 'starting',
-      message: 'Initializing contract generation...'
-    });
     addLog("Starting contract generation...");
     
     try {
-      // Close any existing event source
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-
       const response = await fetch("/api/generate-contract", {
         method: "POST",
         headers: {
@@ -227,68 +162,45 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      if (!response.body) {
-        throw new Error("No response body available");
+      // Clear existing code
+      setSourceCode("");
+      addLog("Generating contract...");
+      
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      
+      if (!reader) {
+        throw new Error("No reader available");
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedContract = '';
+      const chunks: string[] = [];
+      let done = false;
 
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
+      while (!done) {
+        const { value, done: isDone } = await reader.read();
+        done = isDone;
+        
+        if (value) {
           const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ') && line.trim() !== 'data: ') {
-              try {
-                const data = JSON.parse(line.substring(6));
-                
-                setGenerationStatus({
-                  status: data.error ? 'error' : data.status === 'completed' ? 'completed' : data.status,
-                  message: data.message,
-                  error: data.error
-                });
-
-                addLog(data.message);
-
-                if (data.content) {
-                  accumulatedContract += data.content;
-                  setStreamedContent(accumulatedContract);
-                }
-
-                if (data.status === 'completed' && data.contract) {
-                  setSourceCode(data.contract);
-                  setStreamedContent('');
-                  addLog("Contract generation completed successfully!");
-                }
-
-                if (data.error) {
-                  throw new Error(data.message);
-                }
-              } catch (parseError) {
-                console.warn('Failed to parse SSE data:', parseError);
-              }
-            }
-          }
+          chunks.push(chunk);
         }
-      } finally {
-        reader.releaseLock();
+      }
+      
+      reader.releaseLock();
+      
+      // Set the final code (all chunks joined)
+      const finalCode = chunks.join("");
+      
+      if (finalCode.trim()) {
+        setSourceCode(finalCode);
+        addLog("Contract generated successfully");
+      } else {
+        throw new Error("No code generated");
       }
       
     } catch (error) {
       console.error('Generation error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      addLog(`Generation failed: ${errorMessage}`);
-      setGenerationStatus({
-        status: 'error',
-        message: `Generation failed: ${errorMessage}`,
-        error: true
-      });
+      addLog(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsGenerating(false);
     }
@@ -311,25 +223,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     }
   };
 
-  const displayCode = sourceCode || streamedContent;
-  const hasCode = displayCode.length > 0;
-
-  const getStatusIcon = () => {
-    switch (generationStatus.status) {
-      case 'error':
-        return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'completed':
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'generating':
-      case 'streaming':
-      case 'saving':
-      case 'database':
-        return <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />;
-      default:
-        return <AlertCircle className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -346,75 +239,46 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         >
           Contract Code
         </motion.div>
-
-        {/* Status Display */}
-        <div className="flex items-center gap-3 p-3 bg-navy-800 rounded-lg border border-navy-600">
-          {getStatusIcon()}
-          <span className={`text-sm ${
-            generationStatus.status === 'error' ? 'text-red-400' :
-            generationStatus.status === 'completed' ? 'text-green-400' :
-            'text-blue-400'
-          }`}>
-            {generationStatus.message}
-          </span>
-        </div>
         
         <div
           ref={containerRef}
-          className={`text-black relative overflow-hidden rounded-xl bg-navy-800 border border-navy-600 ${
+          className={`text-black relative overflow-hidden rounded-xl bg-navy-800 border border-navy-600" ${
             editable ? "bg-yellow-200" : "bg-yellow-100"
           }`}
         >
           {showSourceCode && (
-            <div className="relative">
-              {!hasCode && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm">
-                  <div className="text-center text-gray-300">
-                    <div className="text-4xl mb-4">📄</div>
-                    <h3 className="font-medium mb-2">No contract generated yet</h3>
-                    <p className="text-sm">
-                      Connect blocks and click "Generate New" to create your Cairo contract
-                    </p>
-                  </div>
-                </div>
-              )}
-              <pre className={`p-6 overflow-y-auto max-h-[60vh] ${!hasCode ? 'opacity-30' : ''}`}>
-                <code
-                  contentEditable={editable && hasCode}
-                  spellCheck="false"
-                  style={{
-                    outline: "none",
-                    border: "none",
-                    whiteSpace: "pre-wrap",
-                    wordWrap: "break-word",
-                    padding: "0",
-                  }}
-                  suppressContentEditableWarning={true}
-                  onBlur={(e) => {
-                    if (editable && e.currentTarget.textContent) {
-                      setSourceCode(e.currentTarget.textContent);
-                    }
-                  }}
-                >
-                  {displayCode || "// Contract code will appear here after generation..."}
-                </code>
-              </pre>
-            </div>
+            <pre className="p-6 overflow-y-auto max-h-[60vh]">
+              <code
+                contentEditable={editable}
+                spellCheck="false"
+                style={{
+                  outline: "none",
+                  border: "none",
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                  padding: "0",
+                }}
+                suppressContentEditableWarning={true}
+                onBlur={(e) => setSourceCode(e.currentTarget.textContent || "")}
+              >
+                {sourceCode}
+              </code>
+            </pre>
           )}
         </div>
 
         <div className="flex gap-4 mt-2">
           <button
             className={`px-4 py-2 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 font-bold ${
-              isDeploying || !hasCode || editable || isGenerating
-                ? "bg-gray-500 cursor-not-allowed text-gray-300"
+              isLoading || editable || isGenerating
+                ? "bg-gray-500 cursor-not-allowed"
                 : "bg-cyan-500 hover:bg-cyan-600 text-black"
             }`}
             style={{
-              boxShadow: (isDeploying || !hasCode || editable || isGenerating) ? "none" : "0 0 15px rgba(100, 255, 218, 0.3)",
+              boxShadow: "0 0 15px rgba(100, 255, 218, 0.3)",
             }}
             onClick={compileContractHandler}
-            disabled={isDeploying || !hasCode || editable || isGenerating}
+            disabled={isDeploying || editable || isGenerating}
           >
             <span className="flex items-center justify-center gap-2">
               <Play className="w-5 h-5" />
@@ -422,7 +286,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
             </span>
           </button>
 
-          {hasCode && (
+          {sourceCode && (
             <button
               className={`px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 ${
                 isDeploying || isLoading || isGenerating
@@ -467,7 +331,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               description: step.details && (
                 <div className="text-sm">
                   {step.hash ? (
-                    
+                    <a
                       href={`https://starkscan.co/tx/${step.hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -486,7 +350,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         </Card>
       </div>
 
-      {/* Enhanced Logs */}
+      {/* Simple Logs */}
       {logs.length > 0 && (
         <div className="mt-4">
           <div className="flex justify-between items-center mb-2">
@@ -533,7 +397,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Transaction:</span>
-                  
+                  <a
                     href={`https://sepolia.starkscan.co/tx/${result.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
