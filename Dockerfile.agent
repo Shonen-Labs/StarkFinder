@@ -1,0 +1,74 @@
+FROM node:20-slim AS builder
+WORKDIR /agent
+
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
+# minimal package.json
+RUN cat <<EOF > package.json
+{
+  "name": "elizaos-agent",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node run-all-agents.js"
+  },
+  "dependencies": {
+    "@elizaos/core": "^0.25.9",
+    "fastembed": "^1.14.4",
+    "@anush008/tokenizers-linux-x64-gnu": "^0.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
+EOF
+
+# minimal tsconfig.json
+RUN cat <<EOF > tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "rootDir": "agents"
+  },
+  "include": [
+    "agents/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
+EOF
+
+RUN npm install
+
+# Copy only agent code
+COPY ./client/agents ./agents
+
+# Copy the run-all-agents script
+COPY run-all-agents.js ./
+
+RUN npm run build
+
+# Prune devDependencies to shrink node_modules
+RUN npm prune --production && npm cache clean --force
+
+# ---- Production Stage ----
+FROM node:20-slim AS runner
+WORKDIR /agent
+ENV NODE_ENV=production
+
+COPY --from=builder /agent/node_modules ./node_modules
+COPY --from=builder /agent/package.json ./
+COPY --from=builder /agent/dist ./dist
+COPY --from=builder /agent/run-all-agents.js ./
+
+EXPOSE 4000
+CMD ["npm", "start"]

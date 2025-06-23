@@ -1,3 +1,5 @@
+"use client";
+
 import { ReactFlowProvider } from "reactflow";
 import Playground from "./Playground";
 

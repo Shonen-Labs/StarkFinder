@@ -5,7 +5,7 @@ import type { MDXComponents } from "mdx/types";
 import Erc20 from "./erc20.mdx";
 import { Highlight, type Language, themes } from "prism-react-renderer";
 import Sidebar from "@/components/devx/contracts/Sidebar";
-
+import OpenEditorButton from "@/components/OpenEditorButton"
 const components: MDXComponents = {
   h1: ({ children }) => (
     <h1 className="text-3xl font-bold mb-6 mt-8">{children}</h1>
@@ -27,6 +27,7 @@ const components: MDXComponents = {
 
     return (
       <div className="my-6 rounded-lg overflow-hidden">
+        <OpenEditorButton contractCode={children.trim()} contractName="ERC20" />
         <Highlight
           theme={themes.nightOwl}
           code={children.trim()}

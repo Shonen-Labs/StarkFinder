@@ -33,7 +33,6 @@ import { toast } from "sonner";
 import BlockNode from "./Blocknode";
 import BlockNodeInterface from "./Blocknode";
 import EventNode from "./Blocknode/EventNode";
-import FloatingSidebar from "./floatingWindow/FloatingSidebar";
 import LiquidityNode from "./Blocknode/LiquidityNode";
 import StakeNode from "./Blocknode/StakeNode";
 import SwapNode from "./Blocknode/SwapNode";
@@ -41,6 +40,7 @@ import Header from "./Header";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { FlowSummaryItem } from "@/types/main-types";
+import FloatingSidebar from "./FloatingSidebar";
 
 
 interface BlockNodeInterface extends NodeProps {

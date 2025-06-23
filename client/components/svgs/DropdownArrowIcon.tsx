@@ -14,7 +14,7 @@ const DropdownArrowIcon = ({ status }: DropdownArrowIconProps) => {
         <path
           d="M7 9L12.1429 15L17.2857 9"
           stroke="#141414"
-          stroke-opacity="0.32"
+          strokeOpacity="0.32"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -35,7 +35,7 @@ const DropdownArrowIcon = ({ status }: DropdownArrowIconProps) => {
         <path
           d="M7 15L12.1429 9L17.2857 15"
           stroke="#141414"
-          stroke-opacity="0.32"
+          strokeOpacity="0.32"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
