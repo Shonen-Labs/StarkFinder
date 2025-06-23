@@ -92,7 +92,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     }
   }, [sourceCode, logs, streamedContent]);
 
-  // Clear source code on component mount to fix pre-generated contract issue
   useEffect(() => {
     setSourceCode('');
     setStreamedContent('');
@@ -100,7 +99,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       status: 'idle',
       message: 'Ready to generate contract'
     });
-  }, []);
+  }, [setSourceCode]);
 
   const updateStep = (index: number, updates: Partial<DeploymentStep>) => {
     setSteps((current) =>
@@ -117,13 +116,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     setIsDeploying(true);
 
     try {
-      // Step 1: Building Contract
       updateStep(0, { status: "processing" });
       addLog("Starting contract compilation...");
       await new Promise((resolve) => setTimeout(resolve, 1000));
       updateStep(0, { status: "complete" });
 
-      // Step 2: Declaring Sierra Hash
       updateStep(1, { status: "processing" });
       addLog("Deploying contract to StarkNet...");
       
@@ -131,8 +128,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          contractName: "lib", // Use lib as the contract name since that's where we save
-          userId: "default-user" // You should pass the actual user ID
+          contractName: "lib",
+          userId: "default-user"
         }),
       });
 
@@ -147,7 +144,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         });
         updateStep(2, {
           status: "complete",
-          hash: data.classHash, // CASM hash might be the same
+          hash: data.classHash,
         });
         updateStep(3, {
           status: "complete",
@@ -195,7 +192,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     if (isGenerating) return;
     
     setIsGenerating(true);
-    setSourceCode(''); // Clear existing code immediately
+    setSourceCode('');
     setStreamedContent('');
     setGenerationStatus({
       status: 'starting',
@@ -204,7 +201,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     addLog("Starting contract generation...");
     
     try {
-      // Close any existing event source
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
@@ -218,8 +214,8 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           nodes: nodes || [],
           edges: edges || [],
           flowSummary: flowSummary || [],
-          userId: "default-user", // Replace with actual user ID
-          blockchain: "blockchain1" // or "blockchain4" for Dojo
+          userId: "default-user",
+          blockchain: "blockchain1"
         }),
       });
 
@@ -347,7 +343,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           Contract Code
         </motion.div>
 
-        {/* Status Display */}
         <div className="flex items-center gap-3 p-3 bg-navy-800 rounded-lg border border-navy-600">
           {getStatusIcon()}
           <span className={`text-sm ${
@@ -373,7 +368,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                     <div className="text-4xl mb-4">📄</div>
                     <h3 className="font-medium mb-2">No contract generated yet</h3>
                     <p className="text-sm">
-                      Connect blocks and click "Generate New" to create your Cairo contract
+                      Connect blocks and click &quot;Generate New&quot; to create your Cairo contract
                     </p>
                   </div>
                 </div>
@@ -458,7 +453,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           </button>
         </div>
 
-        {/* Deployment Steps */}
         <Card className="mt-4 p-4">
           <Steps
             items={steps.map((step) => ({
@@ -467,7 +461,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               description: step.details && (
                 <div className="text-sm">
                   {step.hash ? (
-                    
+                    <a
                       href={`https://starkscan.co/tx/${step.hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -486,7 +480,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         </Card>
       </div>
 
-      {/* Enhanced Logs */}
       {logs.length > 0 && (
         <div className="mt-4">
           <div className="flex justify-between items-center mb-2">
@@ -511,7 +504,6 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         </div>
       )}
 
-      {/* Deployment Result */}
       <AnimatePresence>
         {result && (
           <motion.div
@@ -533,7 +525,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm">Transaction:</span>
-                  
+                  <a
                     href={`https://sepolia.starkscan.co/tx/${result.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"

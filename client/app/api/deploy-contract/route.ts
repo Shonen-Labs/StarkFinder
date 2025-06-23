@@ -28,10 +28,10 @@ const execAsync = promisify(exec);
 
 async function compileCairo(): Promise<CompilationResult> {
   try {
-    // Check if Scarb is available
+    // Check if Scarb is available - FIXED: Remove unused variable
     try {
       await execAsync("scarb --version");
-    } catch (scarbError) {
+    } catch {
       throw new Error("Scarb is not installed or not available in PATH. Please install Scarb first.");
     }
 
@@ -57,10 +57,10 @@ async function compileCairo(): Promise<CompilationResult> {
 
     const targetDir = getContractsPath("target", "dev");
     
-    // Check if target directory exists
+    // Check if target directory exists - FIXED: Remove unused variable
     try {
       await fs.access(targetDir);
-    } catch (targetError) {
+    } catch {
       throw new Error(`Target directory not found: ${targetDir}. Compilation may have failed.`);
     }
 
@@ -141,11 +141,12 @@ async function getCompiledCode(filename: string) {
     `${filename}.compiled_contract_class.json`
   );
 
+  // FIXED: Remove unused variable
   const code = [sierraFilePath, casmFilePath].map(async (filePath) => {
     try {
       const file = await fs.readFile(filePath);
       return JSON.parse(file.toString("ascii"));
-    } catch (error) {
+    } catch {
       throw new Error(`Failed to read compiled contract file: ${filePath}`);
     }
   });

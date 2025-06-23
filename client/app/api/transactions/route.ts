@@ -15,24 +15,42 @@ import { UserPreferences, InvestmentRecommendation, Pool } from "./types";
 import { BRIAN_API_KEY, BRIAN_API_URL, BRIAN_TRANSACTION_API_URL, BRIAN_DEFAULT_RESPONSE, createOrGetChat, fetchTokenData, fetchYieldData, getOrCreateUser, OPENAI_API_KEY, storeMessage, storeChat } from "./helper";
 import axios from "axios";
 
-// Initialize OpenAI models
-const agent = new ChatOpenAI({
-	modelName: "gpt-4o",
-	temperature: 0.5,
-	openAIApiKey: OPENAI_API_KEY,
-	streaming: true,
-});
+// ✅ Initialize OpenAI models lazily
+let agent: ChatOpenAI | null = null;
+let transactionLLM: ChatOpenAI | null = null;
 
-const transactionLLM = new ChatOpenAI({
-	model: "gpt-4",
-	apiKey: OPENAI_API_KEY,
-});
+function getAgent() {
+	if (!agent) {
+		if (!OPENAI_API_KEY) {
+			throw new Error("OpenAI API key not configured");
+		}
+		agent = new ChatOpenAI({
+			modelName: "gpt-4o",
+			temperature: 0.5,
+			openAIApiKey: OPENAI_API_KEY,
+			streaming: true,
+		});
+	}
+	return agent;
+}
+
+function getTransactionLLM() {
+	if (!transactionLLM) {
+		if (!OPENAI_API_KEY) {
+			throw new Error("OpenAI API key not configured");
+		}
+		transactionLLM = new ChatOpenAI({
+			model: "gpt-4",
+			apiKey: OPENAI_API_KEY,
+		});
+	}
+	return transactionLLM;
+}
 
 const systemPrompt = ASK_OPENAI_AGENT_PROMPT + "\nThe provided chat history includes a summary of the earlier conversation.";
 const systemMessage = SystemMessagePromptTemplate.fromTemplate(systemPrompt);
 const userMessage = HumanMessagePromptTemplate.fromTemplate("{user_query}");
 const askAgentPromptTemplate = ChatPromptTemplate.fromMessages([systemMessage, userMessage]);
-
 
 async function getChatHistory(chatId: string | { configurable?: { additional_args?: { chatId?: string } } }) {
 	try {
@@ -100,12 +118,15 @@ async function getOrCreateTransactionChat(userId: string) {
 
 // LangChain workflow for Q&A
 const initialCallModel = async (state: typeof MessagesAnnotation.State) => {
+	const agentInstance = getAgent(); // ✅ Get agent lazily
 	const messages = [await systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }), ...state.messages];
-	const response = await agent.invoke(messages);
+	const response = await agentInstance.invoke(messages);
 	return { messages: response };
 };
 
 const callModel = async (state: typeof MessagesAnnotation.State, chatId?: any) => {
+	const agentInstance = getAgent(); // ✅ Get agent lazily
+	
 	if (!chatId) {
 		return await initialCallModel(state);
 	}
@@ -121,9 +142,9 @@ const callModel = async (state: typeof MessagesAnnotation.State, chatId?: any) =
     IMPORTANT NOTE: Include all information related to user's nature about trading and what kind of trader he/she is. 
     `;
 
-		const summary = await agent.invoke([...chatHistory, { role: "user", content: summaryPrompt }]);
+		const summary = await agentInstance.invoke([...chatHistory, { role: "user", content: summaryPrompt }]);
 
-		const response = await agent.invoke([await systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }), summary, currentMessage]);
+		const response = await agentInstance.invoke([await systemMessage.format({ brianai_answer: BRIAN_DEFAULT_RESPONSE }), summary, currentMessage]);
 
 		return {
 			messages: [summary, currentMessage, response],
@@ -135,7 +156,14 @@ const callModel = async (state: typeof MessagesAnnotation.State, chatId?: any) =
 
 const workflow = new StateGraph(MessagesAnnotation).addNode("model", callModel).addEdge(START, "model").addEdge("model", END);
 
-const app = workflow.compile({ checkpointer: new MemorySaver() });
+// ✅ Lazy initialization of workflow
+let app: any = null;
+function getWorkflow() {
+	if (!app) {
+		app = workflow.compile({ checkpointer: new MemorySaver() });
+	}
+	return app;
+}
 
 // Function to determine if a prompt is transaction-related
 async function isTransactionIntent(prompt: string, messages: any[]): Promise<boolean> {
@@ -165,7 +193,8 @@ async function isTransactionIntent(prompt: string, messages: any[]): Promise<boo
     Answer only with "true" if this is a transaction intent or "false" if it's just an information query.
     `;
 
-		const response = await agent.invoke([
+		const agentInstance = getAgent(); // ✅ Get agent lazily
+		const response = await agentInstance.invoke([
 			{ role: "system", content: "You determine if user messages relate to blockchain transactions." },
 			{ role: "user", content: checkPrompt },
 		]);
@@ -191,7 +220,8 @@ async function getTransactionIntentFromOpenAI(prompt: string, address: string, c
 		});
 
 		const jsonOutputParser = new StringOutputParser();
-		const response = await transactionLLM.pipe(jsonOutputParser).invoke(formattedPrompt);
+		const transactionLLMInstance = getTransactionLLM(); // ✅ Get LLM lazily
+		const response = await transactionLLMInstance.pipe(jsonOutputParser).invoke(formattedPrompt);
 		const intentData = JSON.parse(response);
 
 		if (!intentData.isTransactionIntent) {
@@ -327,11 +357,13 @@ async function queryBrianAI(prompt: string, chatId?: string, streamCallback?: (c
 // Function for OpenAI querying
 async function queryOpenAI({ userQuery, brianaiResponse, chatId, streamCallback }: { userQuery: string; brianaiResponse: string; chatId?: string; streamCallback?: (chunk: string) => Promise<void> }): Promise<string> {
 	try {
+		const agentInstance = getAgent(); // ✅ Get agent lazily
+		
 		if (streamCallback) {
 			const messages = [await systemMessage.format({ brianai_answer: brianaiResponse }), { role: "user", content: userQuery }];
 
 			let fullResponse = "";
-			await agent.invoke(messages, {
+			await agentInstance.invoke(messages, {
 				callbacks: [
 					{
 						handleLLMNewToken: async (token: string) => {
@@ -345,7 +377,8 @@ async function queryOpenAI({ userQuery, brianaiResponse, chatId, streamCallback 
 			return fullResponse;
 		}
 
-		const response = await app.invoke(
+		const workflowInstance = getWorkflow(); // ✅ Get workflow lazily
+		const response = await workflowInstance.invoke(
 			{
 				messages: [
 					await askAgentPromptTemplate.format({
@@ -383,7 +416,8 @@ async function generateInvestmentRecommendations(userPreferences: UserPreference
 		});
 
 		const jsonOutputParser = new StringOutputParser();
-		const response = await agent.pipe(jsonOutputParser).invoke(formattedPrompt);
+		const agentInstance = getAgent(); // ✅ Get agent lazily
+		const response = await agentInstance.pipe(jsonOutputParser).invoke(formattedPrompt);
 		const recommendationData = JSON.parse(response);
 
 		if (!recommendationData.data?.pools || !recommendationData.data?.strategy) {
@@ -685,4 +719,4 @@ export async function POST(request: Request) {
 
 export async function GET() {
 	return NextResponse.json({ message: "API is working" });
-  }
+}

@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
           let accumulatedContent = "";
           let hasStarted = false;
 
-          // Send initial status
-          const sendMessage = (data: any) => {
+          // Send initial status - FIXED: Remove any type
+          const sendMessage = (data: Record<string, unknown>) => {
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify(data)}\n\n`)
             );
