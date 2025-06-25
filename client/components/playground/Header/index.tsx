@@ -77,9 +77,7 @@ export default function Header({
 
   function formatAddress(address?: string) {
     if (!address) return "";
-    return `${address.substring(0, 6)}...${address.substring(
-      address.length - 4
-    )}`;
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
   }
 
   const handleConnect = async (connectorId: string) => {
@@ -108,12 +106,12 @@ export default function Header({
 
   const centerItems = (
     <motion.div
-      className="flex-1 flex justify-center pb-4 md:pb-0 text-black md:text-white"
+      className="flex justify-center text-black md:text-white"
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 1.5, delay: 0.5 }}
     >
-      <ul className="flex flex-col md:flex-row gap-6">
+      <ul className="flex flex-row gap-4">
         <li>
           <Link
             href="/"
@@ -153,9 +151,9 @@ export default function Header({
   return (
     <>
       <header className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke text-white w-full">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between h-16">
           <motion.div
-            className="flex-1 flex items-center"
+            className="flex items-center"
             initial={{ x: -200, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5 }}
@@ -167,10 +165,10 @@ export default function Header({
             </Link>
           </motion.div>
 
-          <nav className="hidden md:flex gap-8 text-sm">{centerItems}</nav>
+          <nav className="hidden md:flex">{centerItems}</nav>
 
           <motion.div
-            className="flex-1 flex items-center justify-start md:justify-end gap-2"
+            className="flex items-center gap-2"
             initial={{ x: 200, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5, delay: 1 }}
@@ -201,7 +199,7 @@ export default function Header({
 
             {isConnected ? (
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
                   {formatAddress(address)}
                 </span>
                 <DisconnectButton className="flex items-center gap-2 text-grayscale-200 border-red-200 hover:bg-red-50 hover:text-green-dark" />
@@ -209,22 +207,22 @@ export default function Header({
             ) : (
               <Button
                 onClick={() => setIsWalletModalOpen(true)}
-                className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-l bg-primary hover:bg-primary-dark"
+                className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-sm bg-primary hover:bg-primary-dark h-8"
               >
-                <Wallet size={18} /> Connect Wallet
+                <Wallet size={16} /> Connect Wallet
               </Button>
             )}
 
             {/* User Session Info & Logout */}
             {status === "loading" ? (
-              <div className="hidden md:flex items-center gap-2">
-                <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
               </div>
             ) : session ? (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <motion.button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105"
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105 h-8"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -237,7 +235,7 @@ export default function Header({
             {isDeleteVisible && (
               <Button
                 onClick={() => handleDelete(selectedNode)}
-                className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
               >
                 Delete node
               </Button>
@@ -245,7 +243,7 @@ export default function Header({
             {showClearButton && (
               <Button
                 onClick={handleClear}
-                className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
               >
                 Clear
               </Button>
@@ -303,7 +301,7 @@ export default function Header({
                 <div className="flex flex-col gap-2 pt-2 border-t border-gray-200">
                   <Button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white"
+                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-500 text-white"
                   >
                     <LogOut size={16} />
                     Sign Out
