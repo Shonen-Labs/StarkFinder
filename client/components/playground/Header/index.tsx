@@ -84,7 +84,7 @@ export default function Header({
   const isDeleteVisible = !!selectedNode;
 
   const centerItems = (
-    <ul className="flex flex-col md:flex-row gap-6">
+    <ul className="flex flex-col md:flex-row gap-4">
       <li>
         <Link
           href="/"
@@ -107,8 +107,8 @@ export default function Header({
   return (
     <>
       <header className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke text-white w-full">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
+        <div className="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between h-16">
+          <div className="flex items-center">
             <Link href={"/devx"}>
               <h2 className="text-md md:text-2xl font-semibold text-black cursor-pointer">
                 DevXStark
@@ -116,12 +116,12 @@ export default function Header({
             </Link>
           </div>
 
-          <nav className="hidden md:flex gap-8 text-sm">{centerItems}</nav>
+          <nav className="hidden md:flex">{centerItems}</nav>
 
           {isConnected ? (
             <div className="flex items-center gap-2">
               <Select>
-                <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-3 py-1 hover:bg-green-200">
+                <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-2 py-1 hover:bg-green-200">
                   <div className="flex items-center gap-2">
                     <span>{formatAddress(address)}</span>
                   </div>
@@ -138,22 +138,22 @@ export default function Header({
           ) : (
             <Button
               onClick={() => setIsWalletModalOpen(true)}
-              className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-l bg-primary hover:bg-primary-dark"
+              className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-sm bg-primary hover:bg-primary-dark h-8"
             >
-              <Wallet size={18} /> Connect Wallet
+              <Wallet size={16} /> Connect Wallet
             </Button>
           )}
 
           {/* User Session Info & Logout */}
           {status === "loading" ? (
-            <div className="hidden md:flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
             </div>
           ) : session ? (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <motion.button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-2 px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105 h-8"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -166,7 +166,7 @@ export default function Header({
           {isDeleteVisible && (
             <Button
               onClick={() => handleDelete(selectedNode)}
-              className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+              className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
             >
               Delete node
             </Button>
@@ -174,7 +174,7 @@ export default function Header({
           {showClearButton && (
             <Button
               onClick={handleClear}
-              className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
+              className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
             >
               Clear
             </Button>
@@ -212,7 +212,7 @@ export default function Header({
                 <div className="flex flex-col gap-2 pt-2 border-t border-gray-200">
                   <Button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white"
+                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-500 text-white"
                   >
                     <LogOut size={16} />
                     Sign Out
