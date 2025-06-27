@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./contracts
+        working-directory: client/app/devx/contracts/utility-contracts/fee-deduction
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ./contracts/target/
+            client/app/devx/contracts/utility-contracts/fee-deduction/target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install Rust toolchain
