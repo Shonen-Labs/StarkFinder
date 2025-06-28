@@ -1,3 +1,4 @@
+import 'dotenv/config';
 interface DeepSeekMessage {
     role: 'system' | 'user' | 'assistant';
     content: string;
@@ -41,7 +42,7 @@ export class DeepSeekClient {
     private baseURL: string;
 
     constructor(options: DeepSeekClientOptions = {}) {
-        this.apiKey = options.apiKey || process.env.DEEPSEEK_API_KEY || '';
+        this.apiKey = process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY || '';
         this.model = options.model || 'deepseek-chat';
         this.temperature = options.temperature ?? 0.2;
         this.maxTokens = options.maxTokens;
