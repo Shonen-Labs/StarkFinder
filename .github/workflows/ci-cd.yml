@@ -22,7 +22,7 @@ jobs:
           sudo apt-get install -y build-essential libssl-dev pkg-config
 
       - name: Install Scarb
-        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.9.1
+        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.9.4
 
       - name: Add Scarb to PATH
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
