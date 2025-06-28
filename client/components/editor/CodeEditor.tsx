@@ -142,8 +142,8 @@ export default function CodeEditor() {
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isGeneratingScarb, setIsGeneratingScarb] = useState(false);
   const [generatedScarbToml, setGeneratedScarbToml] = useState("");
-  const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
+  const {isConnected } = useAccount();
+  // const { connect, connectors } = useConnect();
 
   // Get sourceCode AFTER initialization to ensure we have the right value
   const sourceCode = useCodeStore((state) => state.sourceCode);
