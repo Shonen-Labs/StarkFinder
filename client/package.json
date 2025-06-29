@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "test": "npx jest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -100,7 +101,10 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
     "@types/dotenv-safe": "^8.1.6",
+    "@types/jest": "^30.0.0",
+    "@types/jest-json-schema": "^6.1.4",
     "@types/node": "^20.17.31",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^18.3.19",
@@ -109,6 +113,9 @@
     "concurrently": "^9.1.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.17",
+    "jest": "^30.0.3",
+    "jest-json-schema": "^6.1.0",
+    "next-test-api-route-handler": "^4.0.16",
     "postcss": "^8",
     "prisma": "^6.3.1",
     "raw-loader": "^4.0.2",

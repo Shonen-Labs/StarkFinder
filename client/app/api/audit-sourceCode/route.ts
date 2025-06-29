@@ -1,72 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Anthropic } from '@anthropic-ai/sdk';
+import { NextRequest, NextResponse } from "next/server";
+import { Anthropic } from "@anthropic-ai/sdk";
 
 export async function POST(req: NextRequest) {
   try {
-    // Parse request body
     const { sourceCode } = await req.json();
+
+    if (!sourceCode || typeof sourceCode !== "string") {
+      return NextResponse.json(
+        { error: "`sourceCode` is required in the request body." },
+        { status: 400 }
+      );
+    }
+
     const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-    const stream = await claude.messages.create({
+    const response = await claude.messages.create({
       model: "claude-3-opus-20240229",
       system: getStarknetSystemPrompt(),
       max_tokens: 4096,
       messages: [
         {
           role: "user",
-          content: `Carefully audit the following Starknet smart contract and provide a STRICTLY FORMATTED JSON response:\n\n${sourceCode}`
-        }
+          content: `Carefully audit this Starknet smart contract \n\n${sourceCode}. \n\n Provide a STRICTLY FORMATTED JSON response using this Format: ${outputFormat}`,
+        },
       ],
-      stream: true,
     });
 
-    const response = new ReadableStream({
-      async start(controller) {
-        let fullResponse = '';
-        for await (const messageStream of stream) {
-          if (messageStream.type === 'content_block_delta') {
-            const deltaText = messageStream.delta.type; // Adjust if incorrect
-            fullResponse += deltaText;
-            controller.enqueue(`data: ${JSON.stringify({ chunk: deltaText })}\n\n`);
-          }
-        }
-        controller.close();
+    const textBlock = response.content.find((block) => block.type === "text");
 
-        // Log full response and extract JSON
-        console.log(fullResponse);
-        const jsonContent = extractJSON(fullResponse);
-        try {
-          JSON.parse(jsonContent); // Verify JSON structure
-        } catch (parseError) {
-          console.error('JSON Parsing Error:', parseError);
-          throw new Error('Invalid JSON response received.');
-        }
-      },
-    });
+    if (!textBlock || !textBlock.text) {
+      return NextResponse.json(
+        { error: "No text content returned" },
+        { status: 502 }
+      );
+    }
 
-    return new NextResponse(response, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        Connection: 'keep-alive',
-      },
-    });
+    return NextResponse.json({ result: textBlock.text });
   } catch (error) {
-    console.error('API Error:', error);
+    console.error("API Error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'An unexpected error occurred' },
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
       { status: 500 }
     );
   }
-}
-
-function extractJSON(text: string) {
-  const codeBlockMatch = text.match(/```json\n([\s\S]*?)```/);
-  if (codeBlockMatch) return codeBlockMatch[1].trim();
-  const bracketMatch = text.match(/\{[\s\S]*\}/);
-  if (bracketMatch) return bracketMatch[0].trim();
-  const cleanedText = text.replace(/^[^{]*/, '').replace(/[^}]*$/, '');
-  return cleanedText;
 }
 
 function getStarknetSystemPrompt() {
@@ -130,3 +111,22 @@ IMPORTANT:
 - Include concrete, implementable code fixes for each vulnerability
 - Explain all changes made in the corrected code`;
 }
+
+const outputFormat = `
+{
+    contract_name: string,
+    audit_date: string,
+    security_score: number, // 0-100
+    original_contract_code: string,
+    corrected_contract_code: string,
+    vulnerabilities: [
+        {
+            category: string,
+            severity: 'Low'|'Medium'|'High',
+            description: string,
+            recommended_fix: string
+        }
+    ],
+    recommended_fixes: string[]
+}
+`;
