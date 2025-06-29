@@ -2,7 +2,7 @@
 import path from "path";
 import { contractPromptTemplate } from "./prompt-generate";
 import fs from "fs/promises";
-import { createDeepSeekClient, DeepSeekClient } from "./deepseek-client";
+import { DeepSeekClient, createDeepSeekClient } from "./deepseek-client";
 import type { BaseMessage } from "@langchain/core/messages";
 
 interface ContractGenerationResult {
@@ -19,7 +19,11 @@ export class CairoContractGenerator {
   private model: DeepSeekClient;
 
   constructor() {
-    this.model = createDeepSeekClient();
+    this.model = createDeepSeekClient({
+      model: 'deepseek-coder',
+      temperature: 0.2,
+      maxTokens: 4000
+    });
   }
 
   async generateContract(
@@ -62,9 +66,12 @@ export class CairoContractGenerator {
           throw new Error("Generated source code is empty");
         }
 
+        // Clean up the generated code
+        const cleanedCode = this.cleanGeneratedCode(sourceCode);
+
         return {
           success: true,
-          sourceCode,
+          sourceCode: cleanedCode,
         };
       } else {
         // Use non-streaming for simpler cases
@@ -74,9 +81,12 @@ export class CairoContractGenerator {
           throw new Error("Generated source code is empty");
         }
 
+        // Clean up the generated code
+        const cleanedCode = this.cleanGeneratedCode(sourceCode);
+
         return {
           success: true,
-          sourceCode,
+          sourceCode: cleanedCode,
         };
       }
     } catch (error) {
@@ -122,20 +132,34 @@ export class CairoContractGenerator {
     });
   }
 
+  private cleanGeneratedCode(sourceCode: string): string {
+    // Remove markdown code blocks if present
+    let cleaned = sourceCode.replace(/```(?:cairo|rust)?\n?/g, '');
+    cleaned = cleaned.replace(/```\n?/g, '');
+    
+    // Remove any leading/trailing whitespace
+    cleaned = cleaned.trim();
+    
+    // Ensure proper formatting
+    return cleaned;
+  }
+
   async saveContract(
     sourceCode: string,
+    contractName: string = "lib"
   ): Promise<string> {
     if (!sourceCode?.trim()) {
       throw new Error("Cannot save empty contract source code");
     }
   
-    const contractsDir = path.join(process.cwd(), "contracts", "src");
+    const contractsDir = path.join(process.cwd(), "..", "contracts", "src");
   
     try {
       // Ensure the directory exists
       await fs.mkdir(contractsDir, { recursive: true });
       
-      const filePath = path.join(process.cwd(), "contracts", "src");
+      // Create the full file path with .cairo extension
+      const filePath = path.join(contractsDir, `${contractName}.cairo`);
 
       // Check if file exists and get its stats
       let fileExists = false;
@@ -163,6 +187,7 @@ export class CairoContractGenerator {
         throw new Error('File content verification failed');
       }
       
+      console.log(`Contract saved successfully to: ${filePath}`);
       return filePath;
     } catch (error) {
       console.error("Error saving contract:", error);
@@ -177,7 +202,7 @@ export class CairoContractGenerator {
   // Utility method to generate and save in one step
   async generateAndSaveContract(
     requirements: string,
-    contractName: string,
+    contractName: string = "lib",
     options: GenerateOptions = {}
   ): Promise<{ success: boolean; filePath?: string; error?: string }> {
     try {
@@ -190,7 +215,7 @@ export class CairoContractGenerator {
         };
       }
 
-      const filePath = await this.saveContract(result.sourceCode);
+      const filePath = await this.saveContract(result.sourceCode, contractName);
       
       return {
         success: true,
@@ -243,3 +268,5 @@ export class CairoContractGenerator {
     return await this.model.chat(messages);
   }
 }
+
+export default CairoContractGenerator;

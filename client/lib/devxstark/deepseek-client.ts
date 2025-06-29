@@ -42,8 +42,8 @@ export class DeepSeekClient {
     private baseURL: string;
 
     constructor(options: DeepSeekClientOptions = {}) {
-        this.apiKey = process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY || '';
-        this.model = options.model || 'deepseek-chat';
+        this.apiKey = options.apiKey || process.env.DEEPSEEK_API_KEY || process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY || '';
+        this.model = options.model || 'deepseek-reasoner';
         this.temperature = options.temperature ?? 0.2;
         this.maxTokens = options.maxTokens;
         this.maxRetries = options.maxRetries ?? 3;
@@ -102,6 +102,7 @@ export class DeepSeekClient {
             async start(controller) {
                 const reader = response.body?.getReader();
                 const decoder = new TextDecoder();
+                let buffer = '';
 
                 if (!reader) {
                     controller.close();
@@ -117,12 +118,24 @@ export class DeepSeekClient {
                             break;
                         }
 
-                        const chunk = decoder.decode(value);
-                        const lines = chunk.split('\n');
+                        // Add new chunk to buffer
+                        const chunk = decoder.decode(value, { stream: true });
+                        buffer += chunk;
+
+                        // Process complete lines (SSE format)
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
                         for (const line of lines) {
-                            if (line.startsWith('data: ')) {
-                                const data = line.slice(6);
+                            const trimmedLine = line.trim();
+                            
+                            // Skip empty lines and comments
+                            if (!trimmedLine || trimmedLine.startsWith(':')) {
+                                continue;
+                            }
+
+                            if (trimmedLine.startsWith('data: ')) {
+                                const data = trimmedLine.slice(6);
                                 
                                 if (data === '[DONE]') {
                                     continue;
@@ -135,15 +148,21 @@ export class DeepSeekClient {
                                         controller.enqueue(content);
                                     }
                                 } catch (error) {
-                                    console.error('Error parsing JSON from DeepSeek stream:', error);
-                                    controller.error(error);
-                                    return;
+                                    // Log parse errors but continue processing
+                                    console.warn('Error parsing JSON from DeepSeek stream:', {
+                                        data: data.substring(0, 100) + (data.length > 100 ? '...' : ''),
+                                        error: error instanceof Error ? error.message : 'Unknown error'
+                                    });
+                                    // Don't throw here, just continue with the next chunk
                                 }
                             }
                         }
                     }
                 } catch (error) {
+                    console.error('Stream processing error:', error);
                     controller.error(error);
+                } finally {
+                    reader.releaseLock();
                 }
             },
         });
@@ -195,3 +214,6 @@ export const createDeepSeekClient = (options?: DeepSeekClientOptions): DeepSeekC
 
 // Default instance with environment variables
 export const deepseek = createDeepSeekClient();
+
+// Export as default for easier importing
+export default DeepSeekClient;
