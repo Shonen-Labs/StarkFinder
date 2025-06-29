@@ -3,26 +3,33 @@ import React, { useState } from "react";
 import { Button } from "../../../ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap } from "lucide-react";
-import { useAccount } from "@starknet-react/core";
 
 interface GenerateCodeProps {
   nodes: any;
   edges: any;
   flowSummary: { content: string }[];
-  setDisplayState: (state: "generate" | "contract") => void; // Use the specific type here
+  setDisplayState: (state: "generate" | "contract") => void;
   appendToSourceCode: (sourceCode: string) => void;
   sourceCode?: string;
+  setBlockchain?: (blockchain: string) => void;
 }
 
 export default function GenerateCode({
-  nodes,
-  edges,
   flowSummary,
   setDisplayState,
-  appendToSourceCode,
+  setBlockchain,
 }: GenerateCodeProps) {
-  const { address } = useAccount();
   const [selectedOption, setSelectedOption] = useState("");
+
+  const handleGenerate = () => {
+    if (selectedOption) {
+      if (setBlockchain) {
+        setBlockchain(selectedOption);
+      }
+      setDisplayState("contract");
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -62,21 +69,24 @@ export default function GenerateCode({
       </motion.div>
 
       <div className="mt-6 flex flex-col gap-4">
-        <div className=" text-xl text-cyan-300 font-semibold">
+        <div className="text-xl text-cyan-300 font-semibold">
           Select Blockchain:
         </div>
         <select
           id="blockchain-select"
           value={selectedOption}
           onChange={(e) => setSelectedOption(e.target.value)}
-          className="w-full h-[48px] bg-gray-800 rounded-md border border-white hover:border-slate-500 text-slate-300"
+          className="w-full h-[48px] bg-gray-800 rounded-md border border-white hover:border-slate-500 text-slate-300 px-3"
           defaultValue=""
         >
-          <option value="" disabled />
+          <option value="" disabled>
+            Choose a blockchain...
+          </option>
           <option value="blockchain1">Starknet</option>
           <option value="blockchain4">Dojo</option>
         </select>
       </div>
+
       <AnimatePresence>
         {!!selectedOption.length && (
           <motion.div
@@ -87,7 +97,7 @@ export default function GenerateCode({
           >
             <Button
               size="lg"
-              onClick={generateCodeHandler}
+              onClick={handleGenerate}
               className="w-full bg-cyan-500 hover:bg-cyan-600 text-navy-900 font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50"
               style={{
                 boxShadow: "0 0 15px rgba(100, 255, 218, 0.3)",
@@ -95,7 +105,7 @@ export default function GenerateCode({
             >
               <span className="flex items-center justify-center gap-3">
                 <Zap className="w-6 h-6" />
-                Generate
+                Continue to Contract Generation
               </span>
             </Button>
           </motion.div>
@@ -103,40 +113,4 @@ export default function GenerateCode({
       </AnimatePresence>
     </motion.div>
   );
-  async function generateCodeHandler() {
-    setDisplayState("contract");
-    const fetchStreamedData = async () => {
-      const response = await fetch("/api/generate-contract", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nodes,
-          edges,
-          flowSummary,
-          userId: address,
-          blockchain: selectedOption,
-        }),
-      }); // Fetch data from the server
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (reader) {
-        let done = false;
-
-        while (!done) {
-          const { value, done: isDone } = await reader.read(); // Read chunks
-          done = isDone;
-
-          if (value) {
-            // Decode the chunk and append it to the state
-            appendToSourceCode(decoder.decode(value));
-          }
-        }
-      }
-    };
-
-    fetchStreamedData();
-  }
 }

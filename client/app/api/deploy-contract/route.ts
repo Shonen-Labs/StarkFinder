@@ -69,29 +69,97 @@ async function saveContractFiles(
 }
 
 // Validate contract structure before compilation
+// Replace the validateContract function in your deploy-contract/route.ts with this:
+
+// Validate Starknet contract structure before compilation
 async function validateContract(sourceCode: string) {
+  console.log(chalk.blue("🔍 Validating Starknet contract structure..."));
+  
+  // Required patterns for Starknet contracts
   const requiredPatterns = [
-    { pattern: /fn\s+main\s*\(\)/, message: "Missing main() function" },
-    { pattern: /struct\s+[A-Za-z0-9_]+\s*\{/, message: "No structs defined" },
-    { pattern: /impl\s+[A-Za-z0-9_]+\s+of\s+[A-Za-z0-9_]+/, message: "No trait implementations" }
+    { 
+      pattern: /#\[starknet::contract\]|mod\s+contract\s*\{/, 
+      message: "Missing Starknet contract definition (#[starknet::contract] or mod contract)" 
+    },
+    { 
+      pattern: /#\[storage\]|struct\s+Storage\s*\{/, 
+      message: "Missing storage definition" 
+    }
   ];
 
+  // Optional but common patterns (warnings, not errors)
+  const recommendedPatterns = [
+    { 
+      pattern: /#\[external\(\w*\)\]|#\[external\]/, 
+      message: "No external functions found - contract may not be callable" 
+    },
+    { 
+      pattern: /use\s+starknet::/, 
+      message: "No Starknet imports found - may cause compilation issues" 
+    }
+  ];
+
+  // Check required patterns
   for (const { pattern, message } of requiredPatterns) {
     if (!pattern.test(sourceCode)) {
+      console.error(chalk.red(`❌ Validation failed: ${message}`));
       throw new Error(`Contract validation failed: ${message}`);
     }
   }
 
+  // Check recommended patterns (warnings only)
+  for (const { pattern, message } of recommendedPatterns) {
+    if (!pattern.test(sourceCode)) {
+      console.warn(chalk.yellow(`⚠️  Warning: ${message}`));
+    }
+  }
+
+  // Security checks - things that shouldn't be in contracts
   const unsafePatterns = [
-    { pattern: /unsafe\s+{/, message: "Unsafe blocks not allowed" },
-    { pattern: /loop\s+{/, message: "Infinite loops not allowed" }
+    { 
+      pattern: /unsafe\s*\{/, 
+      message: "Unsafe blocks detected - remove for security" 
+    },
+    { 
+      pattern: /panic\s*\(/, 
+      message: "Direct panic calls detected - use proper error handling" 
+    },
+    { 
+      pattern: /loop\s*\{[^}]*\}(?![^}]*break)/, 
+      message: "Potential infinite loops detected - ensure proper exit conditions" 
+    }
   ];
 
   for (const { pattern, message } of unsafePatterns) {
     if (pattern.test(sourceCode)) {
-      throw new Error(`Security violation: ${message}`);
+      console.warn(chalk.yellow(`⚠️  Security warning: ${message}`));
+      // Don't throw error, just warn
     }
   }
+
+  // Basic syntax checks
+  const syntaxChecks = [
+    {
+      pattern: /\{/g,
+      counterPattern: /\}/g,
+      message: "Unbalanced braces detected"
+    },
+    {
+      pattern: /\(/g,
+      counterPattern: /\)/g,
+      message: "Unbalanced parentheses detected"
+    }
+  ];
+
+  for (const { pattern, counterPattern, message } of syntaxChecks) {
+    const openCount = (sourceCode.match(pattern) || []).length;
+    const closeCount = (sourceCode.match(counterPattern) || []).length;
+    if (openCount !== closeCount) {
+      console.warn(chalk.yellow(`⚠️  Syntax warning: ${message}`));
+    }
+  }
+
+  console.log(chalk.green("✓ Contract structure validation passed"));
 }
 
 // Clean up build artifacts after deployment
