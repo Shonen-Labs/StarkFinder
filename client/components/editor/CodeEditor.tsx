@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import { Button } from "../ui/button";
 import Editor from "react-simple-code-editor";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useAccount } from "@starknet-react/core";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-rust";

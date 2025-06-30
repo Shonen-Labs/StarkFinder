@@ -100,6 +100,69 @@ The application's architecture follows a multi-agent design, where each agent sp
    ```
 ### Setting up Telegram Test Environment
 - Please go through this [doc](https://docs.ton.org/v3/guidelines/dapps/tma/guidelines/testing-apps) to setup the telegram mini app test environment
+
+## Development
+
+### Quick Start with Makefile
+StarkFinder includes a comprehensive Makefile to streamline development. Here are the available commands:
+
+```bash
+# View all available commands
+make help
+
+# Install all dependencies (recommended first step)
+make install
+
+# Start development server
+make dev
+
+# Build the entire project
+make build
+
+# Run all tests
+make test
+
+# Run linting
+make lint
+
+# Run TypeScript type checking
+make type-check
+
+# Setup database (generate Prisma client + migrate)
+make db-setup
+
+# Seed database with initial data
+make db-seed
+
+# Clean build artifacts and dependencies
+make clean
+
+# Start Docker services
+make docker-up
+
+# Stop Docker services
+make docker-down
+
+# Build Starknet contracts specifically
+make contracts-build
+
+# Test Starknet contracts specifically
+make contracts-test
+
+# Quick setup for new developers (install + db-setup)
+make setup
+
+# Full CI/CD pipeline simulation
+make ci
+```
+
+### Prerequisites for Contract Development
+To build and test Starknet contracts, you'll need to install Scarb:
+- Visit [Scarb installation guide](https://docs.swmansion.com/scarb/download.html)
+- The Makefile will automatically detect if Scarb is installed and skip contract operations if not available
+
+### Manual Setup (Alternative)
+If you prefer manual setup instead of using the Makefile:
 ## Using StarkFinder
 
 ### Available Agents
