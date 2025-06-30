@@ -221,11 +221,11 @@ async function compileCairo(): Promise<CompilationResult> {
     console.log(chalk.blue("🔨 Running scarb build..."));
     let stdout = '', stderr = '';
     try {
-      const result = await execAsync("scarb build", {
+      const {stdout, stderr } = await execAsync("scarb build", {
         cwd: getContractsPath(),
       });
-      stdout = result.stdout;
-      stderr = result.stderr;
+      stdout = stdout;
+      stderr = stderr;
     } catch (error) {
       if (error instanceof Error) {
         stdout = (error as any).stdout || '';
@@ -258,6 +258,12 @@ async function compileCairo(): Promise<CompilationResult> {
 
     const targetDir = getContractsPath("target", "dev");
     console.log(chalk.blue(`📂 Checking build output in: ${targetDir}`));
+
+    try {
+      await fs.access(targetDir);
+    } catch {
+      throw new Error(`Target directory not found: ${targetDir}.`);
+    }
     
     const files = await fs.readdir(targetDir);
     const contractFiles = files.filter(
