@@ -27,6 +27,7 @@ ARG STARKNET_RPC_URL
 ARG ACCOUNT_ADDRESS
 ARG OZ_ACCOUNT_PRIVATE_KEY
 ARG DATABASE_URL
+ARG DEEPSEEK_API_KEY
 
 # Create package.json for backend with all required dependencies
 RUN cat <<EOF > package.json
@@ -34,7 +35,7 @@ RUN cat <<EOF > package.json
   "name": "api-backend",
   "version": "1.0.0",
   "scripts": {
-    "build": "prisma generate && next build",
+    "build": "prisma generate --no-engine && next build",
     "start": "next start"
   },
   "dependencies": {
@@ -164,6 +165,8 @@ COPY ./client/webpack.config.js ./
 COPY ./client/prompts ./prompts
 COPY ./client/auth.ts ./auth.ts
 COPY ./client/middleware.ts ./middleware.ts
+COPY ./client/tailwind.config.ts ./tailwind.config.ts
+COPY ./client/postcss.config.mjs ./postcss.config.mjs
 
 # Verify UI components exist (debugging step)
 RUN ls -la /app/backend/components/ui/ || echo "No UI components found"
@@ -268,6 +271,8 @@ COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/webpack.config.js
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/prompts ./backend/prompts
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/auth.ts ./backend/
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/middleware.ts ./backend/
+COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/tailwind.config.ts ./backend/
+COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/postcss.config.mjs ./backend/
 
 # Copy agent files
 COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/node_modules ./agent/node_modules
