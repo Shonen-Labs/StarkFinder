@@ -51,21 +51,48 @@ Output must follow the structured JSON format described above and contain no ext
   }),
 ]);
 
-export const DOJO_SYSTEM_PROMPT = `You are a senior Cairo 2.0 smart contract developer with deep expertise in the Starknet ecosystem and the Dojo toolchain. You write production-ready, secure, gas-efficient Cairo smart contracts using the Dojo framework.
+export const DOJO_SYSTEM_PROMPT = `You are an expert Cairo 2.0 Dojo smart contract developer.
+You generate secure, gas-optimized, production-ready contracts for the Starknet ecosystem using the Dojo toolchain.
 
-Your responsibilities:
-- Implement contract logic using the #[dojo::contract] attribute inside a module named 'contract' (e.g., mod contract {}).
-- Define state models using #[dojo::model] with at least one #[key] field per model.
-- Apply Starknet and Cairo 2.0 best practices including gas optimization, naming clarity, and strict typing.
-- Include all necessary permissions (e.g., access control), metadata, and interface types if applicable.
-- Avoid redundant comments or non-functional boilerplate.
-- Return only the Cairo 2.0 contract code in a valid JSON format with a single field named "code".
-- Never include explanations, markdown, or language tags in your response.
+You must:
+- Use #[dojo::contract] in a module named \`mod contract {}\`
+- Use #[dojo::model] for models with #[key] on at least one field
+- Respect Cairo 2.0 and Starknet best practices (security, gas, naming, modularity)
+- Generate pure JSON output — no markdown, no extra explanations
 
-Output format (very important):
+Return JSON in the following format:
 {
-  "code": "<your full, production-grade Cairo 2.0 contract here>"
-}`;
+  "filename": "contract.cairo",
+  "language": "cairo",
+  "contract_type": "ERC20",
+  "description": "Human-readable description",
+  "permissions": {
+    "admin": ["..."],
+    "public": ["..."]
+  },
+  "code": "<full Cairo contract string>"
+}
+
+The \`code\` value must contain the complete Cairo 2.0 contract using #[dojo::contract].
+NEVER wrap the JSON in \`\`\`, never explain anything, and never include code outside the JSON object.
+`;
+
+export const input = {
+  contract_type: "token",
+  description: "ERC20-like token with mint and burn",
+  permissions: {
+    admin: ["mint", "burn"],
+    public: ["transfer", "approve", "transfer_from", "balance_of", "allowance"],
+  },
+  models: [],
+  events: ["Transfer", "Approval"],
+  logic: "Token transfers, approvals, minting and burning",
+  metadata: {
+    version: "1.0.0",
+    author: "DojoExpert",
+    license: "MIT",
+  },
+};
 
 export const dojoContractPromptTemplate = ChatPromptTemplate.fromMessages([
   new SystemMessage(DOJO_SYSTEM_PROMPT),
@@ -73,40 +100,51 @@ export const dojoContractPromptTemplate = ChatPromptTemplate.fromMessages([
     content: [
       {
         type: "text",
-        text: `Generate a secure, production-ready Cairo 2.0 smart contract using the Dojo framework with the following parameters:
+        text: `You are to generate a production-ready Cairo 2.0 smart contract using the Dojo framework.
+
+The contract must be returned in a valid JSON format, with no extra text, no markdown, and no code fences.
+
+Please follow this structure for the input:
 
 {
-  "contract_type": "game|token|access_control|voting|storage|combat|marketplace|governance",
+  "contract_type": "game | voting | profile | leaderboard | marketplace | combat",
+  "description": "Short description of the contract’s purpose",
   "permissions": {
-    "admin": ["create", "update", "delete"],
-    "public": ["read"]
+    "admin": ["list", "of", "functions", "only", "admins", "can", "call"],
+    "public": ["list", "of", "functions", "accessible", "to", "anyone"]
   },
   "models": [
     {
-      "name": "Player",
-      "keys": ["id"],
+      "name": "ModelName",
+      "keys": ["field1"],
       "fields": [
-        {"name": "score", "type": "u32"},
-        {"name": "level", "type": "u8"}
+        { "name": "field1", "type": "u32" },
+        { "name": "field2", "type": "felt252" }
       ]
     }
   ],
-  "logic": "Increment score when player completes a mission. Level up every 100 points.",
-  "events": ["PlayerLeveledUp", "ScoreUpdated"],
+  "logic": "Human-readable description of the logic or behavior of the contract",
+  "events": ["ListOfEventsToEmit"],
   "metadata": {
     "version": "1.0.0",
-    "author": "Dojo Cairo Expert",
+    "author": "YourNameOrTeam",
     "license": "MIT"
   }
 }
 
-Your output must be valid JSON with a single field:
-{
-  "code": "<Cairo contract goes here>"
-}
+Return a JSON object with the following keys:
+- filename
+- language
+- contract_type
+- description
+- permissions
+- code (Cairo 2.0 contract inside a string, in a module called 'contract')
 
-Do not include any extra explanations, markdown formatting, or code blocks.`,
+The code must use #[dojo::contract] and #[dojo::model] appropriately and reflect all the input instructions.
+
+Do not include markdown (like \`\`\`) or any explanation. Only return valid JSON.`,
         cache_control: { type: "ephemeral" },
+        requirements: JSON.stringify(input, null, 2),
       },
     ],
   }),
