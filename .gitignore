@@ -10,6 +10,5 @@ venv/
 node_modules/
 *.log
 .vercel
-
 .vscode
 starknet-foundry/
