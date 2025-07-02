@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@anush008/tokenizers-linux-x64-gnu": "^0.0.0",
     "@argent/invisible-sdk": "^1.0.0",
     "@argent/tma-wallet": "^1.17.1",
     "@auth/prisma-adapter": "^2.9.1",
