@@ -25,9 +25,9 @@ help:
 # Install all project dependencies
 install:
 	@echo "Installing root dependencies..."
-	@yarn install
+	@npm install
 	@echo "Installing client dependencies..."
-	@cd client && yarn install
+	@cd client && npm install
 	@echo "Installing Prisma dependencies..."
 	@cd client && npx prisma generate
 	@echo "Building Starknet contracts..."
@@ -41,7 +41,7 @@ install:
 # Build the entire project
 build:
 	@echo "Building frontend..."
-	@cd client && yarn run build
+	@cd client && npm run build
 	@echo "Building Starknet contracts..."
 	@if [ -f "client/app/devx/contracts/utility-contracts/fee-deduction/Scarb.toml" ] && command -v scarb >/dev/null 2>&1; then \
 		cd client/app/devx/contracts/utility-contracts/fee-deduction && scarb build; \
@@ -53,17 +53,17 @@ build:
 # Start development server
 dev:
 	@echo "Starting development server..."
-	@cd client && yarn run dev
+	@cd client && npm run dev
 
 # Start production server
 start:
 	@echo "Starting production server..."
-	@cd client && yarn run start
+	@cd client && npm run start
 
 # Run all tests
 test:
 	@echo "Running frontend tests..."
-	@cd client && yarn run type-check
+	@cd client && npm run type-check
 	@echo "Running Starknet contract tests..."
 	@if [ -f "client/app/devx/contracts/utility-contracts/fee-deduction/Scarb.toml" ] && command -v scarb >/dev/null 2>&1; then \
 		cd client/app/devx/contracts/utility-contracts/fee-deduction && scarb test; \
@@ -75,12 +75,12 @@ test:
 # Run linting
 lint:
 	@echo "Running linter..."
-	@cd client && yarn run lint
+	@cd client && npm run lint
 
 # Run TypeScript type checking
 type-check:
 	@echo "Running TypeScript type checking..."
-	@cd client && yarn run type-check
+	@cd client && npm run type-check
 
 # Setup database (generate Prisma client and run migrations)
 db-setup:
@@ -92,7 +92,7 @@ db-setup:
 # Seed the database with initial data
 db-seed:
 	@echo "Seeding database..."
-	@cd client && yarn run seed
+	@cd client && npm run seed
 	@echo "✅ Database seeding complete!"
 
 # Clean build artifacts and dependencies
