@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./contracts
+        working-directory: client/app/devx/contracts/utility-contracts/fee-deduction
 
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
           sudo apt-get install -y build-essential libssl-dev pkg-config
 
       - name: Install Scarb
-        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.9.1
+        run: curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.9.4
 
       - name: Add Scarb to PATH
         run: echo "${HOME}/.local/share/scarb/bin" >> $GITHUB_PATH
@@ -33,7 +33,7 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ./contracts/target/
+            client/app/devx/contracts/utility-contracts/fee-deduction/target/
           key: ${{ runner.os }}-rust-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install Rust toolchain
@@ -56,7 +56,7 @@ jobs:
           if ! command -v snforge &> /dev/null; then
             git clone https://github.com/foundry-rs/starknet-foundry.git
             cd starknet-foundry
-            git checkout v0.44.0
+            git checkout v0.39.0
             cargo build --release
             sudo cp target/release/snforge /usr/local/bin/snforge
             cd ..
@@ -104,8 +104,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
-          OPENAI_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.OPENAI_API_KEY }}
-          BRIAN_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key' || secrets.BRIAN_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key-for-build' || secrets.DEEPSEEK_API_KEY }}
 
       - name: Cache build output
         uses: actions/cache@v4
@@ -122,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # Required for GitHub Container Registry
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
@@ -178,5 +177,4 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}

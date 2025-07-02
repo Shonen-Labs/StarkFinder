@@ -59,6 +59,7 @@ model GeneratedContract {
   id          String   @id @default(uuid())
   name        String
   sourceCode  String
+  scarbConfig   String?  @db.Text
   userId      String
   User        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
@@ -68,6 +69,7 @@ model DeployedContract {
   id          String   @id @default(uuid())
   name        String
   sourceCode  String
+  scarbConfig      String?  @db.Text
   userId      String
   contractAddress String
   classHash   String

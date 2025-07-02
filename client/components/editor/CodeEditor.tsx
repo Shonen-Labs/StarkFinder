@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import { Button } from "../ui/button";
 import Editor from "react-simple-code-editor";
+import { useAccount } from "@starknet-react/core";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-rust";
@@ -15,11 +16,13 @@ import {
   CheckCircle,
   XCircle,
   ArrowLeft,
+  ScrollText,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Steps } from "@/components/ui/steps";
 import { DeploymentResponse, DeploymentStep } from "@/types/main-types";
 import { useRouter } from "next/navigation";
+import { scarbGenerator } from "@/lib/devxstark/scarb-generator";
 
 const DEFAULT_CONTRACT = `#[starknet::contract]
 mod contract {
@@ -98,10 +101,49 @@ const initializeCodeStore = (setSourceCode: (code: string) => void) => {
   }
 };
 
+interface ExtendedDeploymentResponse extends DeploymentResponse {
+  casmHash?: string;
+}
+
+const extractImports = (code: string): string[] => {
+  const importRegex = /use\s+([a-zA-Z0-9_:]+)(::\{[^}]+\})?;/g;
+  const matches = [...code.matchAll(importRegex)];
+  return matches.flatMap((matchArr) => {
+    const base = matchArr[1];
+    const inner = matchArr[2];
+    if (inner) {
+      return inner
+        .replace(/^::\{|\}$/g, "")
+        .split(",")
+        .map((item) => `${base}::${item.trim()}`);
+    }
+    return [base];
+  });
+};
+
+const generateScarb = (deeps: string[]): string => {
+  const sanitizeDeeps = deeps.map((dep) => dep.replace(/[^a-zA-Z0-9:_-]/g, ""));
+  const uniqueDeeps = Array.from(new Set(sanitizeDeeps));
+  const baseNames = Array.from(
+    new Set(uniqueDeeps.map((dep) => dep.split("::")[0]))
+  );
+  const deepFormatted = baseNames.map((name) => `${name} = "2.9.1"`).join("\n");
+  return `[package]
+    name = "GeneratedContract"
+    version = "0.1.0"
+    
+[dependencies]
+    ${deepFormatted}`;
+};
+
 export default function CodeEditor() {
   const router = useRouter();
   const setSourceCode = useCodeStore((state) => state.setSourceCodeStore);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isGeneratingScarb, setIsGeneratingScarb] = useState(false);
+  const [generatedScarbToml, setGeneratedScarbToml] = useState("");
+  const { isConnected } = useAccount();
+  // const { connect, connectors } = useConnect();
 
   // Get sourceCode AFTER initialization to ensure we have the right value
   const sourceCode = useCodeStore((state) => state.sourceCode);
@@ -111,6 +153,8 @@ export default function CodeEditor() {
   const [steps, setSteps] = useState<DeploymentStep[]>(initialSteps);
   const logsContainerRef = useRef<HTMLDivElement>(null);
   const [contractName, setContractName] = useState("");
+  const [createScarb, setCreateScarb] = useState("");
+  const [showScarb, setShowScarb] = useState(false);
 
   // Initialize code store and component state from localStorage on mount
   useEffect(() => {
@@ -145,7 +189,8 @@ export default function CodeEditor() {
   // Scroll logs to bottom when they change
   useEffect(() => {
     if (logsContainerRef.current) {
-      logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
+      logsContainerRef.current.scrollTop =
+        logsContainerRef.current.scrollHeight;
     }
   }, [logs]);
 
@@ -206,7 +251,7 @@ export default function CodeEditor() {
                   setSourceCode(accumulatedCode);
                 }
               } catch (jsonError) {
-                console.log(jsonError)
+                console.log(jsonError);
                 // If it's not valid JSON, just treat it as regular text
                 accumulatedCode += decodedValue;
                 setSourceCode(accumulatedCode);
@@ -224,21 +269,71 @@ export default function CodeEditor() {
     fetchStreamedData();
   };
 
+  const handleGenerateScarb = async () => {
+    if (!sourceCode) {
+      console.error("No source code to generate Scarb.toml from");
+      return;
+    }
+    setIsGeneratingScarb(true);
+    try {
+      // Use the new AI-powered generator
+      const scarbToml = await scarbGenerator.generateScarbToml(
+        sourceCode,
+        contractName || "GeneratedContract"
+      );
+
+      setCreateScarb(scarbToml);
+      setGeneratedScarbToml(scarbToml);
+      setShowScarb(true);
+
+      // Save the generated Scarb.toml to localStorage for persistence
+      localStorage.setItem("generatedScarbToml", scarbToml);
+    } catch (error) {
+      console.error("Error generating Scarb.toml:", error);
+      // Fallback to basic generation
+      const dependencies = extractImports(sourceCode);
+      const toml = generateScarb(dependencies);
+      setCreateScarb(toml);
+      setGeneratedScarbToml(toml);
+      setShowScarb(true);
+    } finally {
+      setIsGeneratingScarb(false);
+    }
+  };
+
   const handleCompile = async (): Promise<void> => {
     setIsDeploying(true);
-
+    setResult(null);
     try {
+      // Generate Scarb.toml if not already generated
+      let scarbToml = generatedScarbToml;
+      if (!scarbToml) {
+        scarbToml = await scarbGenerator.generateScarbToml(
+          sourceCode,
+          contractName || "GeneratedContract"
+        );
+        setGeneratedScarbToml(scarbToml);
+        setCreateScarb(scarbToml);
+      }
+
       // Step 1: Building Contract
       updateStep(0, { status: "processing" });
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate build time
+      setLogs((prev) => [...prev, "Starting contract build..."]);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       updateStep(0, { status: "complete" });
 
       // Step 2: Declaring Sierra Hash
       updateStep(1, { status: "processing" });
+
       const response = await fetch("/api/deploy-contract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contractName: "contractww_contractww" }),
+        body: JSON.stringify({
+          contractName: contractName || "lib",
+          sourceCode: sourceCode,
+          scarbToml: scarbToml,
+          userId: localStorage.getItem("userId"), // Assuming you store userId
+        }),
       });
 
       const data = await response.json();
@@ -261,6 +356,16 @@ export default function CodeEditor() {
           status: "complete",
           hash: data.transactionHash,
         });
+
+        setResult({
+          success: true,
+          contractAddress: data.contractAddress,
+          classHash: data.classHash,
+          transactionHash: data.transactionHash,
+          casmHash: data.casmHash,
+          title: "Deployment Successful",
+        } as ExtendedDeploymentResponse);
+        setLogs((prev) => [...prev, "✅ Contract deployed successfully!"]);
       } else {
         throw new Error(data.error || "Deployment failed");
       }
@@ -274,24 +379,49 @@ export default function CodeEditor() {
           details: error instanceof Error ? error.message : "Unknown error",
         });
       }
+
+      // For all remaining pending steps, mark as error
+      steps.forEach((step, index) => {
+        if (step.status === "pending") {
+          updateStep(index, { status: "error" });
+        }
+      });
+
+      setResult({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+        title: "Deployment Failed",
+      });
     } finally {
       setIsDeploying(false);
     }
   };
 
+  // Load generated Scarb.toml from localStorage on mount
+  useEffect(() => {
+    if (hasInitialized) {
+      const savedScarbToml = localStorage.getItem("generatedScarbToml");
+      if (savedScarbToml) {
+        setGeneratedScarbToml(savedScarbToml);
+        setCreateScarb(savedScarbToml);
+      }
+    }
+  }, [hasInitialized]);
+
+  // Clear localStorage and state when going back
   const backToDevx = () => {
     // Clear the state and local storage before navigating away
     localStorage.removeItem("editorCode");
     localStorage.removeItem("contractName");
+    localStorage.removeItem("generatedScarbToml");
     setSourceCode("");
     setResult(null);
     setSteps(initialSteps);
     setLogs([]);
+    setShowScarb(false);
+    setGeneratedScarbToml("");
     router.push("/devx");
   };
-
-  // Add a DEBUG button in development to view state (remove in production)
-
 
   {
     return (
@@ -331,12 +461,32 @@ export default function CodeEditor() {
                   {isAuditing ? "Auditing..." : "Audit Contract"}
                 </Button>
                 <Button
-                  onClick={() => handleCompile()}
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={isDeploying}
+                  onClick={handleGenerateScarb}
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                  disabled={isGeneratingScarb || showScarb}
+                >
+                  <ScrollText className="w-5 h-5" />
+                  {isGeneratingScarb
+                    ? "Generating..."
+                    : showScarb
+                      ? "Scarb Generated"
+                      : "Generate Scarb"}
+                </Button>
+                <Button
+                  onClick={() => (isConnected ? handleCompile() : null)}
+                  className="bg-blue-600 hover:bg-blue-700 relative group"
+                  disabled={isDeploying || !isConnected}
                 >
                   <Play className="w-5 h-5" />
                   {isDeploying ? "Compiling..." : "Compile & Deploy"}
+
+                  {/* Wallet connection tooltip */}
+                  {!isConnected && (
+                    <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                      ← Connect wallet first
+                      <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-gray-800 transform -translate-x-1/2 translate-y-1/2 rotate-45"></div>
+                    </div>
+                  )}
                 </Button>
               </div>
             </div>
@@ -405,6 +555,18 @@ export default function CodeEditor() {
               </div>
             )}
 
+            {/* Scarb.toml */}
+            {showScarb && (
+              <Card className="mt-4 p-4 bg-black text-yellow-300">
+                <h3 className="text-lg font-semibold mb-2 text-white">
+                  Generated Scarb.toml
+                </h3>
+                <pre className="whitespace-pre-wrap font-mono text-sm">
+                  {createScarb}
+                </pre>
+              </Card>
+            )}
+
             {/* Result */}
             <AnimatePresence>
               {result && (
@@ -414,48 +576,60 @@ export default function CodeEditor() {
                   exit={{ opacity: 0, y: 100 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${result.success
-                    ? "bg-green-900/95 border-green-700"
-                    : "bg-red-900/95 border-red-700"
+                      ? "bg-green-900/95 border-green-700"
+                      : "bg-red-900/95 border-red-700"
                     }`}
                 >
                   {result.success ? (
                     <div className="flex flex-col gap-2">
-                      <div className="font-semibold text-white">
+                      <div className="font-semibold text-white flex items-center gap-2">
                         <CheckCircle className="w-6 h-6" />
                         Deployment Successful!
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm">Transaction:</span>
+                        <span className="text-sm text-white">Transaction:</span>
                         <a
                           href={`https://sepolia.starkscan.co/tx/${result.transactionHash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                          className="text-blue-300 hover:text-blue-200 flex items-center gap-1"
                         >
                           View on Starkscan
                           <ExternalLink size={14} />
                         </a>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-200">
                         <div className="mt-1">
                           <span className="font-medium">Contract Address:</span>{" "}
-                          {result.contractAddress}
+                          <code className="bg-black/20 px-1 rounded">
+                            {result.contractAddress}
+                          </code>
                         </div>
                         <div className="mt-1">
                           <span className="font-medium">Class Hash:</span>{" "}
-                          {result.classHash}
+                          <code className="bg-black/20 px-1 rounded">
+                            {result.classHash}
+                          </code>
                         </div>
+                        {(result as ExtendedDeploymentResponse).casmHash && (
+                          <div className="mt-1">
+                            <span className="font-medium">CASM Hash:</span>{" "}
+                            <code className="bg-black/20 px-1 rounded">
+                              {(result as ExtendedDeploymentResponse).casmHash}
+                            </code>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
-                    <div className="">
+                    <div className="text-white">
                       <div className="font-semibold text-xl flex items-center gap-2">
                         <XCircle className="w-6 h-6" />
                         {result.title ?? "Deployment Failed"}
                       </div>
                       <div className="text-sm mt-2">{result.error}</div>
                       {result.details && (
-                        <div className="text-sm mt-2 text-white">
+                        <div className="text-sm mt-2 text-gray-200">
                           {result.details}
                         </div>
                       )}

@@ -39,6 +39,7 @@ export interface DeploymentResponse {
   error?: string;
   details?: string;
   title?: string;
+  casmHash?: string;
 }
 
 /**

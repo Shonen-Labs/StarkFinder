@@ -14,7 +14,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { Home, Book, Wallet, LogOut } from "lucide-react";
+import { Home, Book, Wallet, LogOut, User } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -83,112 +83,104 @@ export default function Header({
 
   const isDeleteVisible = !!selectedNode;
 
-  const centerItems = (
-    <ul className="flex flex-col md:flex-row gap-6">
-      <li>
-        <Link
-          href="/"
-          className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
-        >
-          <Home size={18} /> Home
-        </Link>
-      </li>
-      <li>
-        <Link
-          href="/devx/resources"
-          className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
-        >
-          <Book size={18} /> Resources
-        </Link>
-      </li>
-    </ul>
-  );
-
   return (
     <>
       <header className="bg-[radial-gradient(circle,_#797474,_#e6e1e1,_#979191)] animate-smoke text-white w-full">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
+        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center h-16">
+          <div className="flex items-center">
             <Link href={"/devx"}>
               <h2 className="text-md md:text-2xl font-semibold text-black cursor-pointer">
                 DevXStark
               </h2>
             </Link>
           </div>
-
-          <nav className="hidden md:flex gap-8 text-sm">{centerItems}</nav>
-
-          {isConnected ? (
-            <div className="flex items-center gap-2">
-              <Select>
-                <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-3 py-1 hover:bg-green-200">
-                  <div className="flex items-center gap-2">
-                    <span>{formatAddress(address)}</span>
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-white shadow-md rounded-md flex justify-center">
-                  <SelectItem value="disconnect" className="focus:bg-red-50">
-                    <div className="flex items-center gap-2 text-red-600">
-                      <DisconnectButton className="text-red-600 hover:text-red-800" />
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <Button
-              onClick={() => setIsWalletModalOpen(true)}
-              className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-l bg-primary hover:bg-primary-dark"
+          <div className="flex-1" /> {/* Spacer to push right content */}
+          <div className="hidden md:flex items-center gap-4 justify-end">
+            <Link
+              href="/"
+              className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
             >
-              <Wallet size={18} /> Connect Wallet
-            </Button>
-          )}
-
-          {/* User Session Info & Logout */}
-          {status === "loading" ? (
-            <div className="hidden md:flex items-center gap-2">
-              <div className="w-6 h-6 border-2 border-gray-400 border-t-black rounded-full animate-spin" />
-            </div>
-          ) : session ? (
-            <div className="hidden md:flex items-center gap-2">
+              <Home size={18} /> Home
+            </Link>
+            <Link
+              href="/devx/resources"
+              className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+            >
+              <Book size={18} /> Resources
+            </Link>
+            {session && (
+              <Link
+                href={`/devx/profile/${session?.user?.id}`}
+                className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+              >
+                <User size={18} /> Profile
+              </Link>
+            )}
+            {!isConnected && (
+              <Button
+                onClick={() => setIsWalletModalOpen(true)}
+                className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-sm bg-primary hover:bg-primary-dark h-8"
+              >
+                <Wallet size={16} /> Connect Wallet
+              </Button>
+            )}
+            {isConnected && (
+              <div className="flex items-center gap-2">
+                <Select>
+                  <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-3 py-1 hover:bg-green-200">
+                    <div className="flex items-center gap-2">
+                      <span>{formatAddress(address)}</span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white shadow-md rounded-md flex justify-center">
+                    <SelectItem value="disconnect" className="focus:bg-red-50">
+                      <div className="flex items-center gap-2 text-red-600">
+                        <DisconnectButton className="text-red-600 hover:text-red-800" />
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {session && (
               <motion.button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 bg-red-500/80 hover:bg-red-600 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-2 px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105 h-8"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <LogOut size={16} />
                 <span className="hidden lg:inline">Sign Out</span>
               </motion.button>
-            </div>
-          ) : null}
-
-          {isDeleteVisible && (
-            <Button
-              onClick={() => handleDelete(selectedNode)}
-              className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
-            >
-              Delete node
-            </Button>
-          )}
-          {showClearButton && (
-            <Button
-              onClick={handleClear}
-              className="px-6 bg-[#252525] hover:bg-[#323232] text-white"
-            >
-              Clear
-            </Button>
-          )}
-          {showFinishButton && (
-            <Compile
-              nodes={nodes}
-              edges={edges}
-              isOpen={isCompileModalOpen}
-              onOpenChange={setIsCompileModalOpen}
-              flowSummary={flowSummary}
-            />
-          )}
-
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {isDeleteVisible && (
+              <Button
+                onClick={() => handleDelete(selectedNode)}
+                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
+              >
+                Delete node
+              </Button>
+            )}
+            {showClearButton && (
+              <Button
+                onClick={handleClear}
+                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
+              >
+                Clear
+              </Button>
+            )}
+            {showFinishButton && (
+              <Compile
+                nodes={nodes}
+                edges={edges}
+                isOpen={isCompileModalOpen}
+                onOpenChange={setIsCompileModalOpen}
+                flowSummary={flowSummary}
+              />
+            )}
+          </div>
           <div className="md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -201,9 +193,72 @@ export default function Header({
 
         {mobileMenuOpen && (
           <div className="md:hidden bg-white p-4 rounded-lg shadow-lg">
-            {centerItems}
-            <div className="mt-4 flex flex-col gap-2">
-              {/* Mobile User Session & Logout */}
+            <ul className="flex flex-col text-black gap-4">
+              <li>
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+                >
+                  <Home size={18} /> Home
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/devx/resources"
+                  className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+                >
+                  <Book size={18} /> Resources
+                </Link>
+              </li>
+              {session && (
+                <li>
+                  <Link
+                    href={`/devx/profile/${session?.user?.id}`}
+                    className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+                  >
+                    <User size={18} /> Profile
+                  </Link>
+                </li>
+              )}
+              {!isConnected && (
+                <Button
+                  onClick={() => setIsWalletModalOpen(true)}
+                  className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-sm bg-primary hover:bg-primary-dark h-8"
+                >
+                  <Wallet size={16} /> Connect Wallet
+                </Button>
+              )}
+              {isConnected && (
+                <div className="flex items-center gap-2">
+                  <Select>
+                    <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-3 py-1 hover:bg-green-200">
+                      <div className="flex items-center gap-2">
+                        <span>{formatAddress(address)}</span>
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="bg-white shadow-md rounded-md flex justify-center">
+                      <SelectItem
+                        value="disconnect"
+                        className="focus:bg-red-50"
+                      >
+                        <div className="flex items-center gap-2 text-red-600">
+                          <DisconnectButton className="text-red-600 hover:text-red-800" />
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {session && (
+                <Button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-gray-600 hover:bg-gray-500 text-white h-8"
+                >
+                  <LogOut size={16} /> Sign Out
+                </Button>
+              )}
+            </ul>
+            <div className="mt-4 flex flex-col gap-3">
               {status === "loading" ? (
                 <div className="flex justify-center py-2">
                   <div className="w-6 h-6 border-2 border-gray-400 border-t-gray-800 rounded-full animate-spin" />
@@ -212,7 +267,7 @@ export default function Header({
                 <div className="flex flex-col gap-2 pt-2 border-t border-gray-200">
                   <Button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white"
+                    className="flex items-center gap-2 bg-gray-600 hover:bg-gray-500 text-white"
                   >
                     <LogOut size={16} />
                     Sign Out

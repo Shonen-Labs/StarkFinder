@@ -1,9 +1,57 @@
+export const runtime = 'nodejs'
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from "next/server";
 import { CairoContractGenerator } from "@/lib/devxstark/contract-generator1";
+import { DojoContractGenerator } from "@/lib/devxstark/dojo-contract-generator";
+import { scarbGenerator } from "@/lib/devxstark/scarb-generator";
 import prisma from "@/lib/db";
 import { getOrCreateUser } from "@/app/api/transactions/helper";
-import { DojoContractGenerator } from "@/lib/devxstark/dojo-contract-generator";
+import path from "path";
+import { promises as fs } from "fs";
+
+// Helper function to save both source and Scarb files
+async function saveContractWithScarb(
+  sourceCode: string,
+  contractName: string = "lib"
+): Promise<{ sourcePath: string; scarbPath: string }> {
+  const contractsDir = path.join(process.cwd(), "..", "contracts");
+  const srcDir = path.join(contractsDir, "src");
+
+  try {
+    // Ensure directories exist
+    await fs.mkdir(srcDir, { recursive: true });
+
+    // Save the Cairo source code
+    const sourceFilePath = path.join(srcDir, `${contractName}.cairo`);
+    await fs.writeFile(sourceFilePath, sourceCode, { encoding: 'utf8', flag: 'w' });
+
+    // Generate and save Scarb.toml
+    const scarbToml = await scarbGenerator.generateScarbToml(sourceCode, contractName);
+    const scarbFilePath = path.join(contractsDir, "Scarb.toml");
+    await fs.writeFile(scarbFilePath, scarbToml, { encoding: 'utf8', flag: 'w' });
+
+    // Verify files were written correctly
+    const writtenSource = await fs.readFile(sourceFilePath, 'utf8');
+    const writtenScarb = await fs.readFile(scarbFilePath, 'utf8');
+    
+    if (writtenSource !== sourceCode) {
+      throw new Error('Source file content verification failed');
+    }
+
+    return {
+      sourcePath: sourceFilePath,
+      scarbPath: scarbFilePath
+    };
+  } catch (error) {
+    console.error("Error saving contract files:", error);
+    throw new Error(
+      `Failed to save contract files: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
 
 export async function POST(req: NextRequest) {
   const controller = new AbortController();
@@ -57,98 +105,148 @@ export async function POST(req: NextRequest) {
     };
     const generator = generators[blockchain as "blockchain1" | "blockchain4"];
 
+    if (!generator) {
+      return NextResponse.json(
+        { error: "Invalid blockchain type" },
+        { status: 400 }
+      );
+    }
+
     // Create a response object that supports streaming
     const response = new NextResponse(
       new ReadableStream({
         async start(controller) {
           let accumulatedContent = "";
+          let isControllerClosed = false;
+
+          // Helper function to safely enqueue data
+          const safeEnqueue = (data: string) => {
+            if (!isControllerClosed) {
+              try {
+                controller.enqueue(new TextEncoder().encode(data));
+              } catch (error) {
+                console.error("Error enqueueing data:", error);
+                isControllerClosed = true;
+              }
+            }
+          };
+
+          // Helper function to safely close controller
+          const safeClose = () => {
+            if (!isControllerClosed) {
+              try {
+                controller.close();
+                isControllerClosed = true;
+              } catch (error) {
+                console.error("Error closing controller:", error);
+              }
+            }
+          };
 
           // Helper function to extract code from content
           const extractCodeFromContent = (content: string): string => {
-            // Look for ALL Cairo/Rust code blocks
-            const cairoCodeBlockRegex = /```(?:cairo|rust)?\s*([\s\S]*?)```/g;
-            const matches = [...content.matchAll(cairoCodeBlockRegex)];
-            
-            if (matches && matches.length > 0) {
-              // Get the LAST code block (most recent/final)
-              const lastMatch = matches[matches.length - 1];
-              const code = lastMatch[1]?.trim() || '';
-              
-              // Ensure it contains a proper Cairo contract
-              if (code.includes('mod contract') || code.includes('#[starknet::contract]')) {
-                return code;
-              }
-            }
-            
-            // If no proper code blocks found, look for mod contract pattern directly
-            const modContractRegex = /mod contract\s*\{[\s\S]*?\n\}/g;
-            const contractMatches = [...content.matchAll(modContractRegex)];
-            
-            if (contractMatches && contractMatches.length > 0) {
-              return contractMatches[contractMatches.length - 1][0].trim();
-            }
-            
-            return '';
+            // This function is no longer needed as the DeepSeekClient now cleans the code properly
+            return content.trim();
           };
 
           try {
-            // Generate the contract - accumulate content silently
+            // Generate the contract with streaming
             const result = await generator.generateContract(bodyOfTheCall, {
               onProgress: (chunk) => {
                 accumulatedContent += chunk;
+                // Send Cairo code chunks directly without JSON wrapping
+                safeEnqueue(chunk);
               },
             });
-
+            
             if (!result.success || !result.sourceCode) {
               throw new Error(result.error || "Failed to generate source code.");
             }
 
-            // Extract final clean code
+            // Use the cleaned source code from the generator
             let finalCode = result.sourceCode;
-            
-            // If the result doesn't look like proper code, try extracting from accumulated content
-            if (!finalCode.includes('mod contract') && !finalCode.includes('#[starknet::contract]')) {
-              const extractedFinalCode = extractCodeFromContent(accumulatedContent);
-              if (extractedFinalCode) {
-                finalCode = extractedFinalCode;
-              }
-            }
 
             if (!finalCode || finalCode.length < 50) {
               throw new Error("Generated code is empty or too short");
             }
 
-            // Save the contract source code
-            const savedPath = await generator.saveContract(finalCode, "lib");
+            // Generate Scarb.toml for the contract
+            let scarbToml = "";
+            try {
+              scarbToml = await scarbGenerator.generateScarbToml(finalCode, "lib");
+              console.log("Generated Scarb.toml successfully");
+            } catch (scarbError) {
+              console.error("Error generating Scarb.toml:", scarbError);
+              // Use a basic fallback if generation fails
+              scarbToml = `[package]
+name = "generated_contract"
+version = "0.1.0"
+edition = "2024_07"
+cairo_version = "2.8.0"
+
+[dependencies]
+starknet = "2.8.0"
+
+[[target.starknet-contract]]
+sierra = true
+casm = true
+
+[cairo]
+sierra-replace-ids = true`;
+            }
+
+            // Save files
+            const { sourcePath, scarbPath } = await saveContractWithScarb(finalCode, "lib");
+            console.log(`Contract saved to: ${sourcePath}`);
+            console.log(`Scarb.toml saved to: ${scarbPath}`);
             
+            // Save to database
             await getOrCreateUser(userId);
             await prisma.generatedContract.create({
               data: {
                 name: "Generated Contract",
                 sourceCode: finalCode,
+                scarbConfig: scarbToml,
                 userId,
               },
             });
 
-            // Send ONLY the final clean code
-            controller.enqueue(new TextEncoder().encode(finalCode));
+            // Send final response marker - use a special delimiter to separate streaming content from final JSON
+            safeEnqueue("\n---FINAL_RESPONSE---\n");
+            
+            // Create a response object that includes both source code and Scarb.toml
+            const responseData = {
+              sourceCode: finalCode,
+              scarbToml: scarbToml,
+              success: true
+            };
+
+            // Send the final response as JSON
+            safeEnqueue(JSON.stringify(responseData));
 
           } catch (error) {
             console.error('Generation error:', error);
-            controller.enqueue(
-              new TextEncoder().encode(`// Error: ${error instanceof Error ? error.message : "An unexpected error occurred"}`)
-            );
+            
+            // Send error response marker
+            safeEnqueue("\n---ERROR_RESPONSE---\n");
+            
+            const errorResponse = {
+              success: false,
+              error: error instanceof Error ? error.message : "An unexpected error occurred"
+            };
+            safeEnqueue(JSON.stringify(errorResponse));
           } finally {
-            controller.close();
+            safeClose();
             clearTimeout(timeoutId);
           }
         },
       }),
       {
         headers: {
-          "Content-Type": "text/plain",
+          "Content-Type": "text/plain; charset=utf-8",
           "Cache-Control": "no-cache",
           Connection: "keep-alive",
+          "Transfer-Encoding": "chunked",
         },
       }
     );

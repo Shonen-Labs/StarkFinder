@@ -1,0 +1,20 @@
+[package]
+name = "fee_deduction"
+version = "0.1.0"
+edition = "2024_07"
+
+[dependencies]
+starknet = "2.9.4"
+
+[dev-dependencies]
+snforge_std = "0.39.0"
+assert_macros = "2.9.4"
+
+[[target.starknet-contract]]
+sierra = true
+
+[scripts]
+test = "snforge test"
+
+[tool.scarb]
+allow-prebuilt-plugins = ["snforge_std"] 
