@@ -1,11 +1,23 @@
 services:
-  backend:
+  starkfinder:
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: Dockerfile
+      args:
+        - OPENAI_API_KEY=${OPENAI_API_KEY}
+        - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+        - BRIAN_API_KEY=${BRIAN_API_KEY}
+        - DEFAULT_LLM_PROVIDER=${DEFAULT_LLM_PROVIDER}
+        - STARKNET_RPC_URL=${STARKNET_RPC_URL}
+        - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
+        - OZ_ACCOUNT_PRIVATE_KEY=${OZ_ACCOUNT_PRIVATE_KEY}
+        - DATABASE_URL=${DATABASE_URL}
+        - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Backend port
+      - "4000:4000"  # Agent port
     environment:
+      - NODE_ENV=production
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - BRIAN_API_KEY=${BRIAN_API_KEY}
@@ -14,18 +26,21 @@ services:
       - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
       - OZ_ACCOUNT_PRIVATE_KEY=${OZ_ACCOUNT_PRIVATE_KEY}
       - DATABASE_URL=${DATABASE_URL}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
     depends_on:
-      - db
-      - agent
-  agent:
-    build:
-      context: .
-      dockerfile: Dockerfile.agent
-    ports:
-      - "4000:4000"
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   db:
     image: postgres:16-alpine
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -34,6 +49,11 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db_data:
