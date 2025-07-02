@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Header from "./Header";
 import { Button } from "../ui/button";
 import Editor from "react-simple-code-editor";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useAccount } from "@starknet-react/core";
 import { highlight, languages } from "prismjs/components/prism-core";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-rust";
@@ -142,7 +142,7 @@ export default function CodeEditor() {
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isGeneratingScarb, setIsGeneratingScarb] = useState(false);
   const [generatedScarbToml, setGeneratedScarbToml] = useState("");
-  const {isConnected } = useAccount();
+  const { isConnected } = useAccount();
   // const { connect, connectors } = useConnect();
 
   // Get sourceCode AFTER initialization to ensure we have the right value
@@ -469,8 +469,8 @@ export default function CodeEditor() {
                   {isGeneratingScarb
                     ? "Generating..."
                     : showScarb
-                    ? "Scarb Generated"
-                    : "Generate Scarb"}
+                      ? "Scarb Generated"
+                      : "Generate Scarb"}
                 </Button>
                 <Button
                   onClick={() => (isConnected ? handleCompile() : null)}
@@ -575,11 +575,10 @@ export default function CodeEditor() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 100 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${
-                    result.success
+                  className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${result.success
                       ? "bg-green-900/95 border-green-700"
                       : "bg-red-900/95 border-red-700"
-                  }`}
+                    }`}
                 >
                   {result.success ? (
                     <div className="flex flex-col gap-2">
