@@ -1,20 +1,13 @@
-// Module declarations - must come first
-mod parametric_insurance;
-mod oracle;
-mod mock_erc20;
-
-// Re-export main contracts for easy access
-pub use parametric_insurance::ParametricInsurancePool;
-pub use oracle::{MockOracle, OracleIntegration};
-pub use mock_erc20::MockERC20;
-
-// Re-export interfaces
-pub use parametric_insurance::IParametricInsurancePool;
-pub use oracle::{IOracle, IOracleIntegration};
-pub use mock_erc20::IERC20Mock;
-
-// Re-export types and structs
-pub use parametric_insurance::{
-    PolicyType, DataType, TriggerCondition, ComparisonOperator, 
-    Policy, LiquidityProvider, OracleData
-};
+```json
+{
+  "filename": "contract.cairo",
+  "language": "cairo",
+  "contract_type": "ERC20",
+  "description": "A basic ERC20 token implementation with minting and burning functionality",
+  "permissions": {
+    "admin": ["mint", "burn"],
+    "public": ["transfer", "approve", "transfer_from", "balance_of", "allowance"]
+  },
+  "code": "use starknet::ContractAddress;\nuse starknet::get_caller_address;\n\n#[starknet::contract]\nmod contract {\n    use super::{ContractAddress, get_caller_address};\n    use starknet::Felt252;\n\n    #[storage]\n    struct Storage {\n        name: felt252,\n        symbol: felt252,\n        decimals: u8,\n        total_supply: Felt252,\n        balances: LegacyMap::<ContractAddress, Felt252>,\n        allowances: LegacyMap::<(ContractAddress, ContractAddress), Felt252>\n    }\n\n    #[event]\n    #[derive(Drop, starknet::Event)]\n    enum Event {\n        Transfer: Transfer,\n        Approval: Approval\n    }\n\n    #[derive(Drop, starknet::Event)]\n    struct Transfer {\n        from: ContractAddress,\n        to: ContractAddress,\n        value: Felt252\n    }\n\n    #[derive(Drop, starknet::Event)]\n    struct Approval {\n        owner: ContractAddress,\n        spender: ContractAddress,\n        value: Felt252\n    }\n\n    #[constructor]\n    fn constructor(\n        name: felt252,\n        symbol: felt252,\n        decimals: u8,\n        initial_supply: Felt252,\n        recipient: ContractAddress\n    ) {\n        storage.name.write(name);\n        storage.symbol.write(symbol);\n        storage.decimals.write(decimals);\n        storage.total_supply.write(initial_supply);\n        storage.balances.write(recipient, initial_supply);\n    }\n\n    #[external]\n    fn transfer(recipient: ContractAddress, amount: Felt252) -> bool {\n        let sender = get_caller_address();\n        _transfer(sender, recipient, amount);\n        true\n    }\n\n    #[external]\n    fn approve(spender: ContractAddress, amount: Felt252) -> bool {\n        let owner = get_caller_address();\n        storage.allowances.write((owner, spender), amount);\n        emit(Event::Approval(Approval { owner, spender, value: amount }));\n        true\n    }\n\n    #[external]\n    fn transfer_from(\n        sender: ContractAddress,\n        recipient: ContractAddress,\n        amount: Felt252\n    ) -> bool {\n        let caller = get_caller_address();\n        let allowance = storage.allowances.read((sender, caller));\n        assert(allowance >= amount, 'Insufficient allowance');\n        storage.allowances.write((sender, caller), allowance - amount);\n        _transfer(sender, recipient, amount);\n        true\n    }\n\n    #[external]\n    fn balance_of(account: ContractAddress) -> Felt252 {\n        storage.balances.read(account)\n    }\n\n    #[external]\n    fn allowance(owner: ContractAddress, spender: ContractAddress) -> Felt252 {\n        storage.allowances.read((owner, spender))\n    }\n\n    #[external]\n    fn mint(recipient: ContractAddress, amount: Felt252) {\n        // In production, add access control here\n        storage.total_supply.write(storage.total_supply.read() + amount);\n        storage.balances.write(recipient, storage.balances.read(recipient) + amount);\n        emit(Event::Transfer(Transfer {\n            from: ContractAddress::default(),\n            to: recipient,\n            value: amount\n        }));\n    }\n\n    #[external]\n    fn burn(amount: Felt252) {\n        // In production, add access control here\n        let caller = get_caller_address();\n        let balance = storage.balances.read(caller);\n        assert(balance >= amount, 'Insufficient balance');\n        storage.balances.write(caller, balance - amount);\n        storage.total_supply.write(storage.total_supply.read() - amount);\n        emit(Event::Transfer(Transfer {\n            from: caller,\n            to: ContractAddress::default(),\n            value: amount\n        }));\n    }\n\n    #[internal]\n    fn _transfer(sender: ContractAddress, recipient: ContractAddress, amount: Felt252) {\n        assert(sender != ContractAddress::default(), 'Transfer from zero address');\n        assert(recipient != ContractAddress::default(), 'Transfer to zero address');\n\n        let sender_balance = storage.balances.read(sender);\n        assert(sender_balance >= amount, 'Insufficient balance');\n        storage.balances.write(sender, sender_balance - amount);\n        storage.balances.write(\n            recipient,\n            storage.balances.read(recipient) + amount\n        );\n\n        emit(Event::Transfer(Transfer { from: sender, to: recipient, value: amount }));\n    }\n}"
+}
+```
