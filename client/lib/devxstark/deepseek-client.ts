@@ -234,8 +234,21 @@ export const createDeepSeekClient = (
   return new DeepSeekClient(options);
 };
 
-// Default instance with environment variables
-export const deepseek = createDeepSeekClient();
+// Lazy instantiation
+let _deepseekClient: DeepSeekClient | null = null;
+
+export const getDeepSeekClient = (): DeepSeekClient => {
+  if (!_deepseekClient) {
+    _deepseekClient = createDeepSeekClient();
+  }
+  return _deepseekClient;
+};
+
+export const deepseek = {
+  chat: (messages: DeepSeekMessage[]) => getDeepSeekClient().chat(messages),
+  chatStream: (messages: DeepSeekMessage[]) => getDeepSeekClient().chatStream(messages),
+  complete: (prompt: string, systemPrompt?: string) => getDeepSeekClient().complete(prompt, systemPrompt),
+};
 
 // Export as default for easier importing
 export default DeepSeekClient;

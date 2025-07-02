@@ -84,6 +84,7 @@
     "reactflow": "^11.11.4",
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
+    "sharp": "^0.34.2",
     "solc": "^0.8.28",
     "sonner": "^1.7.2",
     "starknet": "^6.11.0",

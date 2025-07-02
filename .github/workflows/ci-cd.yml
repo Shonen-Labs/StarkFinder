@@ -104,7 +104,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ github.event_name == 'pull_request' && 'dummy-api-url' || secrets.NEXT_PUBLIC_API_URL }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ github.event_name == 'pull_request' && 'dummy-key-for-build' || secrets.DEEPSEEK_API_KEY }}
 
       - name: Cache build output
         uses: actions/cache@v4
@@ -121,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write  # Required for GitHub Container Registry
+      packages: write
 
     steps:
       - uses: actions/checkout@v4
