@@ -19,8 +19,6 @@ FROM base AS backend-builder
 WORKDIR /app/backend
 
 # Set environment variables for Next.js build
-ARG OPENAI_API_KEY
-ARG BRIAN_API_KEY
 ARG ANTHROPIC_API_KEY
 ARG DEFAULT_LLM_PROVIDER
 ARG STARKNET_RPC_URL
@@ -181,7 +179,7 @@ WORKDIR /app/agent
 # Create package.json for agent
 RUN cat <<EOF > package.json
 {
-  "name": "elizaos-agent",
+  "name": "",
   "version": "1.0.0",
   "type": "module",
   "scripts": {

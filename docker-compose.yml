@@ -4,9 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - OPENAI_API_KEY=${OPENAI_API_KEY}
         - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-        - BRIAN_API_KEY=${BRIAN_API_KEY}
         - DEFAULT_LLM_PROVIDER=${DEFAULT_LLM_PROVIDER}
         - STARKNET_RPC_URL=${STARKNET_RPC_URL}
         - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
@@ -18,9 +16,7 @@ services:
       - "4000:4000"  # Agent port
     environment:
       - NODE_ENV=production
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - BRIAN_API_KEY=${BRIAN_API_KEY}
       - DEFAULT_LLM_PROVIDER=${DEFAULT_LLM_PROVIDER}
       - STARKNET_RPC_URL=${STARKNET_RPC_URL}
       - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
