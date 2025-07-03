@@ -10,9 +10,13 @@ import { getOrCreateUser } from "@/app/api/transactions/helper";
 import path from "path";
 import { promises as fs } from "fs";
 
+// Simple in-memory set to prevent duplicate requests
+const activeRequests = new Set<string>();
+
 // Helper function to save both source and Scarb files
 async function saveContractWithScarb(
   sourceCode: string,
+  scarbToml: string,
   contractName: string = "lib"
 ): Promise<{ sourcePath: string; scarbPath: string }> {
   const contractsDir = path.join(process.cwd(), "..", "contracts");
@@ -27,17 +31,16 @@ async function saveContractWithScarb(
     await fs.writeFile(sourceFilePath, sourceCode, { encoding: 'utf8', flag: 'w' });
 
     // Generate and save Scarb.toml
-    const scarbToml = await scarbGenerator.generateScarbToml(sourceCode, contractName);
     const scarbFilePath = path.join(contractsDir, "Scarb.toml");
     await fs.writeFile(scarbFilePath, scarbToml, { encoding: 'utf8', flag: 'w' });
 
-    // Verify files were written correctly
+    /* // Verify files were written correctly
     const writtenSource = await fs.readFile(sourceFilePath, 'utf8');
     const writtenScarb = await fs.readFile(scarbFilePath, 'utf8');
-    
+
     if (writtenSource !== sourceCode) {
       throw new Error('Source file content verification failed');
-    }
+    } */
 
     return {
       sourcePath: sourceFilePath,
@@ -46,8 +49,7 @@ async function saveContractWithScarb(
   } catch (error) {
     console.error("Error saving contract files:", error);
     throw new Error(
-      `Failed to save contract files: ${
-        error instanceof Error ? error.message : "Unknown error"
+      `Failed to save contract files: ${error instanceof Error ? error.message : "Unknown error"
       }`
     );
   }
@@ -60,9 +62,27 @@ export async function POST(req: NextRequest) {
   // Set a timeout for the request
   const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
+  let requestKey = "";
+
   try {
-    const { nodes, edges, flowSummary, userId, blockchain } = await req.json();
-    
+    const { nodes, edges, flowSummary, userId, blockchain, regenerate = false } = await req.json();
+
+    // Create a unique key for this request to prevent duplicates
+    requestKey = JSON.stringify({ nodes, edges, flowSummary, userId, blockchain });
+
+    // Check if the same request is already being processed
+    if (activeRequests.has(requestKey) && !regenerate) {
+      console.log("⚠️ Duplicate request detected, rejecting");
+      return NextResponse.json(
+        { error: "A request with the same parameters is already being processed. Please wait." },
+        { status: 429 }
+      );
+    }
+
+    // Mark this request as active
+    activeRequests.add(requestKey);
+    console.log("🔄 Processing new request with key:", requestKey.substring(0, 50) + "...");
+
     // Validate input
     if (
       !Array.isArray(nodes) ||
@@ -150,28 +170,32 @@ export async function POST(req: NextRequest) {
           };
 
           try {
+            let finalCode = "";
+            let scarbToml = "";
+
             // Generate the contract with streaming
             const result = await generator.generateContract(bodyOfTheCall, {
               onProgress: (chunk) => {
-                accumulatedContent += chunk;
-                // Send Cairo code chunks directly without JSON wrapping
-                safeEnqueue(chunk);
+                if (!isControllerClosed) {
+                  accumulatedContent += chunk;
+                  // Send Cairo code chunks directly without JSON wrapping
+                  safeEnqueue(chunk);
+                }
               },
             });
-            
+
             if (!result.success || !result.sourceCode) {
               throw new Error(result.error || "Failed to generate source code.");
             }
 
             // Use the cleaned source code from the generator
-            let finalCode = result.sourceCode;
+            finalCode = result.sourceCode;
 
             if (!finalCode || finalCode.length < 50) {
               throw new Error("Generated code is empty or too short");
             }
 
-            // Generate Scarb.toml for the contract
-            let scarbToml = "";
+            // Generate Scarb.toml for the contract with better error handling
             try {
               scarbToml = await scarbGenerator.generateScarbToml(finalCode, "lib");
               console.log("Generated Scarb.toml successfully");
@@ -193,13 +217,14 @@ casm = true
 
 [cairo]
 sierra-replace-ids = true`;
+              console.log("Using fallback Scarb.toml");
             }
 
             // Save files
-            const { sourcePath, scarbPath } = await saveContractWithScarb(finalCode, "lib");
+            const { sourcePath, scarbPath } = await saveContractWithScarb(finalCode, scarbToml, "lib");
             console.log(`Contract saved to: ${sourcePath}`);
             console.log(`Scarb.toml saved to: ${scarbPath}`);
-            
+
             // Save to database
             await getOrCreateUser(userId);
             await prisma.generatedContract.create({
@@ -211,33 +236,42 @@ sierra-replace-ids = true`;
               },
             });
 
-            // Send final response marker - use a special delimiter to separate streaming content from final JSON
-            safeEnqueue("\n---FINAL_RESPONSE---\n");
-            
-            // Create a response object that includes both source code and Scarb.toml
-            const responseData = {
-              sourceCode: finalCode,
-              scarbToml: scarbToml,
-              success: true
-            };
+            // Only send final response if controller is still open
+            if (!isControllerClosed) {
+              // Send final response marker
+              safeEnqueue("\n---FINAL_RESPONSE---\n");
 
-            // Send the final response as JSON
-            safeEnqueue(JSON.stringify(responseData));
+              // Create a response object that includes both source code and Scarb.toml
+              const responseData = {
+                sourceCode: finalCode,
+                scarbToml: scarbToml,
+                success: true
+              };
+
+              // Send the final response as JSON
+              safeEnqueue(JSON.stringify(responseData));
+            }
 
           } catch (error) {
             console.error('Generation error:', error);
-            
-            // Send error response marker
-            safeEnqueue("\n---ERROR_RESPONSE---\n");
-            
-            const errorResponse = {
-              success: false,
-              error: error instanceof Error ? error.message : "An unexpected error occurred"
-            };
-            safeEnqueue(JSON.stringify(errorResponse));
+
+            // Only send error response if controller is still open
+            if (!isControllerClosed) {
+              // Send error response marker
+              safeEnqueue("\n---ERROR_RESPONSE---\n");
+
+              const errorResponse = {
+                success: false,
+                error: error instanceof Error ? error.message : "An unexpected error occurred"
+              };
+              safeEnqueue(JSON.stringify(errorResponse));
+            }
           } finally {
             safeClose();
             clearTimeout(timeoutId);
+            // Clean up the request from active requests
+            activeRequests.delete(requestKey);
+            console.log("✅ Request completed and removed from active requests");
           }
         },
       }),
@@ -254,6 +288,11 @@ sierra-replace-ids = true`;
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
+    // Clean up the request from active requests on error
+    if (requestKey) {
+      activeRequests.delete(requestKey);
+      console.log("❌ Request failed and removed from active requests");
+    }
     console.error("API error:", error);
     return NextResponse.json(
       {

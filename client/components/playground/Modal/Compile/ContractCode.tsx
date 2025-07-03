@@ -65,6 +65,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
+  const hasAutoStartedRef = useRef<boolean>(false);
 
   const addLog = (message: string): void => {
     setLogs((prev) => [
@@ -85,8 +86,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
   // Auto-start generation when component mounts (if no source code exists)
   useEffect(() => {
-    if (!sourceCode.trim() && !isGenerating) {
+    if (!sourceCode.trim() && !isGenerating && !hasAutoStartedRef.current) {
       generateCodeHandler();
+      hasAutoStartedRef.current = true;
     }
   }, []);
 
@@ -120,11 +122,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       // Step 2: Declaring Sierra Hash
       updateStep(1, { status: "processing" });
       addLog("🔗 Declaring contract to Starknet...");
-      
+
       const response = await fetch("/api/deploy-contract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           contractName: "generated_contract",
           sourceCode: sourceCode, // Send the actual source code
           scarbToml: scarbToml, // Send the Scarb.toml configuration
@@ -153,7 +155,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           status: "complete",
           hash: data.transactionHash,
         });
-        
+
         // Set the deployment result for display
         setResult({
           success: true,
@@ -167,7 +169,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       addLog(`❌ Deployment failed: ${errorMessage}`);
-      
+
       const currentStep = steps.findIndex(
         (step) => step.status === "processing"
       );
@@ -177,7 +179,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           details: errorMessage,
         });
       }
-      
+
       // Set error result for display
       setResult({
         success: false,
@@ -188,59 +190,63 @@ const ContractCode: React.FC<ContractCodeProps> = ({
     }
   };
 
-  const generateCodeHandler = async (): Promise<void> => {
+  // make regenerate optional
+  const generateCodeHandler = async (regenerate: boolean = false): Promise<void> => {
     if (isGenerating) return;
-    
+
     setIsGenerating(true);
     setSourceCode(""); // Clear existing code immediately
     addLog("Clearing previous contract...");
     addLog("Starting contract generation...");
-    
+
+    let continueGenerating = true;
+
     try {
       const response = await fetch("/api/generate-contract", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           nodes: nodes || [],
           edges: edges || [],
           flowSummary: flowSummary || [],
           userId: address || "default-user",
-          blockchain: blockchain // Use the selected blockchain
+          blockchain: blockchain, // Use the selected blockchain
+          regenerate: regenerate
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       addLog(`Generating ${blockchain === 'blockchain4' ? 'Dojo' : 'Cairo'} contract...`);
-      
+
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      
+
       if (!reader) {
         throw new Error("No reader available");
       }
-  
+
       let receivedText = "";
       let cairoCode = "";
       let isStreamingComplete = false;
-  
+
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        
+
         const textChunk = decoder.decode(value, { stream: true });
         receivedText += textChunk;
-        
+
         // Check if we've hit the final response delimiter
         if (receivedText.includes('---FINAL_RESPONSE---')) {
           // Extract only the Cairo code (everything before the delimiter)
           const parts = receivedText.split('---FINAL_RESPONSE---');
           cairoCode = parts[0].trim();
-          
+
           // Also try to extract from JSON if available
           const jsonPart = parts[1]?.trim();
           if (jsonPart) {
@@ -257,11 +263,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               console.warn("Could not parse JSON response, using streamed code");
             }
           }
-          
+
           isStreamingComplete = true;
           break;
         }
-        
+
         // Check if we've hit an error response delimiter
         if (receivedText.includes('---ERROR_RESPONSE---')) {
           const parts = receivedText.split('---ERROR_RESPONSE---');
@@ -276,9 +282,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           }
           break;
         }
-        
+
         // Only update UI if we haven't reached the end delimiter yet
-        if (!isStreamingComplete && !receivedText.includes('---FINAL_RESPONSE---')) {
+        if (!isStreamingComplete && !receivedText.includes('---FINAL_RESPONSE---') && !receivedText.includes('---ERROR_RESPONSE---')) {
           const currentCode = receivedText.trim();
           // Only show valid Cairo code (avoid showing partial JSON at the end)
           if (currentCode && !currentCode.includes('---') && !currentCode.includes('{"sourceCode"')) {
@@ -286,9 +292,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           }
         }
       }
-      
+
       reader.releaseLock();
-      
+
       // Set the final Cairo code (without any JSON response parts)
       if (cairoCode && cairoCode.length > 50) {
         setSourceCode(cairoCode);
@@ -300,13 +306,26 @@ const ContractCode: React.FC<ContractCodeProps> = ({
       } else {
         throw new Error("No valid Cairo code generated");
       }
-      
+
+      continueGenerating = false;
+
     } catch (error) {
       console.error('Generation error:', error);
+
+      // do nothing for 429
+      if (error instanceof Error && error.message.includes('429')) {
+        addLog("🔄 Request already in progress. Please wait for it to complete.");
+        return;
+      }
+
+      continueGenerating = false;
+
       addLog(`Generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setSourceCode(""); // Clear on error
     } finally {
-      setIsGenerating(false);
+      if (!continueGenerating) {
+        setIsGenerating(false);
+      }
     }
   };
 
@@ -348,12 +367,11 @@ const ContractCode: React.FC<ContractCodeProps> = ({
             Blockchain: {blockchainName}
           </div>
         </motion.div>
-        
+
         <div
           ref={containerRef}
-          className={`relative overflow-hidden rounded-xl border border-navy-600 ${
-            editable ? "bg-yellow-200" : "bg-yellow-100"
-          }`}
+          className={`relative overflow-hidden rounded-xl border border-navy-600 ${editable ? "bg-yellow-200" : "bg-yellow-100"
+            }`}
         >
           {showSourceCode && sourceCode && (
             <pre className="p-6 overflow-y-auto max-h-[60vh]">
@@ -373,7 +391,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               </code>
             </pre>
           )}
-          
+
           {/* Show placeholder when no code */}
           {showSourceCode && !sourceCode && (
             <div className="p-6 text-gray-500 italic min-h-[200px] flex items-center justify-center">
@@ -384,11 +402,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
         <div className="flex gap-4 mt-2">
           <button
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 font-bold ${
-              isLoading || editable || isGenerating || !sourceCode.trim() || !scarbToml.trim()
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-cyan-500 hover:bg-cyan-600 text-black"
-            }`}
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-opacity-50 font-bold ${isLoading || editable || isGenerating || !sourceCode.trim() || !scarbToml.trim()
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-cyan-500 hover:bg-cyan-600 text-black"
+              }`}
             style={{
               boxShadow: isLoading || editable || isGenerating || !sourceCode.trim() || !scarbToml.trim() ? "none" : "0 0 15px rgba(100, 255, 218, 0.3)",
             }}
@@ -403,11 +420,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
 
           {sourceCode && (
             <button
-              className={`px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 ${
-                isDeploying || isLoading || isGenerating
-                  ? "bg-gray-500 cursor-not-allowed text-gray-300"
-                  : "bg-gray-500 hover:bg-gray-600 text-white"
-              }`}
+              className={`px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-50 ${isDeploying || isLoading || isGenerating
+                ? "bg-gray-500 cursor-not-allowed text-gray-300"
+                : "bg-gray-500 hover:bg-gray-600 text-white"
+                }`}
               onClick={() => openInCodeEditor()}
               disabled={isDeploying || isLoading || isGenerating}
             >
@@ -419,15 +435,16 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           )}
 
           <button
-            className={`px-4 py-2 rounded-lg ${
-              editable || isLoading
-                ? "bg-gray-500 cursor-not-allowed text-gray-300"
-                : "bg-green-500 hover:bg-green-600 text-white font-bold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
-            }`}
+            className={`px-4 py-2 rounded-lg ${editable || isLoading
+              ? "bg-gray-500 cursor-not-allowed text-gray-300"
+              : "bg-green-500 hover:bg-green-600 text-white font-bold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+              }`}
             style={{
               boxShadow: editable || isLoading ? "none" : "0 0 15px rgba(34, 197, 94, 0.3)",
             }}
-            onClick={generateCodeHandler}
+            onClick={() => {
+              generateCodeHandler(!!sourceCode.trim());
+            }}
             disabled={editable || isDeploying || isLoading}
           >
             <span className="flex items-center justify-center gap-2">
@@ -498,11 +515,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 rounded-lg ${
-              result.success
-                ? "bg-green-900/95 border-green-700"
-                : "bg-red-900/95 border-red-700"
-            }`}
+            className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 rounded-lg ${result.success
+              ? "bg-green-900/95 border-green-700"
+              : "bg-red-900/95 border-red-700"
+              }`}
           >
             {result.success ? (
               <div className="flex flex-col gap-2">
