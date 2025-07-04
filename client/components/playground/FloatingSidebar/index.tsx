@@ -76,7 +76,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
 
   return (
     <div
-      className="w-[300px] bg-white px-6 py-4 rounded-lg shadow-lg transition-all duration-300 ease-out mb-5 text-sm"
+      className="w-[300px] h-fit bg-white px-6 py-4 pb-12 rounded-lg shadow-lg transition-all duration-300 ease-out mb-5 text-sm"
       style={sidebarStyle}
     >
       <EnvironmentSwitch
@@ -360,16 +360,6 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
         addBlock={addBlock}
         setIsCustomModalOpen={setIsCustomModalOpen}
       />
-
-      {/* Promotional Section */}
-      <div className="mt-10 p-4 bg-[#104926] rounded-md text-white">
-        <div>Take full control of your rewards! 🚀</div>
-        <button className="mt-6 flex py-3 px-6 w-full gap-4 bg-[#F6FFFE] rounded-md text-[#297E71] shadow-sm transition transform hover:hover:bg-opacity-80 hover:shadow-md active:shadow-lg active:scale-95 ease-out">
-          <span><RewardIcon /></span>
-          <div>Claim Token</div>
-        </button>
-      </div>
-
       {/* Navigation Links */}
       <div className="mt-4">
         <Link href="/devx/contracts" className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium">
