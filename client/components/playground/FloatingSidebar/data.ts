@@ -25,8 +25,6 @@ import {
   TrendingUp,
   Users,
   Zap,
-  DollarSign,
-  Shield,
   UserCheck,
   UserX,
   CheckSquare,
@@ -38,13 +36,15 @@ import {
   Download,
   Upload,
   Code,
-} from "lucide-react";
+  Flame,
+  Send,
+} from "lucide-react"
 
 const blockTypes = [
   // Trigger Actions
   {
     id: "start",
-    content: "Upon Initialise",
+    content: "Initialize",
     color: "bg-[#451805]",
     borderColor: "border-[#8A5035]",
     hoverBorderColor: "hover:border-[#BE5B2A]",
@@ -60,6 +60,30 @@ const blockTypes = [
   },
 
   // Token Actions
+  {
+    id: "mintTokens",
+    content: "Mint Tokens",
+    color: "bg-[#1E3A3A]",
+    borderColor: "border-[#2A5656]",
+    hoverBorderColor: "hover:border-[#3E7D7D]",
+    icon: Coins,
+  },
+  {
+    id: "burnTokens",
+    content: "Burn Tokens",
+    color: "bg-[#322131]",
+    borderColor: "border-[#663B6A]",
+    hoverBorderColor: "hover:border-[#FB6A9E]",
+    icon: Flame,
+  },
+  {
+    id: "transferTokens",
+    content: "Transfer Tokens",
+    color: "bg-[#17273E]",
+    borderColor: "border-[#2F5B87]",
+    hoverBorderColor: "hover:border-[#4C86C1]",
+    icon: Send,
+  },
   {
     id: "swap",
     content: "Swap Tokens",
@@ -263,23 +287,7 @@ const blockTypes = [
     icon: ChartLine,
   },
 
-  // New Common Functions
-  {
-    id: "mintTokens",
-    content: "Mint Tokens",
-    color: "bg-[#1E3A3A]",
-    borderColor: "border-[#2A5656]",
-    hoverBorderColor: "hover:border-[#3E7D7D]",
-    icon: DollarSign,
-  },
-  {
-    id: "burnTokens",
-    content: "Burn Tokens",
-    color: "bg-[#1E3A3A]",
-    borderColor: "border-[#2A5656]",
-    hoverBorderColor: "hover:border-[#3E7D7D]",
-    icon: Shield,
-  },
+  // Common Functions
   {
     id: "freezeAccount",
     content: "Freeze Account",
@@ -360,6 +368,7 @@ const blockTypes = [
     hoverBorderColor: "hover:border-[#3E7D7D]",
     icon: Upload,
   },
+
   // Custom template for custom blocks
   {
     id: "custom",
@@ -369,15 +378,16 @@ const blockTypes = [
     hoverBorderColor: "hover:border-[#9C9C9C]",
     icon: Code,
   },
-];
+]
 
 // Group blocks into categories for the sidebar
 const groupedBlocks = {
-  "Trigger Actions": blockTypes.filter((block) =>
-    ["start", "end", "disconnect", "initialise"].includes(block.id)
-  ),
+  "Trigger Actions": blockTypes.filter((block) => ["start", "end"].includes(block.id)),
   "Token Actions": blockTypes.filter((block) =>
     [
+      "mintTokens",
+      "burnTokens",
+      "transferTokens",
       "swap",
       "stake",
       "allocate",
@@ -387,11 +397,9 @@ const groupedBlocks = {
       "borrowTokens",
       "repayLoan",
       "claimTokens",
-    ].includes(block.id)
+    ].includes(block.id),
   ),
-  Liquidity: blockTypes.filter((block) =>
-    ["liquidity", "createStakingPool"].includes(block.id)
-  ),
+  Liquidity: blockTypes.filter((block) => ["liquidity", "createStakingPool"].includes(block.id)),
   "Portfolio Management": blockTypes.filter((block) =>
     [
       "rebalancePortfolio",
@@ -400,21 +408,13 @@ const groupedBlocks = {
       "setStopLoss",
       "setTakeProfit",
       "setStrategy",
-    ].includes(block.id)
+    ].includes(block.id),
   ),
-  Governance: blockTypes.filter((block) =>
-    ["governance", "createVesting"].includes(block.id)
-  ),
-  Events: blockTypes.filter((block) =>
-    ["event", "executeFlashLoan", "initiateAirdrop"].includes(block.id)
-  ),
-  Analytics: blockTypes.filter((block) =>
-    ["getTransactionHistory", "getPortfolioAnalytics"].includes(block.id)
-  ),
+  Governance: blockTypes.filter((block) => ["governance", "createVesting"].includes(block.id)),
+  Events: blockTypes.filter((block) => ["event", "executeFlashLoan", "initiateAirdrop"].includes(block.id)),
+  Analytics: blockTypes.filter((block) => ["getTransactionHistory", "getPortfolioAnalytics"].includes(block.id)),
   "Common Functions": blockTypes.filter((block) =>
     [
-      "mintTokens",
-      "burnTokens",
       "freezeAccount",
       "unfreezeAccount",
       "approveSpending",
@@ -425,9 +425,9 @@ const groupedBlocks = {
       "updateMetadata",
       "withdrawFunds",
       "depositFunds",
-    ].includes(block.id)
+    ].includes(block.id),
   ),
   Custom: blockTypes.filter((block) => ["custom"].includes(block.id)),
-};
+}
 
-export default groupedBlocks;
+export default groupedBlocks
