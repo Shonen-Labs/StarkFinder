@@ -59,10 +59,10 @@ Return only a **valid, minimal JSON object** in this format:
   "code": "/ full contract code here /"
 }
 
-Important Rules:
-- DO NOT return markdown, explanation, or any additional text.
-- DO NOT include "Here is" or any wrapping text.
-- DO NOT add extra line breaks before or after the JSON object.
+ DO NOT return markdown or wrap output in triple backticks (e.g. \`\`\`json)
+- DO NOT return strings that contain JSON (e.g. "sourceCode": "{...}")
+- DO NOT include any explanation, logging, or wrapping text
+- The response MUST be a raw JSON object directly parsable with JSON.parse()
 - The mod contract {} block MUST NOT be renamed.`;
 
 export const contractPromptTemplate = ChatPromptTemplate.fromMessages([
