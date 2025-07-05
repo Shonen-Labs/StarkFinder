@@ -91,7 +91,6 @@ jobs:
           echo "Contract build and test phase completed"
           echo "If no tests are available, consider adding them to improve code quality"
 
-  # Alternative simpler contract job for debugging
   check-contracts-simple:
     runs-on: ubuntu-latest
     if: failure() # Only run if the main contract job fails
