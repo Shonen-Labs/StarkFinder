@@ -14,7 +14,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { Home, Book, Wallet, LogOut } from "lucide-react";
+import { Home, Book, Wallet, LogOut, User } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -94,9 +94,7 @@ export default function Header({
               </h2>
             </Link>
           </div>
-
           <div className="flex-1" /> {/* Spacer to push right content */}
-
           <div className="hidden md:flex items-center gap-4 justify-end">
             <Link
               href="/"
@@ -110,6 +108,14 @@ export default function Header({
             >
               <Book size={18} /> Resources
             </Link>
+            {session && (
+              <Link
+                href={`/devx/profile/${session?.user?.id}`}
+                className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+              >
+                <User size={18} /> Profile
+              </Link>
+            )}
             {!isConnected && (
               <Button
                 onClick={() => setIsWalletModalOpen(true)}
@@ -148,7 +154,6 @@ export default function Header({
               </motion.button>
             )}
           </div>
-
           <div className="flex items-center gap-3">
             {isDeleteVisible && (
               <Button
@@ -176,7 +181,6 @@ export default function Header({
               />
             )}
           </div>
-
           <div className="md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -189,7 +193,7 @@ export default function Header({
 
         {mobileMenuOpen && (
           <div className="md:hidden bg-white p-4 rounded-lg shadow-lg">
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col text-black gap-4">
               <li>
                 <Link
                   href="/"
@@ -206,6 +210,16 @@ export default function Header({
                   <Book size={18} /> Resources
                 </Link>
               </li>
+              {session && (
+                <li>
+                  <Link
+                    href={`/devx/profile/${session?.user?.id}`}
+                    className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+                  >
+                    <User size={18} /> Profile
+                  </Link>
+                </li>
+              )}
               {!isConnected && (
                 <Button
                   onClick={() => setIsWalletModalOpen(true)}
@@ -223,7 +237,10 @@ export default function Header({
                       </div>
                     </SelectTrigger>
                     <SelectContent className="bg-white shadow-md rounded-md flex justify-center">
-                      <SelectItem value="disconnect" className="focus:bg-red-50">
+                      <SelectItem
+                        value="disconnect"
+                        className="focus:bg-red-50"
+                      >
                         <div className="flex items-center gap-2 text-red-600">
                           <DisconnectButton className="text-red-600 hover:text-red-800" />
                         </div>
