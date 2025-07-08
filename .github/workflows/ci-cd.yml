@@ -219,6 +219,4 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          BRIAN_API_KEY: ${{ secrets.BRIAN_API_KEY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
