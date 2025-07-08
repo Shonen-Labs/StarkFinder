@@ -151,8 +151,8 @@ COPY ./client/components ./components
 COPY ./client/hooks ./hooks
 COPY ./client/public ./public
 COPY ./client/types ./types
-COPY ./client/legacy ./legacy
-COPY ./client/scripts ./scripts
+# COPY ./client/legacy ./legacy
+COPY ./scripts ./scripts
 COPY ./client/utils ./utils
 COPY ./client/tsconfig.json ./
 COPY ./client/next.config.mjs ./
@@ -160,7 +160,7 @@ COPY ./client/prisma ./prisma
 COPY ./client/lib ./lib
 COPY ./client/components.json ./
 COPY ./client/webpack.config.js ./
-COPY ./client/prompts ./prompts
+# COPY ./client/prompts ./prompts
 COPY ./client/auth.ts ./auth.ts
 COPY ./client/middleware.ts ./middleware.ts
 COPY ./client/tailwind.config.ts ./tailwind.config.ts
@@ -227,7 +227,7 @@ EOF
 RUN npm install
 
 # Copy agent sources
-COPY ./client/agents ./agents
+# COPY ./client/agents ./agents
 COPY ./run-all-agents.js ./
 
 # Build agent
@@ -259,14 +259,14 @@ COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/lib ./backend/lib
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/hooks ./backend/hooks
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/public ./backend/public
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/types ./backend/types
-COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/legacy ./backend/legacy
+# COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/legacy ./backend/legacy
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/utils ./backend/utils
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/scripts ./backend/scripts
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/app ./backend/app
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/components ./backend/components
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/components.json ./backend/
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/webpack.config.js ./backend/
-COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/prompts ./backend/prompts
+# COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/prompts ./backend/prompts
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/auth.ts ./backend/
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/middleware.ts ./backend/
 COPY --from=backend-builder --chown=nextjs:nodejs /app/backend/tailwind.config.ts ./backend/
@@ -277,7 +277,7 @@ COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/node_modules ./agent/
 COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/package.json ./agent/
 COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/dist ./agent/dist
 COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/run-all-agents.js ./agent/
-COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/agents ./agent/agents
+# COPY --from=agent-builder --chown=nextjs:nodejs /app/agent/agents ./agent/agents
 
 # Create startup script
 RUN cat <<'EOF' > start-services.sh
