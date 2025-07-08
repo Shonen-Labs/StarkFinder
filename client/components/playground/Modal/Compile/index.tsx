@@ -49,9 +49,8 @@ export default function Compile({
 
       <Credenza open={isOpen} onOpenChange={onOpenChange}>
         <CredenzaContent
-          className={`border-white/10 bg-[#faf3dd] max-w-[100vh] ${
-            displayState === "generate" && "w-[60vh]"
-          } `}
+          className={`border-white/10 bg-[#faf3dd] max-w-[100vh] ${displayState === "generate" && "w-[60vh]"
+            } `}
         >
           <CredenzaBody className="max-h-[84vh] max-w-[95vh] p-5">
             {displayState === "generate" && (
@@ -62,6 +61,7 @@ export default function Compile({
                 edges={edges}
                 flowSummary={flowSummary}
                 setDisplayState={setDisplayState}
+                setSourceCode={setSourceCode}
               />
             )}
 
