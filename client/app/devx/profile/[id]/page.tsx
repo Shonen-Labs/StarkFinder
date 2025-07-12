@@ -36,7 +36,7 @@ export default function UserProfilePage() {
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const params = useParams();
   const router = useRouter();
-  const id = params?.id as string;
+  const id = params?.id;
 
   const fetchUserData = useCallback(async () => {
     if (!id) {
@@ -47,34 +47,15 @@ export default function UserProfilePage() {
 
     try {
       setLoading(true);
-      setError(null);
       const response = await fetch(`/api/user/${id}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+      console.log(response);
+      // if (!response.ok) {
+      //   throw new Error('Failed to fetch user data');
+      // }
       const data = await response.json();
-      
-      // Validate the response data structure
-      if (!data || typeof data !== 'object') {
-        throw new Error('Invalid response data');
-      }
-      
-      // Ensure arrays exist and are arrays
-      const validatedData: UserData = {
-        name: data.name || '',
-        email: data.email || '',
-        address: data.address || '',
-        createdAt: data.createdAt || new Date().toISOString(),
-        deployedContracts: Array.isArray(data.deployedContracts) ? data.deployedContracts : [],
-        generatedContracts: Array.isArray(data.generatedContracts) ? data.generatedContracts : []
-      };
-      
-      setUserData(validatedData);
+      setUserData(data);
     } catch (err) {
-      console.error('Error fetching user data:', err);
-      setError(err instanceof Error ? err.message : "An error occurred while fetching user data");
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -82,7 +63,7 @@ export default function UserProfilePage() {
 
   useEffect(() => {
     fetchUserData();
-  }, [fetchUserData]);
+  }, [id, fetchUserData]);
 
   const handleDeleteContract = async (contractId: string) => {
     if (!confirm("Are you sure you want to delete this contract? This action cannot be undone.")) {
@@ -99,7 +80,7 @@ export default function UserProfilePage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to delete contract: ${response.status}`);
+        throw new Error('Failed to delete contract');
       }
 
       // Update local state to remove the deleted contract
@@ -137,7 +118,7 @@ export default function UserProfilePage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to update contract deployment status: ${response.status}`);
+        throw new Error('Failed to update contract deployment status');
       }
 
       // Remove from generated contracts and add to deployed contracts
@@ -179,24 +160,20 @@ export default function UserProfilePage() {
   };
 
   const handleOpenEditor = (contract: Contract) => {
-    try {
-      const editorData = {
-        contractId: contract.id,
-        sourceCode: contract.sourceCode || "",
-        scarbConfig: contract.scarbConfig || "",
-        contractName: contract.name,
-        blockchain: contract.blockchain || "blockchain1"
-      };
-      
-      // Encode the data to pass to the editor
-      const encodedData = encodeURIComponent(JSON.stringify(editorData));
-      
-      // Navigate to editor with contract data
-      router.push(`/editor?contract=${encodedData}`);
-    } catch (err) {
-      console.error('Error opening editor:', err);
-      alert('Failed to open editor');
-    }
+    // Create a query string with contract data
+    const editorData = {
+      contractId: contract.id,
+      sourceCode: contract.sourceCode || "",
+      scarbConfig: contract.scarbConfig || "",
+      contractName: contract.name,
+      blockchain: contract.blockchain || "blockchain1"
+    };
+    
+    // Encode the data to pass to the editor
+    const encodedData = encodeURIComponent(JSON.stringify(editorData));
+    
+    // Navigate to editor with contract data
+    router.push(`/editor?contract=${encodedData}`);
   };
 
   const handleViewCode = (contract: Contract) => {
@@ -231,13 +208,7 @@ export default function UserProfilePage() {
   }
 
   if (!userData) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="text-white text-xl">No user data found</div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -248,7 +219,7 @@ export default function UserProfilePage() {
         transition={{ duration: 0.5 }}
         className="text-center mb-16"
       >
-        <h1 className="text-4xl font-bold text-white mb-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
           User Profile
         </h1>
         <p className="text-xl text-white/80 max-w-2xl mx-auto">
@@ -407,25 +378,11 @@ function ContractCard({
 }) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = () => {
     if (!contract.contractAddress) return;
-    
-    try {
-      await navigator.clipboard.writeText(contract.contractAddress);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = contract.contractAddress;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    navigator.clipboard.writeText(contract.contractAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const getBlockchainName = (blockchain?: string) => {
@@ -586,27 +543,14 @@ function CodeModal({ contract, onClose }: { contract: Contract; onClose: () => v
   const [activeCodeTab, setActiveCodeTab] = useState<"source" | "scarb">("source");
   const [copied, setCopied] = useState(false);
 
-  const handleCopyCode = async () => {
+  const handleCopyCode = () => {
     const codeToCopy = activeCodeTab === "source" 
       ? contract.sourceCode || "" 
       : contract.scarbConfig || "";
     
-    try {
-      await navigator.clipboard.writeText(codeToCopy);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = codeToCopy;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    navigator.clipboard.writeText(codeToCopy);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
