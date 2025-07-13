@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { Copy } from "lucide-react";
+import CachedContractsManager from "@/components/cached-contracts/CachedContractsManager";
 
 type Contract = {
   id: string;
@@ -25,7 +26,7 @@ type UserData = {
 
 export default function UserProfilePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<"deployed" | "generated">(
+  const [activeTab, setActiveTab] = useState<"deployed" | "generated" | "cached">(
     "deployed"
   );
   const [loading, setLoading] = useState(true);
@@ -127,10 +128,10 @@ export default function UserProfilePage() {
               )}
               <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                 <span className="px-3 py-1 bg-indigo-800 rounded-full text-xs text-indigo-100">
-                  {userData.deployedContracts.length} Deployed
+                  {userData.deployedContracts?.length ?? 0} Deployed
                 </span>
                 <span className="px-3 py-1 bg-purple-800 rounded-full text-xs text-purple-100">
-                  {userData.generatedContracts.length} Generated
+                  {userData.generatedContracts?.length ?? 0} Generated
                 </span>
                 <span className="px-3 py-1 bg-blue-800 rounded-full text-xs text-blue-100">
                   Member since{" "}
@@ -170,48 +171,61 @@ export default function UserProfilePage() {
             >
               Generated Contracts
             </button>
+            <button
+              className={`px-6 py-3 text-sm font-medium ${
+                activeTab === "cached"
+                  ? "border-b-2 border-purple-500 text-white"
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+              onClick={() => setActiveTab("cached")}
+            >
+              Cached Contracts
+            </button>
           </div>
         </div>
 
-        {/* Contracts List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeTab === "deployed" && userData.deployedContracts.length > 0 ? (
-            userData.deployedContracts.map((contract) => (
-              <ContractCard
-                key={contract.id}
-                contract={contract}
-                type="deployed"
-              />
-            ))
-          ) : activeTab === "generated" &&
-            userData.generatedContracts.length > 0 ? (
-            userData.generatedContracts.map((contract) => (
-              <ContractCard
-                key={contract.id}
-                contract={contract}
-                type="generated"
-              />
-            ))
-          ) : (
-            <div className="col-span-full text-center p-12">
-              <div className="bg-gray-800 bg-opacity-70 rounded-lg p-8">
-                <h3 className="text-xl font-medium text-white mb-2">
-                  No {activeTab} contracts found
-                </h3>
-                <p className="text-gray-300">
-                  {activeTab === "deployed"
-                    ? "You haven't deployed any contracts yet."
-                    : "You haven't generated any contracts yet."}
-                </p>
-                <button className="mt-4 px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white transition-colors">
-                  {activeTab === "deployed"
-                    ? "Deploy Your First Contract"
-                    : "Generate Your First Contract"}
-                </button>
+        {/* Contracts Content */}
+        {activeTab === "cached" ? (
+          <CachedContractsManager userId={id as string} />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeTab === "deployed" && (userData.deployedContracts?.length ?? 0) > 0 ? (
+              userData.deployedContracts?.map((contract) => (
+                <ContractCard
+                  key={contract.id}
+                  contract={contract}
+                  type="deployed"
+                />
+              ))
+            ) : activeTab === "generated" && (userData.generatedContracts?.length ?? 0) > 0 ? (
+              userData.generatedContracts?.map((contract) => (
+                <ContractCard
+                  key={contract.id}
+                  contract={contract}
+                  type="generated"
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center p-12">
+                <div className="bg-gray-800 bg-opacity-70 rounded-lg p-8">
+                  <h3 className="text-xl font-medium text-white mb-2">
+                    No {activeTab} contracts found
+                  </h3>
+                  <p className="text-gray-300">
+                    {activeTab === "deployed"
+                      ? "You haven't deployed any contracts yet."
+                      : "You haven't generated any contracts yet."}
+                  </p>
+                  <button className="mt-4 px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-md text-white transition-colors">
+                    {activeTab === "deployed"
+                      ? "Deploy Your First Contract"
+                      : "Generate Your First Contract"}
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

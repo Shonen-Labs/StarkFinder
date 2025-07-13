@@ -62,6 +62,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<DeploymentResponse | null>(null);
   const [scarbToml, setScarbToml] = useState<string>(""); // Store Scarb.toml
+  const [contractId, setContractId] = useState<string | null>(null); // Store cached contract ID
 
   const containerRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
@@ -259,6 +260,10 @@ const ContractCode: React.FC<ContractCodeProps> = ({
                 setScarbToml(jsonResponse.scarbToml); // Store Scarb.toml
                 console.log("📋 Scarb.toml received:", jsonResponse.scarbToml.length, "characters");
               }
+              if (jsonResponse.contractId) {
+                setContractId(jsonResponse.contractId); // Store contract ID
+                console.log("🆔 Contract ID received:", jsonResponse.contractId);
+              }
             } catch (parseError) {
               console.warn("Could not parse JSON response, using streamed code");
             }
@@ -300,6 +305,9 @@ const ContractCode: React.FC<ContractCodeProps> = ({
         setSourceCode(cairoCode);
         if (scarbToml) {
           addLog(`${blockchain === 'blockchain4' ? 'Dojo' : 'Cairo'} contract generated successfully`);
+          if (contractId) {
+            addLog(`💾 Contract cached with ID: ${contractId}`);
+          }
         } else {
           addLog(`${blockchain === 'blockchain4' ? 'Dojo' : 'Cairo'} contract generated (missing Scarb.toml)`);
         }

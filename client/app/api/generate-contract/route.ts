@@ -225,31 +225,54 @@ sierra-replace-ids = true`;
             console.log(`Contract saved to: ${sourcePath}`);
             console.log(`Scarb.toml saved to: ${scarbPath}`);
 
-            // Save to database
+            // Save to Redis cache
             await getOrCreateUser(userId);
-            await prisma.generatedContract.create({
-              data: {
+            
+            // Import contract cache service
+            const { contractCacheService } = await import("@/lib/services/contractCacheService");
+            
+            let contractId: string | null = null;
+            let cacheError: string | null = null;
+            try {
+              contractId = await contractCacheService.cacheContract({
                 name: "Generated Contract",
                 sourceCode: finalCode,
                 scarbConfig: scarbToml,
                 userId,
-              },
-            });
+                blockchain: blockchain || "blockchain1",
+                sessionId: requestKey, // Use request key as session ID for tracking
+              });
+            } catch (err) {
+              cacheError = err instanceof Error ? err.message : "Unknown caching error";
+              console.error("Error caching contract:", cacheError);
+            }
 
             // Only send final response if controller is still open
             if (!isControllerClosed) {
-              // Send final response marker
-              safeEnqueue("\n---FINAL_RESPONSE---\n");
+              if (contractId === null) {
+                // Send error response marker
+                safeEnqueue("\n---ERROR_RESPONSE---\n");
+                const errorResponse = {
+                  success: false,
+                  error: cacheError || "Failed to cache contract. Contract ID is null."
+                };
+                safeEnqueue(JSON.stringify(errorResponse));
+              } else {
+                // Send final response marker
+                safeEnqueue("\n---FINAL_RESPONSE---\n");
 
-              // Create a response object that includes both source code and Scarb.toml
-              const responseData = {
-                sourceCode: finalCode,
-                scarbToml: scarbToml,
-                success: true
-              };
+                // Create a response object that includes both source code and Scarb.toml
+                const responseData = {
+                  sourceCode: finalCode,
+                  scarbToml: scarbToml,
+                  success: true,
+                  contractId: contractId,
+                  ...(cacheError ? { cacheError } : {})
+                };
 
-              // Send the final response as JSON
-              safeEnqueue(JSON.stringify(responseData));
+                // Send the final response as JSON
+                safeEnqueue(JSON.stringify(responseData));
+              }
             }
 
           } catch (error) {

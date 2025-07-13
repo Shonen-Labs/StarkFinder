@@ -804,7 +804,8 @@ export async function POST(req: NextRequest) {
     // Save to database if userId is provided
     if (userId) {
       try {
-        await prisma.deployedContract.create({
+        // Create deployed contract record
+        const deployedContract = await prisma.deployedContract.create({
           data: {
             name: contractName,
             sourceCode: sourceCode,
@@ -815,6 +816,20 @@ export async function POST(req: NextRequest) {
             transactionHash: deployResponse.transaction_hash,
           },
         });
+
+        // Try to find and update the corresponding cached contract if it exists
+        try {
+          const { contractCacheService } = await import("@/lib/services/contractCacheService");
+          const cachedContract = await contractCacheService.findContractBySourceCode(userId, sourceCode);
+          
+          if (cachedContract) {
+            await contractCacheService.markContractAsDeployed(userId, cachedContract.id, deployedContract.id);
+            console.log(chalk.green("✓ Cached contract marked as deployed"));
+          }
+        } catch (cacheError) {
+          console.warn(chalk.yellow("⚠️  Warning: Could not update cached contract:"), cacheError);
+        }
+
         console.log(chalk.green("✓ Deployment saved to database"));
       } catch (dbError) {
         console.error(
