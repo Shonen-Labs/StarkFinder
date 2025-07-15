@@ -88,7 +88,7 @@
     "sharp": "^0.34.2",
     "solc": "^0.8.28",
     "sonner": "^1.7.2",
-    "starknet": "^6.11.0",
+    "starknet": "^7.6.2",
     "starknetkit": "^2.3.3",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
