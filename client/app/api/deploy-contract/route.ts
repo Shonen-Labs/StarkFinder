@@ -18,18 +18,18 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import chalk from "chalk";
 import prisma from "@/lib/db";
+import {
+  extractConstructorArgs,
+  ConstructorArg,
+  checkForConstructorArgs,
+} from "@/lib/codeEditor";
+
 interface CompilationResult {
   success: boolean;
   contracts: string[];
   error?: string;
   errorLog?: string;
 }
-
-type ConstructorArgs = {
-  name: string;
-  type: string;
-  value?: string;
-};
 
 function getContractsPath(...paths: string[]) {
   return path.join(process.cwd(), "..", "contracts", ...paths);
@@ -202,6 +202,24 @@ async function validateContract(sourceCode: string) {
   console.log(chalk.green("✓ Contract structure validation passed"));
 }
 
+async function validateConstructorArgs(
+  sourceCode: string,
+  constructorArgs: ConstructorArg[]
+): Promise<void> {
+  const expectedArgs = extractConstructorArgs(JSON.parse(sourceCode));
+
+  if (expectedArgs.length === 0) return;
+
+  for (const expected of expectedArgs) {
+    const provided = constructorArgs.find((arg) => arg.name === expected.name);
+    if (!provided || !provided.value || provided.value.trim() === "") {
+      throw new Error(
+        `Constructor argument "${expected.name}" is missing or empty.`
+      );
+    }
+  }
+}
+
 // Clean up build artifacts after deployment
 async function cleanupBuildArtifacts() {
   try {
@@ -363,12 +381,11 @@ async function compileCairo(): Promise<CompilationResult> {
 
 function parseConstructorCalldata(
   sierrCode: any,
-  constructorArgs: string
+  constructorArgs: ConstructorArg[]
 ): Calldata {
-  const parsedArgs: ConstructorArgs[] = JSON.parse(constructorArgs);
   const contractCalldata: CallData = new CallData(sierrCode.abi);
 
-  const unsetArg = parsedArgs.find(
+  const unsetArg = constructorArgs.find(
     (arg) => !arg.value || arg.value.trim() === ""
   );
 
@@ -376,7 +393,7 @@ function parseConstructorCalldata(
     throw new Error(`Constructor argument "${unsetArg.name}" is not set.`);
   }
 
-  const constructorObject = parsedArgs.reduce<Record<string, string>>(
+  const constructorObject = constructorArgs.reduce<Record<string, string>>(
     (acc, arg) => {
       acc[arg.name] = arg.value!;
       return acc;
@@ -520,16 +537,6 @@ function formatWeiToEth(wei: string): string {
   }
 }
 
-function formatEthToWei(eth: string): string {
-  try {
-    const weiBigInt = BigInt(eth);
-    const wei = Number(weiBigInt) * 1e18;
-    return wei.toString();
-  } catch {
-    return eth;
-  }
-}
-
 export async function POST(req: NextRequest) {
   console.log(chalk.blue("\n🚀 Starting contract deployment process...\n"));
 
@@ -610,6 +617,23 @@ export async function POST(req: NextRequest) {
     // Validate contract structure
     console.log(chalk.yellow("\n🔍 Validating contract structure...\n"));
     await validateContract(sourceCode);
+
+    if (checkForConstructorArgs(sourceCode)) {
+      if (!constructorArgs) {
+        console.error(chalk.red("❌ Missing Constructor Args"));
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Missing required field: constructorArgs",
+            details: "constructorArgs configuration is required for deployment",
+          },
+          { status: 400 }
+        );
+      } else {
+        await validateConstructorArgs(sourceCode, constructorArgs);
+      }
+    }
+
     console.log(chalk.green("✓ Contract structure validated"));
 
     console.log(chalk.yellow("\n📁 Saving contract files...\n"));
@@ -817,8 +841,11 @@ export async function POST(req: NextRequest) {
 
     let constructorData: Calldata = [];
 
-    if (constructorArgs) {
-      constructorData = parseConstructorCalldata(sierraCode, constructorArgs);
+    if (constructorArgs && checkForConstructorArgs(sourceCode)) {
+      constructorData = parseConstructorCalldata(
+        sierraCode,
+        JSON.parse(constructorArgs)
+      );
     }
 
     const deployResponse = await withRetry(() =>
@@ -927,9 +954,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
-    const userId = params.id;
+    const { id: userId } = context.params;
 
     const contracts = await prisma.deployedContract.findMany({
       where: { userId },

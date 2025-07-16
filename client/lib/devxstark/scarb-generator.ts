@@ -46,7 +46,6 @@ export class ScarbGenerator {
 
       // Analyze the code to understand what it does
       const codeAnalysis = await this.analyzeCode(sourceCode);
-
       // Generate appropriate Scarb.toml based on the analysis
       const scarbConfig = await this.generateScarbConfig(
         sourceCode,
