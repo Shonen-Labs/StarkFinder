@@ -38,7 +38,7 @@ export const CachedContractsManager: React.FC<Props> = ({ userId }) => {
         const res = await fetch(`/api/cached-contracts?userId=${userId}`);
         const data = await res.json();
         setContracts(data.contracts || []);
-      } catch (err) {
+      } catch {
         setError('Failed to load cached contracts');
       } finally {
         setLoading(false);
