@@ -206,7 +206,7 @@ async function validateConstructorArgs(
   sourceCode: string,
   constructorArgs: ConstructorArg[]
 ): Promise<void> {
-  const expectedArgs = extractConstructorArgs(JSON.parse(sourceCode));
+  const expectedArgs = extractConstructorArgs(sourceCode);
 
   if (expectedArgs.length === 0) return;
 
@@ -630,7 +630,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       } else {
-        await validateConstructorArgs(sourceCode, constructorArgs);
+        await validateConstructorArgs(sourceCode, JSON.parse(constructorArgs));
       }
     }
 

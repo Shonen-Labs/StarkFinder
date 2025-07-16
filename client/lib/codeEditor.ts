@@ -141,7 +141,7 @@ export function extractConstructorArgs(contractCode: string): ConstructorArg[] {
 
 export function checkForConstructorArgs(contractCode: string): boolean {
   const constructorRegex = /#\[constructor\]\s*fn\s+constructor\s*\(([^)]*)\)/;
-  const match = JSON.parse(contractCode).match(constructorRegex);
+  const match = contractCode.match(constructorRegex);
   if (!match || !match[1]) return false;
   return true;
 }

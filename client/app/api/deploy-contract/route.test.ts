@@ -7,7 +7,7 @@ import {
   validScarbToml,
 } from "@/data/deploy-test";
 
-describe("POST /api/audit-sourceCode", () => {
+describe("POST /api/deploy-contract", () => {
   const ORIGINAL_ENV = process.env;
 
   beforeEach(() => {
@@ -30,8 +30,8 @@ describe("POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(simpleContract),
-            scarbToml: JSON.stringify(validScarbToml),
+            sourceCode: simpleContract,
+            scarbToml: validScarbToml,
           }),
         });
 
@@ -58,7 +58,7 @@ describe("POST /api/audit-sourceCode", () => {
           body: JSON.stringify({
             contractName: "generatedcontract",
             sourceCode: "",
-            scarbToml: JSON.stringify(validScarbToml),
+            scarbToml: validScarbToml,
           }),
         });
 
@@ -82,7 +82,7 @@ describe("POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(simpleContract),
+            sourceCode: simpleContract,
             scarbToml: "",
           }),
         });
@@ -108,8 +108,8 @@ describe("POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(modified),
-            scarbToml: JSON.stringify(validScarbToml),
+            sourceCode: modified,
+            scarbToml: validScarbToml,
           }),
         });
 
@@ -138,8 +138,8 @@ describe("POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(modified),
-            scarbToml: JSON.stringify(validScarbToml),
+            sourceCode: modified,
+            scarbToml: validScarbToml,
           }),
         });
 
@@ -163,8 +163,8 @@ describe("POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(badContract),
-            scarbToml: JSON.stringify(validScarbToml),
+            sourceCode: badContract,
+            scarbToml: validScarbToml,
           }),
         });
 
@@ -187,8 +187,8 @@ describe("POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(contractWithConstructor),
-            scarbToml: JSON.stringify(validScarbToml),
+            sourceCode: contractWithConstructor,
+            scarbToml: validScarbToml,
           }),
         });
 

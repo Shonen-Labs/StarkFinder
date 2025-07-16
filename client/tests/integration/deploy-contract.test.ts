@@ -7,11 +7,15 @@ import {
 } from "@/data/deploy-test";
 
 // ensure you're running devnet before running
-describe("Integration Test POST /api/audit-sourceCode", () => {
+describe("Integration Test POST /api/deploy-contract", () => {
   const ORIGINAL_ENV = process.env;
 
   beforeEach(() => {
     process.env = { ...ORIGINAL_ENV };
+    process.env.OZ_ACCOUNT_PRIVATE_KEY = "";
+    process.env.ACCOUNT_ADDRESS = "";
+    process.env.STARKNET_RPC_URL = "http://127.0.0.1:5050";
+    process.env.STARKNET_PROVIDER_URL = "http://127.0.0.1:5050";
   });
 
   afterEach(() => {
@@ -19,39 +23,36 @@ describe("Integration Test POST /api/audit-sourceCode", () => {
   });
 
   it("deploy contract successfully without constructor", async () => {
-    process.env.OZ_ACCOUNT_PRIVATE_KEY = "";
-    process.env.ACCOUNT_ADDRESS = "";
-    process.env.STARKNET_RPC_URL = "http://127.0.0.1:5050";
-    process.env.STARKNET_PROVIDER_URL = "http://127.0.0.1:5050";
-
     await testApiHandler({
       appHandler,
       test: async ({ fetch }) => {
-        const body = {
-          sourceCode: JSON.stringify({
-            contractName: "generatedcontract",
-            sourceCode: JSON.stringify(simpleContract),
-            scarbToml: JSON.stringify(validScarbToml),
-          }),
-        };
-
         const response = await fetch({
           method: "POST",
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            contractName: "generatedcontract",
+            sourceCode: simpleContract,
+            scarbToml: validScarbToml,
+          }),
           headers: { "Content-Type": "application/json" },
         });
 
         expect(response.status).toBe(200);
+
+        const json = await response.json();
+
+        expect(json).toMatchObject({
+          success: true,
+          contractAddress: expect.any(String),
+          classHash: expect.any(String),
+          transactionHash: expect.any(String),
+        });
+
+        console.log(json);
       },
     });
   }, 20000000);
 
   it("deploy contract successfully with constructor", async () => {
-    process.env.OZ_ACCOUNT_PRIVATE_KEY = "";
-    process.env.ACCOUNT_ADDRESS = "";
-    process.env.STARKNET_RPC_URL = "http://127.0.0.1:5050";
-    process.env.STARKNET_PROVIDER_URL = "http://127.0.0.1:5050";
-
     await testApiHandler({
       appHandler,
       test: async ({ fetch }) => {
@@ -60,11 +61,11 @@ describe("Integration Test POST /api/audit-sourceCode", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contractName: "generatedcontract",
-            sourceCode: JSON.stringify(contractWithConstructor),
-            scarbToml: JSON.stringify(validScarbToml),
+            sourceCode: contractWithConstructor,
+            scarbToml: validScarbToml,
             constructorArgs: JSON.stringify([
               {
-                name: "initial_value",
+                name: "initial_supply",
                 type: "u256",
                 value: "10000000",
               },
@@ -81,7 +82,6 @@ describe("Integration Test POST /api/audit-sourceCode", () => {
           contractAddress: expect.any(String),
           classHash: expect.any(String),
           transactionHash: expect.any(String),
-          casmHash: expect.any,
         });
 
         console.log(json);

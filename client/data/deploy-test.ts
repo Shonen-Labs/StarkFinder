@@ -33,43 +33,81 @@ mod HelloStarknet {
 `;
 
 export const contractWithConstructor = `
-  #[starknet::interface]
-  pub trait ICounter<TContractState> {
-      fn increment(ref self: TContractState, amount: u128);
-      fn get_count(self: @TContractState) -> u128;
-  }
+use starknet::{ContractAddress};
 
-  #[starknet::contract]
-  mod counter {
-      use super::ICounter;
+#[starknet::interface]
+pub trait IStarknetContract<TContractState> {
+    /// Transfer token
+    fn transfer(ref self: TContractState, recipient: ContractAddress, amount: u256);
+    /// Retrieve balance.
+    fn get_balance(self: @TContractState, account: ContractAddress) -> u256;
+    /// Retrieve total supply
+    fn get_total_supply(self: @TContractState) -> u256;
+}
 
-      #[storage]
-      struct Storage {
-          counter: u128,
-      }
+#[starknet::contract]
+mod contract {
+    use starknet::{ContractAddress, get_caller_address};
+    use starknet::storage::{
+        StoragePointerReadAccess, StoragePointerWriteAccess, Map, StorageMapReadAccess,
+        StorageMapWriteAccess,
+    };
 
-      #[constructor]
-      fn constructor(ref self: Storage, initial_value: u128) {
-          self.counter.write(0);
-      }
+    #[storage]
+    struct Storage {
+        owner: ContractAddress,
+        balance: Map<ContractAddress, u256>,
+        total_supply: u256,
+    }
 
-      #[abi(embed_v0)]
-      impl CounterImpl of ICounter<ContractState> {
-          fn increment(ref self: ContractState, amount: u128) {
-              let current = self.counter.read();
-              self.counter.write(current - amount);
-          }
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        Transfer: Transfer,
+    }
 
-          fn get_count(self: @ContractState) -> u128 {
-              self.counter.read() + 1
-          }
-      }
-  }
+    #[derive(Drop, starknet::Event)]
+    struct Transfer {
+        from: ContractAddress,
+        to: ContractAddress,
+        value: u256,
+    }
+
+    #[constructor]
+    fn constructor(ref self: ContractState, initial_supply: u256) {
+        let sender = get_caller_address();
+        self.owner.write(sender);
+        self.total_supply.write(initial_supply);
+        self.balance.write(sender, initial_supply);
+    }
+
+    #[abi(embed_v0)]
+    impl StarknetImpl of super::IStarknetContract<ContractState> {
+        fn transfer(ref self: ContractState, recipient: ContractAddress, amount: u256) {
+            let sender = get_caller_address();
+            let sender_balance = self.balance.read(sender);
+            assert(sender_balance >= amount, 'Insufficient balance');
+
+            self.balance.write(sender, sender_balance - amount);
+            self.balance.write(recipient, self.balance.read(recipient) + amount);
+
+            self.emit(Event::Transfer(Transfer { from: sender, to: recipient, value: amount }));
+        }
+
+        fn get_balance(self: @ContractState, account: ContractAddress) -> u256 {
+            self.balance.read(account)
+        }
+
+        fn get_total_supply(self: @ContractState) -> u256 {
+            self.total_supply.read()
+        }
+    }
+}
 `;
 
 export const validScarbToml = `
 [package]
-name = "generatedcontract"
+name = "generated_contract"
 version = "0.1.0"
 edition = "2024_07"
 cairo_version = "2.8.0"
