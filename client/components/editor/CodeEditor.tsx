@@ -23,118 +23,11 @@ import { Steps } from "@/components/ui/steps";
 import { DeploymentResponse, DeploymentStep } from "@/types/main-types";
 import { useRouter } from "next/navigation";
 import { scarbGenerator } from "@/lib/devxstark/scarb-generator";
-
-const DEFAULT_CONTRACT = `#[starknet::contract]
-mod contract {
-    use starknet::{ContractAddress, get_caller_address};
-    
-    #[storage]
-    struct Storage {
-        owner: ContractAddress,
-        balance: LegacyMap::<ContractAddress, u256>,
-        total_supply: u256,
-    }
-    
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        Transfer: Transfer,
-    }
-    
-    #[derive(Drop, starknet::Event)]
-    struct Transfer {
-        from: ContractAddress,
-        to: ContractAddress,
-        value: u256,
-    }
-    
-    #[constructor]
-    fn constructor(ref self: ContractState, initial_supply: u256) {
-        let sender = get_caller_address();
-        self.owner.write(sender);
-        self.total_supply.write(initial_supply);
-        self.balance.write(sender, initial_supply);
-    }
-    
-    #[external(v0)]
-    fn transfer(ref self: ContractState, recipient: ContractAddress, amount: u256) {
-        let sender = get_caller_address();
-        let sender_balance = self.balance.read(sender);
-        assert(sender_balance >= amount, "Insufficient balance");
-        
-        self.balance.write(sender, sender_balance - amount);
-        self.balance.write(recipient, self.balance.read(recipient) + amount);
-        
-        self.emit(Event::Transfer(Transfer { from: sender, to: recipient, value: amount }));
-    }
-    
-    #[external(v0)]
-    fn get_balance(self: @ContractState, account: ContractAddress) -> u256 {
-        self.balance.read(account)
-    }
-    
-    #[external(v0)]
-    fn get_total_supply(self: @ContractState) -> u256 {
-        self.total_supply.read()
-    }
-}`;
-
-const initialSteps: DeploymentStep[] = [
-  { title: "Building Contract", status: "pending" },
-  { title: "Declaring Sierra Hash", status: "pending" },
-  { title: "Declaring CASM Hash", status: "pending" },
-  { title: "Deploying Contract", status: "pending" },
-  { title: "Confirming Transaction", status: "pending" },
-];
-
-// Create a function to initialize the codeStore with the right value
-const initializeCodeStore = (setSourceCode: (code: string) => void) => {
-  const savedEditorCode = localStorage.getItem("editorCode");
-
-  if (savedEditorCode) {
-    setSourceCode(savedEditorCode);
-    return true;
-  } else {
-    setSourceCode(DEFAULT_CONTRACT);
-    localStorage.setItem("editorCode", DEFAULT_CONTRACT);
-    return false;
-  }
-};
+import { extractConstructorArgs, ConstructorArg, initialSteps, initializeCodeStore, extractImports, generateScarb } from "@/lib/codeEditor";
 
 interface ExtendedDeploymentResponse extends DeploymentResponse {
   casmHash?: string;
 }
-
-const extractImports = (code: string): string[] => {
-  const importRegex = /use\s+([a-zA-Z0-9_:]+)(::\{[^}]+\})?;/g;
-  const matches = [...code.matchAll(importRegex)];
-  return matches.flatMap((matchArr) => {
-    const base = matchArr[1];
-    const inner = matchArr[2];
-    if (inner) {
-      return inner
-        .replace(/^::\{|\}$/g, "")
-        .split(",")
-        .map((item) => `${base}::${item.trim()}`);
-    }
-    return [base];
-  });
-};
-
-const generateScarb = (deeps: string[]): string => {
-  const sanitizeDeeps = deeps.map((dep) => dep.replace(/[^a-zA-Z0-9:_-]/g, ""));
-  const uniqueDeeps = Array.from(new Set(sanitizeDeeps));
-  const baseNames = Array.from(
-    new Set(uniqueDeeps.map((dep) => dep.split("::")[0]))
-  );
-  const deepFormatted = baseNames.map((name) => `${name} = "2.9.1"`).join("\n");
-  return `[package]
-    name = "GeneratedContract"
-    version = "0.1.0"
-    
-[dependencies]
-    ${deepFormatted}`;
-};
 
 export default function CodeEditor() {
   const router = useRouter();
@@ -143,6 +36,8 @@ export default function CodeEditor() {
   const [isGeneratingScarb, setIsGeneratingScarb] = useState(false);
   const [generatedScarbToml, setGeneratedScarbToml] = useState("");
   const { isConnected } = useAccount();
+  const [errorLogs, setErrorLogs] = useState("");
+  const [constructorArgs, setConstructorArgs] = useState<ConstructorArg[]>([]);
   // const { connect, connectors } = useConnect();
 
   // Get sourceCode AFTER initialization to ensure we have the right value
@@ -155,6 +50,13 @@ export default function CodeEditor() {
   const [contractName, setContractName] = useState("");
   const [createScarb, setCreateScarb] = useState("");
   const [showScarb, setShowScarb] = useState(false);
+
+  useEffect(() => {
+    if (sourceCode) {
+      const constructor = extractConstructorArgs(sourceCode);
+      setConstructorArgs(constructor);
+    }
+  }, [sourceCode])
 
   // Initialize code store and component state from localStorage on mount
   useEffect(() => {
@@ -202,6 +104,13 @@ export default function CodeEditor() {
 
   const [isAuditing, setIsAuditing] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
+
+
+  const handleConstructorArgs = (index: number, newValue: string) => {
+    const updatedArgs = [...constructorArgs];
+    updatedArgs[index].value = newValue;
+    setConstructorArgs(updatedArgs);
+  };
 
   const handleAudit = async (): Promise<void> => {
     if (!sourceCode) {
@@ -304,7 +213,17 @@ export default function CodeEditor() {
   const handleCompile = async (): Promise<void> => {
     setIsDeploying(true);
     setResult(null);
+    setErrorLogs("");
+
     try {
+      if (constructorArgs.length > 0) {
+        const arg = constructorArgs.find(arg => !arg.value || arg.value.trim() === "");
+
+        if (arg) {
+          throw new Error(`Constructor argument "${arg.name}" is not set.`);
+        }
+      }
+
       // Generate Scarb.toml if not already generated
       let scarbToml = generatedScarbToml;
       if (!scarbToml) {
@@ -333,6 +252,7 @@ export default function CodeEditor() {
           sourceCode: sourceCode,
           scarbToml: scarbToml,
           userId: localStorage.getItem("userId"), // Assuming you store userId
+          constructorArgs: JSON.stringify(constructorArgs)
         }),
       });
 
@@ -367,6 +287,9 @@ export default function CodeEditor() {
         } as ExtendedDeploymentResponse);
         setLogs((prev) => [...prev, "✅ Contract deployed successfully!"]);
       } else {
+        if (data.errorLog) {
+          setErrorLogs(data.errorLog);
+        }
         throw new Error(data.error || "Deployment failed");
       }
     } catch (error) {
@@ -538,6 +461,29 @@ export default function CodeEditor() {
               />
             </Card>
 
+            {/* Constructor Args */}
+            {
+              constructorArgs.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold mb-2">Constructor Args</h3>
+                  <div className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[300px] overflow-y-auto space-y-3">
+                    {constructorArgs.map((arg, index) => (
+                      <div key={index} className="font-mono text-sm flex items-center space-x-2">
+                        <span>{arg.name}:</span>
+                        <span className="text-blue-300">{arg.type}</span>
+                        <input
+                          type="text"
+                          placeholder="value"
+                          value={arg.value ?? ""}
+                          onChange={(e) => handleConstructorArgs(index, e.target.value)}
+                          className="bg-gray-800 text-white px-2 py-1 rounded border border-gray-600 w-40"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>)
+            }
+
             {/* Deployment Logs */}
             {logs.length > 0 && (
               <div className="mt-4">
@@ -554,6 +500,20 @@ export default function CodeEditor() {
                 </div>
               </div>
             )}
+
+            {/* Compilation Logs */}
+            {errorLogs &&
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Compilation Logs</h3>
+                <div
+                  className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[200px] overflow-y-auto"
+                >
+                  <div className="font-mono text-sm mb-1">
+                    {errorLogs}
+                  </div>
+                </div>
+              </div>
+            }
 
             {/* Scarb.toml */}
             {showScarb && (
@@ -576,12 +536,15 @@ export default function CodeEditor() {
                   exit={{ opacity: 0, y: 100 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${result.success
-                      ? "bg-green-900/95 border-green-700"
-                      : "bg-red-900/95 border-red-700"
+                    ? "bg-green-900/95 border-green-700"
+                    : "bg-red-900/95 border-red-700"
                     }`}
                 >
                   {result.success ? (
                     <div className="flex flex-col gap-2">
+                      <div className="absolute top-2 right-2 cursor-pointer p-3">
+                        <XCircle className="w-6 h-6" onClick={() => setResult(null)} />
+                      </div>
                       <div className="font-semibold text-white flex items-center gap-2">
                         <CheckCircle className="w-6 h-6" />
                         Deployment Successful!
@@ -624,7 +587,7 @@ export default function CodeEditor() {
                   ) : (
                     <div className="text-white">
                       <div className="font-semibold text-xl flex items-center gap-2">
-                        <XCircle className="w-6 h-6" />
+                        <XCircle className="w-6 h-6" onClick={() => setResult(null)} />
                         {result.title ?? "Deployment Failed"}
                       </div>
                       <div className="text-sm mt-2">{result.error}</div>

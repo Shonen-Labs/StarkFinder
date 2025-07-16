@@ -43,10 +43,9 @@ export class ScarbGenerator {
     try {
       // First, extract basic imports from the code
       const imports = this.extractImports(sourceCode);
-      
+
       // Analyze the code to understand what it does
       const codeAnalysis = await this.analyzeCode(sourceCode);
-      
       // Generate appropriate Scarb.toml based on the analysis
       const scarbConfig = await this.generateScarbConfig(
         sourceCode,
@@ -54,7 +53,7 @@ export class ScarbGenerator {
         imports,
         codeAnalysis
       );
-      
+
       // Convert to TOML format
       return this.configToToml(scarbConfig);
     } catch (error) {
@@ -67,15 +66,13 @@ export class ScarbGenerator {
   private extractImports(code: string): string[] {
     const importRegex = /use\s+([a-zA-Z0-9_:]+)(?:::\{([^}]+)\})?;/g;
     const matches = [...code.matchAll(importRegex)];
-    
+
     return matches.flatMap((match) => {
       const base = match[1];
       const inner = match[2];
-      
+
       if (inner) {
-        return inner
-          .split(",")
-          .map((item) => `${base}::${item.trim()}`);
+        return inner.split(",").map((item) => `${base}::${item.trim()}`);
       }
       return [base];
     });
@@ -104,35 +101,51 @@ Provide a concise analysis focusing on dependencies needed.`;
     imports: string[],
     codeAnalysis: string
   ): Promise<ScarbConfig> {
-    const prompt = `Based on this Cairo contract analysis and imports, generate a proper Scarb.toml configuration.
+    const prompt = `You are a Cairo smart contract tooling assistant.
 
-Contract Name: ${contractName}
-Imports found: ${imports.join(", ")}
-Code Analysis: ${codeAnalysis}
+      Your task is to generate a valid Scarb.toml configuration as a JSON object, based on the contract's name, imports, and code analysis.
 
-Generate a JSON object with the following structure:
-{
-  "package": {
-    "name": "contract_name",
-    "version": "0.1.0",
-    "edition": "2024_07",
-    "cairo_version": "2.8.0"
-  },
-  "dependencies": {
-    "starknet": "2.8.0",
-    "openzeppelin": { "git": "https://github.com/OpenZeppelin/cairo-contracts.git", "tag": "v0.15.0" }
-  }
-}
+      ## Contract Metadata
+      - Contract Name: ${contractName}
+      - Cairo Version: 2.8.0
+      - Imports Found: ${imports.join(", ")}
 
-Rules:
-1. Use appropriate versions for Cairo 2.8.0 compatibility
-2. Include OpenZeppelin if ERC20/ERC721/Access control is detected
-3. Include alexandria if advanced math/data structures are needed
-4. Use semantic versioning
-5. Return ONLY the JSON object, no markdown or explanation`;
+      ## Code Analysis
+      ${codeAnalysis}
+
+      ## Output Format
+      Return ONLY a valid JSON object with the following structure:
+
+      {
+        "package": {
+          "name": "<contract_name>",
+          "version": "0.1.0",
+          "edition": "2024_07",
+          "cairo_version": "2.8.0"
+        },
+        "dependencies": {
+          "<name>": "<version or git/tag object>"
+        }
+      }
+
+      ## Rules
+      1. Resolve the provided imports into appropriate dependencies.
+      2. Use the correct version or git source + tag for each dependency, compatible with Cairo v2.8.0.
+      3. Do not include unused dependencies.
+      4. Use semantic versioning (e.g. "1.0.0") or git objects like this:
+
+        Example:
+        "openzeppelin": {
+          "git": "https://github.com/OpenZeppelin/cairo-contracts.git",
+          "tag": "v0.15.0"
+        }
+
+      5. All package names must be lowercase ASCII letters, numbers, or underscores.
+      6. The output must be a valid JSON object — do not include explanations, markdown, or extra text.
+    `;
 
     const response = await this.model.complete(prompt);
-    
+
     try {
       // Extract JSON from response
       const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -147,28 +160,33 @@ Rules:
     }
   }
 
-  private getDefaultScarbConfig(contractName: string, imports: string[]): ScarbConfig {
+  private getDefaultScarbConfig(
+    contractName: string,
+    imports: string[]
+  ): ScarbConfig {
     const dependencies: Record<string, any> = {
-      starknet: "2.8.0"
+      starknet: "2.8.0",
     };
 
     // Detect common dependencies from imports
     const importStr = imports.join(" ");
-    
-    if (importStr.includes("openzeppelin") || 
-        importStr.includes("ERC20") || 
-        importStr.includes("ERC721") ||
-        importStr.includes("Ownable")) {
+
+    if (
+      importStr.includes("openzeppelin") ||
+      importStr.includes("ERC20") ||
+      importStr.includes("ERC721") ||
+      importStr.includes("Ownable")
+    ) {
       dependencies.openzeppelin = {
         git: "https://github.com/OpenZeppelin/cairo-contracts.git",
-        tag: "v0.15.0"
+        tag: "v0.15.0",
       };
     }
 
     if (importStr.includes("alexandria")) {
       dependencies.alexandria = {
         git: "https://github.com/keep-starknet-strange/alexandria.git",
-        tag: "v0.1.0"
+        tag: "v0.1.0",
       };
     }
 
@@ -177,20 +195,20 @@ Rules:
         name: contractName.toLowerCase().replace(/[^a-z0-9_]/g, "_"),
         version: "0.1.0",
         edition: "2024_07",
-        cairo_version: "2.8.0"
+        cairo_version: "2.8.0",
       },
-      dependencies
+      dependencies,
     };
   }
 
   private configToToml(config: ScarbConfig): string {
     let toml = "[package]\n";
-    
+
     // Package section
     for (const [key, value] of Object.entries(config.package)) {
       toml += `${key} = "${value}"\n`;
     }
-    
+
     // Dependencies section
     toml += "\n[dependencies]\n";
     for (const [name, value] of Object.entries(config.dependencies)) {
@@ -203,9 +221,12 @@ Rules:
         toml += " }\n";
       }
     }
-    
+
     // Dev dependencies if present
-    if (config.dev_dependencies && Object.keys(config.dev_dependencies).length > 0) {
+    if (
+      config.dev_dependencies &&
+      Object.keys(config.dev_dependencies).length > 0
+    ) {
       toml += "\n[dev-dependencies]\n";
       for (const [name, value] of Object.entries(config.dev_dependencies)) {
         if (typeof value === "string") {
@@ -214,22 +235,25 @@ Rules:
           toml += `${name} = { `;
           const parts = Object.entries(value).map(([k, v]) => `${k} = "${v}"`);
           toml += parts.join(", ");
-          toml += " }\n`;"
+          toml += " }\n`;";
         }
       }
     }
-    
+
     // Cairo configuration
     toml += "\n[[target.starknet-contract]]\n";
-    toml += 'sierra = true\n';
-    toml += 'casm = true\n';
-    toml += '\n[cairo]\n';
-    toml += 'sierra-replace-ids = true\n';
-    
+    toml += "sierra = true\n";
+    toml += "casm = true\n";
+    toml += "\n[cairo]\n";
+    toml += "sierra-replace-ids = true\n";
+
     return toml;
   }
 
-  private generateBasicScarbToml(sourceCode: string, contractName: string): string {
+  private generateBasicScarbToml(
+    sourceCode: string,
+    contractName: string
+  ): string {
     const imports = this.extractImports(sourceCode);
     const config = this.getDefaultScarbConfig(contractName, imports);
     return this.configToToml(config);
