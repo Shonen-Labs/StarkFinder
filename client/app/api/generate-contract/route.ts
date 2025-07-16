@@ -9,6 +9,7 @@ import prisma from "@/lib/db";
 import { getOrCreateUser } from "@/app/api/transactions/helper";
 import path from "path";
 import { promises as fs } from "fs";
+import { ContractCacheService } from '@/lib/services/contractCacheService';
 
 // Simple in-memory set to prevent duplicate requests
 const activeRequests = new Set<string>();
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
   let requestKey = "";
 
   try {
-    const { nodes, edges, flowSummary, userId, blockchain, regenerate = false } = await req.json();
+    const { nodes, edges, flowSummary, userId, blockchain, sessionId, regenerate = false } = await req.json();
 
     // Create a unique key for this request to prevent duplicates
     requestKey = JSON.stringify({ nodes, edges, flowSummary, userId, blockchain });
@@ -236,6 +237,25 @@ sierra-replace-ids = true`;
               },
             });
 
+            // Cache in Redis (userId/sessionId)
+            let contractId = null;
+            let cacheError = null;
+            try {
+              const cachedContract = await ContractCacheService.cacheContract({
+                name: "Generated Contract",
+                sourceCode: finalCode,
+                scarbConfig: scarbToml,
+                userId,
+                sessionId,
+                blockchain: blockchain,
+              });
+              contractId = cachedContract.id;
+              console.log('Contract cached with ID:', contractId);
+            } catch (error) {
+              console.error('Error caching contract in Redis:', error);
+              cacheError = error instanceof Error ? error.message : 'Unknown cache error';
+            }
+
             // Only send final response if controller is still open
             if (!isControllerClosed) {
               // Send final response marker
@@ -245,7 +265,9 @@ sierra-replace-ids = true`;
               const responseData = {
                 sourceCode: finalCode,
                 scarbToml: scarbToml,
-                success: true
+                success: true,
+                contractId: contractId,
+                cacheError: cacheError
               };
 
               // Send the final response as JSON
