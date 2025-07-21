@@ -78,6 +78,7 @@ The application's architecture follows a multi-agent design, where each agent sp
    BOT_USERNAME=""
    BRIAN_API_KEY=""
    DATABASE_URL=""
+   REDIS_URL=""
    LAYERSWAP_API_KEY=""
    OPENAI_API_KEY=""
    ANTHROPIC_API_KEY=""
@@ -85,16 +86,26 @@ The application's architecture follows a multi-agent design, where each agent sp
    - For `BOT_USERNAME`, go to [Bot Father](https://t.me/BotFather) and create a Bot || *`NOT REQUIRED`*
    - For `BRIAN_API_KEY`, visit [Brian AI](http://docs.brianknows.org/brian-api/api-key) website and create your API key || *`REQUIRED`*
    - For `DATABASE_URL`, create or use a provider for PostgreSQL db url || *`REQUIRED`*
+   - For `REDIS_URL`, use `redis://localhost:6379` for local development || *`REQUIRED`*
    - `WEBHOOK_URL` is not required || *`NOT REQUIRED`*
    - For `LAYERSWAP_API_KEY`, Go to [Layerswap Dashboard](https://v0-docs.layerswap.io/api-reference/api-keys) and create one || *`REQUIRED`*
    - For `OPENAI_API_KEY`, go to [OpenAI API website](https://openai.com/index/openai-api/) and create one || *`REQUIRED`*
    - For `ANTHROPIC_API_KEY`, go to [Dashboard](https://console.anthropic.com/settings/keys) || *`REQUIRED`*
-5. Set up the database (both into `client` and `tg_bot` directories):
+5. Set up Redis for contract caching:
+   ```
+   # Using Docker (recommended)
+   docker run --name starkfinder-redis -p 6379:6379 -d redis
+   
+   # Or install Redis directly on Ubuntu/Debian
+   sudo apt-get install redis-server
+   redis-server
+   ```
+6. Set up the database (both into `client` and `tg_bot` directories):
    ```
    npx prisma generate
    npx prisma migrate dev
    ```
-6. Start the development server:
+7. Start the development server:
    ```
    npm run dev
    ```

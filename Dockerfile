@@ -26,6 +26,7 @@ ARG ACCOUNT_ADDRESS
 ARG OZ_ACCOUNT_PRIVATE_KEY
 ARG DATABASE_URL
 ARG DEEPSEEK_API_KEY
+ARG REDIS_URL
 
 # Create package.json for backend with all required dependencies
 RUN cat <<EOF > package.json
@@ -87,6 +88,7 @@ RUN cat <<EOF > package.json
     "framer-motion": "^10.18.0",
     "grammy": "^1.34.0",
     "https-browserify": "^1.0.0",
+    "ioredis": "^5.6.1",
     "langchain": "^0.3.10",
     "lucide-react": "^0.456.0",
     "next": "^14.2.20",
@@ -123,6 +125,7 @@ RUN cat <<EOF > package.json
   },
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.6",
+    "@types/ioredis": "^4.28.10",
     "@types/node": "^20.17.31",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^18.3.19",

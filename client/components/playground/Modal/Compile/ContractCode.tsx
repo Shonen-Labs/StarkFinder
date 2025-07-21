@@ -62,6 +62,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
   const [logs, setLogs] = useState<string[]>([]);
   const [result, setResult] = useState<DeploymentResponse | null>(null);
   const [scarbToml, setScarbToml] = useState<string>(""); // Store Scarb.toml
+  const [cachedContractId, setCachedContractId] = useState<string | null>(null); // Store cached contract ID
 
   const containerRef = useRef<HTMLDivElement>(null);
   const logsContainerRef = useRef<HTMLDivElement>(null);
@@ -213,6 +214,7 @@ const ContractCode: React.FC<ContractCodeProps> = ({
           flowSummary: flowSummary || [],
           userId: address || "default-user",
           blockchain: blockchain, // Use the selected blockchain
+          sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           regenerate: regenerate
         }),
       });
@@ -258,6 +260,15 @@ const ContractCode: React.FC<ContractCodeProps> = ({
               if (jsonResponse.scarbToml) {
                 setScarbToml(jsonResponse.scarbToml); // Store Scarb.toml
                 console.log("📋 Scarb.toml received:", jsonResponse.scarbToml.length, "characters");
+              }
+              if (jsonResponse.contractId) {
+                setCachedContractId(jsonResponse.contractId);
+                console.log("🔑 Contract cached with ID:", jsonResponse.contractId);
+                addLog(`Contract cached with ID: ${jsonResponse.contractId}`);
+              }
+              if (jsonResponse.cacheError) {
+                console.warn("⚠️ Cache error:", jsonResponse.cacheError);
+                addLog(`Cache warning: ${jsonResponse.cacheError}`);
               }
             } catch (parseError) {
               console.warn("Could not parse JSON response, using streamed code");

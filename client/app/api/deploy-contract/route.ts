@@ -23,6 +23,7 @@ import {
   ConstructorArg,
   checkForConstructorArgs,
 } from "@/lib/codeEditor";
+import { ContractCacheService } from '@/lib/services/contractCacheService';
 
 interface CompilationResult {
   success: boolean;
@@ -884,7 +885,7 @@ export async function POST(req: NextRequest) {
     // Save to database if userId is provided
     if (userId) {
       try {
-        await prisma.deployedContract.create({
+        const deployed = await prisma.deployedContract.create({
           data: {
             name: contractName,
             sourceCode: sourceCode,
@@ -896,6 +897,17 @@ export async function POST(req: NextRequest) {
           },
         });
         console.log(chalk.green("✓ Deployment saved to database"));
+        // Mark as deployed in Redis cache (if present)
+        try {
+          // Find cached contract by user and sourceCode
+          const cachedContracts = await ContractCacheService.listContractsByUser(userId);
+          const match = cachedContracts.find(c => c.sourceCode === sourceCode);
+          if (match) {
+            await ContractCacheService.markDeployed(match.id, deployed.id);
+          }
+        } catch (cacheError) {
+          console.error('Error marking contract as deployed in Redis:', cacheError);
+        }
       } catch (dbError) {
         console.error(
           chalk.yellow("⚠️  Warning: Could not save to database:"),
