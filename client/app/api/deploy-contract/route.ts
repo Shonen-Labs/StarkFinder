@@ -23,7 +23,7 @@ import {
   ConstructorArg,
   checkForConstructorArgs,
 } from "@/lib/codeEditor";
-import { ContractCacheService } from '@/lib/services/contractCacheService';
+import { ContractCacheService } from "@/lib/services/contractCacheService";
 
 interface CompilationResult {
   success: boolean;
@@ -36,7 +36,7 @@ function getContractsPath(...paths: string[]) {
   return path.join(process.cwd(), "..", "contracts", ...paths);
 }
 
-function sanitizePaths(output: string): string {
+function normalizePaths(output: string): string {
   const contractsPath = path.resolve(getContractsPath()); // normalized absolute path
   const escapedContractsPath = contractsPath.replace(
     /[-\/\\^$*+?.()|[\]{}]/g,
@@ -290,7 +290,6 @@ async function compileCairo(): Promise<CompilationResult> {
         cwd: getContractsPath(),
         // maxBuffer: 1024 * 1024 * 10, // 10 MB buffer
       });
-      // console.log(result);
       stdout = result.stdout;
       stderr = result.stderr;
     } catch (error) {
@@ -375,7 +374,7 @@ async function compileCairo(): Promise<CompilationResult> {
       success: false,
       contracts: [],
       error: errorDetails,
-      errorLog: stdout ? sanitizePaths(stdout) : stderr,
+      errorLog: stdout ? normalizePaths(stdout) : stderr,
     };
   }
 }
@@ -900,13 +899,19 @@ export async function POST(req: NextRequest) {
         // Mark as deployed in Redis cache (if present)
         try {
           // Find cached contract by user and sourceCode
-          const cachedContracts = await ContractCacheService.listContractsByUser(userId);
-          const match = cachedContracts.find(c => c.sourceCode === sourceCode);
+          const cachedContracts =
+            await ContractCacheService.listContractsByUser(userId);
+          const match = cachedContracts.find(
+            (c) => c.sourceCode === sourceCode
+          );
           if (match) {
             await ContractCacheService.markDeployed(match.id, deployed.id);
           }
         } catch (cacheError) {
-          console.error('Error marking contract as deployed in Redis:', cacheError);
+          console.error(
+            "Error marking contract as deployed in Redis:",
+            cacheError
+          );
         }
       } catch (dbError) {
         console.error(
