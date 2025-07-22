@@ -63,6 +63,10 @@ model GeneratedContract {
   userId      String
   User        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
+  isDeployed  Boolean  @default(false)
+  deployedContractId String? 
+  deployedAt   DateTime?
+  DeployedContract DeployedContract? @relation(fields: [deployedContractId], references: [id])
 }
 
 model DeployedContract {
@@ -76,6 +80,7 @@ model DeployedContract {
   transactionHash String
   User        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
+  GeneratedContract GeneratedContract[]
 }
 
 model Agent {

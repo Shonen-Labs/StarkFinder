@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { Copy } from "lucide-react";
+import { CachedContractsManager } from '@/components/cached-contracts/CachedContractsManager';
 
 type Contract = {
   id: string;
@@ -25,9 +26,7 @@ type UserData = {
 
 export default function UserProfilePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<"deployed" | "generated">(
-    "deployed"
-  );
+  const [activeTab, setActiveTab] = useState<'deployed' | 'generated' | 'cached'>('deployed');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
@@ -170,6 +169,16 @@ export default function UserProfilePage() {
             >
               Generated Contracts
             </button>
+            <button
+              className={`px-6 py-3 text-sm font-medium ${
+                activeTab === "cached"
+                  ? "border-b-2 border-purple-500 text-white"
+                  : "text-gray-400 hover:text-gray-300"
+              }`}
+              onClick={() => setActiveTab("cached")}
+            >
+              Cached Contracts
+            </button>
           </div>
         </div>
 
@@ -192,6 +201,10 @@ export default function UserProfilePage() {
                 type="generated"
               />
             ))
+          ) : activeTab === "cached" ? (
+            <div className="col-span-full">
+              <CachedContractsManager userId={id as string} />
+            </div>
           ) : (
             <div className="col-span-full text-center p-12">
               <div className="bg-gray-800 bg-opacity-70 rounded-lg p-8">

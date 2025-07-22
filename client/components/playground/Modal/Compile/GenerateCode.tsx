@@ -12,12 +12,14 @@ interface GenerateCodeProps {
   appendToSourceCode: (sourceCode: string) => void;
   sourceCode?: string;
   setBlockchain?: (blockchain: string) => void;
+  setSourceCode: (sourceCode: string) => void;
 }
 
 export default function GenerateCode({
   flowSummary,
   setDisplayState,
   setBlockchain,
+  setSourceCode,
 }: GenerateCodeProps) {
   const [selectedOption, setSelectedOption] = useState("");
 
@@ -26,6 +28,7 @@ export default function GenerateCode({
       if (setBlockchain) {
         setBlockchain(selectedOption);
       }
+      setSourceCode("");
       setDisplayState("contract");
     }
   };
