@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
+import Header from "@/components/playground/Header"
 
 interface Message {
   id: string
@@ -52,24 +53,27 @@ export default function ChatPage() {
   }
 
   return (
-    <div
-      className="flex min-h-screen w-full overflow-x-hidden overflow-y-hidden"
-      style={{
-        backgroundColor: "#f9f7f3",
-        backgroundImage: "radial-gradient(circle, #d3d3d3 1px, transparent 1px)",
-        backgroundSize: "15px 15px",
-      }}
-    >
-      <main className="flex-1 w-full h-screen overflow-hidden flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-white text-gray-900 border-gray-200 shadow-lg rounded-xl">
-          <CardHeader className="border-b border-gray-200">
+    <div className="flex flex-col relative min-h-screen  w-full overflow-x-hidden overflow-y-hidden">
+      <Header
+        showClearButton={false}
+        showFinishButton={false}
+        handleClear={() => {}}
+        nodes={[]}
+        edges={[]}
+        flowSummary=""
+        selectedNode={null}
+        handleDelete={() => {}}
+      />
+      <main className="flex-1 w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 h-screen overflow-hidden flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl bg-gray-950 text-gray-50 border-gray-800 shadow-lg rounded-xl">
+          <CardHeader className="border-b border-gray-800">
             <CardTitle className="text-xl font-semibold text-center">Cairo Contract Generator Chatbot</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             <ScrollArea className="h-[60vh] pr-4">
               <div className="space-y-4">
                 {messages.length === 0 && (
-                  <div className="text-center text-gray-500 py-10">
+                  <div className="text-center text-gray-400 py-10">
                     Type a description of the Cairo contract you want to generate!
                   </div>
                 )}
@@ -79,7 +83,7 @@ export default function ChatPage() {
                     className={cn("flex items-start gap-3", message.role === "user" ? "justify-end" : "justify-start")}
                   >
                     {message.role === "assistant" && (
-                      <Avatar className="h-8 w-8 border border-gray-300">
+                      <Avatar className="h-8 w-8 border border-gray-700">
                         <AvatarImage src="/placeholder.svg?height=32&width=32" alt="AI" />
                         <AvatarFallback>AI</AvatarFallback>
                       </Avatar>
@@ -87,13 +91,13 @@ export default function ChatPage() {
                     <div
                       className={cn(
                         "max-w-[70%] rounded-lg p-3",
-                        message.role === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800", // AI message is light gray with dark text
+                        message.role === "user" ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-50",
                       )}
                     >
                       <p className="text-sm">{message.content}</p>
                     </div>
                     {message.role === "user" && (
-                      <Avatar className="h-8 w-8 border border-gray-300 text-[#f9f7f3]">
+                      <Avatar className="h-8 w-8 border border-gray-700">
                         <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
                         <AvatarFallback>You</AvatarFallback>
                       </Avatar>
@@ -102,11 +106,11 @@ export default function ChatPage() {
                 ))}
                 {isLoading && (
                   <div className="flex items-start gap-3 justify-start">
-                    <Avatar className="h-8 w-8 border border-gray-300 text-[#f9f7f3]">
+                    <Avatar className="h-8 w-8 border border-gray-700">
                       <AvatarImage src="/placeholder.svg?height=32&width=32" alt="AI" />
                       <AvatarFallback>AI</AvatarFallback>
                     </Avatar>
-                    <div className="max-w-[70%] rounded-lg p-3 bg-gray-100 text-gray-800">
+                    <div className="max-w-[70%] rounded-lg p-3 bg-gray-800 text-gray-50">
                       <p className="text-sm animate-pulse">Thinking...</p>
                     </div>
                   </div>
@@ -115,13 +119,13 @@ export default function ChatPage() {
               </div>
             </ScrollArea>
           </CardContent>
-          <CardFooter className="border-t border-gray-200 p-4">
+          <CardFooter className="border-t border-gray-800 p-4">
             <form onSubmit={handleSubmit} className="flex w-full gap-2">
               <Input
                 placeholder="Describe your Cairo contract..."
                 value={input}
                 onChange={handleInputChange}
-                className="flex-1 bg-gray-50 border-gray-300 text-gray-800 placeholder:text-gray-500 focus-visible:ring-blue-500"
+                className="flex-1 bg-gray-800 border-gray-700 text-gray-50 placeholder:text-gray-400 focus-visible:ring-blue-500"
                 disabled={isLoading}
               />
               <Button type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
