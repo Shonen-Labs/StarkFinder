@@ -86,7 +86,7 @@
     "sharp": "^0.34.3",
     "solc": "^0.8.30",
     "sonner": "^1.7.2",
-    "starknet": "^7.6.2",
+    "starknet": "^6.24.1",
     "starknetkit": "^2.3.3",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
