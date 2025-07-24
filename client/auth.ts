@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import prisma from "./lib/db";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,
   // Remove the adapter line - you don't need it with JWT strategy
   providers: [
     Google({
