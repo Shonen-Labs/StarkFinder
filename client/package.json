@@ -104,7 +104,7 @@
     "@types/node": "^20.17.31",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^19.1.8",
-    "@types/react-dom": "^18",
+    "@types/react-dom": "^19.1.6",
     "@types/react-syntax-highlighter": "^15.5.13",
     "concurrently": "^9.1.2",
     "eslint": "^8",
