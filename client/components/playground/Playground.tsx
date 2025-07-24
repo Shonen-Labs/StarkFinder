@@ -12,7 +12,7 @@ import {
 
 // Third-party libraries
 import { motion } from "framer-motion";
-import {} from "lucide-react";
+import { } from "lucide-react";
 import ReactFlow, {
   Background,
   Edge,
@@ -36,11 +36,14 @@ import EventNode from "./Blocknode/EventNode";
 import LiquidityNode from "./Blocknode/LiquidityNode";
 import StakeNode from "./Blocknode/StakeNode";
 import SwapNode from "./Blocknode/SwapNode";
-import Header from "./Header";
+import Header from "../Header";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { FlowSummaryItem } from "@/types/main-types";
 import FloatingSidebar from "./FloatingSidebar";
+import { Button } from "@/components/ui/button";
+import Compile from "./Modal/Compile";
+import { X, Menu } from "lucide-react";
 
 
 interface BlockNodeInterface extends NodeProps {
@@ -71,6 +74,8 @@ export default function Playground() {
   const [showClearButton, setShowClearButton] = useState(false);
   const edgeReconnectSuccessful = useRef(true);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
+
 
   // Effect to check if 'start' and 'end' nodes are present
   useEffect(() => {
@@ -206,15 +211,35 @@ export default function Playground() {
         transition={{ duration: 0.3 }}
       >
         <Header
-          showClearButton={showClearButton}
-          showFinishButton={showFinishButton}
-          handleClear={handleClear}
-          nodes={nodes}
-          edges={edges}
-          flowSummary={flowSummary}
-          selectedNode={selectedNode}
-          handleDelete={handleDeleteNode}
-        />
+        >
+          <div className="flex items-center ml-2 gap-3">
+            {!!selectedNode && (
+              <Button
+                onClick={() => handleDeleteNode(selectedNode)}
+                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
+              >
+                Delete node
+              </Button>
+            )}
+            {showClearButton && (
+              <Button
+                onClick={handleClear}
+                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
+              >
+                Clear
+              </Button>
+            )}
+            {showFinishButton && (
+              <Compile
+                nodes={nodes}
+                edges={edges}
+                isOpen={isCompileModalOpen}
+                onOpenChange={setIsCompileModalOpen}
+                flowSummary={flowSummary}
+              />
+            )}
+          </div>
+        </Header>
       </motion.div>
       <div className="flex flex-row">
         <div className="h-screen w-[312px] overflow-y-scroll overflow-x-hidden  hover:scrollbar-thumb-gray-400 scrollbar-transparent hide-scrollbar">
@@ -245,7 +270,7 @@ export default function Playground() {
                 key={edge.id}
                 style={
                   selectedNode &&
-                  (edge.source === selectedNode || edge.target === selectedNode)
+                    (edge.source === selectedNode || edge.target === selectedNode)
                     ? edgeStyles.selected
                     : edgeStyles.default
                 }
@@ -323,12 +348,12 @@ export default function Playground() {
         block.id === "stake"
           ? "stakeNode"
           : block.id === "swap"
-          ? "swapNode"
-          : block.id === "liquidity"
-          ? "liquidityNode"
-          : block.id === "event"
-          ? "eventNode"
-          : "blockNode",
+            ? "swapNode"
+            : block.id === "liquidity"
+              ? "liquidityNode"
+              : block.id === "event"
+                ? "eventNode"
+                : "blockNode",
       position: { x: 500, y: 100 + nodes.length * 100 },
       data: {
         ...block,
@@ -501,11 +526,10 @@ export default function Playground() {
               {lintErrors.map((error, index) => (
                 <div
                   key={index}
-                  className={`flex items-start space-x-2 ${
-                    error.severity === "error"
-                      ? "text-red-400"
-                      : "text-yellow-400"
-                  }`}
+                  className={`flex items-start space-x-2 ${error.severity === "error"
+                    ? "text-red-400"
+                    : "text-yellow-400"
+                    }`}
                 >
                   <span className="font-mono">Line {error.line}:</span>
                   <span className="flex-1">{error.message}</span>
