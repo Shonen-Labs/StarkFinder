@@ -4,6 +4,9 @@ import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import prisma from "./lib/db";
 
+// Force Node.js runtime for auth to avoid Edge Runtime issues with bcryptjs
+export const runtime = 'nodejs';
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   // Remove the adapter line - you don't need it with JWT strategy

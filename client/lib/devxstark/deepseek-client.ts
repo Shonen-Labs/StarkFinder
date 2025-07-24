@@ -53,7 +53,8 @@ export class DeepSeekClient {
     this.maxRetries = options.maxRetries ?? 3;
     this.baseURL = options.baseURL || "https://api.deepseek.com";
 
-    if (!this.apiKey) {
+    // Only throw error if we're not in build time
+    if (!this.apiKey && typeof window !== 'undefined') {
       throw new Error(
         "DEEPSEEK_API_KEY is not configured. Please set it in environment variables or pass it as an option."
       );

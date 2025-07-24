@@ -16,14 +16,19 @@ interface GenerateOptions {
 }
 
 export class CairoContractGenerator {
-  private model: DeepSeekClient;
+  private model: DeepSeekClient | null = null;
 
   constructor() {
-    this.model = createDeepSeekClient({
-      model: 'deepseek-coder',
-      temperature: 0.2,
-      maxTokens: 4000
-    });
+    try {
+      this.model = createDeepSeekClient({
+        model: 'deepseek-coder',
+        temperature: 0.2,
+        maxTokens: 4000
+      });
+    } catch (error) {
+      console.warn('DeepSeek client initialization failed:', error);
+      this.model = null;
+    }
   }
 
   async generateContract(
@@ -31,6 +36,13 @@ export class CairoContractGenerator {
     options: GenerateOptions = {}
   ): Promise<ContractGenerationResult> {
     try {
+      if (!this.model) {
+        return {
+          success: false,
+          error: "DeepSeek API is not configured. Please set DEEPSEEK_API_KEY in your environment variables.",
+        };
+      }
+
       // Format the messages using LangChain's ChatPromptTemplate
       const messages = await contractPromptTemplate.formatMessages({ requirements });
       
@@ -102,6 +114,12 @@ export class CairoContractGenerator {
   async generateContractNonStreaming(
     requirements: string
   ): Promise<ContractGenerationResult> {
+    if (!this.model) {
+      return {
+        success: false,
+        error: "DeepSeek API is not configured. Please set DEEPSEEK_API_KEY in your environment variables.",
+      };
+    }
     return this.generateContract(requirements, {});
   }
 
@@ -257,6 +275,10 @@ export class CairoContractGenerator {
 
   // Utility method for simple completions
   async complete(prompt: string, systemPrompt?: string): Promise<string> {
+    if (!this.model) {
+      throw new Error("DeepSeek API is not configured. Please set DEEPSEEK_API_KEY in your environment variables.");
+    }
+    
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
     
     if (systemPrompt) {
