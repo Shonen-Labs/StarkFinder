@@ -47,7 +47,12 @@ export default function UserProfilePage() {
       //   throw new Error('Failed to fetch user data');
       // }
       const data = await response.json();
-      setUserData(data);
+      // setUserData(data); // old code commented out
+      setUserData({
+        ...data,
+        deployedContracts: data.deployedContracts ?? [],
+        generatedContracts: data.generatedContracts ?? [],
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -126,10 +131,10 @@ export default function UserProfilePage() {
               )}
               <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                 <span className="px-3 py-1 bg-indigo-800 rounded-full text-xs text-indigo-100">
-                  {userData.deployedContracts.length} Deployed
+                  {(userData.deployedContracts?.length ?? 0)} Deployed
                 </span>
                 <span className="px-3 py-1 bg-purple-800 rounded-full text-xs text-purple-100">
-                  {userData.generatedContracts.length} Generated
+                  {(userData.generatedContracts?.length ?? 0)} Generated
                 </span>
                 <span className="px-3 py-1 bg-blue-800 rounded-full text-xs text-blue-100">
                   Member since{" "}
