@@ -32,7 +32,7 @@ export interface DeploymentResponse {
 
 export interface CompiledContract {
   sierraCode: any;
-  casmCode: any;
+  casmCode: any
 }
 
 export interface ContractPattern {
