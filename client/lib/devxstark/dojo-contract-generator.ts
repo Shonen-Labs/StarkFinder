@@ -15,10 +15,15 @@ interface GenerateOptions {
 }
 
 export class DojoContractGenerator {
-  private model: DeepSeekClient;
+  private model: DeepSeekClient | null = null;
 
   constructor() {
-    this.model = createDeepSeekClient();
+    try {
+      this.model = createDeepSeekClient();
+    } catch (error) {
+      console.warn('DeepSeek client initialization failed:', error);
+      this.model = null;
+    }
   }
 
   async generateContract(
@@ -26,6 +31,13 @@ export class DojoContractGenerator {
     options: GenerateOptions = {}
   ): Promise<DojoContractGenerationResult> {
     try {
+      if (!this.model) {
+        return {
+          success: false,
+          error: "DeepSeek API is not configured. Please set DEEPSEEK_API_KEY in your environment variables.",
+        };
+      }
+
       // Format the messages using LangChain's ChatPromptTemplate
       const messages = await dojoContractPromptTemplate.formatMessages({ requirements });
       
@@ -91,6 +103,12 @@ export class DojoContractGenerator {
   async generateContractNonStreaming(
     requirements: string
   ): Promise<DojoContractGenerationResult> {
+    if (!this.model) {
+      return {
+        success: false,
+        error: "DeepSeek API is not configured. Please set DEEPSEEK_API_KEY in your environment variables.",
+      };
+    }
     return this.generateContract(requirements, {});
   }
 
@@ -208,6 +226,10 @@ export class DojoContractGenerator {
 
   // Utility method for simple completions
   async complete(prompt: string, systemPrompt?: string): Promise<string> {
+    if (!this.model) {
+      throw new Error("DeepSeek API is not configured. Please set DEEPSEEK_API_KEY in your environment variables.");
+    }
+    
     const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [];
     
     if (systemPrompt) {
