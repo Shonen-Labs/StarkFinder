@@ -13,6 +13,7 @@ import { CustomBlockSection } from "./components/CustomBlockSection";
 // Hooks
 import { useSidebarState } from "./hooks/useSidebarState";
 import { useCustomBlocks } from "./hooks/useCustomBlocks";
+import { useUser } from "@/hooks/useUser";
 
 // Utils
 import { dojoBlockAdapter } from "./utils/adapters";
@@ -40,7 +41,9 @@ import AirdropIcon from "@/components/svgs/AirdropIcon";
 import LiquidDropIcon from "@/components/svgs/LiquidDropIcon";
 
 export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
-  const [environment, setEnvironment] = useState<"starknet" | "dojo">("starknet");
+  const [environment, setEnvironment] = useState<"starknet" | "dojo">(
+    "starknet"
+  );
   const [onToggleButton, setOnToggleButton] = useState(false);
   const [sidebarHeight, setSidebarHeight] = useState<number | null>(null);
   const starknetRef = useRef<HTMLDivElement>(null);
@@ -52,6 +55,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     setIsCustomModalOpen,
     onSubmitCustomBlock,
   } = useCustomBlocks(addBlock);
+  const { user } = useUser(); // get user object
 
   // Create combined trigger actions
   const combined = triggerActions.map((action, index) => ({
@@ -70,9 +74,12 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
     setEnvironment(newEnvironment);
   };
 
-  const sidebarStyle = environment === "dojo" && sidebarHeight
-    ? { minHeight: `${sidebarHeight}px` }
-    : {};
+  const sidebarStyle =
+    environment === "dojo" && sidebarHeight
+      ? { minHeight: `${sidebarHeight}px` }
+      : {};
+
+  const currentUserId = user?.id;
 
   return (
     <div
@@ -121,7 +128,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Token (ERC-20 Deflationary)"
                 icon={<CoinIcon />}
@@ -153,7 +160,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="NFT Collection (ERC-1155)"
                 icon={<CubeIcon />}
@@ -185,7 +192,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Staking"
                 icon={<StakeTokenIcon />}
@@ -198,7 +205,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Farming"
                 icon={<YieldFarmingIcon />}
@@ -211,7 +218,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="ERC-4626 (Tokenized Vaults)"
                 icon={<BagIcon />}
@@ -243,7 +250,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Multisig"
                 icon={<PadlockIcon />}
@@ -256,7 +263,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Multisig Wallet"
                 icon={<BagIcon />}
@@ -269,7 +276,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Vesting"
                 icon={<ClockIcon />}
@@ -301,7 +308,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="AirDrop (Multisender)"
                 icon={<AirdropIcon />}
@@ -314,7 +321,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Token Locker"
                 icon={<PadlockIcon />}
@@ -327,7 +334,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 onToggleButton={onToggleButton}
                 switchToggleBtn={switchToggleBtn}
               />
-              
+
               <ContractSection
                 title="Liquidity Locker"
                 icon={<LiquidDropIcon />}
@@ -362,12 +369,25 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
       />
       {/* Navigation Links */}
       <div className="mt-4">
-        <Link href="/devx/contracts" className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium">
+        <Link
+          href="/devx/contracts"
+          className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
+        >
           Contracts
         </Link>
       </div>
-      <Link href="/devx/resources" className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium">
+      <Link
+        href="/devx/resources"
+        className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
+      >
         Resources
+      </Link>
+
+      <Link
+        href={currentUserId ? `/devx/profile/${currentUserId}` : "/devx/profile"}
+        className="inline-flex justify-center py-3 w-full text-sm rounded-md bg-neutral-50 hover:bg-gray-200 font-medium"
+      >
+        Profile
       </Link>
 
       <CustomBlockModal
