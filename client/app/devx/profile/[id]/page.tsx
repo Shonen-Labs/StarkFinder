@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { Copy } from "lucide-react";
-import { CachedContractsManager } from '@/components/cached-contracts/CachedContractsManager';
+import { CachedContractsManager } from "@/components/cached-contracts/CachedContractsManager";
+import OpenEditorButton from "@/components/OpenEditorButton";
 
 type Contract = {
   id: string;
@@ -13,6 +14,11 @@ type Contract = {
   contractAddress?: string;
   createdAt: string;
   updatedAt?: string;
+  sourceCode: string;
+  scarbConfig?: string;
+  isDeployed?: boolean;
+  deployedContractId?: string;
+  deployedAt?: string;
 };
 
 type UserData = {
@@ -26,7 +32,9 @@ type UserData = {
 
 export default function UserProfilePage() {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<'deployed' | 'generated' | 'cached'>('deployed');
+  const [activeTab, setActiveTab] = useState<
+    "deployed" | "generated" | "cached"
+  >("deployed");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
@@ -44,7 +52,7 @@ export default function UserProfilePage() {
       const response = await fetch(`/api/user/${id}`);
       console.log(response);
       // if (!response.ok) {
-      //   throw new Error('Failed to fetch user data');
+      //   throw new Error("Failed to fetch user data");
       // }
       const data = await response.json();
       setUserData(data);
@@ -245,6 +253,7 @@ function ContractCard({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
   return (
     <div className="bg-gray-800 bg-opacity-70 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
       <div className="p-6">
@@ -277,16 +286,17 @@ function ContractCard({
             {contract.contractAddress && (
               <button
                 onClick={handleCopy}
-                className={`${copied ? "text-green-600" : "text-gray-400"} hover:text-white transition`}
+                className={`${
+                  copied ? "text-green-600" : "text-gray-400"
+                } hover:text-white transition`}
                 title="Copy address"
               >
                 <Copy className="w-4 h-4" />
               </button>
             )}
           </div>
-             {copied && <div className="text-green-400 text-xs mt-1">Copied!</div>}
+          {copied && <div className="text-green-400 text-xs mt-1">Copied!</div>}
 
-          
           {contract.contractAddress && (
             <a
               href={`https://sepolia.starkscan.co/contract/${contract.contractAddress}`}
@@ -330,9 +340,12 @@ function ContractCard({
           View Details
         </button>
         {type === "generated" && !contract.contractAddress && (
-          <button className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
-            Deploy Contract
-          </button>
+          <OpenEditorButton
+            contractCode={contract.sourceCode}
+            contractName={contract.name}
+            contractId={contract.id}
+            classname="bg-indigo-600 hover:bg-indigo-700 text-white text-sm transition-colors py-1 px-2 rounded-sm"
+          />
         )}
       </div>
     </div>

@@ -17,6 +17,7 @@ export async function GET(
             name: true,
             contractAddress: true,
             createdAt: true,
+            sourceCode: true,
           },
         },
         generatedContracts: {
@@ -24,6 +25,11 @@ export async function GET(
             id: true,
             name: true,
             createdAt: true,
+            sourceCode: true,
+            scarbConfig: true,
+            isDeployed: true,
+            deployedContractId: true,
+            deployedAt: true,
           },
         },
       },
@@ -32,7 +38,6 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    
 
     return NextResponse.json({
       name: user.name,
@@ -48,4 +53,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

@@ -582,6 +582,7 @@ export async function POST(req: NextRequest) {
       sourceCode,
       scarbToml,
       constructorArgs,
+      generatedContractId,
     } = requestBody;
 
     if (!sourceCode) {
@@ -896,6 +897,31 @@ export async function POST(req: NextRequest) {
           },
         });
         console.log(chalk.green("✓ Deployment saved to database"));
+
+        // Delete the generated contract after successful deployment
+        if (generatedContractId) {
+          try {
+            const deletedContract = await prisma.generatedContract.delete({
+              where: {
+                id: generatedContractId,
+                userId: userId,
+              },
+            });
+            console.log(
+              chalk.green(
+                `✓ Generated contract ${generatedContractId} deleted after deployment`
+              )
+            );
+          } catch (deleteError) {
+            console.warn(
+              chalk.yellow(
+                `⚠️  Warning: Could not delete generated contract ${generatedContractId}:`
+              ),
+              deleteError
+            );
+          }
+        }
+
         // Mark as deployed in Redis cache (if present)
         try {
           // Find cached contract by user and sourceCode
@@ -932,6 +958,7 @@ export async function POST(req: NextRequest) {
       classHash: declareResponse.class_hash,
       casmHash: casmHash,
       transactionHash: deployResponse.transaction_hash,
+      generatedContractDeleted: !!generatedContractId,
     });
   } catch (error) {
     console.error(chalk.red("\n❌ Contract deployment error:\n"), error);
