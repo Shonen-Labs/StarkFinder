@@ -23,7 +23,14 @@ import { Steps } from "@/components/ui/steps";
 import { DeploymentResponse, DeploymentStep } from "@/types/main-types";
 import { useRouter } from "next/navigation";
 import { scarbGenerator } from "@/lib/devxstark/scarb-generator";
-import { extractConstructorArgs, ConstructorArg, initialSteps, initializeCodeStore, extractImports, generateScarb } from "@/lib/codeEditor";
+import {
+  extractConstructorArgs,
+  ConstructorArg,
+  initialSteps,
+  initializeCodeStore,
+  extractImports,
+  generateScarb,
+} from "@/lib/codeEditor";
 
 interface ExtendedDeploymentResponse extends DeploymentResponse {
   casmHash?: string;
@@ -56,7 +63,7 @@ export default function CodeEditor() {
       const constructor = extractConstructorArgs(sourceCode);
       setConstructorArgs(constructor);
     }
-  }, [sourceCode])
+  }, [sourceCode]);
 
   // Initialize code store and component state from localStorage on mount
   useEffect(() => {
@@ -104,7 +111,6 @@ export default function CodeEditor() {
 
   const [isAuditing, setIsAuditing] = useState(false);
   const [isDeploying, setIsDeploying] = useState(false);
-
 
   const handleConstructorArgs = (index: number, newValue: string) => {
     const updatedArgs = [...constructorArgs];
@@ -217,7 +223,9 @@ export default function CodeEditor() {
 
     try {
       if (constructorArgs.length > 0) {
-        const arg = constructorArgs.find(arg => !arg.value || arg.value.trim() === "");
+        const arg = constructorArgs.find(
+          (arg) => !arg.value || arg.value.trim() === ""
+        );
 
         if (arg) {
           throw new Error(`Constructor argument "${arg.name}" is not set.`);
@@ -252,7 +260,8 @@ export default function CodeEditor() {
           sourceCode: sourceCode,
           scarbToml: scarbToml,
           userId: localStorage.getItem("userId"), // Assuming you store userId
-          constructorArgs: JSON.stringify(constructorArgs)
+          constructorArgs: JSON.stringify(constructorArgs),
+          generatedContractId: localStorage.getItem("contractId") || null, // Use the contract ID from localStorage
         }),
       });
 
@@ -337,6 +346,7 @@ export default function CodeEditor() {
     localStorage.removeItem("editorCode");
     localStorage.removeItem("contractName");
     localStorage.removeItem("generatedScarbToml");
+    localStorage.removeItem("contractId");
     setSourceCode("");
     setResult(null);
     setSteps(initialSteps);
@@ -392,8 +402,8 @@ export default function CodeEditor() {
                   {isGeneratingScarb
                     ? "Generating..."
                     : showScarb
-                      ? "Scarb Generated"
-                      : "Generate Scarb"}
+                    ? "Scarb Generated"
+                    : "Generate Scarb"}
                 </Button>
                 <Button
                   onClick={() => (isConnected ? handleCompile() : null)}
@@ -462,27 +472,31 @@ export default function CodeEditor() {
             </Card>
 
             {/* Constructor Args */}
-            {
-              constructorArgs.length > 0 && (
-                <div className="mt-4">
-                  <h3 className="text-lg font-semibold mb-2">Constructor Args</h3>
-                  <div className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[300px] overflow-y-auto space-y-3">
-                    {constructorArgs.map((arg, index) => (
-                      <div key={index} className="font-mono text-sm flex items-center space-x-2">
-                        <span>{arg.name}:</span>
-                        <span className="text-blue-300">{arg.type}</span>
-                        <input
-                          type="text"
-                          placeholder="value"
-                          value={arg.value ?? ""}
-                          onChange={(e) => handleConstructorArgs(index, e.target.value)}
-                          className="bg-gray-800 text-white px-2 py-1 rounded border border-gray-600 w-40"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>)
-            }
+            {constructorArgs.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Constructor Args</h3>
+                <div className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[300px] overflow-y-auto space-y-3">
+                  {constructorArgs.map((arg, index) => (
+                    <div
+                      key={index}
+                      className="font-mono text-sm flex items-center space-x-2"
+                    >
+                      <span>{arg.name}:</span>
+                      <span className="text-blue-300">{arg.type}</span>
+                      <input
+                        type="text"
+                        placeholder="value"
+                        value={arg.value ?? ""}
+                        onChange={(e) =>
+                          handleConstructorArgs(index, e.target.value)
+                        }
+                        className="bg-gray-800 text-white px-2 py-1 rounded border border-gray-600 w-40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Deployment Logs */}
             {logs.length > 0 && (
@@ -502,18 +516,14 @@ export default function CodeEditor() {
             )}
 
             {/* Compilation Logs */}
-            {errorLogs &&
+            {errorLogs && (
               <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-2">Compilation Logs</h3>
-                <div
-                  className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[200px] overflow-y-auto"
-                >
-                  <div className="font-mono text-sm mb-1">
-                    {errorLogs}
-                  </div>
+                <div className="bg-gray-900 text-gray-100 rounded-lg p-4 max-h-[200px] overflow-y-auto">
+                  <div className="font-mono text-sm mb-1">{errorLogs}</div>
                 </div>
               </div>
-            }
+            )}
 
             {/* Scarb.toml */}
             {showScarb && (
@@ -535,15 +545,19 @@ export default function CodeEditor() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 100 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${result.success
-                    ? "bg-green-900/95 border-green-700"
-                    : "bg-red-900/95 border-red-700"
-                    }`}
+                  className={`sticky bottom-0 left-0 right-0 p-6 border mt-4 ${
+                    result.success
+                      ? "bg-green-900/95 border-green-700"
+                      : "bg-red-900/95 border-red-700"
+                  }`}
                 >
                   {result.success ? (
                     <div className="flex flex-col gap-2">
                       <div className="absolute top-2 right-2 cursor-pointer p-3">
-                        <XCircle className="w-6 h-6" onClick={() => setResult(null)} />
+                        <XCircle
+                          className="w-6 h-6"
+                          onClick={() => setResult(null)}
+                        />
                       </div>
                       <div className="font-semibold text-white flex items-center gap-2">
                         <CheckCircle className="w-6 h-6" />
@@ -587,7 +601,10 @@ export default function CodeEditor() {
                   ) : (
                     <div className="text-white">
                       <div className="font-semibold text-xl flex items-center gap-2">
-                        <XCircle className="w-6 h-6" onClick={() => setResult(null)} />
+                        <XCircle
+                          className="w-6 h-6"
+                          onClick={() => setResult(null)}
+                        />
                         {result.title ?? "Deployment Failed"}
                       </div>
                       <div className="text-sm mt-2">{result.error}</div>
