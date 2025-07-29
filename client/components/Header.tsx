@@ -4,7 +4,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import Compile from "../Modal/Compile";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { DisconnectButton } from "@/lib/Connect";
 import {
@@ -21,29 +20,14 @@ import { Menu, X } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 
 interface HeaderProps {
-  showClearButton: boolean;
-  showFinishButton: boolean;
-  handleClear: () => void;
-  nodes: any;
-  edges: any;
-  flowSummary: any;
-  selectedNode: any;
-  handleDelete: (node: any) => void;
   selectedModel?: string;
   onModelChange?: (model: string) => void;
+  children?: React.ReactNode;
 }
 
 export default function Header({
-  showClearButton,
-  showFinishButton,
-  handleClear,
-  nodes,
-  edges,
-  flowSummary,
-  selectedNode,
-  handleDelete,
+  children,
 }: HeaderProps) {
-  const [isCompileModalOpen, setIsCompileModalOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -81,7 +65,7 @@ export default function Header({
     }
   };
 
-  const isDeleteVisible = !!selectedNode;
+
 
   return (
     <>
@@ -154,33 +138,9 @@ export default function Header({
               </motion.button>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            {isDeleteVisible && (
-              <Button
-                onClick={() => handleDelete(selectedNode)}
-                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
-              >
-                Delete node
-              </Button>
-            )}
-            {showClearButton && (
-              <Button
-                onClick={handleClear}
-                className="px-4 bg-[#252525] hover:bg-[#323232] text-white h-8"
-              >
-                Clear
-              </Button>
-            )}
-            {showFinishButton && (
-              <Compile
-                nodes={nodes}
-                edges={edges}
-                isOpen={isCompileModalOpen}
-                onOpenChange={setIsCompileModalOpen}
-                flowSummary={flowSummary}
-              />
-            )}
-          </div>
+
+          {children}
+
           <div className="md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

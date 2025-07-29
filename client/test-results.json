@@ -1,0 +1,48 @@
+{
+  "passed": 7,
+  "failed": 0,
+  "details": [
+    {
+      "name": "Basic ERC20 Token",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 363
+    },
+    {
+      "name": "Complex NFT Marketplace",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 584
+    },
+    {
+      "name": "Testing Contract",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 300
+    },
+    {
+      "name": "Alexandria Math Contract",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 492
+    },
+    {
+      "name": "Grouped Imports",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 377
+    },
+    {
+      "name": "Empty Contract",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 279
+    },
+    {
+      "name": "Comments Only",
+      "status": "PASSED",
+      "generationTime": 0,
+      "contentLength": 277
+    }
+  ]
+}

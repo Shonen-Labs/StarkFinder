@@ -152,11 +152,85 @@ export const generateScarb = (deeps: string[]): string => {
   const baseNames = Array.from(
     new Set(uniqueDeeps.map((dep) => dep.split("::")[0]))
   );
-  const deepFormatted = baseNames.map((name) => `${name} = "2.9.1"`).join("\n");
-  return `[package]
-    name = "GeneratedContract"
-    version = "0.1.0"
-    
+
+  // Enhanced dependency mapping
+  const dependencies: Record<string, string | object> = {
+    starknet: "2.8.0"
+  };
+
+  baseNames.forEach(name => {
+    const lowerName = name.toLowerCase();
+
+    // Enhanced OpenZeppelin detection
+    if (lowerName.includes('openzeppelin') || lowerName.includes('erc20') ||
+        lowerName.includes('erc721') || lowerName.includes('erc1155') ||
+        lowerName.includes('ownable') || lowerName.includes('access')) {
+      dependencies.openzeppelin = {
+        git: "https://github.com/OpenZeppelin/cairo-contracts.git",
+        tag: "v0.15.0"
+      };
+    }
+
+    // Enhanced Alexandria detection
+    else if (lowerName.includes('alexandria')) {
+      if (lowerName.includes('math')) {
+        dependencies.alexandria_math = {
+          git: "https://github.com/keep-starknet-strange/alexandria.git",
+          tag: "v0.1.0"
+        };
+      } else if (lowerName.includes('storage')) {
+        dependencies.alexandria_storage = {
+          git: "https://github.com/keep-starknet-strange/alexandria.git",
+          tag: "v0.1.0"
+        };
+      } else if (lowerName.includes('data_structures')) {
+        dependencies.alexandria_data_structures = {
+          git: "https://github.com/keep-starknet-strange/alexandria.git",
+          tag: "v0.1.0"
+        };
+      }
+    }
+
+    // Testing dependencies
+    else if (lowerName.includes('snforge') || lowerName.includes('test')) {
+      dependencies.snforge_std = "0.39.0";
+    }
+
+    // Fallback for unknown dependencies
+    else if (name !== 'starknet' && !dependencies[name]) {
+      dependencies[name] = "2.8.0";
+    }
+  });
+
+  // Generate TOML format
+  let toml = `[package]
+name = "GeneratedContract"
+version = "0.1.0"
+edition = "2024_07"
+cairo_version = "2.8.0"
+
 [dependencies]
-    ${deepFormatted}`;
+`;
+
+  Object.entries(dependencies).forEach(([name, value]) => {
+    if (typeof value === 'string') {
+      toml += `${name} = "${value}"\n`;
+    } else {
+      toml += `${name} = { `;
+      const parts = Object.entries(value).map(([k, v]) => `${k} = "${v}"`);
+      toml += parts.join(', ');
+      toml += ' }\n';
+    }
+  });
+
+  toml += `
+[[target.starknet-contract]]
+sierra = true
+casm = true
+
+[cairo]
+sierra-replace-ids = true
+`;
+
+  return toml;
 };

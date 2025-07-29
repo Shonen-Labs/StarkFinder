@@ -31,7 +31,12 @@ export default function UserProfilePage() {
       const response = await fetch(`/api/user/${id}`);
       console.log(response);
       const data = await response.json();
-      setUserData(data);
+      // setUserData(data); // old code commented out
+      setUserData({
+        ...data,
+        deployedContracts: data.deployedContracts ?? [],
+        generatedContracts: data.generatedContracts ?? [],
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -112,3 +117,5 @@ export default function UserProfilePage() {
     </div>
   );
 }
+
+
