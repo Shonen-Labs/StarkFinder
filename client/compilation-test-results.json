@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Simple ERC20 Token",
+    "status": "SKIPPED_NO_SCARB",
+    "reason": "Scarb compiler not available"
+  },
+  {
+    "name": "Basic Storage Contract",
+    "status": "SKIPPED_NO_SCARB",
+    "reason": "Scarb compiler not available"
+  }
+]
