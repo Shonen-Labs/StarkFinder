@@ -27,6 +27,71 @@ interface ScarbConfig {
   };
 }
 
+// Enhanced dependency mapping with proper versions and compatibility
+interface DependencyInfo {
+  name: string;
+  version?: string;
+  git?: string;
+  tag?: string;
+  branch?: string;
+  patterns: string[];
+  cairoVersions: string[];
+  description: string;
+}
+
+// Comprehensive dependency database
+const DEPENDENCY_DATABASE: DependencyInfo[] = [
+  {
+    name: "starknet",
+    version: "2.8.0",
+    patterns: ["starknet", "ContractAddress", "ClassHash", "StorageAccess"],
+    cairoVersions: ["2.8.0", "2.9.0", "2.9.1", "2.9.2", "2.9.3", "2.9.4"],
+    description: "Core Starknet library"
+  },
+  {
+    name: "openzeppelin",
+    git: "https://github.com/OpenZeppelin/cairo-contracts.git",
+    tag: "v0.15.0",
+    patterns: [
+      "openzeppelin", "ERC20", "ERC721", "ERC1155", "Ownable", "AccessControl",
+      "Pausable", "ReentrancyGuard", "Upgradeable", "IERC20", "IERC721", "IERC1155"
+    ],
+    cairoVersions: ["2.8.0", "2.9.0", "2.9.1", "2.9.2", "2.9.3", "2.9.4"],
+    description: "OpenZeppelin Cairo contracts for secure smart contract development"
+  },
+  {
+    name: "alexandria_storage",
+    git: "https://github.com/keep-starknet-strange/alexandria.git",
+    tag: "v0.1.0",
+    patterns: ["alexandria_storage", "List", "Vec"],
+    cairoVersions: ["2.8.0", "2.9.0", "2.9.1", "2.9.2", "2.9.3", "2.9.4"],
+    description: "Alexandria storage utilities"
+  },
+  {
+    name: "alexandria_math",
+    git: "https://github.com/keep-starknet-strange/alexandria.git",
+    tag: "v0.1.0",
+    patterns: ["alexandria_math", "pow", "sqrt", "fast_power"],
+    cairoVersions: ["2.8.0", "2.9.0", "2.9.1", "2.9.2", "2.9.3", "2.9.4"],
+    description: "Alexandria math utilities"
+  },
+  {
+    name: "alexandria_data_structures",
+    git: "https://github.com/keep-starknet-strange/alexandria.git",
+    tag: "v0.1.0",
+    patterns: ["alexandria_data_structures", "array_ext", "queue", "stack"],
+    cairoVersions: ["2.8.0", "2.9.0", "2.9.1", "2.9.2", "2.9.3", "2.9.4"],
+    description: "Alexandria data structures"
+  },
+  {
+    name: "snforge_std",
+    version: "0.39.0",
+    patterns: ["snforge_std", "declare", "deploy", "start_prank", "stop_prank"],
+    cairoVersions: ["2.8.0", "2.9.0", "2.9.1", "2.9.2", "2.9.3", "2.9.4"],
+    description: "Starknet Foundry standard library for testing"
+  }
+];
+
 export class ScarbGenerator {
   private model: DeepSeekClient;
 
@@ -64,18 +129,65 @@ export class ScarbGenerator {
   }
 
   private extractImports(code: string): string[] {
-    const importRegex = /use\s+([a-zA-Z0-9_:]+)(?:::\{([^}]+)\})?;/g;
-    const matches = [...code.matchAll(importRegex)];
+    const imports: string[] = [];
 
-    return matches.flatMap((match) => {
-      const base = match[1];
-      const inner = match[2];
+    // Enhanced regex patterns for different import styles
+    const patterns = [
+      // Standard use statements: use path::to::module;
+      /use\s+([a-zA-Z0-9_:]+)(?:::\{([^}]+)\})?;/g,
+      // Direct imports: use path::to::{Item1, Item2};
+      /use\s+([a-zA-Z0-9_:]+)::\{([^}]+)\};/g,
+      // Single item imports: use path::to::Item;
+      /use\s+([a-zA-Z0-9_:]+);/g,
+      // Super imports: use super::something;
+      /use\s+super::([a-zA-Z0-9_:]+);/g,
+      // Crate imports: use crate::something;
+      /use\s+crate::([a-zA-Z0-9_:]+);/g
+    ];
 
-      if (inner) {
-        return inner.split(",").map((item) => `${base}::${item.trim()}`);
-      }
-      return [base];
+    patterns.forEach(pattern => {
+      const matches = [...code.matchAll(pattern)];
+      matches.forEach(match => {
+        const base = match[1];
+        const inner = match[2];
+
+        if (inner) {
+          // Handle grouped imports like {Item1, Item2, Item3}
+          inner.split(',').forEach(item => {
+            const trimmed = item.trim();
+            if (trimmed) {
+              imports.push(`${base}::${trimmed}`);
+            }
+          });
+        } else if (base) {
+          imports.push(base);
+        }
+      });
     });
+
+    // Also extract from trait implementations and struct definitions
+    const traitImplRegex = /impl\s+([a-zA-Z0-9_:]+)/g;
+    const traitMatches = [...code.matchAll(traitImplRegex)];
+    traitMatches.forEach(match => {
+      if (match[1] && match[1].includes('::')) {
+        imports.push(match[1]);
+      }
+    });
+
+    // Extract from function signatures and type annotations
+    const typeRegex = /@([a-zA-Z0-9_:]+)|:\s*([a-zA-Z0-9_:]+)/g;
+    const typeMatches = [...code.matchAll(typeRegex)];
+    typeMatches.forEach(match => {
+      const type = match[1] || match[2];
+      if (type && type.includes('::')) {
+        imports.push(type);
+      }
+    });
+
+    // Remove duplicates and filter out invalid imports
+    return Array.from(new Set(imports))
+      .filter(imp => imp && imp.length > 0 && !imp.startsWith('_'))
+      .sort();
   }
 
   private async analyzeCode(sourceCode: string): Promise<string> {
@@ -95,99 +207,194 @@ Provide a concise analysis focusing on dependencies needed.`;
     return await this.model.complete(prompt);
   }
 
+  /**
+   * Analyze imports and code to determine required dependencies
+   */
+  private analyzeDependencies(imports: string[], sourceCode: string): DependencyInfo[] {
+    const requiredDeps: DependencyInfo[] = [];
+    const codeContent = sourceCode.toLowerCase();
+    const importContent = imports.join(' ').toLowerCase();
+
+    // Always include starknet as base dependency
+    const starknetDep = DEPENDENCY_DATABASE.find(dep => dep.name === 'starknet');
+    if (starknetDep) {
+      requiredDeps.push(starknetDep);
+    }
+
+    // Check each dependency in our database
+    DEPENDENCY_DATABASE.forEach(dep => {
+      if (dep.name === 'starknet') return; // Already added
+
+      // Check if any patterns match in imports or code
+      const hasPattern = dep.patterns.some(pattern =>
+        importContent.includes(pattern.toLowerCase()) ||
+        codeContent.includes(pattern.toLowerCase())
+      );
+
+      if (hasPattern) {
+        requiredDeps.push(dep);
+      }
+    });
+
+    // Special handling for OpenZeppelin - if we detect any ERC patterns, include it
+    const hasErcPattern = /\b(erc20|erc721|erc1155|ierc20|ierc721|ierc1155)\b/i.test(sourceCode);
+    const hasOzPattern = /\bopenzeppelin\b/i.test(sourceCode);
+    const hasOwnable = /\bownable\b/i.test(sourceCode);
+    const hasAccessControl = /\baccess_?control\b/i.test(sourceCode);
+
+    if ((hasErcPattern || hasOzPattern || hasOwnable || hasAccessControl) &&
+        !requiredDeps.some(dep => dep.name === 'openzeppelin')) {
+      const ozDep = DEPENDENCY_DATABASE.find(dep => dep.name === 'openzeppelin');
+      if (ozDep) {
+        requiredDeps.push(ozDep);
+      }
+    }
+
+    // Special handling for testing dependencies
+    const hasTestPattern = /\b(test|assert|declare|deploy|start_prank|stop_prank)\b/i.test(sourceCode);
+    if (hasTestPattern && !requiredDeps.some(dep => dep.name === 'snforge_std')) {
+      const testDep = DEPENDENCY_DATABASE.find(dep => dep.name === 'snforge_std');
+      if (testDep) {
+        requiredDeps.push(testDep);
+      }
+    }
+
+    return requiredDeps;
+  }
+
   private async generateScarbConfig(
     sourceCode: string,
     contractName: string,
     imports: string[],
     codeAnalysis: string
   ): Promise<ScarbConfig> {
-    const prompt = `You are a Cairo smart contract tooling assistant.
+    // First try our enhanced local analysis
+    const localConfig = this.getDefaultScarbConfig(contractName, imports, sourceCode);
 
-      Your task is to generate a valid Scarb.toml configuration as a JSON object, based on the contract's name, imports, and code analysis.
+    // Validate the dependencies are compatible
+    const requiredDeps = this.analyzeDependencies(imports, sourceCode);
+    if (!this.validateDependencyCompatibility(requiredDeps)) {
+      console.warn("Dependency compatibility issues detected, using fallback");
+      return localConfig;
+    }
 
-      ## Contract Metadata
+    // Enhanced prompt with better context
+    const dependencyContext = requiredDeps.map(dep =>
+      `${dep.name}: ${dep.description}`
+    ).join('\n');
+
+    const prompt = `You are a Cairo smart contract tooling assistant specializing in Scarb.toml generation.
+
+      ## Contract Analysis
       - Contract Name: ${contractName}
       - Cairo Version: 2.8.0
-      - Imports Found: ${imports.join(", ")}
+      - Detected Imports: ${imports.slice(0, 20).join(", ")}${imports.length > 20 ? '...' : ''}
+      - Required Dependencies Based on Analysis:
+      ${dependencyContext}
 
       ## Code Analysis
       ${codeAnalysis}
 
-      ## Output Format
-      Return ONLY a valid JSON object with the following structure:
+      ## Available Dependencies Database
+      ${DEPENDENCY_DATABASE.map(dep =>
+        `${dep.name}: ${dep.version || `${dep.git} (${dep.tag || dep.branch})`}`
+      ).join('\n')}
 
+      ## Task
+      Generate a complete Scarb.toml configuration as JSON that:
+      1. Uses the exact dependency versions/sources from the database above
+      2. Includes only dependencies that are actually needed
+      3. Ensures all dependencies are compatible with Cairo 2.8.0
+      4. Follows proper TOML naming conventions
+
+      ## Output Format (JSON only, no explanations)
       {
         "package": {
-          "name": "<contract_name>",
+          "name": "<sanitized_contract_name>",
           "version": "0.1.0",
           "edition": "2024_07",
-          "cairo_version": "2.8.0"
+          "cairo_version": "2.8.0",
+          "description": "<brief_description>"
         },
         "dependencies": {
-          "<name>": "<version or git/tag object>"
+          "<dep_name>": "<version_or_git_object>"
         }
       }
-
-      ## Rules
-      1. Resolve the provided imports into appropriate dependencies.
-      2. Use the correct version or git source + tag for each dependency, compatible with Cairo v2.8.0.
-      3. Do not include unused dependencies.
-      4. Use semantic versioning (e.g. "1.0.0") or git objects like this:
-
-        Example:
-        "openzeppelin": {
-          "git": "https://github.com/OpenZeppelin/cairo-contracts.git",
-          "tag": "v0.15.0"
-        }
-
-      5. All package names must be lowercase ASCII letters, numbers, or underscores.
-      6. The output must be a valid JSON object — do not include explanations, markdown, or extra text.
     `;
 
-    const response = await this.model.complete(prompt);
-
     try {
+      const response = await this.model.complete(prompt);
+
       // Extract JSON from response
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        const aiConfig = JSON.parse(jsonMatch[0]);
+
+        // Validate and merge with local analysis
+        const mergedConfig = this.mergeConfigs(localConfig, aiConfig);
+        return mergedConfig;
       }
-      throw new Error("No valid JSON found in response");
+      throw new Error("No valid JSON found in AI response");
     } catch (error) {
-      console.error("Error parsing Scarb config:", error);
-      // Return a sensible default
-      return this.getDefaultScarbConfig(contractName, imports);
+      console.error("Error generating AI Scarb config:", error);
+      // Return our enhanced local analysis as fallback
+      return localConfig;
     }
+  }
+
+  /**
+   * Merge local analysis with AI-generated config, preferring local analysis for reliability
+   */
+  private mergeConfigs(localConfig: ScarbConfig, aiConfig: ScarbConfig): ScarbConfig {
+    const merged: ScarbConfig = {
+      package: {
+        ...localConfig.package,
+        description: aiConfig.package.description || localConfig.package.description
+      },
+      dependencies: { ...localConfig.dependencies }
+    };
+
+    // Add any additional dependencies from AI that we recognize
+    Object.entries(aiConfig.dependencies).forEach(([name, value]) => {
+      const knownDep = DEPENDENCY_DATABASE.find(dep => dep.name === name);
+      if (knownDep && !merged.dependencies[name]) {
+        merged.dependencies[name] = value;
+      }
+    });
+
+    return merged;
   }
 
   private getDefaultScarbConfig(
     contractName: string,
-    imports: string[]
+    imports: string[],
+    sourceCode?: string
   ): ScarbConfig {
-    const dependencies: Record<string, any> = {
-      starknet: "2.8.0",
-    };
+    const dependencies: Record<string, any> = {};
 
-    // Detect common dependencies from imports
-    const importStr = imports.join(" ");
+    // Use enhanced dependency analysis
+    const requiredDeps = this.analyzeDependencies(imports, sourceCode || '');
 
-    if (
-      importStr.includes("openzeppelin") ||
-      importStr.includes("ERC20") ||
-      importStr.includes("ERC721") ||
-      importStr.includes("Ownable")
-    ) {
-      dependencies.openzeppelin = {
-        git: "https://github.com/OpenZeppelin/cairo-contracts.git",
-        tag: "v0.15.0",
-      };
-    }
+    // Convert dependency info to scarb format
+    requiredDeps.forEach(dep => {
+      if (dep.version) {
+        dependencies[dep.name] = dep.version;
+      } else if (dep.git && dep.tag) {
+        dependencies[dep.name] = {
+          git: dep.git,
+          tag: dep.tag
+        };
+      } else if (dep.git && dep.branch) {
+        dependencies[dep.name] = {
+          git: dep.git,
+          branch: dep.branch
+        };
+      }
+    });
 
-    if (importStr.includes("alexandria")) {
-      dependencies.alexandria = {
-        git: "https://github.com/keep-starknet-strange/alexandria.git",
-        tag: "v0.1.0",
-      };
+    // Ensure we have at least starknet dependency
+    if (!dependencies.starknet) {
+      dependencies.starknet = "2.8.0";
     }
 
     return {
@@ -196,6 +403,7 @@ Provide a concise analysis focusing on dependencies needed.`;
         version: "0.1.0",
         edition: "2024_07",
         cairo_version: "2.8.0",
+        description: `Generated Cairo contract: ${contractName}`
       },
       dependencies,
     };
@@ -206,7 +414,9 @@ Provide a concise analysis focusing on dependencies needed.`;
 
     // Package section
     for (const [key, value] of Object.entries(config.package)) {
-      toml += `${key} = "${value}"\n`;
+      if (value !== undefined && value !== null) {
+        toml += `${key} = "${value}"\n`;
+      }
     }
 
     // Dependencies section
@@ -214,7 +424,7 @@ Provide a concise analysis focusing on dependencies needed.`;
     for (const [name, value] of Object.entries(config.dependencies)) {
       if (typeof value === "string") {
         toml += `${name} = "${value}"\n`;
-      } else {
+      } else if (typeof value === "object" && value !== null) {
         toml += `${name} = { `;
         const parts = Object.entries(value).map(([k, v]) => `${k} = "${v}"`);
         toml += parts.join(", ");
@@ -231,11 +441,11 @@ Provide a concise analysis focusing on dependencies needed.`;
       for (const [name, value] of Object.entries(config.dev_dependencies)) {
         if (typeof value === "string") {
           toml += `${name} = "${value}"\n`;
-        } else {
+        } else if (typeof value === "object" && value !== null) {
           toml += `${name} = { `;
           const parts = Object.entries(value).map(([k, v]) => `${k} = "${v}"`);
           toml += parts.join(", ");
-          toml += " }\n`;";
+          toml += " }\n";
         }
       }
     }
@@ -244,6 +454,7 @@ Provide a concise analysis focusing on dependencies needed.`;
     toml += "\n[[target.starknet-contract]]\n";
     toml += "sierra = true\n";
     toml += "casm = true\n";
+
     toml += "\n[cairo]\n";
     toml += "sierra-replace-ids = true\n";
 
@@ -255,8 +466,41 @@ Provide a concise analysis focusing on dependencies needed.`;
     contractName: string
   ): string {
     const imports = this.extractImports(sourceCode);
-    const config = this.getDefaultScarbConfig(contractName, imports);
+    const config = this.getDefaultScarbConfig(contractName, imports, sourceCode);
     return this.configToToml(config);
+  }
+
+  /**
+   * Get the latest compatible version for a dependency
+   */
+  private getLatestCompatibleVersion(depName: string, cairoVersion: string = "2.8.0"): string | null {
+    const dep = DEPENDENCY_DATABASE.find(d => d.name === depName);
+    if (!dep) return null;
+
+    if (dep.version && dep.cairoVersions.includes(cairoVersion)) {
+      return dep.version;
+    }
+
+    return null;
+  }
+
+  /**
+   * Validate that all dependencies are compatible with each other
+   */
+  private validateDependencyCompatibility(dependencies: DependencyInfo[]): boolean {
+    // Check for version conflicts
+    const cairoVersions = new Set<string>();
+
+    dependencies.forEach(dep => {
+      dep.cairoVersions.forEach(version => cairoVersions.add(version));
+    });
+
+    // Find common Cairo versions
+    const commonVersions = dependencies.reduce((common, dep) => {
+      return common.filter(version => dep.cairoVersions.includes(version));
+    }, Array.from(cairoVersions));
+
+    return commonVersions.length > 0;
   }
 }
 
