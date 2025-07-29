@@ -93,12 +93,17 @@ const DEPENDENCY_DATABASE: DependencyInfo[] = [
 ];
 
 export class ScarbGenerator {
-  private model: DeepSeekClient;
+  private model: DeepSeekClient | null;
 
   constructor() {
-    this.model = createDeepSeekClient({
-      temperature: 0.1, // Lower temperature for more deterministic output
-    });
+    try {
+      this.model = createDeepSeekClient({
+        temperature: 0.1, // Lower temperature for more deterministic output
+      });
+    } catch (error) {
+      console.warn('DeepSeek client initialization failed, using fallback mode:', error);
+      this.model = null;
+    }
   }
 
   async generateScarbToml(
@@ -191,6 +196,10 @@ export class ScarbGenerator {
   }
 
   private async analyzeCode(sourceCode: string): Promise<string> {
+    if (!this.model) {
+      return "Basic Cairo smart contract analysis - using fallback mode due to missing AI configuration.";
+    }
+
     const prompt = `Analyze this Cairo smart contract and identify:
 1. What type of contract it is (ERC20, ERC721, ERC1155, Game, DeFi, etc.)
 2. Key features and functionality
@@ -204,7 +213,12 @@ ${sourceCode}
 
 Provide a concise analysis focusing on dependencies needed.`;
 
-    return await this.model.complete(prompt);
+    try {
+      return await this.model.complete(prompt);
+    } catch (error) {
+      console.warn('AI analysis failed, using fallback:', error);
+      return "Basic Cairo smart contract analysis - AI analysis unavailable.";
+    }
   }
 
   /**
@@ -321,6 +335,11 @@ Provide a concise analysis focusing on dependencies needed.`;
         }
       }
     `;
+
+    if (!this.model) {
+      console.warn("AI model not available, using local analysis");
+      return localConfig;
+    }
 
     try {
       const response = await this.model.complete(prompt);
