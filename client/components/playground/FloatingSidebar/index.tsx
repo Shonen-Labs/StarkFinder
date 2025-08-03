@@ -21,7 +21,25 @@ import { dojoBlockAdapter } from "./utils/adapters";
 // Constants
 import { triggerActions } from "./constants/menuItems";
 import * as menuItems from "./constants/menuItems";
-import { greg, token, li, po, inst, go, ev } from "./constants/blockReferences";
+import { 
+  greg, 
+  tokenERC20Blocks,
+  tokenERC20DeflationaryBlocks,
+  nftERC721Blocks,
+  nftERC1155Blocks,
+  crowsaleICOBlocks,
+  stakingBlocks,
+  farmingBlocks,
+  daoBlocks,
+  blockchainLotteryBlocks,
+  airdropMultisenderBlocks,
+  multisigBlocks,
+  multisigWalletBlocks,
+  vestingBlocks,
+  tokenLockerBlocks,
+  liquidityLockerBlocks,
+  erc4626VaultsBlocks
+} from "./constants/blockReferences";
 
 // Types
 import { FloatingSidebarProps } from "./types";
@@ -120,7 +138,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Token (ERC-20)"
                 icon={<CoinIcon />}
                 items={menuItems.tokenERC20}
-                blockArray={token}
+                blockArray={tokenERC20Blocks}
                 isToggled={state.tokenERC20Toggle}
                 toggleAction={{ type: "toggle_tokenERC20" }}
                 dispatch={dispatch}
@@ -133,7 +151,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Token (ERC-20 Deflationary)"
                 icon={<CoinIcon />}
                 items={menuItems.tokenERC20Deflationary}
-                blockArray={token}
+                blockArray={tokenERC20DeflationaryBlocks}
                 isToggled={state.tokenERC20DeflationaryToggle}
                 toggleAction={{ type: "toggle_tokenERC20Deflationary" }}
                 dispatch={dispatch}
@@ -152,7 +170,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="NFT Collection (ERC-721)"
                 icon={<CubeIcon />}
                 items={menuItems.nftERC721}
-                blockArray={po}
+                blockArray={nftERC721Blocks}
                 isToggled={state.nftERC721Toggle}
                 toggleAction={{ type: "toggle_nftERC721" }}
                 dispatch={dispatch}
@@ -165,7 +183,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="NFT Collection (ERC-1155)"
                 icon={<CubeIcon />}
                 items={menuItems.nftERC1155}
-                blockArray={po}
+                blockArray={nftERC1155Blocks}
                 isToggled={state.nftERC1155Toggle}
                 toggleAction={{ type: "toggle_nftERC1155" }}
                 dispatch={dispatch}
@@ -184,7 +202,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Crowdsale (ICO)"
                 icon={<RewardIcon />}
                 items={menuItems.crowsaleICO}
-                blockArray={ev}
+                blockArray={crowsaleICOBlocks}
                 isToggled={state.crowsaleICOToggle}
                 toggleAction={{ type: "toggle_crowsaleICO" }}
                 dispatch={dispatch}
@@ -197,7 +215,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Staking"
                 icon={<StakeTokenIcon />}
                 items={menuItems.staking}
-                blockArray={token}
+                blockArray={stakingBlocks}
                 isToggled={state.stakingToggle}
                 toggleAction={{ type: "toggle_staking" }}
                 dispatch={dispatch}
@@ -210,7 +228,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Farming"
                 icon={<YieldFarmingIcon />}
                 items={menuItems.farming}
-                blockArray={li}
+                blockArray={farmingBlocks}
                 isToggled={state.farmingToggle}
                 toggleAction={{ type: "toggle_farming" }}
                 dispatch={dispatch}
@@ -223,7 +241,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="ERC-4626 (Tokenized Vaults)"
                 icon={<BagIcon />}
                 items={menuItems.erc4626Vaults}
-                blockArray={po}
+                blockArray={erc4626VaultsBlocks}
                 isToggled={state.erc4626VaultsToggle}
                 toggleAction={{ type: "toggle_erc4626Vaults" }}
                 dispatch={dispatch}
@@ -242,7 +260,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="DAO"
                 icon={<GovernanceIcon />}
                 items={menuItems.dao}
-                blockArray={go}
+                blockArray={daoBlocks}
                 isToggled={state.daoToggle}
                 toggleAction={{ type: "toggle_dao" }}
                 dispatch={dispatch}
@@ -255,7 +273,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Multisig"
                 icon={<PadlockIcon />}
                 items={menuItems.multisig}
-                blockArray={inst}
+                blockArray={multisigBlocks}
                 isToggled={state.multisigToggle}
                 toggleAction={{ type: "toggle_multisig" }}
                 dispatch={dispatch}
@@ -268,7 +286,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Multisig Wallet"
                 icon={<BagIcon />}
                 items={menuItems.multisigWallet}
-                blockArray={po}
+                blockArray={multisigWalletBlocks}
                 isToggled={state.multisigWalletToggle}
                 toggleAction={{ type: "toggle_multisigWallet" }}
                 dispatch={dispatch}
@@ -281,7 +299,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Vesting"
                 icon={<ClockIcon />}
                 items={menuItems.vesting}
-                blockArray={ev}
+                blockArray={vestingBlocks}
                 isToggled={state.vestingToggle}
                 toggleAction={{ type: "toggle_vesting" }}
                 dispatch={dispatch}
@@ -300,7 +318,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Blockchain Lottery"
                 icon={<RewardIcon />}
                 items={menuItems.blockchainLottery}
-                blockArray={ev}
+                blockArray={blockchainLotteryBlocks}
                 isToggled={state.blockchainLotteryToggle}
                 toggleAction={{ type: "toggle_blockchainLottery" }}
                 dispatch={dispatch}
@@ -313,7 +331,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="AirDrop (Multisender)"
                 icon={<AirdropIcon />}
                 items={menuItems.airdropMultisender}
-                blockArray={ev}
+                blockArray={airdropMultisenderBlocks}
                 isToggled={state.airdropMultisenderToggle}
                 toggleAction={{ type: "toggle_airdropMultisender" }}
                 dispatch={dispatch}
@@ -326,7 +344,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Token Locker"
                 icon={<PadlockIcon />}
                 items={menuItems.tokenLocker}
-                blockArray={inst}
+                blockArray={tokenLockerBlocks}
                 isToggled={state.tokenLockerToggle}
                 toggleAction={{ type: "toggle_tokenLocker" }}
                 dispatch={dispatch}
@@ -339,7 +357,7 @@ export default function FloatingSidebar({ addBlock }: FloatingSidebarProps) {
                 title="Liquidity Locker"
                 icon={<LiquidDropIcon />}
                 items={menuItems.liquidityLocker}
-                blockArray={li}
+                blockArray={liquidityLockerBlocks}
                 isToggled={state.liquidityLockerToggle}
                 toggleAction={{ type: "toggle_liquidityLocker" }}
                 dispatch={dispatch}
