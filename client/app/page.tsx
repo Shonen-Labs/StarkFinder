@@ -1,35 +1,31 @@
 "use client";
 
-import {
-  Hero,
-  Header,
-  Feature,
-  Footer,
-  Offer,
-  Question,
-} from '@/components/landing/home'
-
-// import FloatingSidebar from "../components/playground/floatingWindow/FloatingSidebar"; 
-
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function HomePage() {
-  // Create a function to handle adding blocks
-  // const handleAddBlock = (block) => {
-  //   console.log("Block added:", block);
-  //   // Here you can implement the logic to add the block to your application
-  // };
-  
   return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <Feature />
-        <Offer />
-        <Question />
-      </main>
-      <Footer />
-      {/* <FloatingSidebar addBlock={handleAddBlock} /> */}
-    </>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold text-white mb-6">
+          StarkFinder
+        </h1>
+        <p className="text-xl text-gray-300 mb-8 max-w-2xl">
+          The only platform you need for all things Starknet. Discover and interact with Starknet applications effortlessly.
+        </p>
+        <div className="space-x-4">
+          <Link href="/chat">
+            <Button size="lg" className="bg-[#171849] hover:bg-[#171849]/80">
+              Start Chatting
+            </Button>
+          </Link>
+          <Link href="/devx">
+            <Button size="lg" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
+              Explore DevX
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </div>
   )
 }
