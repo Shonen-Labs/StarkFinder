@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StarknetProvider } from "@/lib/StarknetProvider";
 import { SessionProvider } from "next-auth/react";
+import { ChatProvider } from "@/lib/chat-context";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/react";
 import { Suspense } from "react";
@@ -37,10 +38,12 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <StarknetProvider>
-              <Suspense fallback={<div>Loading...</div>}>
-                <Analytics />
-                {children}
-              </Suspense>
+              <ChatProvider>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Analytics />
+                  {children}
+                </Suspense>
+              </ChatProvider>
             </StarknetProvider>
           </ThemeProvider>
         </SessionProvider>
