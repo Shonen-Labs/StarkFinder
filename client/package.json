@@ -18,10 +18,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@anush008/tokenizers": "^0.2.0",
-    "@argent/invisible-sdk": "^1.0.0",
-    "@argent/tma-wallet": "^1.17.1",
     "@auth/prisma-adapter": "^2.9.1",
-    "@brian-ai/langchain": "^1.2.9",
     "@brian-ai/sdk": "^0.3.6",
     "@elizaos/core": "^0.25.9",
     "@hookform/resolvers": "^3.10.0",
@@ -45,8 +42,9 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-switch": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
-    "@starknet-react/chains": "^3.1.0",
-    "@starknet-react/core": "^3.5.0",
+    "@starknet-io/get-starknet-core": "^4.0.7",
+    "@starknet-react/chains": "^4.0.4",
+    "@starknet-react/core": "^4.0.4",
     "@tsparticles/engine": "^3.8.0",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.0",
@@ -89,8 +87,7 @@
     "sharp": "^0.34.2",
     "solc": "^0.8.28",
     "sonner": "^1.7.2",
-    "starknet": "^7.6.2",
-    "starknetkit": "^2.3.3",
+    "starknetkit": "^3.0.3",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "tailwind-merge": "^2.5.4",
@@ -106,9 +103,9 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@types/dotenv-safe": "^8.1.6",
+    "@types/ioredis": "^4.28.10",
     "@types/jest": "^30.0.0",
     "@types/jest-json-schema": "^6.1.4",
-    "@types/ioredis": "^4.28.10",
     "@types/node": "^20.17.31",
     "@types/prismjs": "^1.26.5",
     "@types/react": "^18.3.19",
@@ -135,5 +132,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "overrides": {
+    "starknet": "7.6.4"
+  }
 }
+
