@@ -5,7 +5,7 @@ import ChatSidebar from "@/components/chat/ChatSidebar"
 import ChatContainer from "@/components/chat/ChatContainer"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
+import { Menu } from "lucide-react"
 
 export default function ChatPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
