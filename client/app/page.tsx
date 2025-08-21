@@ -1,31 +1,27 @@
-"use client";
+"use client"
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import Header from "@/components/Header"
+import { Feature, Hero, Offer, Question } from "@/components/landing/home"
+import { Footer } from "react-day-picker"
 
 export default function HomePage() {
+  // Create a function to handle adding blocks
+  // const handleAddBlock = (block) => {
+  //   console.log("Block added:", block);
+  //   // Here you can implement the logic to add the block to your application
+  // };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-6">
-          StarkFinder
-        </h1>
-        <p className="text-xl text-gray-300 mb-8 max-w-2xl">
-          The only platform you need for all things Starknet. Discover and interact with Starknet applications effortlessly.
-        </p>
-        <div className="space-x-4">
-          <Link href="/chat">
-            <Button size="lg" className="bg-[#171849] hover:bg-[#171849]/80">
-              Start Chatting
-            </Button>
-          </Link>
-          <Link href="/devx">
-            <Button size="lg" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800">
-              Explore DevX
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </div>
+    <>
+      <Header />
+      <main>
+        <Hero />
+        <Feature />
+        <Offer />
+        <Question />
+      </main>
+      <Footer />
+      {/* <FloatingSidebar addBlock={handleAddBlock} /> */}
+    </>
   )
 }
