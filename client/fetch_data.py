@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 import requests
 
 YIELD_API_URL = "https://yields.llama.fi/pools"
@@ -10,6 +11,7 @@ YIELD_DIR = f"{DATA_DIR}/yields"
 
 os.makedirs(YIELD_DIR, exist_ok=True)
 
+
 def save_json(data, filepath):
     try:
         with open(filepath, "w") as file:
@@ -17,6 +19,7 @@ def save_json(data, filepath):
         print(f"✅ Saved: {filepath}")
     except IOError as e:
         print(f"❌ Error saving {filepath}: {e}")
+
 
 def fetch_yield_data():
 
@@ -39,6 +42,7 @@ def fetch_yield_data():
     except (requests.exceptions.RequestException, IOError, json.JSONDecodeError) as e:
         print(f"❌ Error fetching yield data: {e}")
 
+
 def fetch_token_data():
     try:
         response = requests.get(TOKEN_API_URL, timeout=10)
@@ -50,6 +54,7 @@ def fetch_token_data():
 
     except (requests.exceptions.RequestException, IOError, json.JSONDecodeError) as e:
         print(f"❌ Error fetching token data: {e}")
+
 
 fetch_yield_data()
 fetch_token_data()

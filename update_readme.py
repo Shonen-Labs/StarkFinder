@@ -1,10 +1,11 @@
-import requests
 import os
 
+import requests
 
 REPO_OWNER = "Shonen-Labs"
 REPO_NAME = "StarkFinder"
 GITHUB_TOKEN = os.getenv("TOKEN_GH")
+
 
 def fetch_contributors():
     """
@@ -26,6 +27,7 @@ def fetch_contributors():
         print(response.json())
         return []
 
+
 def update_readme(contributors):
     """
     Update the README.md file with a contributors section.
@@ -33,7 +35,7 @@ def update_readme(contributors):
     readme_file = "README.md"
 
     try:
-        
+
         with open(readme_file, "r") as file:
             content = file.readlines()
 
@@ -64,6 +66,7 @@ def update_readme(contributors):
 
     except FileNotFoundError:
         print("README.md file not found. Please ensure it exists in the repository.")
+
 
 if __name__ == "__main__":
     contributors = fetch_contributors()

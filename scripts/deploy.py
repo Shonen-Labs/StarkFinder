@@ -8,8 +8,8 @@ import asyncio
 import json
 import os
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 from starknet_py.net.account.account import Account
@@ -32,13 +32,13 @@ class InsurancePoolDeployer:
             "sepolia": {
                 "node_url": "https://starknet-sepolia.public.blastapi.io",
                 "chain_id": StarknetChainId.SEPOLIA,
-                "explorer_url": "https://sepolia.starkscan.co"
+                "explorer_url": "https://sepolia.starkscan.co",
             },
             "mainnet": {
                 "node_url": "https://starknet-mainnet.public.blastapi.io",
                 "chain_id": StarknetChainId.MAINNET,
-                "explorer_url": "https://starkscan.co"
-            }
+                "explorer_url": "https://starkscan.co",
+            },
         }
 
         if self.network not in network_configs:
@@ -66,31 +66,33 @@ class InsurancePoolDeployer:
             client=client,
             address=int(account_address, 16),
             key_pair=key_pair,
-            chain=self.config["chain_id"]
+            chain=self.config["chain_id"],
         )
 
         return account
 
     def load_contract_artifacts(self) -> Dict:
         """Load compiled contract artifacts."""
-        contracts_dir = Path(__file__).parent.parent / \
-            "contracts" / "target" / "dev"
+        contracts_dir = Path(__file__).parent.parent / "contracts" / "target" / "dev"
 
         artifacts = {}
         contract_files = [
             ("MockERC20", "parametric_insurance_pool_MockERC20.sierra.json"),
             ("MockOracle", "parametric_insurance_pool_MockOracle.sierra.json"),
-            ("OracleIntegration",
-             "parametric_insurance_pool_OracleIntegration.sierra.json"),
-            ("ParametricInsurancePool",
-             "parametric_insurance_pool_ParametricInsurancePool.sierra.json")
+            (
+                "OracleIntegration",
+                "parametric_insurance_pool_OracleIntegration.sierra.json",
+            ),
+            (
+                "ParametricInsurancePool",
+                "parametric_insurance_pool_ParametricInsurancePool.sierra.json",
+            ),
         ]
 
         for contract_name, filename in contract_files:
             file_path = contracts_dir / filename
             if not file_path.exists():
-                raise FileNotFoundError(
-                    f"Contract artifact not found: {file_path}")
+                raise FileNotFoundError(f"Contract artifact not found: {file_path}")
 
             with open(file_path, "r") as f:
                 artifacts[contract_name] = json.load(f)
@@ -117,13 +119,13 @@ class InsurancePoolDeployer:
             decimals,
             initial_supply,
             0,  # Supply high part (u256)
-            account.address
+            account.address,
         ]
 
         # Deploy contract
         deploy_result = await account.deploy_contract(
             compilation_source=artifacts["MockERC20"],
-            constructor_calldata=constructor_calldata
+            constructor_calldata=constructor_calldata,
         )
 
         await deploy_result.wait_for_acceptance()
@@ -145,7 +147,7 @@ class InsurancePoolDeployer:
 
         deploy_result = await account.deploy_contract(
             compilation_source=artifacts["MockOracle"],
-            constructor_calldata=constructor_calldata
+            constructor_calldata=constructor_calldata,
         )
 
         await deploy_result.wait_for_acceptance()
@@ -163,7 +165,7 @@ class InsurancePoolDeployer:
 
         deploy_result = await account.deploy_contract(
             compilation_source=artifacts["OracleIntegration"],
-            constructor_calldata=constructor_calldata
+            constructor_calldata=constructor_calldata,
         )
 
         await deploy_result.wait_for_acceptance()
@@ -174,30 +176,27 @@ class InsurancePoolDeployer:
         return integration_address
 
     async def deploy_insurance_pool(
-        self,
-        account: Account,
-        artifacts: Dict,
-        token_address: int
+        self, account: Account, artifacts: Dict, token_address: int
     ) -> int:
         """Deploy the main parametric insurance pool."""
         print("📦 Deploying Parametric Insurance Pool...")
 
         # Pool configuration
-        base_premium_rate = 500    # 5% in basis points
+        base_premium_rate = 500  # 5% in basis points
         liquidity_reward_rate = 1000  # 10% annual in basis points
 
         constructor_calldata = [
-            account.address,         # owner
-            token_address,          # payment token
-            base_premium_rate,      # base premium rate
-            0,                      # base premium rate high part (u256)
+            account.address,  # owner
+            token_address,  # payment token
+            base_premium_rate,  # base premium rate
+            0,  # base premium rate high part (u256)
             liquidity_reward_rate,  # liquidity reward rate
-            0                       # liquidity reward rate high part (u256)
+            0,  # liquidity reward rate high part (u256)
         ]
 
         deploy_result = await account.deploy_contract(
             compilation_source=artifacts["ParametricInsurancePool"],
-            constructor_calldata=constructor_calldata
+            constructor_calldata=constructor_calldata,
         )
 
         await deploy_result.wait_for_acceptance()
@@ -214,7 +213,7 @@ class InsurancePoolDeployer:
         account: Account,
         pool_address: int,
         oracle_address: int,
-        integration_address: int
+        integration_address: int,
     ):
         """Configure the insurance system after deployment."""
         print("⚙️ Configuring system...")
@@ -222,26 +221,32 @@ class InsurancePoolDeployer:
         calls = []
 
         # Authorize oracle in insurance pool
-        calls.append(Call(
-            to_addr=pool_address,
-            selector="authorize_oracle",
-            calldata=[oracle_address]
-        ))
+        calls.append(
+            Call(
+                to_addr=pool_address,
+                selector="authorize_oracle",
+                calldata=[oracle_address],
+            )
+        )
 
         # Register oracle in integration contract
         data_types = [1, 2, 3, 4, 10, 20, 30]  # All supported data types
-        calls.append(Call(
-            to_addr=integration_address,
-            selector="register_oracle",
-            calldata=[oracle_address, len(data_types)] + data_types
-        ))
+        calls.append(
+            Call(
+                to_addr=integration_address,
+                selector="register_oracle",
+                calldata=[oracle_address, len(data_types)] + data_types,
+            )
+        )
 
         # Register insurance pool in integration
-        calls.append(Call(
-            to_addr=integration_address,
-            selector="register_insurance_pool",
-            calldata=[pool_address]
-        ))
+        calls.append(
+            Call(
+                to_addr=integration_address,
+                selector="register_insurance_pool",
+                calldata=[pool_address],
+            )
+        )
 
         # Execute configuration
         config_tx = await account.execute(calls=calls)
@@ -250,10 +255,7 @@ class InsurancePoolDeployer:
         print("✅ System configured successfully")
 
     async def setup_initial_state(
-        self,
-        account: Account,
-        token_address: int,
-        pool_address: int
+        self, account: Account, token_address: int, pool_address: int
     ):
         """Set up initial system state with liquidity and test data."""
         print("🔧 Setting up initial state...")
@@ -262,26 +264,32 @@ class InsurancePoolDeployer:
 
         # Mint initial tokens for testing
         initial_mint = 1_000_000_000_000  # 1M tokens
-        calls.append(Call(
-            to_addr=token_address,
-            selector="mint",
-            calldata=[account.address, initial_mint, 0]  # amount as u256
-        ))
+        calls.append(
+            Call(
+                to_addr=token_address,
+                selector="mint",
+                calldata=[account.address, initial_mint, 0],  # amount as u256
+            )
+        )
 
         # Approve tokens for liquidity provision
         liquidity_amount = 500_000_000_000  # 500k tokens
-        calls.append(Call(
-            to_addr=token_address,
-            selector="approve",
-            calldata=[pool_address, liquidity_amount, 0]  # amount as u256
-        ))
+        calls.append(
+            Call(
+                to_addr=token_address,
+                selector="approve",
+                calldata=[pool_address, liquidity_amount, 0],  # amount as u256
+            )
+        )
 
         # Provide initial liquidity
-        calls.append(Call(
-            to_addr=pool_address,
-            selector="provide_liquidity",
-            calldata=[liquidity_amount, 0]  # amount as u256
-        ))
+        calls.append(
+            Call(
+                to_addr=pool_address,
+                selector="provide_liquidity",
+                calldata=[liquidity_amount, 0],  # amount as u256
+            )
+        )
 
         # Execute setup
         setup_tx = await account.execute(calls=calls)
@@ -300,13 +308,13 @@ class InsurancePoolDeployer:
                 "token": hex(addresses["token"]),
                 "oracle": hex(addresses["oracle"]),
                 "integration": hex(addresses["integration"]),
-                "insurance_pool": hex(addresses["pool"])
+                "insurance_pool": hex(addresses["pool"]),
             },
             "explorer_urls": {
                 "token": f"{self.config['explorer_url']}/contract/{hex(addresses['token'])}",
                 "oracle": f"{self.config['explorer_url']}/contract/{hex(addresses['oracle'])}",
                 "integration": f"{self.config['explorer_url']}/contract/{hex(addresses['integration'])}",
-                "insurance_pool": f"{self.config['explorer_url']}/contract/{hex(addresses['pool'])}"
+                "insurance_pool": f"{self.config['explorer_url']}/contract/{hex(addresses['pool'])}",
             },
             "configuration": {
                 "base_premium_rate": "5%",
@@ -317,9 +325,9 @@ class InsurancePoolDeployer:
                     "Flight Delay Insurance",
                     "Hurricane Insurance",
                     "Earthquake Insurance",
-                    "Temperature Insurance"
-                ]
-            }
+                    "Temperature Insurance",
+                ],
+            },
         }
 
         # Save to JSON file
@@ -346,21 +354,27 @@ class InsurancePoolDeployer:
 
             token_address = await self.deploy_mock_token(account, artifacts)
             oracle_address = await self.deploy_mock_oracle(account, artifacts)
-            integration_address = await self.deploy_oracle_integration(account, artifacts)
-            pool_address = await self.deploy_insurance_pool(account, artifacts, token_address)
+            integration_address = await self.deploy_oracle_integration(
+                account, artifacts
+            )
+            pool_address = await self.deploy_insurance_pool(
+                account, artifacts, token_address
+            )
 
             addresses = {
                 "token": token_address,
                 "oracle": oracle_address,
                 "integration": integration_address,
-                "pool": pool_address
+                "pool": pool_address,
             }
 
             print("\n⚙️ System Configuration...")
             print("-" * 40)
 
             # Configure system
-            await self.configure_system(account, pool_address, oracle_address, integration_address)
+            await self.configure_system(
+                account, pool_address, oracle_address, integration_address
+            )
 
             # Setup initial state
             await self.setup_initial_state(account, token_address, pool_address)
@@ -387,6 +401,7 @@ class InsurancePoolDeployer:
         except Exception as e:
             print(f"❌ Deployment failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -395,13 +410,12 @@ async def main():
     """Main deployment function."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Deploy Parametric Insurance Pool")
+    parser = argparse.ArgumentParser(description="Deploy Parametric Insurance Pool")
     parser.add_argument(
         "--network",
         choices=["sepolia", "mainnet"],
         default="sepolia",
-        help="Network to deploy to (default: sepolia)"
+        help="Network to deploy to (default: sepolia)",
     )
 
     args = parser.parse_args()
