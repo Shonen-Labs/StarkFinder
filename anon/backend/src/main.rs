@@ -12,12 +12,13 @@ mod middlewares {
 }
 mod routes {
     pub mod register;
+    pub mod generate;
 }
 
 use axum::{
     http::{header::{CONTENT_TYPE, LOCATION}, Method, StatusCode},
     response::IntoResponse,
-    routing::{get, post},
+    routing::post,
     Router,
 };
 use utoipa::OpenApi;
@@ -54,6 +55,7 @@ async fn main() {
     let app = Router::new()
         // .route("/", get(root_redirect)) //TODO: re-introduce when `/health` is implemented
         .route("/register", post(routes::register::register))
+        .route("/generate", post(routes::generate::generate))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(
             SwaggerUi::new("/docs").url(
