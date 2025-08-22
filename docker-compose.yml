@@ -1,35 +1,71 @@
 services:
-  frontend:
+  starkfinder:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile
+      args:
+        - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+        - DEFAULT_LLM_PROVIDER=${DEFAULT_LLM_PROVIDER}
+        - STARKNET_RPC_URL=${STARKNET_RPC_URL}
+        - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
+        - OZ_ACCOUNT_PRIVATE_KEY=${OZ_ACCOUNT_PRIVATE_KEY}
+        - DATABASE_URL=${DATABASE_URL}
+        - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
     ports:
-      - "3000:3000"
+      - "3000:3000"  # Backend port
+      - "4000:4000"  # Agent port
+    environment:
+      - NODE_ENV=production
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DEFAULT_LLM_PROVIDER=${DEFAULT_LLM_PROVIDER}
+      - STARKNET_RPC_URL=${STARKNET_RPC_URL}
+      - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
+      - OZ_ACCOUNT_PRIVATE_KEY=${OZ_ACCOUNT_PRIVATE_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - REDIS_URL=redis://redis:6379
     depends_on:
-      - backend
-
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    ports:
-      - "8080:8080"
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: starkfinder
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
 
 volumes:
   db_data:
+  redis_data:
