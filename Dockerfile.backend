@@ -1,91 +1,51 @@
-FROM node:20-slim AS builder
+FROM rust:1.75-slim as builder
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Next seems to analyze API routes at build time 
-# https://github.com/Shonen-Labs/StarkFinder/blob/0c1c7072cc9df592eac8050ee944a6d1ae4f21e8/client/app/api/transactions/route.ts#L26
-# Should:
-#  1. Move API client instantiation inside of handler functions
-#  2. Make sure all secret usages are inside handler/request functions or lazy functions
-# interim fix add ******* -> compose will override these with env vars
-ENV OPENAI_API_KEY=*******
-ENV BRIAN_API_KEY=*******
-ENV ANTHROPIC_API_KEY=*******
-ENV BRIAN_API_KEY=*******
-ENV DEFAULT_LLM_PROVIDER=*******
-ENV STARKNET_RPC_URL=*******
-ENV ACCOUNT_ADDRESS=*******
-ENV OZ_ACCOUNT_PRIVATE_KEY=*******
-ENV DATABASE_URL=*******
+# Copy Cargo files
+COPY backend/Cargo.toml backend/Cargo.lock ./
 
-#minimal package.json
-RUN cat <<EOF > package.json
-{
-  "name": "api-backend",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "prisma generate && next build",
-    "start": "next start"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.3.1",
-    "@anthropic-ai/sdk": "^0.39.0",
-    "@langchain/openai": "^0.3.17",
-    "@langchain/core": "^0.3.31",
-    "@langchain/anthropic": "^0.3.11",
-    "@langchain/langgraph": "^0.2.41",
-    "axios": "^1.7.9",
-    "prisma": "^6.3.1",
-    "starknet": "^6.11.0",
-    "next": "14.2.17",
-    "@next/mdx": "^15.3.2",
-    "typescript": "^5.8.3"
-  }
-}
-EOF
+# Create a dummy main.rs to build dependencies
+RUN mkdir src && echo "fn main() {}" > src/main.rs
 
-RUN npm install
+# Build dependencies
+RUN cargo build --release
 
-# Copy sources needed for build
-COPY ./client/app/api ./app/api
-COPY ./client/tsconfig.json ./
-COPY ./client/next.config.mjs ./
-COPY ./client/prisma ./prisma
-COPY ./client/lib ./lib
-COPY ./client/components.json ./
-COPY ./client/webpack.config.js ./
-COPY ./client/prompts ./prompts
+# Remove dummy main.rs and copy actual source
+RUN rm src/main.rs
+COPY backend/src ./src
 
-RUN npm run build
+# Build the application
+RUN cargo build --release
 
-# ---- Production Image ----
-FROM node:20-slim AS runner
+# Production stage
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -r -s /bin/false app
+
 WORKDIR /app
-ENV NODE_ENV=production
 
-# Install wget for healthcheck
-RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+# Copy binary from builder
+COPY --from=builder /app/target/release/backend /app/backend
 
-# Copy only the built app and deps
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/next.config.mjs ./
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/lib ./lib
-COPY --from=builder /app/app/api ./app/api
-COPY --from=builder /app/components.json ./
-COPY --from=builder /app/webpack.config.js  ./
-COPY --from=builder /app/prompts ./prompts
+# Change ownership
+RUN chown app:app /app/backend
 
-# Prisma (required for runtime queries)
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+USER app
 
-#copy schema.prisma for runtime
-COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
+# Expose port
+EXPOSE 8080
 
-EXPOSE 3000
-
-# healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
-
-CMD ["npm", "start"]
+CMD ["./backend"]

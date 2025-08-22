@@ -1,83 +1,76 @@
-# Dependencies
-node_modules
-npm-debug.log*
-
-# Production builds
-.next
-dist
-build
-out
-
-# Environment files
-.env
-.env.local
-
-# IDE and editor files
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
 # Git
 .git
 .gitignore
 .gitattributes
 
-# Docker
-Dockerfile*
-docker-compose*
-.dockerignore
+# Documentation
+README.md
+*.md
+docs/
 
-# Testing
-coverage
-.nyc_output
-*.lcov
+# Development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+build/
+
+# Rust
+target/
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Logs
-logs
+logs/
 *.log
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
 
 # Coverage directory used by tools like istanbul
-coverage
+coverage/
+*.lcov
 
-# Prisma
-prisma/migrations
-!prisma/schema.prisma
+# nyc test coverage
+.nyc_output
 
-# Temporary folders
-tmp
-temp
-
-# Documentation
-README.md
-CHANGELOG.md
-LICENSE
-docs/
-*.md
-
-# Cache directories
-.cache
-.parcel-cache
-.eslintcache
+# Dependency directories
+jspm_packages/
 
 # Optional npm cache directory
 .npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
 
 # Optional REPL history
 .node_repl_history
@@ -88,20 +81,46 @@ docs/
 # Yarn Integrity file
 .yarn-integrity
 
-# TypeScript
-*.tsbuildinfo
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
 
-# Next.js
-.next/
-out/
+# Next.js build output
+.next
 
-# Nuxt.js
+# Nuxt.js build / generate output
 .nuxt
+dist
+
+# Gatsby files
+.cache/
+public
 
 # Storybook build outputs
 .out
 .storybook-out
 
-# Temporary files
-.temp
-.tmp
+# Temporary folders
+tmp/
+temp/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+junit.xml
+
+# Misc
+*.tgz
+*.tar.gz
