@@ -96,9 +96,26 @@ export const Nav = () => {
             className="flex flex-col md:hidden gap-1  rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition  w-6"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <div className=" w-full h-0.5 bg-gray-900 " />
-            <div className=" w-full h-0.5 bg-gray-900 " />
-            <div className=" w-full h-0.5 bg-gray-900 " />
+            <motion.div
+              initial={{ rotate: 0, y: 0 }}
+              animate={isMenuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className=" w-full h-0.5 bg-gray-900 origin-center"
+            />
+            <motion.div
+              initial={{ opacity: 1 }}
+              animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className=" w-full h-0.5 bg-gray-900 "
+            />
+            <motion.div
+              initial={{ rotate: 0, y: 0 }}
+              animate={
+                isMenuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }
+              }
+              transition={{ duration: 0.2 }}
+              className=" w-full h-0.5 bg-gray-900 origin-center"
+            />
           </button>
 
           <AnimatePresence>
