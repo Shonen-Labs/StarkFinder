@@ -24,7 +24,7 @@ interface SocialMediaItem {
 
 export function Footer() {
   return (
-    <footer className="bg-blue-dark text-white pt-20 px-5 pb-10">
+    <footer className="bg-footer-background text-footer-text pt-20 px-5 pb-10">
       <div className="max-w-[70.75rem] mx-auto">
         <div className="flex flex-col md:flex-row justify-between gap-16 md:gap-24">
           <MotionBox>
@@ -57,7 +57,7 @@ function MenuFooter() {
             <Link
               key={`${index}-${subItem.name}`}
               href={subItem.url}
-              className="hover:text-white/80 transition-colors"
+              className="hover:text-footer-linkHover transition-colors"
               target={subItem.target}
               rel={subItem.rel}
             >
@@ -82,7 +82,7 @@ function InfoFooter() {
           <Link
             key={`${index}-${social.name}`}
             href={social.href}
-            className="cursor-pointer [&_path]:hover:fill-grayscale-100 [&_path]:transition-colors"
+            className="cursor-pointer text-footer-link hover:text-footer-linkHover [&_path]:hover:fill-grayscale-100 [&_path]:transition-colors"
             role="menuitem"
             target={social.target}
             rel={social.rel}
@@ -99,32 +99,25 @@ const menuItems: MenuSection[] = [
   {
     title: 'Navigation',
     subItems: [
-      { name: 'DevX', url: '/app/devx' },
-      { name: 'Transact', url: '/app/transactions' },
-      { name: 'Contracts', url: '/app/contracts' },
-      { name: 'Resources', url: '/app/resources' },
+      { name: 'About', url: '/about' },
+      { name: 'Docs', url: 'https://docs.starkfinder.xyz', target: '_blank', rel: 'noopener noreferrer' },
+      { name: 'Terms of Service', url: '/terms' },
+      { name: 'Privacy Policy', url: '/privacy' },
     ],
   },
   {
-    title: 'Company',
+    title: 'Community',
     subItems: [
-      { name: 'Help & Support', url: '#' },
-      { name: 'Terms of Service', url: '#' },
-      { name: 'Privacy Policy', url: '#' },
+      { name: 'GitHub', url: 'https://github.com/Shonen-Labs/StarkFinder', target: '_blank', rel: 'noopener noreferrer' },
+      { name: 'X (Twitter)', url: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
+      { name: 'Discord', url: 'https://discord.gg/your-discord-link', target: '_blank', rel: 'noopener noreferrer' },
     ],
   },
-  {
-    title: 'Social',
-    subItems: [
-      { name: 'Twitter', url: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
-      { name: 'Github', url: 'https://github.com/Shonen-Labs/StarkFinder', target: '_blank', rel: 'noopener noreferrer' },
-      { name: 'Telegram', url: 'https://t.me/starkfinder_bot/', target: '_blank', rel: 'noopener noreferrer' },
-    ],
-  },
-]
+];
 
 const socialMedia: SocialMediaItem[] = [
-  { name: 'Twitter', icon: XIcon, href: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
+  { name: 'X', icon: XIcon, href: 'https://x.com/StrkFinder', target: '_blank', rel: 'noopener noreferrer' },
   { name: 'Github', icon: GithubIcon, href: 'https://github.com/Shonen-Labs/StarkFinder', target: '_blank', rel: 'noopener noreferrer' },
   { name: 'Telegram', icon: TelegramIcon, href: 'https://t.me/shogenlabs/', target: '_blank', rel: 'noopener noreferrer' },
-]
+  { name: 'Discord', icon: XIcon, href: 'https://discord.gg/your-discord-link', target: '_blank', rel: 'noopener noreferrer' }, // Replace XIcon with DiscordIcon if available
+];
