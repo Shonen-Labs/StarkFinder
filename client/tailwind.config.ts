@@ -176,6 +176,12 @@ const config: Config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        footer: {
+          background: "#080B2A", // matches bg-blue-dark
+          text: "#FFFFFF",
+          link: "#C77DFB", // matches violet-light
+          linkHover: "#7e3dff", // matches purple-light
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
