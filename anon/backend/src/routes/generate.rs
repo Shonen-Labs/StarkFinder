@@ -53,14 +53,17 @@ pub async fn generate(
         return Err(ApiError::BadRequest("source code cannot be empty"));
     }
 
-    // Verify that the user exists
+    // Validate user exists
     let user_exists = sqlx::query_scalar::<_, bool>(
         "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)"
     )
     .bind(req.user_id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+    .map_err(|e| {
+        tracing::error!("User existence check error: {:?}", e);
+        ApiError::Internal("failed to validate user")
+    })?;
 
     if !user_exists {
         return Err(ApiError::BadRequest("user not found"));
@@ -70,17 +73,19 @@ pub async fn generate(
     let contract = sqlx::query_as::<_, (i64, i64, String, String, Option<String>, Option<String>, Option<String>, chrono::DateTime<chrono::Utc>)>(
         r#"INSERT INTO contracts (user_id, name, source_code, scarb_config, blockchain, session_id)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, user_id, name, source_code, scarb_config, blockchain, session_id, created_at"#
+           RETURNING id, user_id, name, source_code, scarb_config, blockchain, session_id, created_at"#,
     )
     .bind(req.user_id)
-    .bind(req.name)
-    .bind(req.source_code)
-    .bind(req.scarb_config)
-    .bind(req.blockchain)
-    .bind(req.session_id)
+    .bind(&req.name)
+    .bind(&req.source_code)
+    .bind(&req.scarb_config)
+    .bind(&req.blockchain)
+    .bind(&req.session_id)
     .fetch_one(&pool)
     .await
-    .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+    .map_err(|e| {
+        crate::libs::error::map_sqlx_error(&e)
+    })?;
 
     Ok((
         StatusCode::CREATED,
