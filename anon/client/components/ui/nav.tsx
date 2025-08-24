@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, ArrowRightIcon, Moon, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { div } from "framer-motion/client";
+import { ArrowRightIcon, Moon, Sun } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { div } from "framer-motion/client";
 import { WalletOptions } from "../WalletButton";
 
 const links = [

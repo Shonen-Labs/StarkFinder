@@ -11,10 +11,10 @@ import { useAccount, useConnect, useDisconnect, Connector } from "wagmi";
 
 export function WalletOptions() {
   const { address, isConnected, isDisconnected } = useAccount();
-  const { connect, error, connectors, isLoading, pendingConnector } =
-    useConnect();
+  const { connect, error, connectors, status, pendingConnector } = useConnect();
   const { disconnect } = useDisconnect();
   const [open, setOpen] = useState(false);
+  const isLoading = status === "connecting";
 
   useEffect(() => {
     if (error) {
