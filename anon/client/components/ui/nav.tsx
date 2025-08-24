@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, ArrowRightIcon, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { div } from "framer-motion/client";
-import { WalletOptions } from "@/app/auth/WalletButton";
+import { WalletOptions } from "../WalletButton";
 
 const links = [
   { href: "/", label: "Home" },

@@ -9,7 +9,7 @@ import {
 } from "wagmi/chains";
 import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
 
-const projectId = process.env.WALLETCONNECT_PROJECT_ID as string;
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID as string;
 
 export const config = createConfig({
   chains: [mainnet, base, arbitrum, polygon, optimism, sepolia],

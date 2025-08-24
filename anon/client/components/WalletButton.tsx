@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useAccount, useConnect, useDisconnect, Connector } from "wagmi";
 
 export function WalletOptions() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isDisconnected } = useAccount();
   const { connect, error, connectors, isLoading, pendingConnector } =
     useConnect();
   const { disconnect } = useDisconnect();
@@ -20,7 +20,15 @@ export function WalletOptions() {
     if (error) {
       toast.error(error.message || "Failed to connect");
     }
-  }, [error]);
+
+    if (isConnected) {
+      toast.success("connected successfully");
+    }
+
+    if (isDisconnected) {
+      toast.warning("wallet is disconnected");
+    }
+  }, [error, isConnected, isDisconnected]);
 
   if (!isConnected) {
     return (
