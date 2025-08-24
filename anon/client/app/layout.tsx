@@ -33,7 +33,7 @@ export default function RootLayout({
         <AuthProvider>
           <Nav />
           {children}
-          <Toaster richColors closeButton />
+          <Toaster richColors/>
         </AuthProvider>
       </body>
     </html>
