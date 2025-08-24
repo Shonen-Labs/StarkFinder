@@ -11,10 +11,10 @@ import { useAccount, useConnect, useDisconnect, Connector } from "wagmi";
 
 export function WalletOptions() {
   const { address, isConnected, isDisconnected } = useAccount();
-  const { connect, error, connectors, status, pendingConnector } = useConnect();
+  const { connect, error, connectors, status } = useConnect();
   const { disconnect } = useDisconnect();
   const [open, setOpen] = useState(false);
-  const isLoading = status === "connecting";
+  const isLoading = status === "pending";
 
   useEffect(() => {
     if (error) {
@@ -46,12 +46,10 @@ export function WalletOptions() {
                 connect({ connector });
                 setOpen(false);
               }}
-              disabled={isLoading && pendingConnector?.uid === connector.uid}
+              disabled={isLoading}
             >
               {connector.name}
-              {isLoading &&
-                pendingConnector?.uid === connector.uid &&
-                " (connecting...)"}
+              {isLoading && " (connecting...)"}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

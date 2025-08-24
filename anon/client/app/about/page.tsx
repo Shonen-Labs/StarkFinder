@@ -1,33 +1,38 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
+import { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'About Us - Web3 Wallet Solutions | Empowering the Decentralized Future',
-  description: 'Meet the visionary team behind Web3 Wallet Solutions. Learn about our mission to create secure, intuitive crypto wallets that bring blockchain technology to everyone.',
-  keywords: 'web3, crypto wallet, blockchain, decentralized finance, team, about us, mission',
-  authors: [{ name: 'Web3 Wallet Solutions Team' }],
+  title:
+    "About Us - Web3 Wallet Solutions | Empowering the Decentralized Future",
+  description:
+    "Meet the visionary team behind Web3 Wallet Solutions. Learn about our mission to create secure, intuitive crypto wallets that bring blockchain technology to everyone.",
+  keywords:
+    "web3, crypto wallet, blockchain, decentralized finance, team, about us, mission",
+  authors: [{ name: "Web3 Wallet Solutions Team" }],
   openGraph: {
-    title: 'About Us - Web3 Wallet Solutions',
-    description: 'Empowering the decentralized future with secure, intuitive crypto wallets.',
-    type: 'website',
-    url: 'https://web3walletsolutions.com/about',
-    siteName: 'Web3 Wallet Solutions',
+    title: "About Us - Web3 Wallet Solutions",
+    description:
+      "Empowering the decentralized future with secure, intuitive crypto wallets.",
+    type: "website",
+    url: "https://web3walletsolutions.com/about",
+    siteName: "Web3 Wallet Solutions",
     images: [
       {
-        url: '/og-image.jpg',
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: 'Web3 Wallet Solutions Team',
+        alt: "Web3 Wallet Solutions Team",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'About Us - Web3 Wallet Solutions',
-    description: 'Empowering the decentralized future with secure, intuitive crypto wallets.',
-    images: ['/og-image.jpg'],
+    card: "summary_large_image",
+    title: "About Us - Web3 Wallet Solutions",
+    description:
+      "Empowering the decentralized future with secure, intuitive crypto wallets.",
+    images: ["/og-image.jpg"],
   },
-  robots: 'index, follow',
+  robots: "index, follow",
 };
 
 const teamMembers = [
@@ -78,7 +83,9 @@ function TeamCard({ member }: { member: TeamMember }) {
       <h3 className="text-2xl font-bold mt-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
         {member.name}
       </h3>
-      <p className="text-sm uppercase tracking-wide text-purple-400 mt-1">{member.role}</p>
+      <p className="text-sm uppercase tracking-wide text-purple-400 mt-1">
+        {member.role}
+      </p>
       <p className="text-gray-300 mt-3 text-sm leading-relaxed">{member.bio}</p>
     </div>
   );
@@ -94,30 +101,33 @@ export default function AboutPage() {
             Empowering the Decentralized Future
           </h1>
           <p className="text-lg md:text-xl mt-6 max-w-3xl mx-auto text-gray-300 leading-relaxed">
-            At Web3 Wallet Solutions, we're crafting secure, intuitive wallets that bring crypto to everyone. 
-            Our team blends expertise in blockchain, design, and engineering to build tools for tomorrow's economy.
+            At Web3 Wallet Solutions, we&apos;re crafting secure, intuitive
+            wallets that bring crypto to everyone. Our team blends expertise in
+            blockchain, design, and engineering to build tools for
+            tomorrow&apos;s economy.
           </p>
         </div>
       </section>
 
       {/* Mission Content Section */}
       {/* Mission Content Section */}
-<section className="py-20 px-6 max-w-4xl mx-auto text-center">
-  <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-12 border border-white/10">
-    <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-500 to-blue-400 bg-clip-text text-transparent mb-6">
-      Our Mission
-    </h2>
-    <p className="text-gray-300 text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
-      We believe that blockchain technology should be accessible to everyone, not just technical experts. 
-      Our mission is to bridge the gap between complex blockchain infrastructure and everyday users.
-    </p>
-    <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
-      Through intuitive design, robust security, and seamless user experiences, we're building the tools 
-      that will power the next generation of decentralized applications and financial systems.
-    </p>
-  </div>
-</section>
-
+      <section className="py-20 px-6 max-w-4xl mx-auto text-center">
+        <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl p-12 border border-white/10">
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-500 to-blue-400 bg-clip-text text-transparent mb-6">
+            Our Mission
+          </h2>
+          <p className="text-gray-300 text-lg mb-6 max-w-2xl mx-auto leading-relaxed">
+            We believe that blockchain technology should be accessible to
+            everyone, not just technical experts. Our mission is to bridge the
+            gap between complex blockchain infrastructure and everyday users.
+          </p>
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
+            Through intuitive design, robust security, and seamless user
+            experiences, we&apos;re building the tools that will power the next
+            generation of decentralized applications and financial systems.
+          </p>
+        </div>
+      </section>
 
       {/* Team Grid */}
       <section className="py-16 px-6 max-w-7xl mx-auto">
@@ -126,11 +136,12 @@ export default function AboutPage() {
             Meet Our Team
           </h2>
           <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
-            Our diverse team brings together expertise from blockchain development, user experience design, 
-            and financial technology to create innovative solutions.
+            Our diverse team brings together expertise from blockchain
+            development, user experience design, and financial technology to
+            create innovative solutions.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {teamMembers.map((member) => (
             <TeamCard key={member.id} member={member} />
@@ -145,8 +156,9 @@ export default function AboutPage() {
             Ready to Join the Revolution?
           </h2>
           <p className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">
-            Whether you're a developer, designer, or crypto enthusiast, we'd love to hear from you. 
-            Let's build the future of decentralized finance together.
+            Whether you&apos;re a developer, designer, or crypto enthusiast, we&apos;d
+            love to hear from you. Let&apos;s build the future of decentralized
+            finance together.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -167,14 +179,12 @@ export default function AboutPage() {
 
       {/* Footer Navigation */}
       <footer className="border-t border-white/10 py-12 px-6">
-        
-          
-          <div className="border-t border-white/10 mt-8 pt-8 text-center">
-            <p className="text-gray-500 text-sm">
-              © 2025 Web3 Wallet Solutions. All rights reserved. Building the future of decentralized finance.
-            </p>
-          </div>
-        
+        <div className="border-t border-white/10 mt-8 pt-8 text-center">
+          <p className="text-gray-500 text-sm">
+            © 2025 Web3 Wallet Solutions. All rights reserved. Building the
+            future of decentralized finance.
+          </p>
+        </div>
       </footer>
     </main>
   );
