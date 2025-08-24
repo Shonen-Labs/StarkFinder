@@ -1,0 +1,62 @@
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useAccount, useConnect, useDisconnect, Connector } from "wagmi";
+
+export function WalletOptions() {
+  const { address, isConnected } = useAccount();
+  const { connect, error, connectors, isLoading, pendingConnector } =
+    useConnect();
+  const { disconnect } = useDisconnect();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message || "Failed to connect");
+    }
+  }, [error]);
+
+  if (!isConnected) {
+    return (
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button className="px-5 py-2 rounded-full bg-black text-white font-medium hover:bg-gray-900 transition dark:bg-black dark:text-white dark:hover:bg-gray-200">
+            {isLoading ? "Connecting..." : "Login"}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          {connectors.map((connector: Connector) => (
+            <DropdownMenuItem
+              key={connector.uid}
+              onClick={() => {
+                connect({ connector });
+                setOpen(false);
+              }}
+              disabled={isLoading && pendingConnector?.uid === connector.uid}
+            >
+              {connector.name}
+              {isLoading &&
+                pendingConnector?.uid === connector.uid &&
+                " (connecting...)"}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  return (
+    <Button
+      onClick={() => disconnect()}
+      className="px-5 py-2 rounded-full bg-red-600 text-white font-medium hover:bg-red-700 transition"
+    >
+      {address?.slice(0, 6)}...{address?.slice(-4)} (Logout)
+    </Button>
+  );
+}
