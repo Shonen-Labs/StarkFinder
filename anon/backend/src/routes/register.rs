@@ -41,27 +41,27 @@ pub async fn register(
         .map_err(|_| ApiError::Internal("failed to start transaction"))?;
 
     // Insert user
-    let rec = sqlx::query!(
+    let rec = sqlx::query_as::<_, (i64, String)>(
         r#"INSERT INTO users (wallet) VALUES ($1)
            ON CONFLICT (wallet) DO NOTHING
            RETURNING id, wallet"#,
-        normalized_wallet
     )
+    .bind(&normalized_wallet)
     .fetch_optional(&mut *tx)
     .await
     .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
 
     let (user_id, wallet_saved) = match rec {
-        Some(r) => (r.id, r.wallet),
+        Some((id, wallet)) => (id, wallet),
         None => return Err(ApiError::Conflict("wallet already registered")),
     };
 
     // Insert profile
-    sqlx::query!(
+    sqlx::query(
         r#"INSERT INTO profiles (user_id, referral_code) VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING"#,
-        user_id,
-        req.referral_code
     )
+    .bind(user_id)
+    .bind(&req.referral_code)
     .execute(&mut *tx)
     .await
     .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;

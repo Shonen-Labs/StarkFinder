@@ -24,12 +24,15 @@ impl Modify for SecurityAddon {
 #[openapi(
     paths(
         crate::routes::register::register,
+        crate::routes::generate::generate,
         crate::routes::user::me
     ),
     components(
         schemas(
             crate::routes::register::RegisterReq,
             crate::routes::register::RegisterRes,
+            crate::routes::generate::GenerateReq,
+            crate::routes::generate::GenerateRes,
             crate::routes::user::UserMeRes,
             crate::routes::user::ProfilePublic,
             crate::libs::error::ErrorBody
@@ -38,7 +41,8 @@ impl Modify for SecurityAddon {
     modifiers(&SecurityAddon),
     tags(
         (name = "health", description = "Health check endpoints"),
-        (name = "auth", description = "Authentication & registration endpoints")
+        (name = "auth", description = "Authentication & registration endpoints"),
+        (name = "contracts", description = "Contract generation and management endpoints")
     )
 )]
 pub struct ApiDoc;

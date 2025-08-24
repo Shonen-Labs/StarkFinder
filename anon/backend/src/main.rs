@@ -15,6 +15,7 @@ mod middlewares {
 
 mod routes {
     pub mod register;
+    pub mod generate;
     pub mod user;
 }
 
@@ -25,7 +26,7 @@ use axum::{
         header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
     },
     response::IntoResponse,
-    routing::{get, post},
+    routing::post,
 };
 use tokio::net::TcpListener;
 use tower_http::{
@@ -63,6 +64,7 @@ async fn main() {
     let app = Router::new()
         // .route("/", get(root_redirect)) //TODO: re-introduce when `/health` is implemented
         .route("/register", post(routes::register::register))
+        .route("/generate", post(routes::generate::generate))
         .route("/user", get(routes::user::me))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(
