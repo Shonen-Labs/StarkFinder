@@ -1,33 +1,40 @@
-
 mod libs {
+    pub mod apispec;
     pub mod config;
-    pub mod logging;
     pub mod db;
     pub mod error;
+    pub mod jwt;
+    pub mod logging;
     pub mod wallet;
-    pub mod apispec;
 }
+
 mod middlewares {
+    pub mod auth;
     pub mod request_id;
 }
+
 mod routes {
     pub mod register;
     pub mod generate;
+    pub mod user;
 }
 
 use axum::{
-    http::{header::{CONTENT_TYPE, LOCATION}, Method, StatusCode},
+    Router,
+    http::{
+        Method, StatusCode,
+        header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
+    },
     response::IntoResponse,
     routing::post,
-    Router,
 };
-use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
 use tokio::net::TcpListener;
 use tower_http::{
     cors::{Any, CorsLayer},
-    trace::{TraceLayer, DefaultMakeSpan},
+    trace::{DefaultMakeSpan, TraceLayer},
 };
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 async fn root_redirect() -> impl IntoResponse {
     (StatusCode::MOVED_PERMANENTLY, [(LOCATION, "/health")])
@@ -44,31 +51,33 @@ async fn main() {
 
     // Database pool + migrations
     let pool = libs::db::new_pool_from_env().await.expect("db pool");
-    libs::db::run_migrations(&pool).await.expect("migrations failed");
+    libs::db::run_migrations(&pool)
+        .await
+        .expect("migrations failed");
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
-        .allow_methods([Method::GET, Method::POST])
-        .allow_headers([CONTENT_TYPE]);
+        .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+        .allow_headers([CONTENT_TYPE, AUTHORIZATION]);
 
     // Router
     let app = Router::new()
         // .route("/", get(root_redirect)) //TODO: re-introduce when `/health` is implemented
         .route("/register", post(routes::register::register))
         .route("/generate", post(routes::generate::generate))
+        .route("/user", get(routes::user::me))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
-        .merge(
-            SwaggerUi::new("/docs").url(
-                "/api-docs/openapi.json",
-                crate::libs::apispec::ApiDoc::openapi(),
-            ),
-        );
+        .merge(SwaggerUi::new("/docs").url(
+            "/api-docs/openapi.json",
+            crate::libs::apispec::ApiDoc::openapi(),
+        ));
 
     // request-id layers before trace
     let app = middlewares::request_id::add_request_id(app)
         // trace requests (include headers so x-request-id is visible)
-        .layer(TraceLayer::new_for_http().make_span_with(DefaultMakeSpan::new().include_headers(true)))
-
+        .layer(
+            TraceLayer::new_for_http().make_span_with(DefaultMakeSpan::new().include_headers(true)),
+        )
         .layer(cors)
         .with_state(libs::db::AppState { pool: pool.clone() });
 

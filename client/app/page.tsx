@@ -2,7 +2,7 @@
 
 import Header from "@/components/Header"
 import { Feature, Hero, Offer, Question } from "@/components/landing/home"
-import { Footer } from "react-day-picker"
+import { Footer } from "@/components/landing/home/footer"
 
 export default function HomePage() {
   // Create a function to handle adding blocks

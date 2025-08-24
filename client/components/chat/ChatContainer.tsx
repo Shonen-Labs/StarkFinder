@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, Bot } from "lucide-react"
+import { Bot } from "lucide-react"
 import ChatMessage from "./ChatMessage"
 import ChatInput from "./ChatInput"
 import { cn } from "@/lib/utils"
@@ -30,6 +31,7 @@ export default function ChatContainer({
 }: ChatContainerProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const router = useRouter()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -39,6 +41,10 @@ export default function ChatContainer({
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
     const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
     setShowScrollButton(!isNearBottom)
+  }
+
+  const handleStarkFinderClick = () => {
+    router.push('/')
   }
 
   useEffect(() => {
@@ -61,19 +67,13 @@ export default function ChatContainer({
             <Bot className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h2 className="text-base font-medium text-white">Cairo Generator</h2>
+            <h2 
+              className="text-base font-medium text-white cursor-pointer hover:text-blue-400 transition-colors duration-200"
+              onClick={handleStarkFinderClick}
+            >
+              StarkFinder
+            </h2>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg"
-            onClick={() => window.location.reload()}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
         </div>
       </div>
 

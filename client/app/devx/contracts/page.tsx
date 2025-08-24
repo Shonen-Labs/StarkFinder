@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 import Sidebar from "@/components/devx/contracts/Sidebar";
+import { DevXFooter } from "@/components/footer/footer";
 
 const contracts = [
   {
@@ -73,7 +74,7 @@ const contracts = [
         title: "Starknet Dev Tools",
         url: "https://docs.starknet.io/tools/devtools/",
         description: "Development utilities",
-        icon: "�",
+        icon: "🔧",
       },
     ],
   },
@@ -175,53 +176,58 @@ const ContractCard = ({ item }: { item: ContractItem }) => (
 
 export default function ContractsPage() {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Sidebar />
-      </motion.div>
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-900">
+      <div className="flex py-12 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
-            Starknet Contracts
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            Practical examples for building smart contracts on Starknet using
-            the Cairo programming language
-          </p>
+          <Sidebar />
         </motion.div>
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
+              Starknet Contracts
+            </h1>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+              Practical examples for building smart contracts on Starknet using
+              the Cairo programming language
+            </p>
+          </motion.div>
 
-        <div className="space-y-16">
-          {contracts.map((section, sectionIndex) => (
-            <motion.div
-              key={section.category}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: sectionIndex * 0.1 }}
-            >
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {section.category}
-                </h2>
-                <p className="text-white/70">{section.description}</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {section.items.map((item) => (
-                  <ContractCard key={item.title} item={item} />
-                ))}
-              </div>
-            </motion.div>
-          ))}
+          <div className="space-y-16">
+            {contracts.map((section, sectionIndex) => (
+              <motion.div
+                key={section.category}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: sectionIndex * 0.1 }}
+              >
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    {section.category}
+                  </h2>
+                  <p className="text-white/70">{section.description}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {section.items.map((item) => (
+                    <ContractCard key={item.title} item={item} />
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <DevXFooter />
     </div>
   );
 }
