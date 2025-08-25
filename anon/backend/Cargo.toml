@@ -23,3 +23,6 @@ async-trait = "0.1.89"
 
 [dev-dependencies]
 sqlx-cli = { version = "0.8.2", features = ["native-tls", "postgres"] }
+axum-test = "18.0.0"
+tower = { version = "0.4", features = ["util"] }
+serde_json = "1.0.143"

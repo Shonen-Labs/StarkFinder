@@ -13,6 +13,7 @@ pub fn secret_from_env() -> Vec<u8> {
         .into_bytes()
 }
 
+#[allow(dead_code)] // This function is used in other parts of the codebase
 pub fn encode(wallet: &str, secret: &[u8]) -> Result<String, jsonwebtoken::errors::Error> {
     let exp = std::time::SystemTime::now()
         .checked_add(std::time::Duration::from_secs(60 * 60 * 24 * 7)) // 7 days

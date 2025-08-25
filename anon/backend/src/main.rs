@@ -14,6 +14,7 @@ mod middlewares {
 }
 
 mod routes {
+    pub mod generate;
     pub mod register;
     pub mod user;
 }
@@ -35,6 +36,7 @@ use tower_http::{
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
+#[allow(dead_code)]
 async fn root_redirect() -> impl IntoResponse {
     (StatusCode::MOVED_PERMANENTLY, [(LOCATION, "/health")])
 }
@@ -64,6 +66,7 @@ async fn main() {
         // .route("/", get(root_redirect)) //TODO: re-introduce when `/health` is implemented
         .route("/register", post(routes::register::register))
         .route("/user", get(routes::user::me))
+        .route("/generate", post(routes::generate::generate_contract))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(
             "/api-docs/openapi.json",

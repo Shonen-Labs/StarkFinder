@@ -63,6 +63,7 @@ pub async fn new_pool(database_url: &str) -> Result<PgPool, DbInitError> {
     Ok(pool)
 }
 
+#[allow(dead_code)]
 pub async fn health_check(pool: &PgPool) -> bool {
     sqlx::query_scalar!("SELECT 1 as one")
         .fetch_one(pool)
