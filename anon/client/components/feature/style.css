@@ -1,0 +1,115 @@
+.value-page {
+  min-height: 100svh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.value-page-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -99;
+}
+
+img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.value-header {
+  padding-top: 48px;
+}
+
+.value-header h1 {
+  font-size: 4rem;
+}
+
+.features {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  justify-content: center;
+  gap: 24px;
+  z-index: -99;
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  border: solid 2px rgb(255, 255, 255, 0.06);
+}
+
+.features h1 {
+  font-size: 24px;
+  padding: 2rem;
+}
+
+.features p {
+  font-size: 16px;
+  padding: 2rem;
+}
+
+.card-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -10;
+}
+
+.feature-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  border: solid 2px rgb(255, 255, 255, 0.05);
+}
+
+.card-bg-alt {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -10;
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .features > .grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .feature-card-title,
+  .feature-card {
+    width: 100%;
+  }
+
+  .card-bg-alt {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    display: block;
+  }
+}

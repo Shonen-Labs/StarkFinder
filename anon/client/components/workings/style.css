@@ -1,0 +1,106 @@
+.working-page {
+  height: 100svh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.workings-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -99;
+}
+
+.sticky-cards-section {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 16/5;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sticky-cards-section h1 {
+  font-size: 24px;
+  margin-bottom: 0.2rem;
+}
+
+.sticky-cards-section h2 {
+  margin-bottom: 2rem;
+}
+
+.sticky-cards-section p {
+  font-size: 16px;
+}
+
+.sticky-card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sticky-card-inner {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 2em;
+  will-change: transform;
+}
+
+.sticky-card-cta {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+}
+
+.cta-button {
+  color: white;
+  padding: 8px;
+  border: solid 2px rgb(255, 255, 255, 0.05);
+}
+
+#card-2.sticky-card {
+  background-color: rgba(0, 0, 0, 0.178);
+}
+
+.sticky-card {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  border: solid 2px rgb(255, 255, 255, 0.05);
+}
+
+@media screen and (max-width: 1200px) {
+  .sticky-card-inner {
+    flex-direction: column;
+    gap: 4rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .sticky-card-cta {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    
+  }
+
+  .sticky-cards-section {
+    aspect-ratio: 4/5;
+  }
+}
