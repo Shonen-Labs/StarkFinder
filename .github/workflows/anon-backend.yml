@@ -22,7 +22,7 @@ jobs:
       run:
         working-directory: anon/backend
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/starkfinder_test
 
     services:
       postgres:
@@ -63,8 +63,20 @@ jobs:
       - name: Install sqlx-cli
         run: cargo install sqlx-cli --no-default-features --features native-tls,postgres
 
-      - name: Run database migrations
-        run: sqlx migrate run
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done
+
+      - name: Prepare test database and run migrations
+        run: |
+          sqlx database create --database-url "$DATABASE_URL" || true
+          sqlx migrate run --database-url "$DATABASE_URL"
+          sqlx migrate info --database-url "$DATABASE_URL"
 
       - name: Check formatting
         run: cargo fmt --all -- --check
@@ -79,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/starkfinder_test
       TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/starkfinder_test
 
     defaults:
@@ -125,10 +137,20 @@ jobs:
           cargo install sqlx-cli --no-default-features --features native-tls,postgres
           cargo install cargo-nextest --locked
 
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done
+
       - name: Prepare test database and run migrations
         run: |
           sqlx database create --database-url "$TEST_DATABASE_URL" || true
           sqlx migrate run --database-url "$TEST_DATABASE_URL"
+          sqlx migrate info --database-url "$TEST_DATABASE_URL"
 
       - name: Build
         run: cargo build --verbose
