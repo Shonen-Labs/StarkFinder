@@ -43,23 +43,27 @@ sqlx migrate run --database-url $TEST_DATABASE_URL
 
 ## Running Tests
 
-### Run all tests:
+### Run all tests
+
 ```bash
 cd anon/backend
 cargo test
 ```
 
-### Run specific test file:
+### Run specific test file
+
 ```bash
 cargo test generate_contract_test
 ```
 
-### Run with output:
+### Run with output
+
 ```bash
 cargo test -- --nocapture
 ```
 
-### Run in parallel:
+### Run in parallel
+
 ```bash
 cargo test -- --test-threads=1
 ```
@@ -68,7 +72,7 @@ cargo test -- --test-threads=1
 
 The integration tests cover:
 
-### POST /generate Endpoint Tests:
+### POST /generate Endpoint Tests
 
 1. **Success Cases:**
    - Full request with all fields

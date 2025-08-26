@@ -21,23 +21,6 @@ jobs:
     defaults:
       run:
         working-directory: anon/backend
-    env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/starkfinder_test
-
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
       - name: Checkout code
@@ -59,24 +42,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-lint-
             ${{ runner.os }}-cargo-
-
-      - name: Install sqlx-cli
-        run: cargo install sqlx-cli --no-default-features --features native-tls,postgres
-
-      - name: Install psql client
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-
-      - name: Wait for Postgres
-        run: |
-          until pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done
-
-      - name: Prepare test database and run migrations
-        run: |
-          sqlx database create --database-url "$DATABASE_URL" || true
-          sqlx migrate run --database-url "$DATABASE_URL"
-          sqlx migrate info --database-url "$DATABASE_URL"
 
       - name: Check formatting
         run: cargo fmt --all -- --check

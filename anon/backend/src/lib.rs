@@ -1,6 +1,23 @@
-pub mod libs;
-pub mod middlewares;
-pub mod routes;
+pub mod libs {
+    pub mod apispec;
+    pub mod config;
+    pub mod db;
+    pub mod error;
+    pub mod jwt;
+    pub mod logging;
+    pub mod wallet;
+}
+
+pub mod middlewares {
+    pub mod auth;
+    pub mod request_id;
+}
+
+pub mod routes {
+    pub mod generate;
+    pub mod register;
+    pub mod user;
+}
 
 use axum::{
     Router,

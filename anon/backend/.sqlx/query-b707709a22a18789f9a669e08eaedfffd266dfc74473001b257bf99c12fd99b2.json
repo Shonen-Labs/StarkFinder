@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        TRUNCATE TABLE\n            generated_contracts,\n            profiles,\n            users\n        RESTART IDENTITY CASCADE\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "b707709a22a18789f9a669e08eaedfffd266dfc74473001b257bf99c12fd99b2"
+}

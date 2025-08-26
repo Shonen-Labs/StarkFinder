@@ -1,23 +1,4 @@
-mod libs {
-    pub mod apispec;
-    pub mod config;
-    pub mod db;
-    pub mod error;
-    pub mod jwt;
-    pub mod logging;
-    pub mod wallet;
-}
-
-mod middlewares {
-    pub mod auth;
-    pub mod request_id;
-}
-
-mod routes {
-    pub mod generate;
-    pub mod register;
-    pub mod user;
-}
+use backend::*;
 
 use axum::{
     Router,
