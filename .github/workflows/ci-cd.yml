@@ -73,7 +73,7 @@ jobs:
         run: scarb build
 
       - name: Run forge tests
-        run: snforge test --workspacexxx
+        run: snforge test --workspace
 
   nextjs-build-and-test:
     runs-on: ubuntu-latest
