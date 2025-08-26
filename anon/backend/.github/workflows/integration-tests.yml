@@ -54,13 +54,14 @@ jobs:
     - name: Set up test environment
       run: |
         cd anon/backend
-        export TEST_DATABASE_URL="postgresql://postgres:password@localhost:5432/postgres"
+        export TEST_DATABASE_URL="postgresql://postgres:password@localhost:5432/starkfinder_test"
+        sqlx database create --database-url "$TEST_DATABASE_URL" || true
         sqlx migrate run --database-url "$TEST_DATABASE_URL"
     
     - name: Run integration tests
       run: |
         cd anon/backend
-        export TEST_DATABASE_URL="postgresql://postgres:password@localhost:5432/postgres"
+        export TEST_DATABASE_URL="postgresql://postgres:password@localhost:5432/starkfinder_test"
         cargo test -- --test-threads=1 --nocapture
     
     - name: Upload test results
