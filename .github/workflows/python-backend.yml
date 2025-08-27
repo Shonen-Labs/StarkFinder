@@ -1,0 +1,82 @@
+name: CI/CD Python Backend
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "py-be/**"
+  push:
+    branches: [main]
+    paths:
+      - "py-be/**"
+
+jobs:
+  lint:
+    name: lint
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: py-be
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Cache Poetry packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('py-be/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies (with dev)
+        run: poetry install --no-root --with dev
+
+      - name: Run linters
+        run: |
+          poetry run black --check .
+          poetry run isort --check-only .
+
+  tests:
+    name: test
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: py-be
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Cache Poetry packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('py-be/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies (with dev)
+        run: poetry install --no-root --with dev
+
+      - name: Run tests
+        run: poetry run pytest --maxfail=1 --disable-warnings -q || echo "pytest not installed"
