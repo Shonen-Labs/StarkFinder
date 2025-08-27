@@ -30,18 +30,37 @@ const WalletButton: React.FC<WalletButtonProps> = ({
   src,
   connector,
 }) => {
-  const { connect } = useConnect();
+  const { connectAsync, isPending } = useConnect();
   const isSvg = src?.startsWith("<svg");
 
-  const handleConnectWallet = () => {
-    connect({ connector });
-    localStorage.setItem("lastUsedConnector", connector.name);
+  const handleConnectWallet = async () => {
+    try {
+      // console.log("Connecting to wallet:", connector.name, connector);
+
+      // // Check if connector is ready
+      // if (!connector.ready) {
+      //   console.warn("Connector not ready:", connector);
+      //   alert(
+      //     "Wallet not ready. Please ensure the wallet extension is installed and unlocked."
+      //   );
+      //   return;
+      // }
+
+      await connectAsync({ connector });
+      localStorage.setItem("lastUsedConnector", connector.name);
+    } catch (error) {
+      console.error("Error connecting to wallet:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      alert(`Failed to connect: ${errorMessage}`);
+    }
   };
 
   return (
     <motion.button
-      className=" w-full bg-white flex items-center gap-5 rounded-lg py-1 px-5 text-base font-medium text-[#000000]  "
+      className=" w-full bg-white flex items-center gap-5 rounded-lg py-1 px-5 text-base font-medium text-[#000000] disabled:opacity-50 disabled:cursor-not-allowed "
       onClick={handleConnectWallet}
+      disabled={isPending}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.98 }}
     >
@@ -64,7 +83,7 @@ const WalletButton: React.FC<WalletButtonProps> = ({
         )}
       </div>
       <span className="flex-1 text-left font-medium text-gray-800 dark:text-gray-100">
-        {name}
+        {isPending ? "Connecting..." : name}
       </span>
     </motion.button>
   );
@@ -73,9 +92,25 @@ const WalletButton: React.FC<WalletButtonProps> = ({
 const ConnectModal: React.FC = () => {
   const { connectors } = useConnect();
 
-  const filteredConnectors = connectors.filter((connector) =>
-    connector.name.toLowerCase()
-  );
+ 
+
+  // if (filteredConnectors.length === 0) {
+  //   return (
+  //     <DialogContent className="sm:max-w-[450px] w-[300px] border border-gray-300">
+  //       <DialogHeader>
+  //         <DialogTitle className="text-2xl font-bold text-white">
+  //           No Wallets Available
+  //         </DialogTitle>
+  //       </DialogHeader>
+  //       <div className="p-4 text-center text-gray-400">
+  //         <p>No compatible wallets found.</p>
+  //         <p className="text-sm mt-2">
+  //           Please install Argent or Braavos wallet extension.
+  //         </p>
+  //       </div>
+  //     </DialogContent>
+  //   );
+  // }
 
   return (
     <DialogContent className="sm:max-w-[450px] w-[300px]  border border-gray-300  ">
@@ -86,32 +121,32 @@ const ConnectModal: React.FC = () => {
       </DialogHeader>
       <ScrollArea className="h-[400px] pr-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2   ">
-          {filteredConnectors.map((connector, index) => (
-            <WalletButton
-              key={connector.id || index}
-              src={
-                typeof connector.icon === "object"
-                  ? connector.icon.light
-                  : connector.icon
-              }
-              name={connector.name}
-              connector={connector}
-              alt={`${connector.name} icon`}
-            />
-          ))}
+          {connectors.map((connector, index) => {
+            // Safety check for connector properties
+            if (!connector || !connector.name) {
+              console.warn("Invalid connector:", connector);
+              return null;
+            }
+
+            return (
+              <WalletButton
+                key={connector.id || index}
+                src={
+                  typeof connector.icon === "object"
+                    ? connector.icon.light
+                    : connector.icon
+                }
+                name={connector.name}
+                connector={connector}
+                alt={`${connector.name} icon`}
+              />
+            );
+          })}
         </div>
       </ScrollArea>
     </DialogContent>
   );
 };
-
-
-
-
-
-
-
-
 
 interface ConnectButtonProps {
   text?: string;
@@ -152,14 +187,6 @@ const ConnectButton: React.FC<ConnectButtonProps> = ({
       </DialogTrigger>
       <ConnectModal />
     </Dialog>
-
-
-
-
-
-
-
-
   );
 };
 
@@ -167,9 +194,18 @@ interface DisconnectButtonProps {
   className?: string;
 }
 
-const DisconnectButton: React.FC<DisconnectButtonProps> = ({ className = "" }) => {
-  const { disconnect } = useDisconnect({});
+const DisconnectButton: React.FC<DisconnectButtonProps> = ({
+  className = "",
+}) => {
+  const { disconnect } = useDisconnect({
+    onError: undefined,
+    onSuccess: undefined,
+    onMutate: undefined,
+    onSettled: undefined
+  });
+
   const handleDisconnect = () => {
+    console.log("disconnecting");
     disconnect();
   };
 

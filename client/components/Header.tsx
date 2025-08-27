@@ -4,7 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { Connector, useAccount, useConnect } from "@starknet-react/core";
 import { DisconnectButton } from "@/lib/Connect";
 import {
   Select,
@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 interface HeaderProps {
   selectedModel?: string;
@@ -25,14 +26,12 @@ interface HeaderProps {
   children?: React.ReactNode;
 }
 
-export default function Header({
-  children,
-}: HeaderProps) {
+export default function Header({ children }: HeaderProps) {
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { address } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connectAsync, connectors } = useConnect();
   const { data: session, status } = useSession();
   const isConnected = !!address;
 
@@ -43,10 +42,10 @@ export default function Header({
     )}`;
   }
 
-  const handleConnect = async (connectorId: string) => {
+  const handleConnect = async (connector: Connector) => {
     try {
-      await connect({
-        connector: connectors.find((c) => c.id === connectorId),
+      await connectAsync({
+        connector,
       });
       setIsWalletModalOpen(false);
     } catch (error) {
@@ -64,8 +63,6 @@ export default function Header({
       console.error("Logout error:", error);
     }
   };
-
-
 
   return (
     <>
@@ -138,9 +135,7 @@ export default function Header({
               </motion.button>
             )}
           </div>
-
           {children}
-
           <div className="md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -242,7 +237,11 @@ export default function Header({
       <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <h2 className="text-xl font-bold">Connect your Starknet wallet</h2>
+            <DialogTitle>
+              <h2 className="text-xl font-bold">
+                Connect your Starknet wallet
+              </h2>
+            </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {connectors.map((connector) => {
@@ -254,7 +253,7 @@ export default function Header({
               return (
                 <Button
                   key={connector.id}
-                  onClick={() => handleConnect(connector.id)}
+                  onClick={() => handleConnect(connector)}
                   className="flex items-center justify-center gap-3 bg-primary hover:bg-primary-dark py-4"
                 >
                   {iconSrc && (
