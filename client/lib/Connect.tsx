@@ -205,7 +205,6 @@ const DisconnectButton: React.FC<DisconnectButtonProps> = ({
   });
 
   const handleDisconnect = () => {
-    console.log("disconnecting");
     disconnect();
   };
 

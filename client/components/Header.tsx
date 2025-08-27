@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Connector, useAccount, useConnect } from "@starknet-react/core";
 import { DisconnectButton } from "@/lib/Connect";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { Home, Book, Wallet, LogOut, User } from "lucide-react";
+import { Home, Book, Wallet, LogOut, User, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -106,22 +106,21 @@ export default function Header({ children }: HeaderProps) {
               </Button>
             )}
             {isConnected && (
-              <div className="flex items-center gap-2">
-                <Select>
-                  <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-3 py-1 hover:bg-green-200">
-                    <div className="flex items-center gap-2">
-                      <span>{formatAddress(address)}</span>
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent className="bg-white shadow-md rounded-md flex justify-center">
-                    <SelectItem value="disconnect" className="focus:bg-red-50">
-                      <div className="flex items-center gap-2 text-red-600">
-                        <DisconnectButton className="text-red-600 hover:text-red-800" />
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-sm bg-green-100 text-green-800 rounded-full px-3 py-1 hover:bg-green-200"
+                  >
+                    <span>{formatAddress(address)}</span>
+                    <ChevronDown size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white shadow-md rounded-md">
+                  <DropdownMenuItem className="text-red-600 hover:text-red-800 focus:text-red-800 focus:bg-red-50">
+                    <DisconnectButton className="w-full text-left" />
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             {session && (
               <motion.button
@@ -184,25 +183,21 @@ export default function Header({ children }: HeaderProps) {
                 </Button>
               )}
               {isConnected && (
-                <div className="flex items-center gap-2">
-                  <Select>
-                    <SelectTrigger className="w-[180px] bg-green-100 text-green-800 rounded-full text-sm px-3 py-1 hover:bg-green-200">
-                      <div className="flex items-center gap-2">
-                        <span>{formatAddress(address)}</span>
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="bg-white shadow-md rounded-md flex justify-center">
-                      <SelectItem
-                        value="disconnect"
-                        className="focus:bg-red-50"
-                      >
-                        <div className="flex items-center gap-2 text-red-600">
-                          <DisconnectButton className="text-red-600 hover:text-red-800" />
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      className="flex items-center gap-2 hover:scale-110 duration-300 text-xs md:text-sm bg-green-100 text-green-800 rounded-full px-3 py-1 hover:bg-green-200"
+                    >
+                      <span>{formatAddress(address)}</span>
+                      <ChevronDown size={16} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-white shadow-md rounded-md">
+                    <DropdownMenuItem className="text-red-600 hover:text-red-800 focus:text-red-800 focus:bg-red-50">
+                      <DisconnectButton className="w-full text-left" />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
               {session && (
                 <Button
