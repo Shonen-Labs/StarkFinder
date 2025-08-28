@@ -20,6 +20,7 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 @pytest.fixture
 def test_db():
     """Create a fresh database for each test."""
@@ -31,9 +32,11 @@ def test_db():
         db.close()
         Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture
 def client(test_db):
     """Create a test client using the test database."""
+
     def override_get_db():
         try:
             yield test_db

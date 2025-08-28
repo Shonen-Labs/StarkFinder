@@ -6,8 +6,8 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
-from .api.routes import router
 from .api.limiter import limiter
+from .api.routes import router
 
 app = FastAPI(title="StarkFinder API")
 
@@ -15,13 +15,15 @@ app = FastAPI(title="StarkFinder API")
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 
+
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
     """Handle rate limit exceeded errors."""
     return JSONResponse(
         status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-        content={"detail": "Rate limit exceeded"}
+        content={"detail": "Rate limit exceeded"},
     )
+
 
 # Configure CORS
 app.add_middleware(
