@@ -5,7 +5,6 @@ import Security from "../../security/security";
 import Feature from "../../feature/feature";
 import Workings from "../../workings/workings";
 import FAQpage from "../../faq/faq";
-import ContactUs from "@/components/contact/ContactUs";
 import HowItWorks from "@/components/howto/howto";
 
 
@@ -19,7 +18,6 @@ export default function Homepage(){
         <Feature/>
         <Security/>
         <FAQpage/>
-        <ContactUs/>
         <Footer/>
         </>
     )
