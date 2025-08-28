@@ -82,17 +82,19 @@ def test_rate_limiting(client):
     """Test rate limiting on endpoints."""
     # Test rate limiting on GET endpoint
     for _ in range(61):  # Exceed the 60/minute limit
-        client.get("/api/deployed_contracts")
-    response = client.get("/api/deployed_contracts")
+        response = client.get("/api/deployed_contracts")
+        if response.status_code == 429:  # If we hit the rate limit early
+            break
     assert response.status_code == 429  # Too Many Requests
 
     # Test rate limiting on POST endpoint
-    contract_data = {
-        "name": "Test Contract",
-        "address": "0x1234567890123456789012345678901234567890",
-        "deployment_date": "2025-08-29T12:00:00Z"
-    }
-    for _ in range(11):  # Exceed the 10/minute limit
-        client.post("/api/contracts", json=contract_data)
-    response = client.post("/api/contracts", json=contract_data)
+    for i in range(11):  # Exceed the 10/minute limit
+        contract_data = {
+            "name": f"Test Contract {i}",
+            "address": f"0x{i:040x}",  # Create unique addresses
+            "deployment_date": "2025-08-29T12:00:00Z"
+        }
+        response = client.post("/api/contracts", json=contract_data)
+        if response.status_code == 429:  # If we hit the rate limit early
+            break
     assert response.status_code == 429  # Too Many Requests
