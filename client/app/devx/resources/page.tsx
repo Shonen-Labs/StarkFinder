@@ -5,7 +5,7 @@ import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { Header } from "@/components/devx/resources/header";
 import { DevXFooter } from "@/components/footer/footer";
 
-const resources = [
+const contracts = [
   {
     category: "Getting Started",
     description: "Begin your Starknet journey here",
@@ -146,14 +146,14 @@ const resources = [
   },
 ];
 
-interface ResourceItem {
+interface ContractItem {
   title: string;
   url: string;
   description: string;
   icon: string;
 }
 
-const ResourceCard = ({ item }: { item: ResourceItem }) => (
+const ContractCard = ({ item }: { item: ContractItem }) => (
   <motion.a
     href={item.url}
     target="_blank"
@@ -173,7 +173,7 @@ const ResourceCard = ({ item }: { item: ResourceItem }) => (
   </motion.a>
 );
 
-export default function ResourcesPage() {
+export default function ContractsPage() {
   return (
     <div className="min-h-screen bg-[#172033]">
       <div className="py-12 px-4 sm:px-6 lg:px-8">
@@ -186,16 +186,16 @@ export default function ResourcesPage() {
             className="text-center mb-16"
           >
             <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
-              Starknet Developer Resources
+              Starknet Contracts
             </h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Curated collection of essential tools, libraries, and learning
-              materials for Starknet ecosystem development
+              Practical examples for building smart contracts on Starknet using
+              the Cairo programming language
             </p>
           </motion.div>
 
           <div className="space-y-16">
-            {resources.map((section, sectionIndex) => (
+            {contracts.map((section, sectionIndex) => (
               <motion.div
                 key={section.category}
                 initial={{ opacity: 0, y: 20 }}
@@ -210,7 +210,7 @@ export default function ResourcesPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {section.items.map((item) => (
-                    <ResourceCard key={item.title} item={item} />
+                    <ContractCard key={item.title} item={item} />
                   ))}
                 </div>
               </motion.div>
@@ -218,7 +218,7 @@ export default function ResourcesPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <DevXFooter />
     </div>
