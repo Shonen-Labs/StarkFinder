@@ -1,6 +1,6 @@
 """API routes for the backend."""
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -87,7 +87,7 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
 
 @router.post("/contracts", response_model=Contract, status_code=status.HTTP_201_CREATED, tags=["contracts"])
 @limiter.limit("10/minute")
-async def create_contract(contract_in: ContractCreate, db: Session = Depends(get_db)):
+async def create_contract(contract_in: ContractCreate, db: Session = Depends(get_db), request: Request = None):
     """
     Create a new smart contract record.
     
@@ -111,6 +111,7 @@ async def create_contract(contract_in: ContractCreate, db: Session = Depends(get
 @router.get("/deployed_contracts", response_model=DeployedContractsResponse, tags=["contracts"])
 @limiter.limit("60/minute")
 async def get_deployed_contracts(
+    request: Request,
     db: Session = Depends(get_db),
     limit: int = Query(10, ge=1, le=100, description="Number of records to return"),
     skip: int = Query(0, ge=0, description="Number of records to skip"),
