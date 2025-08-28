@@ -11,6 +11,7 @@ from ..models.base import init_db
 from ..models.user import User
 from ..models.contract import Contract, ContractDB, DeployedContractsResponse
 from ..services.base import get_db
+from .limiter import limiter
 
 
 class UserCreate(BaseModel):
@@ -40,9 +41,17 @@ class UserRead(BaseModel):
 
 class ContractCreate(BaseModel):
     """Schema for creating a new contract."""
-    name: str
-    address: str
+    name: constr(min_length=1, max_length=100)
+    address: constr(regex=r"^0x[a-fA-F0-9]{40}$")
     deployment_date: datetime
+
+    @field_validator("address")
+    @classmethod
+    def validate_address(cls, v: str) -> str:
+        """Validate the contract address format."""
+        if not v.startswith("0x"):
+            raise ValueError("Contract address must start with '0x'")
+        return v.lower()  # Normalize to lowercase
 
 
 router = APIRouter()
@@ -72,9 +81,22 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     return user
 
 
-@router.post("/contracts", response_model=Contract, status_code=status.HTTP_201_CREATED)
+@router.post("/contracts", response_model=Contract, status_code=status.HTTP_201_CREATED, tags=["contracts"])
+@limiter.limit("10/minute")
 async def create_contract(contract_in: ContractCreate, db: Session = Depends(get_db)):
-    """Create a new contract."""
+    """
+    Create a new smart contract record.
+    
+    Parameters:
+    - **name**: Contract name (1-100 characters)
+    - **address**: Contract address (must start with '0x' followed by 40 hex characters)
+    - **deployment_date**: Contract deployment timestamp
+    
+    Returns:
+    - Contract object with assigned ID
+    
+    Rate limit: 10 requests per minute per IP
+    """
     contract = ContractDB(**contract_in.model_dump())
     db.add(contract)
     db.commit()
@@ -82,18 +104,34 @@ async def create_contract(contract_in: ContractCreate, db: Session = Depends(get
     return contract
 
 
-@router.get("/deployed_contracts", response_model=DeployedContractsResponse)
+@router.get("/deployed_contracts", response_model=DeployedContractsResponse, tags=["contracts"])
+@limiter.limit("60/minute")
 async def get_deployed_contracts(
     db: Session = Depends(get_db),
-    limit: int = Query(10, ge=1, le=100),
-    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100, description="Number of records to return"),
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
     sort_by: Optional[str] = Query(
-        None, description="Field to sort by, e.g., 'deployment_date:desc'"),
-    name: Optional[str] = None,
-    address: Optional[str] = None,
+        None, 
+        description="Field and order to sort by, e.g., 'deployment_date:desc'. Valid fields: id, name, address, deployment_date"),
+    name: Optional[str] = Query(None, description="Filter by contract name (case-insensitive partial match)"),
+    address: Optional[str] = Query(None, description="Filter by contract address (case-insensitive partial match)"),
 ):
     """
-    Fetches a list of deployed contracts with filtering, sorting, and pagination.
+    Retrieve a list of deployed contracts with filtering, sorting, and pagination.
+    
+    Parameters:
+    - **limit**: Maximum number of records to return (1-100)
+    - **skip**: Number of records to skip for pagination
+    - **sort_by**: Sort field and order (e.g., 'deployment_date:desc')
+    - **name**: Filter contracts by name (case-insensitive)
+    - **address**: Filter contracts by address (case-insensitive)
+    
+    Returns:
+    - List of contracts
+    - Total count of matching records
+    - Pagination information
+    
+    Rate limit: 60 requests per minute per IP
     """
     # Start with a base query
     query = db.query(ContractDB)
@@ -106,10 +144,26 @@ async def get_deployed_contracts(
 
     # Apply sorting
     if sort_by:
-        field, order = sort_by.split(':') if ':' in sort_by else (sort_by, 'asc')
-        if hasattr(ContractDB, field):
+        try:
+            field, order = sort_by.split(':') if ':' in sort_by else (sort_by, 'asc')
+            if order not in ['asc', 'desc']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid sort order '{order}'. Must be 'asc' or 'desc'"
+                )
+            if not hasattr(ContractDB, field):
+                valid_fields = [c.name for c in ContractDB.__table__.columns]
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Invalid sort field '{field}'. Valid fields are: {', '.join(valid_fields)}"
+                )
             order_by = getattr(ContractDB, field).desc() if order == 'desc' else getattr(ContractDB, field)
             query = query.order_by(order_by)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid sort_by format. Use 'field:order' format, e.g., 'deployment_date:desc'"
+            )
 
     # Get total count for pagination
     total = query.count()
