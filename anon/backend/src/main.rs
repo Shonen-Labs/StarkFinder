@@ -10,6 +10,8 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
+use mongodb::bson::doc;
+use crate::mongo::MongoState;
 use tokio::net::TcpListener;
 use tower_http::{
     cors::{Any, CorsLayer},
@@ -98,4 +100,16 @@ async fn shutdown_signal() {
         _ = ctrl_c => {},
         _ = terminate => {},
     }
+}
+async fn mongo_health(State(state):State<MongoState>)->String{
+    let db=state.client.database("admin");
+    match db.run_command(doc!{"ping":1},None).await{
+            Ok(reply)=>format!("Mongo OK: {}",reply),
+            Err(err)=>format!("Mongo Error: {}", err),
+    }
+}
+pub fn router(state:MongoState)->Router{
+    Router::new()
+    .route("/mongo/health",get(mongo_health))
+    .with_state(state)
 }

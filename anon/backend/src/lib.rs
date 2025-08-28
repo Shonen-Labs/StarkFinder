@@ -63,3 +63,10 @@ pub fn create_app(state: AppState) -> Router {
         .layer(cors)
         .with_state(state)
 }
+#[derive(Debug,Clone,serde::Deserialize)]
+pub struct MongoConfig{
+    pub uri:String,
+    pub database: String,
+    pub connect_timeout_ms: u64,
+    pub server_selection_timeout_ms:u64,
+}
