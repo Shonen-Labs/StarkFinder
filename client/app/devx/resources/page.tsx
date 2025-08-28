@@ -5,7 +5,7 @@ import { ArrowTopRightIcon } from "@radix-ui/react-icons";
 import { Header } from "@/components/devx/resources/header";
 import { DevXFooter } from "@/components/footer/footer";
 
-const resources = [
+const contracts = [
   {
     category: "Getting Started",
     description: "Begin your Starknet journey here",
@@ -24,8 +24,8 @@ const resources = [
       },
       {
         title: "Cairo Basics",
-        url: "https://www.cairographics.org/documentation/",
-        description: "Learn Cairo programming fundamentals",
+        url: "https://docs.starknet.io/documentation/cairo-and-starknet/cairo-1/",
+        description: "Learn Cairo 1 programming fundamentals",
         icon: "⚡",
       },
     ],
@@ -41,9 +41,9 @@ const resources = [
         icon: "📖",
       },
       {
-        title: "Starknet Cairo",
-        url: "https://starknet.io/cairo",
-        description: "Advanced Cairo patterns for Starknet",
+        title: "Cairo & Starknet Overview",
+        url: "https://docs.starknet.io/documentation/cairo-and-starknet/",
+        description: "The moving parts and how they fit together",
         icon: "🌀",
       },
       {
@@ -61,19 +61,19 @@ const resources = [
       {
         title: "Starknet Contracts",
         url: "https://docs.starknet.io/architecture-and-concepts/smart-contracts/contract-classes/",
-        description: "Official contract examples",
+        description: "Official contract concepts and examples",
         icon: "📑",
       },
       {
         title: "OpenZeppelin Cairo",
-        url: "https://docs.openzeppelin.com/",
-        description: "Secure contract templates",
+        url: "https://docs.openzeppelin.com/contracts-cairo/",
+        description: "Battle-tested Cairo contract templates",
         icon: "🛡️",
       },
       {
         title: "Starknet Dev Tools",
         url: "https://docs.starknet.io/tools/devtools/",
-        description: "Development utilities",
+        description: "Ecosystem development utilities",
         icon: "🔧",
       },
     ],
@@ -89,9 +89,9 @@ const resources = [
         icon: "🎮",
       },
       {
-        title: "Dojo Starter",
-        url: "https://dojotoolkit.org/documentation/tutorials/1.10/start/index.html",
-        description: "Quickstart templates",
+        title: "Dojo Quick Start",
+        url: "https://book.dojoengine.org/getting-started/quick-start",
+        description: "Spin up a Dojo project quickly",
         icon: "🚀",
       },
     ],
@@ -114,8 +114,8 @@ const resources = [
       },
       {
         title: "Starknet.js",
-        url: "https://starknetjs.com",
-        description: "JavaScript wallet integration",
+        url: "https://www.starknetjs.com/docs/",
+        description: "JavaScript tooling & wallet integration",
         icon: "🧩",
       },
     ],
@@ -125,42 +125,46 @@ const resources = [
     description: "Development ecosystem",
     items: [
       {
-        title: "Starknet React",
+        title: "starknet-react",
         url: "https://www.starknet-react.com/docs/getting-started",
-        description: "React hooks library",
+        description: "React hooks for Starknet",
         icon: "⚛️",
       },
       {
         title: "StarkNet.py",
         url: "https://starknetpy.readthedocs.io",
-        description: "Python development kit",
+        description: "Python SDK for Starknet",
         icon: "🐍",
       },
       {
         title: "Starkli",
         url: "https://book.starkli.rs/",
-        description: "Starknet CLI tool",
+        description: "The Starknet CLI",
         icon: "💻",
       },
     ],
   },
 ];
 
-interface ResourceItem {
+interface ContractItem {
   title: string;
   url: string;
   description: string;
   icon: string;
 }
 
-const ResourceCard = ({ item }: { item: ResourceItem }) => (
+const ContractCard = ({ item }: { item: ContractItem }) => (
   <motion.a
     href={item.url}
     target="_blank"
     rel="noopener noreferrer"
+    aria-label={`${item.title} – opens in a new tab`}
     whileHover={{ scale: 1.02 }}
     whileTap={{ scale: 0.98 }}
-    className="group relative flex flex-col justify-between p-6 [background:linear-gradient(45deg,#172033,theme(colors.slate.800)_50%,#172033)_padding-box] hover:[background:linear-gradient(45deg,#172033,theme(colors.slate.800)_50%,#172033)_padding-box,conic-gradient(from_var(--border-angle),theme(colors.slate.600/.48)_80%,_theme(colors.gray.500)_86%,_theme(colors.gray.300)_90%,_theme(colors.gray.500)_94%,_theme(colors.slate.600/.48))_border-box] rounded-2xl border border-transparent animate-border"
+    className="group relative flex flex-col justify-between p-6
+               [background:linear-gradient(45deg,#172033,theme(colors.slate.800)_50%,#172033)_padding-box]
+               hover:[background:linear-gradient(45deg,#172033,theme(colors.slate.800)_50%,#172033)_padding-box,conic-gradient(from_var(--border-angle),theme(colors.slate.600/.48)_80%,_theme(colors.gray.500)_86%,_theme(colors.gray.300)_90%,_theme(colors.gray.500)_94%,_theme(colors.slate.600/.48))_border-box]
+               rounded-2xl border border-transparent animate-border"
   >
     <div>
       <div className="text-3xl mb-4">{item.icon}</div>
@@ -173,7 +177,7 @@ const ResourceCard = ({ item }: { item: ResourceItem }) => (
   </motion.a>
 );
 
-export default function ResourcesPage() {
+export default function ContractsPage() {
   return (
     <div className="min-h-screen bg-[#172033]">
       <div className="py-12 px-4 sm:px-6 lg:px-8">
@@ -186,16 +190,16 @@ export default function ResourcesPage() {
             className="text-center mb-16"
           >
             <h1 className="text-4xl font-bold bg-gradient-to-r text-white bg-clip-text text-transparent mb-4">
-              Starknet Developer Resources
+              Starknet Contracts
             </h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Curated collection of essential tools, libraries, and learning
-              materials for Starknet ecosystem development
+              Practical examples for building smart contracts on Starknet using
+              the Cairo programming language
             </p>
           </motion.div>
 
           <div className="space-y-16">
-            {resources.map((section, sectionIndex) => (
+            {contracts.map((section, sectionIndex) => (
               <motion.div
                 key={section.category}
                 initial={{ opacity: 0, y: 20 }}
@@ -206,11 +210,11 @@ export default function ResourcesPage() {
                   <h2 className="text-2xl font-bold text-white mb-2">
                     {section.category}
                   </h2>
-                  <p className="text-white/70">{section.description}</p>
+                <p className="text-white/70">{section.description}</p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {section.items.map((item) => (
-                    <ResourceCard key={item.title} item={item} />
+                    <ContractCard key={item.title} item={item} />
                   ))}
                 </div>
               </motion.div>
@@ -218,7 +222,7 @@ export default function ResourcesPage() {
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <DevXFooter />
     </div>
