@@ -1,7 +1,7 @@
 """API routes for the backend."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, ConfigDict, constr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -17,9 +17,9 @@ from .limiter import limiter
 class UserCreate(BaseModel):
     """Schema for incoming user registration data."""
 
-    username: constr(min_length=3)
+    username: str = Field(..., min_length=3)
     email: str
-    password: constr(min_length=6)
+    password: str = Field(..., min_length=6)
 
     @field_validator("email")
     @classmethod
@@ -39,10 +39,14 @@ class UserRead(BaseModel):
     email: str
 
 
+from annotated_types import MinLen, MaxLen
+from pydantic import Field
+import re
+
 class ContractCreate(BaseModel):
     """Schema for creating a new contract."""
-    name: constr(min_length=1, max_length=100)
-    address: constr(regex=r"^0x[a-fA-F0-9]{40}$")
+    name: str = Field(..., min_length=1, max_length=100)
+    address: str = Field(..., pattern=r"^0x[a-fA-F0-9]{40}$")
     deployment_date: datetime
 
     @field_validator("address")
