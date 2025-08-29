@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { Home, Book, Wallet, LogOut, User, ChevronDown } from "lucide-react";
+import { Home, Book, Wallet, LogOut, User, ChevronDown, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
@@ -89,6 +89,12 @@ export default function Header({ children }: HeaderProps) {
             >
               <Book size={18} /> Resources
             </Link>
+            <Link
+              href="/review"
+              className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+            >
+              <MessageSquare size={18} /> Reviews
+            </Link>
             {session && (
               <Link
                 href={`/devx/profile/${session?.user?.id}`}
@@ -162,6 +168,14 @@ export default function Header({ children }: HeaderProps) {
                   className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
                 >
                   <Book size={18} /> Resources
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/review"
+                  className="flex items-center gap-2 hover:text-black transition-colors hover:scale-110 duration-300"
+                >
+                  <MessageSquare size={18} /> Reviews
                 </Link>
               </li>
               {session && (
