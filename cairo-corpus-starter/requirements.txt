@@ -1,0 +1,8 @@
+beautifulsoup4
+requests
+tqdm
+python-dotenv
+orjson
+rapidfuzz
+jsonschema
+pytest

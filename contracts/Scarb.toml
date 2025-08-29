@@ -7,6 +7,11 @@ cairo_version = "2.8.0"
 [dependencies]
 starknet = "2.8.0"
 
+[dev-dependencies]
+snforge_std = "0.44.0"
+# Optional (enables assert_eq! etc. in tests)
+# assert_macros = "2.8.0"
+
 [[target.starknet-contract]]
 sierra = true
 casm = true

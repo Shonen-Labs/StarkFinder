@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
 
+import Navbar from "../../navbar/navbar";
+import Footer from "../../footer/footer";
+
 export const metadata: Metadata = {
   title:
     "About Us - Web3 Wallet Solutions | Empowering the Decentralized Future",
@@ -93,6 +96,7 @@ function TeamCard({ member }: { member: TeamMember }) {
 
 export default function AboutPage() {
   return (
+    <Navbar/>
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white">
       {/* Hero Section */}
       <section className="py-20 px-6 max-w-6xl mx-auto text-center">
@@ -178,14 +182,7 @@ export default function AboutPage() {
       </section>
 
       {/* Footer Navigation */}
-      <footer className="border-t border-white/10 py-12 px-6">
-        <div className="border-t border-white/10 mt-8 pt-8 text-center">
-          <p className="text-gray-500 text-sm">
-            © 2025 Web3 Wallet Solutions. All rights reserved. Building the
-            future of decentralized finance.
-          </p>
-        </div>
-      </footer>
+      <Footer/>
     </main>
   );
 }

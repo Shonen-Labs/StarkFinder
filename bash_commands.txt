@@ -1,0 +1,17 @@
+pip install -r requirements.txt
+
+# SET GITHUB TOKEN
+# ACTIVATE (cairo_env) ENVIRONMENT
+.\cairo_env\Scripts\activate
+
+# Crawl sources (tweak flags as needed)
+python -m src.scrape_github --query "language:Cairo starknet" --max_repos 5
+python -m src.scrape_docs --max_items 5
+python -m src.scrape_blogs --feeds feeds.txt --max_items 5
+
+# Build dataset
+python -m src.clean_standardize
+python -m src.build_jsonl --out data/processed/dataset.jsonl
+
+# Validate
+pytest -q

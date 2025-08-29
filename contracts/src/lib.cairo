@@ -1,18 +1,24 @@
+#[starknet::contract]
 mod contract {
     use starknet::ContractAddress;
     use starknet::get_caller_address;
-    use starknet::storage_access::StorageBase;
-    use starknet::storage_access::StorageMap;
-    use starknet::storage_access::StorageValue;
+
+    // Storage types + access traits (maps + scalars)
+    use starknet::storage::{
+        Map,
+        StorageMapReadAccess, StorageMapWriteAccess,
+        StoragePointerReadAccess, StoragePointerWriteAccess,
+    };
 
     #[storage]
     struct Storage {
-        owner: StorageValue<ContractAddress>,
-        balances: StorageMap<ContractAddress, u256>,
-        total_supply: StorageValue<u256>,
+        owner: ContractAddress,
+        balances: Map<ContractAddress, u256>,
+        total_supply: u256,
     }
 
     #[event]
+    #[derive(Drop, starknet::Event)]
     enum Event {
         Transfer: TransferEvent,
     }
@@ -25,38 +31,47 @@ mod contract {
     }
 
     #[constructor]
-    fn constructor(initial_supply: u256) {
+    fn constructor(ref self: ContractState, initial_supply: u256) {
         let owner = get_caller_address();
-        storage.owner.write(owner);
-        storage.balances.write(owner, initial_supply);
-        storage.total_supply.write(initial_supply);
+        self.owner.write(owner);                 // scalar → StoragePointerWriteAccess
+        self.balances.write(owner, initial_supply); // map → StorageMapWriteAccess
+        self.total_supply.write(initial_supply); // scalar → StoragePointerWriteAccess
     }
 
-    #[external]
-    fn transfer(to: ContractAddress, value: u256) {
-        let caller = get_caller_address();
-        let from_balance = storage.balances.read(caller);
-        assert(from_balance >= value, 'Insufficient balance');
-
-        let to_balance = storage.balances.read(to);
-        storage.balances.write(caller, from_balance - value);
-        storage.balances.write(to, to_balance + value);
-
-        emit!(Event::Transfer(TransferEvent { from: caller, to, value }));
+    #[starknet::interface]
+    trait IToken<TState> {
+        fn transfer(ref self: TState, to: ContractAddress, value: u256);
+        fn balance_of(self: @TState, account: ContractAddress) -> u256;
+        fn total_supply(self: @TState) -> u256;
+        fn owner(self: @TState) -> ContractAddress;
     }
 
-    #[external]
-    fn balance_of(account: ContractAddress) -> u256 {
-        storage.balances.read(account)
-    }
+    // Export ABI without per-function attributes
+    #[abi(embed_v0)]
+    impl TokenImpl of IToken<ContractState> {
+        fn transfer(ref self: ContractState, to: ContractAddress, value: u256) {
+            let caller = get_caller_address();
 
-    #[external]
-    fn total_supply() -> u256 {
-        storage.total_supply.read()
-    }
+            let from_balance = self.balances.read(caller);
+            assert(from_balance >= value, 'Insufficient balance');
 
-    #[external]
-    fn owner() -> ContractAddress {
-        storage.owner.read()
+            let to_balance = self.balances.read(to);
+            self.balances.write(caller, from_balance - value);
+            self.balances.write(to, to_balance + value);
+
+            self.emit(Event::Transfer(TransferEvent { from: caller, to, value })); // use self.emit
+        }
+
+        fn balance_of(self: @ContractState, account: ContractAddress) -> u256 {
+            self.balances.read(account)
+        }
+
+        fn total_supply(self: @ContractState) -> u256 {
+            self.total_supply.read()
+        }
+
+        fn owner(self: @ContractState) -> ContractAddress {
+            self.owner.read()
+        }
     }
 }
