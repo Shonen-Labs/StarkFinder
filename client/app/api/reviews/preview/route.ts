@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
       hasPII: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/.test(content) ||
               /\b\d{3}-\d{2}-\d{4}\b/.test(content), // Email or SSN patterns
       toxicityScore: content.toLowerCase().includes("hate") ? 0.8 : 0.1,
-      piiDetected: [],
-      warnings: [],
+      piiDetected: [] as string[],
+      warnings: [] as string[],
     };
 
     // Check for PII patterns
