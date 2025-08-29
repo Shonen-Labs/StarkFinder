@@ -4,7 +4,7 @@ import os
 import tempfile
 
 TEST_DB_FILE = os.path.join(tempfile.gettempdir(), "starkfinder_test.db")
-os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB_FILE}"
+os.environ["DATABASE_URL"] = f"postgres://postgres:postgres@localhost:5432/{TEST_DB_FILE}"
 
 import pytest
 
