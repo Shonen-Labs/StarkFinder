@@ -1,20 +1,54 @@
-"""Test configuration and fixtures."""
-
 import os
-import tempfile
-
-TEST_DB_FILE = os.path.join(tempfile.gettempdir(), "starkfinder_test.db")
-os.environ["DATABASE_URL"] = f"postgres://postgres:postgres@localhost:5432/{TEST_DB_FILE}"
-
 import pytest
+from sqlalchemy_utils import create_database, drop_database, database_exists
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from app.models.base import Base, engine, init_db
+from app.models.base import Base
+from app.services.base import get_db
+
+
+TEST_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL",
+    "postgresql://postgres:Soham2003@localhost:5432/starkfinder_test"
+)
+
+
+engine = create_engine(TEST_DATABASE_URL)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_database():
+    """Create a fresh test database before tests and drop it after."""
+    if not database_exists(TEST_DATABASE_URL):
+        create_database(TEST_DATABASE_URL)
+
+    Base.metadata.create_all(bind=engine)
+
+    yield  
+
+    drop_database(TEST_DATABASE_URL)
+
+
+@pytest.fixture()
+def db_session():
+    """Provide a SQLAlchemy session for tests."""
+    session = TestingSessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
 
 @pytest.fixture(autouse=True)
-def setup_db():
-    """Ensure a clean database for each test."""
-    Base.metadata.drop_all(bind=engine)
-    init_db()
-    yield
-    Base.metadata.drop_all(bind=engine)
+def override_get_db(monkeypatch, db_session):
+    """Override the get_db dependency in FastAPI with test session."""
+
+    def _get_db_override():
+        try:
+            yield db_session
+        finally:
+            pass
+
+    monkeypatch.setattr("app.services.base.get_db", _get_db_override)

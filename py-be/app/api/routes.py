@@ -13,6 +13,9 @@ from ..models.user import User
 from ..services.base import get_db
 
 
+app = FastAPI()
+
+
 class UserCreate(BaseModel):
     """Schema for incoming user registration data."""
 
@@ -34,8 +37,7 @@ class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-@@ -38,25 +41,107 @@ class UserRead(BaseModel):
-app = FastAPI()
+
 
 init_db()
 
