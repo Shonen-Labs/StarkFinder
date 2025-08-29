@@ -58,6 +58,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const watchedTimeframe = watch("timeframe");
 
   // Debounced safety check
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSafetyCheck = useCallback(
     debounce(async (content: string) => {
       if (content.length < 10) {
@@ -81,7 +82,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
         setIsCheckingSafety(false);
       }
     }, 500),
-    []
+    [setSafetyCheck, setIsCheckingSafety, checkSafety]
   );
 
   // Trigger safety check when content changes

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SafetyIndicatorProps } from "@/lib/review/types";
-import { getSafetyIndicatorColor, getSafetyIndicatorIcon } from "@/lib/review/utils";
+import { getSafetyIndicatorIcon } from "@/lib/review/utils";
 import { X } from "lucide-react";
 
 export const SafetyIndicator: React.FC<SafetyIndicatorProps> = ({
@@ -23,7 +23,6 @@ export const SafetyIndicator: React.FC<SafetyIndicatorProps> = ({
     return null;
   }
 
-  const colorClass = getSafetyIndicatorColor(safetyCheck);
   const icon = getSafetyIndicatorIcon(safetyCheck);
 
   const getBackgroundColor = () => {
