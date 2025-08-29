@@ -30,3 +30,6 @@ pre-commit = "^4.3.0"
 psycopg2-binary = "^2.9.10"
 sqlalchemy-utils = "^0.41.2"
 
+[tool.isort]
+profile = "black"
+line_length = 88
