@@ -1,16 +1,17 @@
 """API routes for the backend."""
 
-from fastapi import Depends,APIRouter, FastAPI, HTTPException, status  # type: ignore
-from pydantic import BaseModel, ConfigDict, constr, field_validator # type: ignore
-from sqlalchemy import or_ # type: ignore
-from sqlalchemy.orm import Session # type: ignore
-
-from ..models.base import init_db
-from ..models.base import User
-from ..services.base import get_db
-from app.db.crud import get_user
 from app.core.security import get_current_user
+from app.db.crud import get_user
 from app.models.schemas import UserCreate
+from fastapi import (APIRouter, Depends, FastAPI,  # type: ignore
+                     HTTPException, status)
+from pydantic import (BaseModel, ConfigDict, constr,  # type: ignore
+                      field_validator)
+from sqlalchemy import or_  # type: ignore
+from sqlalchemy.orm import Session  # type: ignore
+
+from ..models.base import User, init_db
+from ..services.base import get_db
 
 
 class UserCreate(BaseModel):
@@ -18,9 +19,12 @@ class UserCreate(BaseModel):
 
     def get_username() -> list[str]:
         return []
+
     email: str
+
     def get_password() -> str:
         return ""
+
     @field_validator("email")
     @classmethod
     def validate_email(cls, v: str) -> str:
@@ -65,7 +69,9 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     db.refresh(user)
     return user
 
+
 router = APIRouter()
+
 
 @router.get("/user", response_model=User)
 async def read_user_me(current_user: User = Depends(get_current_user)):
@@ -73,6 +79,7 @@ async def read_user_me(current_user: User = Depends(get_current_user)):
     Get current user details based on authentication token
     """
     return current_user
+
 
 @router.get("/user/{user_id}", response_model=User)
 async def read_user(user_id: int, db: Session = Depends(get_db)):

@@ -1,6 +1,6 @@
 """User model definition."""
 
-from sqlalchemy import Column, Integer, String #type: ignore
+from sqlalchemy import Column, Integer, String  # type: ignore
 
 from .base import Base
 

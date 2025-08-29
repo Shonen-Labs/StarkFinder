@@ -1,4 +1,5 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 
 def quality_tag(meta: Dict[str, Any]) -> Dict[str, Any]:
     """Heuristic quality category + score.
@@ -16,11 +17,15 @@ def quality_tag(meta: Dict[str, Any]) -> Dict[str, Any]:
 
     base = 0.2
     if src == "github":
-        base += min(stars/2000, 0.4) + min(forks/500, 0.2)
-        if has_tests: base += 0.08
-        if has_ci: base += 0.06
-        if has_audit: base += 0.1
-        if archived: base -= 0.1
+        base += min(stars / 2000, 0.4) + min(forks / 500, 0.2)
+        if has_tests:
+            base += 0.08
+        if has_ci:
+            base += 0.06
+        if has_audit:
+            base += 0.1
+        if archived:
+            base -= 0.1
         category = "production" if base >= 0.55 else "unknown"
     else:
         category = "tutorial"

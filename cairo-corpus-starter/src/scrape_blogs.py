@@ -1,28 +1,47 @@
-import json, pathlib, re, time, requests, os
+import json
+import os
+import pathlib
+import re
+import time
 from datetime import datetime
-from bs4 import BeautifulSoup
+
+import requests
 import tests.test_schema
+from bs4 import BeautifulSoup
 
 RAW_DIR = pathlib.Path("data/raw/blogs")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
+
 
 def fetch(url: str) -> str:
     r = requests.get(url, timeout=30)
     r.raise_for_status()
     return r.text
 
+
 def extract_code(html: str):
     soup = BeautifulSoup(html, "html.parser")
     out = []
-    for pre in soup.find_all(["pre","code"]):
+    for pre in soup.find_all(["pre", "code"]):
         txt = pre.get_text("\n")
-        if "use::core" in txt or "starknet::" in txt or "pub" in txt or "mod" in txt or "fn " in txt:
+        if (
+            "use::core" in txt
+            or "starknet::" in txt
+            or "pub" in txt
+            or "mod" in txt
+            or "fn " in txt
+        ):
             out.append(txt)
 
     return out
 
+
 def main(feeds_file: str = "feeds.txt", max_items: int = 50):
-    feeds = [ln.strip() for ln in pathlib.Path(feeds_file).read_text().splitlines() if ln.strip() and not ln.startswith("#")]
+    feeds = [
+        ln.strip()
+        for ln in pathlib.Path(feeds_file).read_text().splitlines()
+        if ln.strip() and not ln.startswith("#")
+    ]
     print(feeds)
     n = 0
     for feed in feeds:
@@ -30,13 +49,16 @@ def main(feeds_file: str = "feeds.txt", max_items: int = 50):
             xml = fetch(feed)
             code = extract_code(xml)
 
-            file_name = os.path.join(RAW_DIR, f'cairo_blog_{datetime.now().strftime("%d-%m-%Y %H-%M-%S")}.txt')
+            file_name = os.path.join(
+                RAW_DIR,
+                f'cairo_blog_{datetime.now().strftime("%d-%m-%Y %H-%M-%S")}.txt',
+            )
             print(file_name)
 
-            with open(file_name, 'a') as file:
+            with open(file_name, "a") as file:
                 for c in code:
                     try:
-                        file.write(c + '\n')
+                        file.write(c + "\n")
                     except Exception as e:
                         print(e)
 
@@ -67,6 +89,7 @@ def main(feeds_file: str = "feeds.txt", max_items: int = 50):
 
 if __name__ == "__main__":
     import argparse
+
     ap = argparse.ArgumentParser()
     ap.add_argument("--feeds", default="feeds.txt")
     ap.add_argument("--max_items", type=int, default=50)
