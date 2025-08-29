@@ -1,7 +1,8 @@
 """Model for storing generated contracts."""
 
 from datetime import datetime
-from sqlalchemy import Column, DateTime, Integer, JSON, String, Text, ForeignKey
+
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
 
 from .base import Base
 
@@ -21,6 +22,4 @@ class GeneratedContract(Base):
     generated_code = Column(Text, nullable=False)
     status = Column(String, nullable=False, default="generated")
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

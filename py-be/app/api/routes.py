@@ -12,7 +12,6 @@ from ..models.generated_contract import GeneratedContract
 from ..models.user import User
 from ..services.base import get_db
 
-
 app = FastAPI()
 
 
@@ -93,7 +92,11 @@ class GeneratedContractRead(BaseModel):
     updated_at: datetime
 
 
-@app.post("/generate", response_model=GeneratedContractRead, status_code=status.HTTP_201_CREATED)
+@app.post(
+    "/generate",
+    response_model=GeneratedContractRead,
+    status_code=status.HTTP_201_CREATED,
+)
 def generate_contract(
     req: GenerateContract, db: Session = Depends(get_db)
 ) -> GeneratedContract:
@@ -101,7 +104,9 @@ def generate_contract(
 
     user = db.query(User).filter(User.id == req.user_id).first()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     if len(req.contract_type) > 100:
         raise HTTPException(

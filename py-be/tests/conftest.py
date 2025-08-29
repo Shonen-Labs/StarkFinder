@@ -1,16 +1,16 @@
 import os
+
 import pytest
-from sqlalchemy_utils import create_database, drop_database, database_exists
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from app.models.base import Base
 from app.services.base import get_db
 
-
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql://postgres:Soham2003@localhost:5432/starkfinder_test"
+    "postgresql://postgres:Soham2003@localhost:5432/starkfinder_test",
 )
 
 
@@ -26,7 +26,7 @@ def setup_test_database():
 
     Base.metadata.create_all(bind=engine)
 
-    yield  
+    yield
 
     drop_database(TEST_DATABASE_URL)
 
