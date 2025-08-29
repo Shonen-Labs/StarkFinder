@@ -1,22 +1,26 @@
 """API routes for the backend."""
 
-from fastapi import Depends, FastAPI, HTTPException, status
-from pydantic import BaseModel, ConfigDict, constr, field_validator
-from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from fastapi import Depends,APIRouter, FastAPI, HTTPException, status  # type: ignore
+from pydantic import BaseModel, ConfigDict, constr, field_validator # type: ignore
+from sqlalchemy import or_ # type: ignore
+from sqlalchemy.orm import Session # type: ignore
 
 from ..models.base import init_db
-from ..models.user import User
+from ..models.base import User
 from ..services.base import get_db
+from app.db.crud import get_user
+from app.core.security import get_current_user
+from app.models.schemas import UserCreate
 
 
 class UserCreate(BaseModel):
     """Schema for incoming user registration data."""
 
-    username: constr(min_length=3)
+    def get_username() -> list[str]:
+        return []
     email: str
-    password: constr(min_length=6)
-
+    def get_password() -> str:
+        return ""
     @field_validator("email")
     @classmethod
     def validate_email(cls, v: str) -> str:
@@ -60,3 +64,22 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+router = APIRouter()
+
+@router.get("/user", response_model=User)
+async def read_user_me(current_user: User = Depends(get_current_user)):
+    """
+    Get current user details based on authentication token
+    """
+    return current_user
+
+@router.get("/user/{user_id}", response_model=User)
+async def read_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    Get user by ID (admin functionality)
+    """
+    db_user = get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user

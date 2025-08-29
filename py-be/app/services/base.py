@@ -2,7 +2,7 @@
 
 from collections.abc import Generator
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session  # type: ignore
 
 from ..models.base import SessionLocal
 
