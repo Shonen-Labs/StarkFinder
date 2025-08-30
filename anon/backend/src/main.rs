@@ -2,7 +2,6 @@ use backend::*;
 
 use axum::{
     Router,
-    extract::State,
     http::{
         Method, StatusCode,
         header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
@@ -50,6 +49,7 @@ async fn main() {
         .route("/register", post(routes::register::register))
         .route("/user", get(routes::user::me))
         .route("/generate", post(routes::generate::generate_contract))
+        .route("/reviews", get(routes::reviews::list_reviews))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(
             "/api-docs/openapi.json",

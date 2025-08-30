@@ -269,6 +269,7 @@ dependencies = [
  "async-trait",
  "axum",
  "axum-test",
+ "base64 0.22.1",
  "chrono",
  "dotenvy",
  "jsonwebtoken",

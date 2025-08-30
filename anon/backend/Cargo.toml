@@ -20,6 +20,7 @@ utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
 chrono = { version = "0.4.41", features = ["serde"] }
 jsonwebtoken = "9.3.1"
 async-trait = "0.1.89"
+base64 = "0.22.1"
 
 [dev-dependencies]
 sqlx-cli = { version = "0.8.2", features = ["native-tls", "postgres"] }
