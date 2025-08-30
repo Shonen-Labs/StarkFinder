@@ -19,6 +19,6 @@ Base = declarative_base()
 def init_db() -> None:
     """Create database tables."""
     # Import models here to ensure they are registered with SQLAlchemy
-    from . import deployed_contract, generated_contract, user  # noqa: F401
+    from . import deployed_contracts, generated_contract, user  # noqa: F401
 
     Base.metadata.create_all(bind=engine)

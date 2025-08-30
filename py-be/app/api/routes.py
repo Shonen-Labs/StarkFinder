@@ -8,7 +8,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from ..models.base import init_db
-from ..models.deployed_contract import DeployedContract
+from ..models.deployed_contracts import DeployedContract
 from ..models.generated_contract import GeneratedContract
 from ..models.user import User
 from ..services.base import get_db
@@ -39,7 +39,7 @@ class UserRead(BaseModel):
     id: int
 
 
-init_db()
+# init_db()  # Commented out to avoid database connection at import time
 
 
 @app.post("/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
