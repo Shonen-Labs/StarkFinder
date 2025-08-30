@@ -15,9 +15,9 @@ pub mod middlewares {
 
 pub mod routes {
     pub mod generate;
+    pub mod health;
     pub mod register;
     pub mod user;
-    pub mod health;
 }
 
 use axum::{

@@ -1,7 +1,7 @@
+use crate::libs::db::AppState;
 use axum::{Json, http::StatusCode};
 use serde::Serialize;
 use sqlx::Row;
-use crate::libs::db::AppState;
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -57,7 +57,7 @@ mod tests {
     async fn test_health_response() {
         let response = health().await;
         let body: serde_json::Value = serde_json::to_value(response.0).unwrap();
-        
+
         assert_eq!(body["status"], "ok");
         assert!(body["timestamp"].is_string());
     }
@@ -69,7 +69,7 @@ mod tests {
             version: Some("PostgreSQL 15.0".to_string()),
             error: None,
         };
-        
+
         let body: serde_json::Value = serde_json::to_value(response).unwrap();
         assert_eq!(body["ok"], true);
         assert_eq!(body["version"], "PostgreSQL 15.0");
@@ -83,7 +83,7 @@ mod tests {
             version: None,
             error: Some("Database connection failed".to_string()),
         };
-        
+
         let body: serde_json::Value = serde_json::to_value(response).unwrap();
         assert_eq!(body["ok"], false);
         assert!(body["version"].is_null());

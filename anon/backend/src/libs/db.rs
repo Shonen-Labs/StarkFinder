@@ -67,10 +67,10 @@ pub async fn new_pool(database_url: &str) -> Result<PgPool, DbInitError> {
 pub async fn new_pool_with_retry(database_url: &str) -> Result<PgPool, DbInitError> {
     const MAX_RETRIES: u32 = 5;
     const INITIAL_DELAY: Duration = Duration::from_secs(1);
-    
+
     let mut attempt = 0;
     let mut delay = INITIAL_DELAY;
-    
+
     loop {
         match new_pool(database_url).await {
             Ok(pool) => {
@@ -80,17 +80,25 @@ pub async fn new_pool_with_retry(database_url: &str) -> Result<PgPool, DbInitErr
             Err(e) => {
                 attempt += 1;
                 if attempt >= MAX_RETRIES {
-                    tracing::error!("Failed to connect to database after {} attempts: {:?}", MAX_RETRIES, e);
+                    tracing::error!(
+                        "Failed to connect to database after {} attempts: {:?}",
+                        MAX_RETRIES,
+                        e
+                    );
                     return Err(e);
                 }
-                
-                tracing::warn!("Database connection attempt {} failed, retrying in {:?}: {:?}", attempt, delay, e);
+
+                tracing::warn!(
+                    "Database connection attempt {} failed, retrying in {:?}: {:?}",
+                    attempt,
+                    delay,
+                    e
+                );
                 sleep(delay).await;
-                
+
                 // Exponential backoff with jitter
                 delay = Duration::from_secs(
-                    (delay.as_secs() * 2).min(30) + 
-                    (rand::random::<u64>() % 5)
+                    (delay.as_secs() * 2).min(30) + (rand::random::<u64>() % 5),
                 );
             }
         }
