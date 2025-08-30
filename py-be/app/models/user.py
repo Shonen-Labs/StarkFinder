@@ -1,16 +1,23 @@
 """User model definition."""
-
-from sqlalchemy import Column, Integer, String
-
-from .base import Base
+from pydantic import BaseModel, EmailStr
 
 
-class User(Base):
-    """SQLAlchemy model for a registered user."""
 
-    __tablename__ = "users"
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, nullable=False, index=True)
-    email = Column(String, unique=True, nullable=False, index=True)
-    password = Column(String, nullable=False)
+class UserCreate(UserBase):
+    password: str
+
+class UserResponse(UserBase):
+    id: int
+    class Config:
+        from_attributes = True
+
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
