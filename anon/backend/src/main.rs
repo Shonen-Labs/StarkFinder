@@ -2,7 +2,6 @@ use backend::*;
 
 use axum::{
     Router,
-    extract::State,
     http::{
         Method, StatusCode,
         header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
@@ -47,6 +46,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root_redirect))
         .route("/health", get(routes::health::health))
+        .route("/db/health", get(routes::health::db_health))
         .route("/register", post(routes::register::register))
         .route("/user", get(routes::user::me))
         .route("/generate", post(routes::generate::generate_contract))

@@ -5,6 +5,7 @@ use sqlx::{
     postgres::{PgConnectOptions, PgPoolOptions},
 };
 use thiserror::Error;
+use tokio::time::sleep;
 
 #[derive(Debug, Error)]
 pub enum DbInitError {
@@ -21,7 +22,7 @@ pub struct AppState {
 
 pub async fn new_pool_from_env() -> Result<PgPool, DbInitError> {
     let url = std::env::var("DATABASE_URL").map_err(|_| DbInitError::MissingUrl)?;
-    new_pool(&url).await
+    new_pool_with_retry(&url).await
 }
 
 pub async fn new_pool(database_url: &str) -> Result<PgPool, DbInitError> {
@@ -61,6 +62,39 @@ pub async fn new_pool(database_url: &str) -> Result<PgPool, DbInitError> {
         .connect_with(opts)
         .await?;
     Ok(pool)
+}
+
+pub async fn new_pool_with_retry(database_url: &str) -> Result<PgPool, DbInitError> {
+    const MAX_RETRIES: u32 = 5;
+    const INITIAL_DELAY: Duration = Duration::from_secs(1);
+    
+    let mut attempt = 0;
+    let mut delay = INITIAL_DELAY;
+    
+    loop {
+        match new_pool(database_url).await {
+            Ok(pool) => {
+                tracing::info!("Database connection established successfully");
+                return Ok(pool);
+            }
+            Err(e) => {
+                attempt += 1;
+                if attempt >= MAX_RETRIES {
+                    tracing::error!("Failed to connect to database after {} attempts: {:?}", MAX_RETRIES, e);
+                    return Err(e);
+                }
+                
+                tracing::warn!("Database connection attempt {} failed, retrying in {:?}: {:?}", attempt, delay, e);
+                sleep(delay).await;
+                
+                // Exponential backoff with jitter
+                delay = Duration::from_secs(
+                    (delay.as_secs() * 2).min(30) + 
+                    (rand::random::<u64>() % 5)
+                );
+            }
+        }
+    }
 }
 
 pub async fn health_check(pool: &PgPool) -> bool {
