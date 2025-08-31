@@ -15,7 +15,8 @@ dependencies = [
     "python-dotenv (>=1.1.1,<2.0.0)",
     "prisma (>=0.15.0,<0.16.0)",
     "starknet-py (>=0.27.0,<0.28.0)",
-    "pytest (>=8.4.1,<9.0.0)"
+    "pytest (>=8.4.1,<9.0.0)",
+    "alembic (>=1.16.5,<2.0.0)"
 ]
 
 
@@ -30,6 +31,9 @@ packages = [{include = "app"}]
 black = "^25.1.0"
 isort = "^6.0.1"
 pre-commit = "^4.3.0"
+pytest = "^8.4.1"
+pytest-asyncio = "^1.1.0"
+httpx = "^0.28.1"
 psycopg2-binary = "^2.9.10"
 sqlalchemy-utils = "^0.41.2"
 

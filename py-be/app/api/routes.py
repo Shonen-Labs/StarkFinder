@@ -49,31 +49,8 @@ class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-
-
-# init_db()  # Commented out to avoid database connection at import time
-
-
-@app.post("/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
-    """Register a new user."""
-
-    existing = (
-        db.query(User)
-        .filter(or_(User.username == user_in.username, User.email == user_in.email))
-        .first()
-    )
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this username or email already exists",
-        )
-
-    user = User(**user_in.model_dump())
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+    username: str
+    email: str
 
 
 class GenerateContract(BaseModel):
@@ -115,6 +92,32 @@ class DeployedContractRead(BaseModel):
     contract_address: str
     metadata: dict | None = Field(None, alias="contract_metadata")
     deployed_at: datetime
+
+
+# Initialize database
+init_db()
+
+
+@app.post("/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
+    """Register a new user."""
+
+    existing = (
+        db.query(User)
+        .filter(or_(User.username == user_in.username, User.email == user_in.email))
+        .first()
+    )
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this username or email already exists",
+        )
+
+    user = User(**user_in.model_dump())
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 @app.post(
