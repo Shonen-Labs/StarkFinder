@@ -155,7 +155,7 @@ pub async fn bookmark_post(
 /// Remove bookmark from a post
 #[utoipa::path(
     delete,
-    path = "/posts/{id}/bookmark",
+    path = "/posts/{id}/unbookmark",
     tag = "bookmarks",
     params(
         ("id" = i64, Path, description = "Post ID to unbookmark")
