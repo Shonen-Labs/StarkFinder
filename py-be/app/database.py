@@ -1,4 +1,5 @@
 """Database configuration and session management."""
+
 import os
 from typing import Generator
 from sqlalchemy import create_engine
@@ -16,7 +17,7 @@ if "sqlite" in DATABASE_URL:
         DATABASE_URL,
         poolclass=StaticPool,
         connect_args={"check_same_thread": False},
-        echo=SQL_DEBUG
+        echo=SQL_DEBUG,
     )
 else:
     # PostgreSQL/MySQL configuration
@@ -26,7 +27,7 @@ else:
         max_overflow=20,
         pool_pre_ping=True,
         pool_recycle=3600,
-        echo=SQL_DEBUG
+        echo=SQL_DEBUG,
     )
 
 # Session configuration
@@ -34,6 +35,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base class for models
 Base = declarative_base()
+
 
 def get_db() -> Generator:
     """
@@ -49,11 +51,14 @@ def get_db() -> Generator:
     finally:
         db.close()
 
+
 def init_db() -> None:
     """Initialize database tables."""
     # Import all models here to ensure they're registered
     from .models import user  # Import your models
+
     Base.metadata.create_all(bind=engine)
+
 
 def get_engine():
     """Get the database engine instance."""
