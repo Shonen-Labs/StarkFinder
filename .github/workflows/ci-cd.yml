@@ -122,7 +122,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    if: github.ref == 'refs/heads/main'
+  if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
 
     steps:
       - uses: actions/checkout@v4
@@ -148,7 +148,7 @@ jobs:
   deploy:
     needs: [check-contracts, nextjs-build-and-test, docker-build-and-push]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+  if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
     defaults:
       run:
         working-directory: ./client
