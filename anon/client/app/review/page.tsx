@@ -1,6 +1,7 @@
 "use client";
 // Dynamic review page route: /companies/[slug]/reviews/[id]
 import React from "react";
+import { motion } from "framer-motion";
 import ReviewPageLayout from "@/components/review/ReviewPageLayout";
 import Breadcrumbs from "@/components/review/Breadcrumbs";
 import CompanyHeaderCompact from "@/components/review/CompanyHeaderCompact";
@@ -53,9 +54,39 @@ function getMockData(slug: string, id: string): { company: Company; review: Revi
   };
 }
 
+// Extract Pros/Cons from the freeform body, returning cleaned body + arrays
+function extractProsCons(body: string): { text: string; pros: string[]; cons: string[] } {
+  const lines = body.split(/\r?\n/);
+  const pros: string[] = [];
+  const cons: string[] = [];
+  const remaining: string[] = [];
+  for (const line of lines) {
+    if (/^\s*Pros:/i.test(line)) {
+      const rest = line.replace(/^\s*Pros:\s*/i, "");
+      rest
+        .split(/,|\u2022|\s\-\s|;|\|/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .forEach((p) => pros.push(p));
+    } else if (/^\s*Cons:/i.test(line)) {
+      const rest = line.replace(/^\s*Cons:\s*/i, "");
+      rest
+        .split(/,|\u2022|\s\-\s|;|\|/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .forEach((c) => cons.push(c));
+    } else {
+      remaining.push(line);
+    }
+  }
+  const text = remaining.join("\n").trim();
+  return { text, pros, cons };
+}
+
 export default function ReviewPage({ params }: PageProps) {
   // Derive company + review details from slug/id
   const { company, review } = getMockData(params.slug, params.id);
+  const { text: cleanBody, pros, cons } = extractProsCons(review.body);
 
   return (
     <>
@@ -63,56 +94,104 @@ export default function ReviewPage({ params }: PageProps) {
       <Navbar />
       <ReviewPageLayout>
         {/* Page content wrapper */}
-        <div className="space-y-4">
+        <main className="space-y-6 md:space-y-8">
         {/* Breadcrumbs: Companies > Company > Reviews > Current */}
-        <Breadcrumbs
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+          <Breadcrumbs
           items={[
             { label: "Companies", href: "/companies" },
             { label: company.name, href: `/companies/${company.slug}` },
             { label: "Reviews", href: `/companies/${company.slug}/reviews` },
           ]}
           current={`Review #${review.id}`}
-        />
-        {/* Company header + moderation banner */}
-        <CompanyHeaderCompact company={company} />
-        <ModerationBanner status={review.status} />
+          />
+        </motion.div>
+        {/* Header Area: company + title + meta, distinctly separated */}
+        <motion.section
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25, delay: 0.05 }}
+          className="rounded-2xl border border-gray-200/70 bg-white/90 p-5 shadow-sm dark:border-gray-800 dark:bg-neutral-900/90"
+        >
+          <div className="space-y-3">
+            <CompanyHeaderCompact company={company} />
+            <div className="space-y-2">
+              <ReviewHeader review={review} />
+              <div className="flex flex-wrap items-center gap-2.5 md:gap-3">
+                <AuthorAnonBadge verified={review.author.verifiedEmployee} />
+                <IntegrityBadge cid={review.integrity.cid} hash={review.integrity.hash} verifyUrl={review.integrity.verifyUrl} />
+                {review.timeframe && <TimeframePill from={review.timeframe.from} to={review.timeframe.to} />}
+              </div>
+            </div>
+            <ModerationBanner status={review.status} />
+          </div>
+        </motion.section>
 
         {/* Responsive layout: main (2 cols) + sidebar (1 col) on desktop */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-4">
-            {/* Title, published time, status */}
-            <ReviewHeader review={review} />
-            {/* Meta badges: author verification, integrity, timeframe */}
-            <div className="flex flex-wrap items-center gap-3">
-              <AuthorAnonBadge verified={review.author.verifiedEmployee} />
-              <IntegrityBadge cid={review.integrity.cid} hash={review.integrity.hash} verifyUrl={review.integrity.verifyUrl} />
-              {review.timeframe && <TimeframePill from={review.timeframe.from} to={review.timeframe.to} />}
-            </div>
-
-            {/* Review body card */}
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-neutral-900">
-              <ReviewBody body={review.body} />
-            </div>
-
-            {/* Tags + safety notice */}
-            <TagChips tags={review.tags} />
-            <SafetyNotice visible={review.piiMasked} />
+        <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            {/* Main Review Section: body, pros/cons, tags */}
+            <motion.article
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="rounded-2xl border border-gray-200/70 bg-white/90 p-6 shadow-md transition hover:shadow-lg dark:border-gray-800 dark:bg-neutral-900/90 backdrop-blur"
+            >
+              <ReviewBody body={cleanBody} />
+              {(pros.length > 0 || cons.length > 0) && (
+                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {pros.length > 0 && (
+                    <section>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Pros</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-800 dark:text-gray-200">
+                        {pros.map((p, i) => (
+                          <li key={i}>{p}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                  {cons.length > 0 && (
+                    <section>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Cons</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-800 dark:text-gray-200">
+                        {cons.map((c, i) => (
+                          <li key={i}>{c}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                </div>
+              )}
+              <div className="mt-6">
+                <TagChips tags={review.tags} />
+              </div>
+            </motion.article>
+            {/* Safety notice below tags */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25, delay: 0.05 }}>
+              <SafetyNotice visible={review.piiMasked} />
+            </motion.div>
             {/* Employer's official response (optional) */}
             {review.officialResponse && (
-              <OfficialResponseBlock
-                body={review.officialResponse.body}
-                author={review.officialResponse.author}
-                publishedAt={review.officialResponse.publishedAt}
-              />
+              <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28 }}>
+                <div className="rounded-2xl border border-indigo-200 bg-indigo-50/80 p-5 shadow-sm dark:border-indigo-900/40 dark:bg-indigo-950/30">
+                  <h3 className="mb-2 text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                    Official Response from {company.name} HR
+                  </h3>
+                  <OfficialResponseBlock
+                    body={review.officialResponse.body}
+                    author={review.officialResponse.author}
+                    publishedAt={review.officialResponse.publishedAt}
+                  />
+                </div>
+              </motion.section>
             )}
             {/* Threaded comments + composer (local state) */}
-            <CommentsSection initial={review.comments as any} />
-            {/* Navigation within review list */}
-            <ReviewFooterNav
-              prevHref={`/companies/${company.slug}/reviews/${Number(review.id) - 1}`}
-              nextHref={`/companies/${company.slug}/reviews/${Number(review.id) + 1}`}
-              backHref={`/companies/${company.slug}`}
-            />
+            <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+              <div className="rounded-2xl border border-gray-200/70 bg-white/90 p-5 shadow-sm dark:border-gray-800 dark:bg-neutral-900/90">
+                <h3 className="mb-3 text-sm font-semibold text-gray-900 dark:text-gray-100">Comments</h3>
+                <CommentsSection initial={review.comments as any} />
+              </div>
+            </motion.section>
             {/* Sticky reactions/bookmark/share/report bar */}
             <ActionBarSticky
               initialLikes={review.reactions?.likes}
@@ -122,20 +201,31 @@ export default function ReviewPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar (desktop right, mobile below) */}
-          <div className="lg:col-span-1">
+          <motion.aside
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="lg:col-span-1"
+          >
             <RelatedContentSidebar
               aiSummary="Employee sentiment highlights strong mentorship and learning; occasional crunch noted."
               related={[{ id: "r2", title: "Solid onboarding experience", href: "#" }]}
               trendingTags={["culture", "learning", "remote"]}
             />
-          </div>
+          </motion.aside>
         </div>
-  {/* Close page content wrapper */}
-  </div>
-        {/* Global footer */}
-        <div className="mt-10">
+        {/* Footer navigation and site footer at very bottom */}
+        <motion.nav initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }} className="mt-8">
+          <ReviewFooterNav
+            prevHref={`/companies/${company.slug}/reviews/${Number(review.id) - 1}`}
+            nextHref={`/companies/${company.slug}/reviews/${Number(review.id) + 1}`}
+            backHref={`/companies/${company.slug}`}
+          />
+        </motion.nav>
+        </main>
+        <footer className="mt-10">
           <Footer />
-        </div>
+        </footer>
       </ReviewPageLayout>
     </>
   );
