@@ -18,6 +18,8 @@ import RelatedContentSidebar from "@/components/review/RelatedContentSidebar";
 import ModerationBanner from "@/components/review/ModerationBanner";
 import ReviewFooterNav from "@/components/review/ReviewFooterNav";
 import type { Company, ReviewData } from "@/components/review/types";
+import Navbar from "@/components/navbar/navbar";
+import Footer from "@/components/footer/footer";
 
 // Next.js app router provides params for dynamic segments
 type PageProps = { params: { slug: string; id: string } };
@@ -56,9 +58,12 @@ export default function ReviewPage({ params }: PageProps) {
   const { company, review } = getMockData(params.slug, params.id);
 
   return (
-    <ReviewPageLayout>
-      {/* Page content wrapper */}
-      <div className="space-y-4">
+    <>
+      {/* Global header */}
+      <Navbar />
+      <ReviewPageLayout>
+        {/* Page content wrapper */}
+        <div className="space-y-4">
         {/* Breadcrumbs: Companies > Company > Reviews > Current */}
         <Breadcrumbs
           items={[
@@ -125,7 +130,13 @@ export default function ReviewPage({ params }: PageProps) {
             />
           </div>
         </div>
-      </div>
-    </ReviewPageLayout>
+  {/* Close page content wrapper */}
+  </div>
+        {/* Global footer */}
+        <div className="mt-10">
+          <Footer />
+        </div>
+      </ReviewPageLayout>
+    </>
   );
 }
