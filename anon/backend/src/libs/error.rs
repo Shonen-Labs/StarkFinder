@@ -1,7 +1,7 @@
 use axum::{
-    Json,
     http::StatusCode,
     response::{IntoResponse, Response},
+    Json,
 };
 use serde::Serialize;
 use utoipa::ToSchema;
@@ -13,6 +13,7 @@ pub enum ApiError {
     Conflict(&'static str),
     NotFound(&'static str),
     Internal(&'static str),
+    Custom(StatusCode, String),
 }
 
 #[derive(Serialize, ToSchema)]
@@ -58,6 +59,9 @@ impl IntoResponse for ApiError {
                 }),
             )
                 .into_response(),
+            ApiError::Custom(status, msg) => {
+                (status, Json(ErrorBody { error: msg })).into_response()
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ pub mod libs {
     pub mod jwt;
     pub mod logging;
     pub mod pagination;
+    pub mod sanitize;
     pub mod wallet;
 }
 
@@ -23,12 +24,12 @@ pub mod routes {
 }
 
 use axum::{
-    Router,
     http::{
-        Method,
         header::{AUTHORIZATION, CONTENT_TYPE},
+        Method,
     },
     routing::{get, post},
+    Router,
 };
 use tower_http::{
     cors::{Any, CorsLayer},
@@ -51,6 +52,11 @@ pub fn create_app(state: AppState) -> Router {
         .route("/user", get(routes::user::me))
         .route("/generate", post(routes::generate::generate_contract))
         .route("/reviews", get(routes::reviews::list_reviews))
+        .route("/posts/{id}", get(routes::reviews::get_review_by_id))
+        .route(
+            "/companies/{slug}/posts",
+            get(routes::reviews::list_company_reviews),
+        )
         .route("/health", get(routes::health::health))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(

@@ -35,7 +35,8 @@ pub struct ReviewItem {
     pub id: i64,
     pub company: String,
     pub tag: Option<String>,
-    pub sentiment: f32,
+    #[schema(value_type = f32)]
+    pub sentiment: bigdecimal::BigDecimal,
     pub body: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub status: String,
@@ -52,7 +53,7 @@ type ReviewRow = (
     i64,
     String,
     Option<String>,
-    f32,
+    bigdecimal::BigDecimal,
     String,
     chrono::DateTime<chrono::Utc>,
     String,
@@ -150,19 +151,22 @@ pub async fn list_reviews(
     let rows: Vec<ReviewRow> = sqlx::query_as_with(&sql, args)
         .fetch_all(&pool)
         .await
-        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+        .map_err(|e| {
+            eprintln!("Database error: {:?}", e);
+            crate::libs::error::map_sqlx_error(&e)
+        })?;
 
     let items: Vec<ReviewItem> = rows
         .into_iter()
         .map(
             |(id, company, tag, sentiment, body, created_at, status, deleted_at)| ReviewItem {
                 id,
-                company,
+                company: company.to_string(),
                 tag,
                 sentiment,
                 body: sanitize_text(&body),
                 created_at,
-                status,
+                status: status.to_string(),
                 deleted_at,
             },
         )
@@ -206,7 +210,10 @@ pub async fn get_review_by_id(
         .bind(id)
         .fetch_optional(&pool)
         .await
-        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+        .map_err(|e| {
+            eprintln!("Database error: {:?}", e);
+            crate::libs::error::map_sqlx_error(&e)
+        })?;
 
     match row {
         Some((id, company, tag, sentiment, body, created_at, status, deleted_at)) => {
@@ -261,7 +268,7 @@ pub async fn list_company_reviews(
     let mut sql = String::from(
         r#"SELECT id, company, tag, sentiment, body, created_at, status, deleted_at
             FROM reviews
-            WHERE company = $1"#,
+            WHERE company = $1 AND deleted_at IS NULL"#,
     );
     let mut args: sqlx::postgres::PgArguments = sqlx::postgres::PgArguments::default();
     args.add(&company_slug)
@@ -290,12 +297,6 @@ pub async fn list_company_reviews(
         sql.push_str(&format!(" AND status = ${}", i));
         args.add(status)
             .map_err(|_| crate::libs::error::ApiError::Internal("Failed to add status arg"))?;
-        i += 1;
-    } else {
-        // Default to published status if not specified
-        sql.push_str(&format!(" AND status = ${}", i));
-        args.add("published")
-            .map_err(|_| crate::libs::error::ApiError::Internal("Failed to add default status arg"))?;
         i += 1;
     }
 
@@ -328,19 +329,22 @@ pub async fn list_company_reviews(
     let rows: Vec<ReviewRow> = sqlx::query_as_with(&sql, args)
         .fetch_all(&pool)
         .await
-        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+        .map_err(|e| {
+            eprintln!("Database error: {:?}", e);
+            crate::libs::error::map_sqlx_error(&e)
+        })?;
 
     let items: Vec<ReviewItem> = rows
         .into_iter()
         .map(
             |(id, company, tag, sentiment, body, created_at, status, deleted_at)| ReviewItem {
                 id,
-                company,
+                company: company.to_string(),
                 tag,
                 sentiment,
                 body: sanitize_text(&body),
                 created_at,
-                status,
+                status: status.to_string(),
                 deleted_at,
             },
         )
