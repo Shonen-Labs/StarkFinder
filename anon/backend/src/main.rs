@@ -7,7 +7,7 @@ use axum::{
         header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
     },
     response::IntoResponse,
-    routing::{get, post. delete},
+    routing::{delete, get, post},
 };
 use tokio::net::TcpListener;
 use tower_http::{
