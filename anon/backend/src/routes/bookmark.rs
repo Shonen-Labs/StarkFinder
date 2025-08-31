@@ -203,6 +203,107 @@ pub async fn unbookmark_post(
     Ok(Json(response))
 }
 
+/// Get user's bookmarks with cursor-based pagination
+#[utoipa::path(
+    get,
+    path = "/me/bookmarks",
+    tag = "bookmarks",
+    params(
+        ("cursor" = Option<String>, Query, description = "Cursor for pagination"),
+        ("limit" = Option<i32>, Query, description = "Number of bookmarks to return (max 100)")
+    ),
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "User bookmarks retrieved successfully", body = BookmarksListResponse),
+        (status = 401, description = "Unauthorized", body = crate::libs::error::ErrorBody),
+        (status = 500, description = "Internal error", body = crate::libs::error::ErrorBody)
+    )
+)]
+pub async fn get_user_bookmarks(
+    State(AppState { pool }): State<AppState>,
+    AuthUser { wallet }: AuthUser,
+    Query(query): Query<BookmarkQuery>,
+) -> Result<Json<BookmarksListResponse>, ApiError> {
+    // Get user ID from wallet
+    let user = sqlx::query!("SELECT id FROM users WHERE wallet = $1", wallet)
+        .fetch_optional(&pool)
+        .await
+        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?
+        .ok_or(ApiError::NotFound("User not found"))?;
+
+    // Validate and set limit (max 100, default 20)
+    let limit = query.limit.unwrap_or(20).min(100).max(1);
+
+    // Parse cursor if provided
+    let cursor_timestamp = if let Some(cursor) = query.cursor {
+        Some(decode_cursor(&cursor)?)
+    } else {
+        None
+    };
+
+    // Query bookmarks with post details
+    let bookmarks = match cursor_timestamp {
+        Some(cursor_time) => {
+            sqlx::query_as!(
+                BookmarkWithPost,
+                r#"SELECT 
+                    b.post_id,
+                    b.created_at,
+                    r.title as post_title,
+                    r.tag as post_tag,
+                    r.body as post_body,
+                    r.created_at as post_created_at
+                FROM bookmarks b
+                JOIN reviews r ON b.post_id = r.id
+                WHERE b.user_id = $1 AND b.created_at < $2
+                ORDER BY b.created_at DESC
+                LIMIT $3"#,
+                user.id,
+                cursor_time,
+                limit
+            )
+            .fetch_all(&pool)
+            .await
+        }
+        None => {
+            sqlx::query_as!(
+                BookmarkWithPost,
+                r#"SELECT 
+                    b.post_id,
+                    b.created_at,
+                    r.title as post_title,
+                    r.tag as post_tag,
+                    r.body as post_body,
+                    r.created_at as post_created_at
+                FROM bookmarks b
+                JOIN reviews r ON b.post_id = r.id
+                WHERE b.user_id = $1
+                ORDER BY b.created_at DESC
+                LIMIT $2"#,
+                user.id,
+                limit
+            )
+            .fetch_all(&pool)
+            .await
+        }
+    }
+    .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+
+    let has_more = bookmarks.len() as i32 == limit;
+    let next_cursor = if has_more && !bookmarks.is_empty() {
+        Some(encode_cursor(bookmarks.last().unwrap().created_at))
+    } else {
+        None
+    };
+
+    let response = BookmarksListResponse {
+        bookmarks,
+        next_cursor,
+        has_more,
+    };
+
+    Ok(Json(response))
+}
 
 // Helper functions for cursor encoding/decoding
 fn encode_cursor(timestamp: DateTime<Utc>) -> String {
