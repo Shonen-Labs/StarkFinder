@@ -1,8 +1,10 @@
 """User model with enhanced fields for SQLAlchemy ORM."""
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
 from sqlalchemy.sql import func
+
 from .base import Base
 
 

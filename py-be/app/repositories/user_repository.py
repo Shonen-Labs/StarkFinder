@@ -1,8 +1,10 @@
 """User repository for CRUD operations."""
 
-from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
+from typing import Any, Dict, List, Optional
+
 from sqlalchemy import or_
+from sqlalchemy.orm import Session
+
 from ..models.user import User
 
 
