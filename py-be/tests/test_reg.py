@@ -4,7 +4,11 @@ from app.models.base import User
 
 
 def test_register_user_success(db_session, client):
-    payload = {"username": "newuser", "email": "newuser@example.com", "password": "secret123"}
+    payload = {
+        "username": "newuser",
+        "email": "newuser@example.com",
+        "password": "secret123",
+    }
     res = client.post("/reg", json=payload)
     assert res.status_code == 201
     data = res.json()
@@ -71,5 +75,3 @@ def test_register_user_duplicate_email(db_session, client):
     )
     assert res.status_code == 400
     assert res.json()["detail"] == "User with this username or email already exists"
-
-

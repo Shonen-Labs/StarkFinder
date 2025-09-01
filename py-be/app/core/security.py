@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
 from app.core.config import Settings
-from fastapi import Depends, HTTPException, status  
-from fastapi.security import OAuth2PasswordBearer  
-from jose import JWTError, jwt  
-from passlib.context import CryptContext  
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -25,7 +27,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
         expire = datetime.now(datetime.timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, Settings.SECRET_KEY, algorithm= Settings.ALGORITHM
+        to_encode, Settings.SECRET_KEY, algorithm=Settings.ALGORITHM
     )
     return encoded_jwt
 
