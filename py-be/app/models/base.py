@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATABASE_URL = os.environ.get(
-    "DATABASE_URL", 
-    "postgresql+psycopg2://postgres:test1234@localhost:5432/Starkfinder-test"
+    "DATABASE_URL",
+    "postgresql+psycopg2://postgres:test1234@localhost:5432/Starkfinder-test",
 )
 
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -38,7 +38,7 @@ def get_db() -> Generator:
 
 class User(Base):
     """SQLAlchemy model for a registered user."""
-    
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)

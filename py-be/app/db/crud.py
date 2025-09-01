@@ -1,7 +1,7 @@
 from app.core.security import get_password_hash
 from app.models.base import User
 from app.models.user import UserCreate
-from sqlalchemy.orm import Session  
+from sqlalchemy.orm import Session
 
 
 def get_user(db: Session, user_id: int):

@@ -7,4 +7,8 @@ async def generate_contract(user_wallet, contract_data):
         return {"status": "failed", "reason": str(e)}
 
     contract_address = await deploy_contract(contract_data)
-    return {"status": "success", "tx_hash": tx_hash, "contract_address": contract_address}
+    return {
+        "status": "success",
+        "tx_hash": tx_hash,
+        "contract_address": contract_address,
+    }

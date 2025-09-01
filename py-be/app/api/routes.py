@@ -18,11 +18,14 @@ from app.db.crud import get_user
 
 router = APIRouter()
 
+
 # Placeholder for authentication - In a real application, this would involve
 # proper token validation (e.g., JWT, OAuth2) and user retrieval.
 # This is added solely to enable testing of unauthorized access.
 async def verify_token(
-    x_token: str = Header(None)  # Changed to Header(None) to make it optional for FastAPI's validation
+    x_token: str = Header(
+        None
+    ),  # Changed to Header(None) to make it optional for FastAPI's validation
 ):
     if x_token is None or x_token != "fake-super-secret-token":
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -30,12 +33,14 @@ async def verify_token(
 
 class UserRead(BaseModel):
     """Schema returned after user registration."""
+
     model_config = ConfigDict(from_attributes=True)
     id: int
 
 
 class GenerateContract(BaseModel):
     """Schema for contract generation requests."""
+
     user_id: int
     contract_type: Annotated[str, constr(min_length=1)]
     contract_name: Annotated[str, constr(min_length=1)]
@@ -46,6 +51,7 @@ class GenerateContract(BaseModel):
 
 class GeneratedContractRead(BaseModel):
     """Schema returned after contract generation."""
+
     model_config = ConfigDict(from_attributes=True)
     id: int
     user_id: int
@@ -62,6 +68,7 @@ class GeneratedContractRead(BaseModel):
 
 class DeployedContractRead(BaseModel):
     """Schema returned for deployed contracts."""
+
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
     id: int
     contract_name: str
