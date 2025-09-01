@@ -1,20 +1,21 @@
 """API routes for the backend."""
 
 from datetime import datetime
-from fastapi import Depends, HTTPException, status, APIRouter, Header
 from typing import Annotated
-from pydantic import BaseModel, ConfigDict, Field, field_validator, constr
+
+from fastapi import APIRouter, Depends, Header, HTTPException, status
+from pydantic import BaseModel, ConfigDict, Field, constr, field_validator
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from ..models.base import init_db
+from app.core.security import get_current_user
+from app.db.crud import get_user
+
+from ..models.base import User, init_db
 from ..models.deployed_contracts import DeployedContract
 from ..models.generated_contract import GeneratedContract
 from ..models.user import UserCreate, UserResponse
-from ..models.base import User
 from ..services.base import get_db
-from app.core.security import get_current_user
-from app.db.crud import get_user
 
 router = APIRouter()
 
