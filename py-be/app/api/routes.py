@@ -1,64 +1,44 @@
 """API routes for the backend."""
 
 from datetime import datetime
-
-from fastapi import Depends, FastAPI, Header, HTTPException, status
-from pydantic import BaseModel, ConfigDict, Field, constr, field_validator
+from fastapi import Depends, HTTPException, status, APIRouter, Header
+from typing import Annotated
+from pydantic import BaseModel, ConfigDict, Field, field_validator, constr
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from ..models.base import init_db
 from ..models.deployed_contracts import DeployedContract
 from ..models.generated_contract import GeneratedContract
-from ..models.user import User
+from ..models.user import UserCreate, UserResponse
+from ..models.base import User
 from ..services.base import get_db
+from app.core.security import get_current_user
+from app.db.crud import get_user
 
-app = FastAPI()
-
+router = APIRouter()
 
 # Placeholder for authentication - In a real application, this would involve
 # proper token validation (e.g., JWT, OAuth2) and user retrieval.
 # This is added solely to enable testing of unauthorized access.
 async def verify_token(
-    x_token: str = Header(
-        None
-    ),  # Changed to Header(None) to make it optional for FastAPI's validation
+    x_token: str = Header(None)  # Changed to Header(None) to make it optional for FastAPI's validation
 ):
     if x_token is None or x_token != "fake-super-secret-token":
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-class UserCreate(BaseModel):
-    """Schema for incoming user registration data."""
-
-    username: constr(min_length=3)
-    email: str
-    password: constr(min_length=6)
-
-    @field_validator("email")
-    @classmethod
-    def validate_email(cls, v: str) -> str:
-        if "@" not in v or "." not in v.split("@")[-1]:
-            raise ValueError("Invalid email address")
-        return v
-
-
 class UserRead(BaseModel):
     """Schema returned after user registration."""
-
     model_config = ConfigDict(from_attributes=True)
-
     id: int
-    username: str
-    email: str
 
 
 class GenerateContract(BaseModel):
     """Schema for contract generation requests."""
-
     user_id: int
-    contract_type: constr(min_length=1)
-    contract_name: constr(min_length=1)
+    contract_type: Annotated[str, constr(min_length=1)]
+    contract_name: Annotated[str, constr(min_length=1)]
     description: str | None = None
     parameters: dict | None = None
     template_id: str | None = None
@@ -66,9 +46,7 @@ class GenerateContract(BaseModel):
 
 class GeneratedContractRead(BaseModel):
     """Schema returned after contract generation."""
-
     model_config = ConfigDict(from_attributes=True)
-
     id: int
     user_id: int
     contract_type: str
@@ -84,9 +62,7 @@ class GeneratedContractRead(BaseModel):
 
 class DeployedContractRead(BaseModel):
     """Schema returned for deployed contracts."""
-
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-
     id: int
     contract_name: str
     contract_address: str
@@ -94,14 +70,12 @@ class DeployedContractRead(BaseModel):
     deployed_at: datetime
 
 
-# Initialize database
-init_db()
+# init_db()  # Commented out to avoid database connection at import time
 
 
-@app.post("/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     """Register a new user."""
-
     existing = (
         db.query(User)
         .filter(or_(User.username == user_in.username, User.email == user_in.email))
@@ -120,7 +94,7 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     return user
 
 
-@app.post(
+@router.post(
     "/generate",
     response_model=GeneratedContractRead,
     status_code=status.HTTP_201_CREATED,
@@ -179,7 +153,7 @@ def generate_contract(
     return contract
 
 
-@app.get("/generated_contracts", response_model=list[GeneratedContractRead])
+@router.get("/generated_contracts", response_model=list[GeneratedContractRead])
 def get_generated_contracts(
     user_id: int | None = None,
     skip: int = 0,
@@ -195,7 +169,7 @@ def get_generated_contracts(
     return contracts
 
 
-@app.get(
+@router.get(
     "/deployed_contracts",
     response_model=list[DeployedContractRead],
     status_code=status.HTTP_200_OK,
@@ -229,3 +203,22 @@ def get_deployed_contracts(
         query = query.order_by(sort_column.asc())
 
     return query.all()
+
+
+@router.get("/user", response_model=UserResponse)
+async def read_user_me(current_user: User = Depends(get_current_user)):
+    """
+    Get current user details based on authentication token
+    """
+    return current_user
+
+
+@router.get("/user/{user_id}", response_model=UserResponse)
+async def read_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    Get user by ID (admin functionality)
+    """
+    db_user = get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user

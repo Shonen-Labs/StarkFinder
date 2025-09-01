@@ -24,7 +24,8 @@ impl Modify for SecurityAddon {
 #[openapi(
     paths(
         crate::routes::register::register,
-        crate::routes::user::me
+        crate::routes::user::me,
+        crate::routes::health::healthz
     ),
     components(
         schemas(
@@ -32,7 +33,8 @@ impl Modify for SecurityAddon {
             crate::routes::register::RegisterRes,
             crate::routes::user::UserMeRes,
             crate::routes::user::ProfilePublic,
-            crate::libs::error::ErrorBody
+            crate::libs::error::ErrorBody,
+            crate::routes::health::HealthzResponse
         )
     ),
     modifiers(&SecurityAddon),
