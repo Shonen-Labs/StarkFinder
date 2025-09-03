@@ -217,7 +217,7 @@ pub async fn get_review_by_id(
 
     match row {
         Some((id, company, tag, sentiment, body, created_at, status, deleted_at)) => {
-            if let Some(_) = deleted_at {
+            if deleted_at.is_some() {
                 return Err(ApiError::Custom(
                     StatusCode::GONE,
                     "Review was deleted".into(),
