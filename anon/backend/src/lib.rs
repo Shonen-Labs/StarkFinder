@@ -51,6 +51,10 @@ pub fn create_app(state: AppState) -> Router {
         .route("/register", post(routes::register::register))
         .route("/user", get(routes::user::me))
         .route("/generate", post(routes::generate::generate_contract))
+        .route(
+            "/generated_contracts",
+            get(routes::generate::list_generated_contracts),
+        )
         .route("/reviews", get(routes::reviews::list_reviews))
         .route("/posts/{id}", get(routes::reviews::get_review_by_id))
         .route(

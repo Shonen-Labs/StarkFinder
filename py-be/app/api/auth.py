@@ -1,16 +1,14 @@
 from datetime import timedelta
-from fastapi import APIRouter
-from app.core.config import Settings
-from app.core.security import (create_access_token, verify_password)
-from app.db.crud import (create_user, get_user_by_email,
-                         get_user_by_username)
-from app.services.base import get_db
-from app.models.user import UserCreate
-from app.models.user import UserResponse, Token
-from fastapi import  Depends, HTTPException, status  
-from fastapi.security import OAuth2PasswordRequestForm  
-from sqlalchemy.orm import Session  
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+
+from app.core.config import Settings
+from app.core.security import create_access_token, verify_password
+from app.db.crud import create_user, get_user_by_email, get_user_by_username
+from app.models.user import Token, UserCreate, UserResponse
+from app.services.base import get_db
 
 router = APIRouter()
 
