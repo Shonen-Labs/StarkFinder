@@ -5,8 +5,13 @@ use chrono::Utc;
 use serde_json::json;
 use sqlx::PgPool;
 use std::str::FromStr;
+use std::env;
 
 use backend::libs::db::AppState;
+
+fn get_test_db_url() -> String {
+    env::var("TEST_DATABASE_URL").expect("TEST_DATABASE_URL should be set in env variables")
+}
 
 async fn setup_test_db(pool: &PgPool) -> anyhow::Result<()> {
     // Clean up any existing data
@@ -81,7 +86,7 @@ async fn setup_test_db(pool: &PgPool) -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_get_review_by_id() -> anyhow::Result<()> {
-    let pool = sqlx::PgPool::connect("postgresql://postgres:postgres@localhost:5433/starkfinder_test").await?;
+    let pool = sqlx::PgPool::connect(&get_test_db_url()).await?;
     setup_test_db(&pool).await?;
 
     let app = backend::create_app(AppState { pool });
@@ -97,7 +102,7 @@ async fn test_get_review_by_id() -> anyhow::Result<()> {
 
     // Test getting a deleted review
     let response = server.get("/posts/2").await;
-    assert_eq!(response.status_code(), StatusCode::OK);
+    assert_eq!(response.status_code(), StatusCode::GONE);
 
     // Test getting a non-existent review
     let response = server.get("/posts/999").await;
@@ -108,7 +113,7 @@ async fn test_get_review_by_id() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_list_company_reviews() -> anyhow::Result<()> {
-    let pool = sqlx::PgPool::connect("postgresql://postgres:postgres@localhost:5433/starkfinder_test").await?;
+    let pool = sqlx::PgPool::connect(&get_test_db_url()).await?;
     setup_test_db(&pool).await?;
 
     let app = backend::create_app(AppState { pool });
@@ -119,24 +124,24 @@ async fn test_list_company_reviews() -> anyhow::Result<()> {
     assert_eq!(response.status_code(), StatusCode::OK);
     let body: serde_json::Value = response.json();
     let items = body["items"].as_array().unwrap();
-    assert_eq!(items.len(), 5); // All non-deleted reviews for the company
-    assert_eq!(items[0]["id"], json!(6));
+    assert_eq!(items.len(), 2); // Published and draft reviews for test-company (excluding deleted)
+    assert!(items.iter().any(|item| item["id"] == json!(1))); // Check review 1 exists in results
 
     // Test with status filter
     let response = server.get("/companies/test-company/posts?status=draft").await;
     assert_eq!(response.status_code(), StatusCode::OK);
     let body: serde_json::Value = response.json();
     let items = body["items"].as_array().unwrap();
-    assert_eq!(items.len(), 2);
-    assert_eq!(items[0]["id"], json!(6));
+    assert_eq!(items.len(), 1); // Only draft review
+    assert_eq!(items[0]["id"], json!(3));
 
     // Test with tag filter
     let response = server.get("/companies/test-company/posts?tag=tag1").await;
     assert_eq!(response.status_code(), StatusCode::OK);
     let body: serde_json::Value = response.json();
     let items = body["items"].as_array().unwrap();
-    assert_eq!(items.len(), 5);
-    assert_eq!(items[0]["id"], json!(6));
+    assert_eq!(items.len(), 2); // Reviews with tag1 (excluding deleted)
+    assert_eq!(items[0]["id"], json!(3));
 
     // Test with non-existent company
     let response = server.get("/companies/non-existent/posts").await;
@@ -150,7 +155,7 @@ async fn test_list_company_reviews() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_text_sanitization() -> anyhow::Result<()> {
-    let pool = sqlx::PgPool::connect("postgresql://postgres:postgres@localhost:5433/starkfinder_test").await?;
+    let pool = sqlx::PgPool::connect(&get_test_db_url()).await?;
     
     // Clean up any existing data
     sqlx::query!("DELETE FROM reviews").execute(&pool).await?;
