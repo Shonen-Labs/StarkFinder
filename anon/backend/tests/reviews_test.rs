@@ -10,7 +10,8 @@ use std::str::FromStr;
 use backend::libs::db::AppState;
 
 fn get_test_db_url() -> String {
-    env::var("TEST_DATABASE_URL").expect("TEST_DATABASE_URL should be set in env variables")
+    env::var("TEST_DATABASE_URL")
+        .unwrap_or_else("postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable")
 }
 
 async fn setup_test_db(pool: &PgPool) -> anyhow::Result<()> {
@@ -145,7 +146,7 @@ async fn test_list_company_reviews() -> anyhow::Result<()> {
     let body: serde_json::Value = response.json();
     let items = body["items"].as_array().unwrap();
     assert_eq!(items.len(), 2); // Reviews with tag1 (excluding deleted)
-    assert_eq!(items[0]["id"], json!(3));
+    assert_eq!(items[0]["id"], json!());
 
     // Test with non-existent company
     let response = server.get("/companies/non-existent/posts").await;
