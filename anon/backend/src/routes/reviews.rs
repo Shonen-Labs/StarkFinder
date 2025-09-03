@@ -1,6 +1,6 @@
 use axum::{
     Json,
-    extract::{Query, State, Path},
+    extract::{Path, Query, State},
     http::StatusCode,
 };
 use serde::{Deserialize, Serialize};
@@ -218,7 +218,10 @@ pub async fn get_review_by_id(
     match row {
         Some((id, company, tag, sentiment, body, created_at, status, deleted_at)) => {
             if let Some(_) = deleted_at {
-                return Err(ApiError::Custom(StatusCode::GONE, "Review was deleted".into()));
+                return Err(ApiError::Custom(
+                    StatusCode::GONE,
+                    "Review was deleted".into(),
+                ));
             }
             Ok(Json(ReviewItem {
                 id,
@@ -231,7 +234,10 @@ pub async fn get_review_by_id(
                 deleted_at,
             }))
         }
-        None => Err(ApiError::Custom(StatusCode::NOT_FOUND, "Review not found".into())),
+        None => Err(ApiError::Custom(
+            StatusCode::NOT_FOUND,
+            "Review not found".into(),
+        )),
     }
 }
 

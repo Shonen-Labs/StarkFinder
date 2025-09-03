@@ -24,12 +24,12 @@ pub mod routes {
 }
 
 use axum::{
+    Router,
     http::{
-        header::{AUTHORIZATION, CONTENT_TYPE},
         Method,
+        header::{AUTHORIZATION, CONTENT_TYPE},
     },
     routing::{get, post},
-    Router,
 };
 use tower_http::{
     cors::{Any, CorsLayer},

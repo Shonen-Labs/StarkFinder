@@ -4,8 +4,8 @@ use bigdecimal::BigDecimal;
 use chrono::Utc;
 use serde_json::json;
 use sqlx::PgPool;
-use std::str::FromStr;
 use std::env;
+use std::str::FromStr;
 
 use backend::libs::db::AppState;
 
@@ -18,7 +18,9 @@ async fn setup_test_db(pool: &PgPool) -> anyhow::Result<()> {
     sqlx::query!("DELETE FROM reviews").execute(pool).await?;
 
     // Reset sequence
-    sqlx::query!("ALTER SEQUENCE reviews_id_seq RESTART WITH 1").execute(pool).await?;
+    sqlx::query!("ALTER SEQUENCE reviews_id_seq RESTART WITH 1")
+        .execute(pool)
+        .await?;
 
     // Insert test data
     let now = Utc::now();
@@ -128,7 +130,9 @@ async fn test_list_company_reviews() -> anyhow::Result<()> {
     assert!(items.iter().any(|item| item["id"] == json!(1))); // Check review 1 exists in results
 
     // Test with status filter
-    let response = server.get("/companies/test-company/posts?status=draft").await;
+    let response = server
+        .get("/companies/test-company/posts?status=draft")
+        .await;
     assert_eq!(response.status_code(), StatusCode::OK);
     let body: serde_json::Value = response.json();
     let items = body["items"].as_array().unwrap();
@@ -156,7 +160,7 @@ async fn test_list_company_reviews() -> anyhow::Result<()> {
 #[tokio::test]
 async fn test_text_sanitization() -> anyhow::Result<()> {
     let pool = sqlx::PgPool::connect(&get_test_db_url()).await?;
-    
+
     // Clean up any existing data
     sqlx::query!("DELETE FROM reviews").execute(&pool).await?;
 
