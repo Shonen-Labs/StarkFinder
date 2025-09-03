@@ -16,7 +16,7 @@ thiserror = "2.0.16"
 sqlx = { version = "0.8.6", features = ["runtime-tokio", "postgres", "macros", "migrate", "chrono", "json", "bigdecimal"] }
 starknet = "0.15.1"
 utoipa = { version = "5.4.0", features = ["axum_extras", "chrono"] }
-utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum", "vendored"] }
 chrono = { version = "0.4.41", features = ["serde"] }
 jsonwebtoken = "9.3.1"
 async-trait = "0.1.89"
