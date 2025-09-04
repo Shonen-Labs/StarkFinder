@@ -7,7 +7,7 @@ use axum::{
         header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
     },
     response::IntoResponse,
-    routing::{get, post},
+    routing::{delete, get, post},
 };
 use tokio::net::TcpListener;
 use tower_http::{
@@ -56,6 +56,15 @@ async fn main() {
             get(routes::generate::list_generated_contracts),
         )
         .route("/reviews", get(routes::reviews::list_reviews))
+        .route("/me/bookmarks", get(routes::bookmark::get_user_bookmarks))
+        .route(
+            "/posts/{id}/bookmark",
+            post(routes::bookmark::bookmark_post),
+        )
+        .route(
+            "/posts/{id}/unbookmark",
+            delete(routes::bookmark::unbookmark_post),
+        )
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(
             "/api-docs/openapi.json",
