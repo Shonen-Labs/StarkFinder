@@ -49,7 +49,7 @@ impl Modify for SecurityAddon {
             crate::routes::reviews::ReviewsListRes,
             // Apeals
             crate::routes::appeals::CreateAppealRequest,
-            crate::routes::appeals::GetAppealResponse,
+            crate::routes::appeals::GetAppealRes,
         )
     ),
     modifiers(&SecurityAddon),

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS appeals (
     id BIGSERIAL PRIMARY KEY,
 
-    actor VARCHAR(20) NOT NULL CHECK (actor IN ('author', 'owner')),
+    actor TEXT NOT NULL UNIQUE,
 
     review_id BIGSERIAL NOT NULL REFERENCES reviews(id) ON DELETE CASCADE,
 
