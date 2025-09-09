@@ -46,10 +46,15 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root_redirect))
         .route("/health", get(routes::health::health))
+        .route("/healthz", get(routes::health::healthz))
         .route("/db/health", get(routes::health::db_health))
         .route("/register", post(routes::register::register))
         .route("/user", get(routes::user::me))
         .route("/generate", post(routes::generate::generate_contract))
+        .route(
+            "/generated_contracts",
+            get(routes::generate::list_generated_contracts),
+        )
         .route("/reviews", get(routes::reviews::list_reviews))
         .route("/appeals", post(routes::appeals::create_appeal))
         .route("/appeals/{id}", get(routes::appeals::get_appeal))

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        INSERT INTO generated_contracts (\n            user_id, contract_type, contract_name, description, \n            parameters, template_id, generated_code, status\n        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n        RETURNING \n            id, user_id, contract_type, contract_name, description,\n            parameters, template_id, generated_code, status, created_at, updated_at\n        ",
+  "query": "\n        INSERT INTO generated_contracts (\n            user_id, contract_type, contract_name, description,\n            parameters, template_id, generated_code, status\n        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n        RETURNING\n            id, user_id, contract_type, contract_name, description,\n            parameters, template_id, generated_code, status, created_at, updated_at\n        ",
   "describe": {
     "columns": [
       {
@@ -85,5 +85,5 @@
       false
     ]
   },
-  "hash": "982d51b229178b33575c9deb29fc7fe444fd9f611669c1b512e6cdf246f5664f"
+  "hash": "98530150563f181667dd6e026550ff9ba4af569def2b709aaf12796d12b8f85a"
 }

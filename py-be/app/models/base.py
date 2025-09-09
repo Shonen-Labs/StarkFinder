@@ -1,34 +1,44 @@
-"""Database base configuration for SQLAlchemy models."""
+"""Database connection pool configuration for SQLAlchemy."""
 
 import os
+from typing import Generator
 
-
-from sqlalchemy import create_engine,Column, Integer, String
-from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
-
-
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL" 
-      , "postgresql+psycopg2://postgres:test1234@localhost:5432/Starkfinder-test"
-)
-
+from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql+psycopg2://postgres:test1234@localhost:5432/Starkfinder-test",
+)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is not set.")
 
 engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+
+def get_db() -> Generator:
+    """Database session dependency with proper connection handling."""
+    db = SessionLocal()
+    try:
+        yield db
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
 
 class User(Base):
     """SQLAlchemy model for a registered user."""
-    
+
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -37,10 +47,11 @@ class User(Base):
     password = Column(String, nullable=False)
 
 
-
 def init_db() -> None:
-    """Create database tables."""
-    # Import models here to ensure they are registered with SQLAlchemy
-    from . import deployed_contracts, generated_contract, user  # noqa: F401
+    """Initialize database tables."""
+    from . import user
 
     Base.metadata.create_all(bind=engine)
+
+
+__all__ = ["Base", "engine", "SessionLocal", "get_db", "init_db", "User"]

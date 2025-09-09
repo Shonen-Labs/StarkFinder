@@ -1,26 +1,23 @@
 """API routes for the backend."""
 
 from datetime import datetime
-
-
-from fastapi import Depends, HTTPException, status , APIRouter
 from typing import Annotated
-from pydantic import BaseModel, ConfigDict, Field, field_validator, constr
 
-
+from fastapi import APIRouter, Depends, Header, HTTPException, status
+from pydantic import BaseModel, ConfigDict, Field, constr, field_validator
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from ..models.base import init_db
-from ..models.deployed_contracts import DeployedContract
-from ..models.generated_contract import GeneratedContract
-from ..models.user import UserCreate , UserResponse
-from ..models.base import User
-from ..services.base import get_db
 from app.core.security import get_current_user
 from app.db.crud import get_user
 
+from ..models.base import User, init_db
+from ..models.deployed_contracts import DeployedContract
+from ..models.generated_contract import GeneratedContract
+from ..models.user import UserCreate, UserResponse
+from ..services.base import get_db
 
+router = APIRouter()
 
 
 # Placeholder for authentication - In a real application, this would involve
@@ -35,26 +32,50 @@ async def verify_token(
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-class UserCreate(BaseModel):
-    """Schema for incoming user registration data."""
-
-
-router = APIRouter()
-
-@field_validator("email")
-@classmethod
-def validate_email(cls, v: str) -> str:
-        if "@" not in v or "." not in v.split("@")[-1]:
-            raise ValueError("Invalid email address")
-        return v
-
-
 class UserRead(BaseModel):
     """Schema returned after user registration."""
 
     model_config = ConfigDict(from_attributes=True)
-
     id: int
+
+
+class GenerateContract(BaseModel):
+    """Schema for contract generation requests."""
+
+    user_id: int
+    contract_type: Annotated[str, constr(min_length=1)]
+    contract_name: Annotated[str, constr(min_length=1)]
+    description: str | None = None
+    parameters: dict | None = None
+    template_id: str | None = None
+
+
+class GeneratedContractRead(BaseModel):
+    """Schema returned after contract generation."""
+
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    user_id: int
+    contract_type: str
+    contract_name: str
+    description: str | None = None
+    parameters: dict | None = None
+    template_id: str | None = None
+    generated_code: str
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class DeployedContractRead(BaseModel):
+    """Schema returned for deployed contracts."""
+
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    id: int
+    contract_name: str
+    contract_address: str
+    metadata: dict | None = Field(None, alias="contract_metadata")
+    deployed_at: datetime
 
 
 # init_db()  # Commented out to avoid database connection at import time
@@ -63,7 +84,6 @@ class UserRead(BaseModel):
 @router.post("/reg", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     """Register a new user."""
-
     existing = (
         db.query(User)
         .filter(or_(User.username == user_in.username, User.email == user_in.email))
@@ -82,52 +102,11 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     return user
 
 
-class GenerateContract(BaseModel):
-    """Schema for contract generation requests."""
-
-    user_id: int
-    contract_type: Annotated[str, constr(min_length=1)]
-    contract_name: Annotated[str, constr(min_length=1)]
-    description: str | None = None
-    parameters: dict | None = None
-    template_id: str | None = None
-
-
-class GeneratedContractRead(BaseModel):
-    """Schema returned after contract generation."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: int
-    user_id: int
-    contract_type: str
-    contract_name: str
-    description: str | None = None
-    parameters: dict | None = None
-    template_id: str | None = None
-    generated_code: str
-    status: str
-    created_at: datetime
-    updated_at: datetime
-
-
-class DeployedContractRead(BaseModel):
-    """Schema returned for deployed contracts."""
-
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-
-    id: int
-    contract_name: str
-    contract_address: str
-    metadata: dict | None = Field(None, alias="contract_metadata")
-    deployed_at: datetime
-
-
-
+@router.post(
     "/generate",
     response_model=GeneratedContractRead,
     status_code=status.HTTP_201_CREATED,
-
+)
 def generate_contract(
     req: GenerateContract, db: Session = Depends(get_db)
 ) -> GeneratedContract:
@@ -182,9 +161,6 @@ def generate_contract(
     return contract
 
 
-
-
-
 @router.get("/generated_contracts", response_model=list[GeneratedContractRead])
 def get_generated_contracts(
     user_id: int | None = None,
@@ -202,7 +178,6 @@ def get_generated_contracts(
 
 
 @router.get(
- main
     "/deployed_contracts",
     response_model=list[DeployedContractRead],
     status_code=status.HTTP_200_OK,
@@ -238,7 +213,7 @@ def get_deployed_contracts(
     return query.all()
 
 
-@router.get("/user", response_model= UserResponse)
+@router.get("/user", response_model=UserResponse)
 async def read_user_me(current_user: User = Depends(get_current_user)):
     """
     Get current user details based on authentication token
@@ -246,7 +221,7 @@ async def read_user_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-@router.get("/user/{user_id}", response_model= UserResponse)
+@router.get("/user/{user_id}", response_model=UserResponse)
 async def read_user(user_id: int, db: Session = Depends(get_db)):
     """
     Get user by ID (admin functionality)

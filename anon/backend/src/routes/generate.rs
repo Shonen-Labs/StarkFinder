@@ -1,10 +1,33 @@
-use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use axum::{
+    Json,
+    extract::{Query, State},
+    http::StatusCode,
+    response::IntoResponse,
+};
+use base64::{Engine as _, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use tracing;
 use utoipa::ToSchema;
 
 use crate::libs::{db::AppState, error::ApiError};
+use crate::middlewares::auth::AuthUser;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GeneratedContractsCursor {
+    pub created_at: DateTime<Utc>,
+    pub id: i64,
+}
+
+pub fn encode_cursor(cursor: &GeneratedContractsCursor) -> String {
+    let json = serde_json::to_vec(cursor).expect("cursor json");
+    URL_SAFE_NO_PAD.encode(json)
+}
+
+pub fn decode_cursor(s: &str) -> Option<GeneratedContractsCursor> {
+    let bytes = URL_SAFE_NO_PAD.decode(s).ok()?;
+    serde_json::from_slice(&bytes).ok()
+}
 
 #[derive(Deserialize, ToSchema)]
 pub struct GenerateContractReq {
@@ -29,6 +52,32 @@ pub struct GenerateContractRes {
     pub status: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Deserialize, ToSchema, utoipa::IntoParams)]
+pub struct GeneratedContractsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct GeneratedContractItem {
+    pub id: i64,
+    pub user_id: i64,
+    pub contract_type: String,
+    pub contract_name: String,
+    pub description: Option<String>,
+    pub parameters: Option<serde_json::Value>,
+    pub template_id: Option<String>,
+    pub status: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct GeneratedContractsListRes {
+    pub items: Vec<GeneratedContractItem>,
+    pub next_cursor: Option<String>,
 }
 
 /// Generate a new contract for a user
@@ -141,10 +190,10 @@ mod {} {{
     let rec = sqlx::query!(
         r#"
         INSERT INTO generated_contracts (
-            user_id, contract_type, contract_name, description, 
+            user_id, contract_type, contract_name, description,
             parameters, template_id, generated_code, status
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING 
+        RETURNING
             id, user_id, contract_type, contract_name, description,
             parameters, template_id, generated_code, status, created_at, updated_at
         "#,
@@ -186,4 +235,136 @@ mod {} {{
             updated_at: rec.updated_at,
         }),
     ))
+}
+
+#[utoipa::path(
+    get,
+    path = "/generated_contracts",
+    tag = "contracts",
+    security(("bearer_auth" = [])),
+    params(GeneratedContractsQuery),
+    responses(
+        (status = 200, description = "List of generated contracts", body = GeneratedContractsListRes),
+        (status = 401, description = "Unauthorized", body = crate::libs::error::ErrorBody),
+        (status = 500, description = "Internal error", body = crate::libs::error::ErrorBody)
+    )
+)]
+pub async fn list_generated_contracts(
+    State(AppState { pool }): State<AppState>,
+    AuthUser { wallet }: AuthUser,
+    Query(q): Query<GeneratedContractsQuery>,
+) -> Result<Json<GeneratedContractsListRes>, ApiError> {
+    let limit = q.limit.unwrap_or(20).clamp(1, 50);
+
+    // Decode cursor if provided
+    let cursor = match q.cursor.as_deref() {
+        Some(s) => decode_cursor(s),
+        None => None,
+    };
+
+    // Get user ID from wallet
+    let user_id: (i64,) = sqlx::query_as("SELECT id FROM users WHERE wallet = $1")
+        .bind(&wallet)
+        .fetch_optional(&pool)
+        .await
+        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?
+        .ok_or(ApiError::NotFound("user not found"))?;
+
+    // Build query for generated contracts
+    let rows = if let Some(c) = &cursor {
+        sqlx::query_as::<_, (
+            i64,            // id
+            i64,            // user_id
+            String,         // contract_type
+            String,         // contract_name
+            Option<String>, // description
+            Option<serde_json::Value>, // parameters
+            Option<String>, // template_id
+            String,         // status
+            DateTime<Utc>,  // created_at
+            DateTime<Utc>,  // updated_at
+        )>(
+            r#"SELECT id, user_id, contract_type, contract_name, description, parameters, template_id, status, created_at, updated_at
+                FROM generated_contracts
+                WHERE user_id = $1 AND (created_at < $2 OR (created_at = $2 AND id < $3))
+                ORDER BY created_at DESC, id DESC
+        LIMIT $4"#
+        )
+        .bind(user_id.0)
+    .bind(c.created_at) // $2
+    .bind(c.id)         // $3
+    .bind(limit)        // $4
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?
+    } else {
+        sqlx::query_as::<_, (
+            i64,
+            i64,
+            String,
+            String,
+            Option<String>,
+            Option<serde_json::Value>,
+            Option<String>,
+            String,
+            DateTime<Utc>,
+            DateTime<Utc>,
+        )>(
+            r#"SELECT id, user_id, contract_type, contract_name, description, parameters, template_id, status, created_at, updated_at
+                FROM generated_contracts
+                WHERE user_id = $1
+                ORDER BY created_at DESC, id DESC
+                LIMIT $2"#
+        )
+        .bind(user_id.0)
+        .bind(limit)
+        .fetch_all(&pool)
+        .await
+        .map_err(|e| crate::libs::error::map_sqlx_error(&e))?
+    };
+
+    let items: Vec<GeneratedContractItem> = rows
+        .into_iter()
+        .map(
+            |(
+                id,
+                user_id,
+                contract_type,
+                contract_name,
+                description,
+                parameters,
+                template_id,
+                status,
+                created_at,
+                updated_at,
+            )| {
+                GeneratedContractItem {
+                    id,
+                    user_id,
+                    contract_type,
+                    contract_name,
+                    description,
+                    parameters,
+                    template_id,
+                    status,
+                    created_at,
+                    updated_at,
+                }
+            },
+        )
+        .collect();
+
+    let next_cursor = if items.len() as i64 == limit {
+        items.last().map(|last| {
+            let c = GeneratedContractsCursor {
+                created_at: last.created_at,
+                id: last.id,
+            };
+            encode_cursor(&c)
+        })
+    } else {
+        None
+    };
+
+    Ok(Json(GeneratedContractsListRes { items, next_cursor }))
 }

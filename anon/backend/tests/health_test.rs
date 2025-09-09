@@ -2,13 +2,14 @@ mod common;
 use axum::http::StatusCode;
 use axum_test::TestServer;
 use backend::libs::db::AppState;
-use backend::routes::health::{db_health, health};
+use backend::routes::health::{db_health, health, healthz};
 use common::TestConfig;
 use sqlx::PgPool;
 
 async fn create_test_app(pool: PgPool) -> axum::Router {
     axum::Router::new()
         .route("/health", axum::routing::get(health))
+        .route("/healthz", axum::routing::get(healthz))
         .route("/db/health", axum::routing::get(db_health))
         .with_state(AppState { pool })
 }
@@ -25,6 +26,19 @@ async fn test_health_endpoint() {
     let body: serde_json::Value = response.json();
     assert_eq!(body["status"], "ok");
     assert!(body["timestamp"].is_string());
+}
+
+#[tokio::test]
+async fn test_healthz_endpoint() {
+    let app = axum::Router::new().route("/healthz", axum::routing::get(healthz));
+    let server = TestServer::new(app).unwrap();
+
+    let response = server.get("/healthz").await;
+
+    assert_eq!(response.status_code(), StatusCode::OK);
+
+    let body: serde_json::Value = response.json();
+    assert_eq!(body["ok"], true);
 }
 
 // Test database health endpoint with a mock pool that will fail
