@@ -1,9 +1,8 @@
 from fastapi import FastAPI
-from app.api import routes
-from app.api import routes, auth
+
+from app.api import auth, routes
 
 app = FastAPI(title="StarkFinder_py-be")
-
 
 
 @app.get("/")
@@ -12,4 +11,7 @@ def root():
 
 
 app.include_router(routes.router, prefix="/api/routes", tags=["users"])
-app.include_router(auth.router, prefix="/api/routes",)    
+app.include_router(
+    auth.router,
+    prefix="/api/routes",
+)

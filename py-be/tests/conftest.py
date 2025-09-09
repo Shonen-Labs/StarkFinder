@@ -16,7 +16,8 @@ TEST_DATABASE_URL = os.getenv(
 )
 os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 
-TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+# CAMBIO MÍNIMO: Agregar default aquí también
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///./test.db")
 if not TEST_DATABASE_URL:
     raise ValueError("TEST_DATABASE_URL environment variable is not set.")
 

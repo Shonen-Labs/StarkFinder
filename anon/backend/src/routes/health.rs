@@ -2,6 +2,7 @@ use crate::libs::db::AppState;
 use axum::{Json, http::StatusCode};
 use serde::Serialize;
 use sqlx::Row;
+use utoipa::ToSchema;
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -14,6 +15,11 @@ pub struct DbHealthResponse {
     pub ok: bool,
     pub version: Option<String>,
     pub error: Option<String>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct HealthzResponse {
+    pub ok: bool,
 }
 
 pub async fn health() -> Json<HealthResponse> {
@@ -47,6 +53,18 @@ pub async fn db_health(
             Err((StatusCode::SERVICE_UNAVAILABLE, error_response))
         }
     }
+}
+
+#[utoipa::path(
+    get,
+    path = "/healthz",
+    responses(
+        (status = 200, description = "Health check", body = HealthzResponse)
+    ),
+    tag = "health"
+)]
+pub async fn healthz() -> Json<HealthzResponse> {
+    Json(HealthzResponse { ok: true })
 }
 
 #[cfg(test)]
