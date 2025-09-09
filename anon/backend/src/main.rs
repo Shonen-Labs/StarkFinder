@@ -52,7 +52,7 @@ async fn main() {
         .route("/generate", post(routes::generate::generate_contract))
         .route("/reviews", get(routes::reviews::list_reviews))
         .route("/appeals", post(routes::appeals::create_appeal))
-        .route("/appeals/{id}", get(routes::appeals::get_appeal))
+        // .route("/appeals/{id}", get(routes::appeals::get_appeal))
         // .route("/admin/appeals", get(routes::appeals::get_admin_appeal))
         // .route("/admin/appeals/{id}", put(routes::appeals::update_admin_appeal))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json

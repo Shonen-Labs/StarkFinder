@@ -94,8 +94,8 @@ pub async fn create_appeal(
     Ok((StatusCode::CREATED, Json("Appeal created successfully")))
 }
 
-pub async fn get_appeal(
-    State(AppState { pool }): State<AppState>,
-    AuthUser { wallet }: AuthUser,
-    Path(appeal_id): Path<i64>,
-) -> Result<impl IntoResponse, ApiError> {}
+// pub async fn get_appeal(
+//     State(AppState { pool }): State<AppState>,
+//     AuthUser { wallet }: AuthUser,
+//     Path(appeal_id): Path<i64>,
+// ) -> Result<impl IntoResponse, ApiError> {}
