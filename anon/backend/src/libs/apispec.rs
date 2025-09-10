@@ -30,6 +30,9 @@ impl Modify for SecurityAddon {
         crate::routes::generate::list_generated_contracts,
         crate::routes::reviews::list_reviews,
         crate::routes::appeals::create_appeal,
+        crate::routes::appeals::get_appeal,
+        crate::routes::appeals::get_admin_appeal,
+        crate::routes::appeals::update_admin_appeal,
     ),
     components(
         schemas(
@@ -49,6 +52,9 @@ impl Modify for SecurityAddon {
             crate::routes::reviews::ReviewsListRes,
             // Apeals
             crate::routes::appeals::CreateAppealRequest,
+            crate::routes::appeals::UpdateAppealRequest,
+            crate::routes::appeals::AdminAppealRequest,
+            crate::routes::appeals::GetAppealItems,
             crate::routes::appeals::GetAppealRes,
         )
     ),

@@ -203,11 +203,6 @@ pub async fn get_admin_appeal(
         i += 1;
     }
 
-    println!("i after {i}");
-
-    println!("sql string {dynamic_sql}");
-    println!("args {:?}", args);
-
     if let Some(reason) = &params.reason {
         dynamic_sql.push_str(&format!(" AND reason = ${i}"));
         args.add(reason)
@@ -233,7 +228,6 @@ pub async fn get_admin_appeal(
         .await
         .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
 
-    println!("\n rows are {:?}", rows);
     let items: Vec<GetAppealItems> = rows
         .into_iter()
         .map(
