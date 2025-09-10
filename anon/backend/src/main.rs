@@ -7,7 +7,7 @@ use axum::{
         header::{AUTHORIZATION, CONTENT_TYPE, LOCATION},
     },
     response::IntoResponse,
-    routing::{get, post},
+    routing::{get, post, put},
 };
 use tokio::net::TcpListener;
 use tower_http::{
@@ -56,6 +56,13 @@ async fn main() {
             get(routes::generate::list_generated_contracts),
         )
         .route("/reviews", get(routes::reviews::list_reviews))
+        .route("/appeals", post(routes::appeals::create_appeal))
+        .route("/appeals/{id}", get(routes::appeals::get_appeal))
+        .route("/admin/appeals", get(routes::appeals::get_admin_appeal))
+        .route(
+            "/admin/appeals/{id}",
+            put(routes::appeals::update_admin_appeal),
+        )
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(
             "/api-docs/openapi.json",

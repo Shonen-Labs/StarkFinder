@@ -15,6 +15,7 @@ pub mod middlewares {
 }
 
 pub mod routes {
+    pub mod appeals;
     pub mod generate;
     pub mod health;
     pub mod register;

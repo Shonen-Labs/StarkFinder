@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT \n            id as appeal_id, actor, review_id, reason, status, resolution_note, created_at::text\n        FROM  appeals\n        WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "appeal_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "actor",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "review_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "reason",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "resolution_note",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      null
+    ]
+  },
+  "hash": "0cc145bb3fb0d46711d52aa7eff1407375da88dbf55a0ba7f2982c70e40ad7c9"
+}
