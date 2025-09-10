@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE appeals SET reason = $1, status = $2 , resolution_note = $3 WHERE id = $4 ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Varchar",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "92172cfcb47356c57914ec94b2a509d337b751ce408a13735adc53c37deeff5c"
+}

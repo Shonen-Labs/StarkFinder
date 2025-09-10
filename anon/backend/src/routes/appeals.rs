@@ -22,6 +22,13 @@ pub struct CreateAppealRequest {
     pub resolution_note: Option<String>,
 }
 
+#[derive(Deserialize, ToSchema)]
+pub struct UpdateAppealRequest {
+    pub reason: Option<String>,
+    pub status: Option<String>,
+    pub resolution_note: Option<String>,
+}
+
 #[derive(Deserialize, ToSchema, Serialize)]
 pub struct GetAppealItems {
     pub appeal_id: i64,
@@ -32,7 +39,7 @@ pub struct GetAppealItems {
     pub resolution_note: Option<String>,
     pub created_at: Option<String>,
 }
-#[derive(Deserialize, ToSchema, Serialize)]
+#[derive(Deserialize, ToSchema, Serialize, utoipa::IntoParams)]
 pub struct AdminAppealRequest {
     pub status: Option<String>,
     pub reason: Option<String>,
@@ -70,7 +77,7 @@ pub struct GetAppealRes {
 )]
 pub async fn create_appeal(
     State(AppState { pool }): State<AppState>,
-    // AuthUser { wallet }: AuthUser,
+    AuthUser { wallet }: AuthUser,
     Json(req): Json<CreateAppealRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     tracing::info!(
@@ -115,6 +122,17 @@ pub async fn create_appeal(
     Ok((StatusCode::CREATED, Json("Appeal created successfully")))
 }
 
+#[utoipa::path(
+    get,
+    path = "/appeals/{id}",
+    tag = "appeals",
+    responses(
+        (status = 201, body = GetAppealItems),
+        (status = 400, description = "Invalid request", body = crate::libs::error::ErrorBody),
+        (status = 404, description = "User not found", body = crate::libs::error::ErrorBody),
+        (status = 500, description = "Internal error", body = crate::libs::error::ErrorBody)
+    )
+)]
 pub async fn get_appeal(
     State(AppState { pool }): State<AppState>,
     AuthUser { wallet }: AuthUser,
@@ -131,7 +149,7 @@ pub async fn get_appeal(
     .map_err(|e| crate::libs::error::map_sqlx_error(&e))?
     .ok_or(ApiError::NotFound("user not found"))?;
 
-    let appeal = sqlx::query_as!(
+    let appeal: GetAppealItems = sqlx::query_as!(
         GetAppealItems,
         r#"SELECT 
             id as appeal_id, actor, review_id, reason, status, resolution_note, created_at::text
@@ -151,6 +169,18 @@ pub async fn get_appeal(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/admin/appeals",
+    tag = "appeals",
+    params(AdminAppealRequest),
+    responses(
+        (status = 201, description = "Successfully gets appeals based on params", body = GetAppealRes),
+        (status = 400, description = "Invalid request", body = crate::libs::error::ErrorBody),
+        (status = 404, description = "User not found", body = crate::libs::error::ErrorBody),
+        (status = 500, description = "Internal error", body = crate::libs::error::ErrorBody)
+    )
+)]
 pub async fn get_admin_appeal(
     State(AppState { pool }): State<AppState>,
     Query(params): Query<AdminAppealRequest>,
@@ -226,3 +256,71 @@ pub async fn get_admin_appeal(
     Ok(Json(GetAppealRes { items, next_cursor }))
 }
 
+#[utoipa::path(
+    put,
+    path = "/admin/appeals/{id}",
+    tag = "appeals",
+    request_body = UpdateAppealRequest,
+    responses(
+        (status = 201, description = "Successfully updates an admin appeal"),
+        (status = 400, description = "Invalid request", body = crate::libs::error::ErrorBody),
+        (status = 404, description = "User not found", body = crate::libs::error::ErrorBody),
+        (status = 500, description = "Internal error", body = crate::libs::error::ErrorBody)
+    )
+)]
+pub async fn update_admin_appeal(
+    State(AppState { pool }): State<AppState>,
+    AuthUser { wallet }: AuthUser,
+    Path(appeal_id): Path<i64>,
+    Json(req): Json<UpdateAppealRequest>,
+) -> Result<impl IntoResponse, ApiError> {
+    tracing::info!("Updating appeal: {}", appeal_id);
+
+    let rec = sqlx::query!(
+        r#"SELECT u.id, u.wallet, u.created_at, p.referral_code
+           FROM users u
+           LEFT JOIN profiles p ON p.user_id = u.id
+           WHERE u.wallet = $1"#,
+        wallet
+    )
+    .fetch_optional(&pool)
+    .await
+    .map_err(|e| crate::libs::error::map_sqlx_error(&e))?;
+
+    rec.ok_or(ApiError::NotFound("user not found"))?;
+
+    let appeal = sqlx::query_as!(
+        GetAppealItems,
+        r#"SELECT 
+            id as appeal_id, actor, review_id, reason, status, resolution_note, created_at::text
+        FROM  appeals
+        WHERE id = $1"#,
+        appeal_id
+    )
+    .fetch_optional(&pool)
+    .await
+    .map_err(|e| crate::libs::error::map_sqlx_error(&e))?
+    .ok_or(ApiError::NotFound("appeal not found"))?;
+
+    let reason = req.reason.unwrap_or(appeal.reason);
+    let status = req.status.unwrap_or(appeal.status);
+    let resolution_note = req
+        .resolution_note
+        .unwrap_or(appeal.resolution_note.unwrap_or_default());
+    println!("details {reason} {status} {resolution_note} {appeal_id}");
+    sqlx::query!(
+        r#"UPDATE appeals SET reason = $1, status = $2 , resolution_note = $3 WHERE id = $4 "#,
+        reason,
+        status,
+        resolution_note,
+        appeal_id
+    )
+    .execute(&pool)
+    .await
+    .map_err(|e| {
+        tracing::error!("❌ Failed to update appeal: {:?}", e);
+        crate::libs::error::map_sqlx_error(&e)
+    })?;
+
+    Ok(Json("APPEAL UPDATED"))
+}
