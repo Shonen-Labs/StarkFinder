@@ -28,7 +28,9 @@ impl Modify for SecurityAddon {
         crate::routes::health::healthz,
         crate::routes::generate::generate_contract,
         crate::routes::generate::list_generated_contracts,
-        crate::routes::reviews::list_reviews
+        crate::routes::reviews::list_reviews,
+        crate::routes::reviews::get_review_by_id,
+        crate::routes::reviews::list_company_reviews
     ),
     components(
         schemas(
@@ -43,9 +45,12 @@ impl Modify for SecurityAddon {
             crate::routes::generate::GenerateContractRes,
             crate::routes::generate::GeneratedContractItem,
             crate::routes::generate::GeneratedContractsListRes,
+            crate::routes::generate::GeneratedContractsQuery,
             // Reviews
             crate::routes::reviews::ReviewItem,
-            crate::routes::reviews::ReviewsListRes
+            crate::routes::reviews::ReviewsListRes,
+            crate::routes::reviews::ReviewsQuery,
+            crate::routes::reviews::CompanyReviewsQuery
         )
     ),
     modifiers(&SecurityAddon),

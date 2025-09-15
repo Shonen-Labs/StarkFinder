@@ -6,6 +6,7 @@ pub mod libs {
     pub mod jwt;
     pub mod logging;
     pub mod pagination;
+    pub mod sanitize;
     pub mod wallet;
 }
 
@@ -55,6 +56,11 @@ pub fn create_app(state: AppState) -> Router {
             get(routes::generate::list_generated_contracts),
         )
         .route("/reviews", get(routes::reviews::list_reviews))
+        .route("/posts/{id}", get(routes::reviews::get_review_by_id))
+        .route(
+            "/companies/{slug}/posts",
+            get(routes::reviews::list_company_reviews),
+        )
         .route("/health", get(routes::health::health))
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(

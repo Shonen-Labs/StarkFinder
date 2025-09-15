@@ -56,6 +56,11 @@ async fn main() {
             get(routes::generate::list_generated_contracts),
         )
         .route("/reviews", get(routes::reviews::list_reviews))
+        .route("/posts/:id", get(routes::reviews::get_review_by_id))
+        .route(
+            "/companies/:slug/posts",
+            get(routes::reviews::list_company_reviews),
+        )
         // Swagger UI at /docs and OpenAPI JSON at /api-docs/openapi.json
         .merge(SwaggerUi::new("/docs").url(
             "/api-docs/openapi.json",

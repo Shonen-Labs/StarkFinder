@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "ALTER SEQUENCE reviews_id_seq RESTART WITH 1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "0c954164fef59ae1bf70c5ddee143efbf0bb07d21902f3c4f6c937b07dce2113"
+}
